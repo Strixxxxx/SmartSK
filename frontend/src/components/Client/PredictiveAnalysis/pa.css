@@ -1,0 +1,292 @@
+/* Predictive Analysis Styles */
+.predictive-analysis-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Forecast Title Styles */
+.forecast-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Forecast Filters Container */
+.forecast-filters {
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+/* Filter Row */
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 0 5px;
+}
+
+/* Filter Group */
+.filter-group {
+  flex: 1;
+  min-width: 200px;
+  margin-right: 15px;
+}
+
+.filter-group:last-child {
+  margin-right: 0;
+}
+
+.filter-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+/* Select Wrapper */
+.select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.select-wrapper select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  appearance: none;
+  background-color: white;
+  cursor: pointer;
+}
+
+/* File Input */
+.file-input {
+  width: 100%;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+}
+
+/* Checkbox Item */
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-right: 20px;
+  flex: 1;
+  min-width: 200px;
+  max-width: 300px;
+  border: 1px solid #eee;
+  padding: 8px 15px;
+  border-radius: 4px;
+}
+
+.checkbox-label {
+  margin-right: 10px;
+  font-weight: 500;
+  color: #333;
+}
+
+.custom-checkbox {
+  margin: 0;
+}
+
+/* General Response and Apply Button Row */
+.filter-row:last-child {
+  justify-content: space-between;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+  margin-top: 20px;
+}
+
+.general-response-text {
+  flex: 1;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.apply-button-container {
+  text-align: right;
+}
+
+/* Apply Filters Button */
+.apply-filters-btn {
+  background-color: #0d6efd;
+  border: none;
+  padding: 10px 20px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  min-width: 150px;
+}
+
+.apply-filters-btn:hover {
+  background-color: #0b5ed7;
+}
+
+/* Analysis Results Styling */
+.analysis-result-card {
+  margin-top: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .filter-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .filter-group {
+    width: 100%;
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
+  
+  .checkbox-item {
+    width: 100%;
+    max-width: none;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+  
+  .general-response-text {
+    margin-bottom: 15px;
+    text-align: center;
+  }
+  
+  .apply-button-container {
+    text-align: center;
+  }
+  
+  .apply-filters-btn {
+    width: 100%;
+  }
+}
+
+.general-response-btn {
+  padding: 8px 16px;
+  font-weight: 500;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.general-response-btn:hover {
+  background-color: #e9ecef;
+}
+
+.filter-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* File Upload Container */
+.file-upload-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-upload-button {
+  white-space: nowrap;
+  padding: 8px 15px;
+}
+
+.selected-file-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.file-input-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.pa-container {
+  padding: 20px;
+}
+
+.forecast-title {
+  color: #333;
+  margin-bottom: 20px !important;
+}
+
+.forecast-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #dee2e6;
+  padding-bottom: 10px;
+}
+
+.forecast-tabs button {
+  padding: 8px 16px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #666;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+}
+
+.forecast-tabs button:hover {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.forecast-tabs button.active {
+  background-color: #e9ecef;
+  color: #333;
+  font-weight: 500;
+}
+
+.forecast-content {
+  background: white;
+  border-radius: 4px;
+  padding: 20px;
+}
+
+/* Existing styles */
+.filter-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+
+.filter-group {
+  flex: 1;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-label {
+  margin-right: auto;
+}
+
+.custom-checkbox {
+  margin: 0;
+}

@@ -1,0 +1,166 @@
+.content-wrapper {
+  padding: 24px;
+  min-height: calc(100vh - 64px);
+  background-color: #f5f5f5;
+}
+
+.forecast-container {
+  margin-top: 32px;
+  margin-bottom: 32px;
+}
+
+.forecast-title {
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 24px;
+}
+
+.forecast-subtitle {
+  color: rgba(0, 0, 0, 0.6);
+  margin-bottom: 24px;
+}
+
+.forecast-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Chart container */
+.chart-paper {
+  margin-bottom: 32px;
+  transition: all 0.3s ease;
+  overflow: visible !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+  border-radius: 12px;
+  position: relative;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.chart-paper:hover {
+  box-shadow: 0px 12px 28px rgba(0, 0, 0, 0.16);
+  transform: translateY(-3px);
+}
+
+/* Add a modern background gradient to the chart */
+.chart-container {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 248, 255, 0.7));
+  border-radius: 10px;
+  padding: 24px;
+  margin-top: 16px;
+  min-height: 500px;
+  border: 1px solid rgba(225, 235, 245, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Details paper styles */
+.details-paper {
+  padding: 24px;
+  margin-top: 32px;
+}
+
+/* Loading container */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Legend explanation box styles */
+.legend-explanation {
+  margin-top: 20px;
+  padding: 15px;
+  background-color: rgba(240, 248, 255, 0.8);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 120, 212, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: block !important;
+}
+
+/* Chart title styling */
+.chart-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(75, 192, 192, 0.4);
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+/* Response container styling */
+.response-container {
+  margin-bottom: 32px;
+  transition: all 0.3s ease;
+  overflow: visible !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+  border-radius: 12px;
+  position: relative;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.response-container:hover {
+  box-shadow: 0px 12px 28px rgba(0, 0, 0, 0.16);
+  transform: translateY(-3px);
+}
+
+/* Analysis content styling */
+.analysis-content {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 248, 255, 0.7));
+  border-radius: 10px;
+  padding: 24px;
+  margin-top: 16px;
+  border: 1px solid rgba(225, 235, 245, 0.7);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Chart explanation section styling */
+.chart-explanation {
+  background: linear-gradient(135deg, rgba(248, 249, 250, 0.95), rgba(240, 248, 255, 0.8));
+  border-radius: 12px;
+  border: 1px solid rgba(0, 123, 255, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
+  transition: all 0.3s ease;
+}
+
+.chart-explanation:hover {
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.chart-explanation-title {
+  color: #007bff;
+  font-weight: 600;
+  margin-bottom: 16px;
+  border-bottom: 2px solid rgba(0, 123, 255, 0.3);
+  padding-bottom: 8px;
+}
+
+.chart-explanation-section {
+  margin-bottom: 20px;
+}
+
+.chart-explanation-section-title {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.chart-explanation-list {
+  padding-left: 20px;
+}
+
+.chart-explanation-list-item {
+  margin-bottom: 8px;
+  line-height: 1.5;
+  color: #6c757d;
+}
+
+.chart-explanation-list-item strong {
+  color: #495057;
+}

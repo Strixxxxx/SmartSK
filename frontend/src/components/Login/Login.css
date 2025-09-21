@@ -1,0 +1,236 @@
+.login-form-container {
+  width: 100%;
+  max-width: 500px; /* Normal width - not too big, not too small */
+  background-color: white;
+  border-radius: 2%;
+  border: none;
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem; /* Reasonable padding */
+}
+
+.change-password-form {
+  width: 100%;
+  max-width: 550px; /* Slightly wider for change password form */
+  background-color: white;
+  border-radius: 2%;
+  border: 1px solid #ccc;
+  box-shadow: 0 0.5% 2% rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+}
+
+.form-group {
+  margin-bottom: 20px; /* Normal spacing */
+  text-align: left;
+  width: 100%;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 500;
+  color: #555;
+  text-align: left;
+  font-size: 14px;
+}
+
+.login-form-container input,
+.change-password-form input {
+  width: 100%;
+  padding: 14px 16px; /* Comfortable padding - not too big */
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 15px; /* Normal font size */
+  line-height: 1.5;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease;
+  background-color: #ffffff;
+  color: #212529;
+}
+
+input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+}
+
+.login-button {
+  width: 100%;
+  padding: 14px 16px; /* Match input padding */
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px; /* Match input font size */
+  font-weight: 500;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: #357abd;
+}
+
+.login-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-links {
+  text-align: right;
+  margin-bottom: 20px;
+}
+
+.form-links a {
+  color: #4a90e2;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.form-links a:hover {
+  text-decoration: underline;
+}
+
+.password-instruction {
+  margin-bottom: 20px;
+  color: #666;
+  font-size: 14px;
+}
+
+.password-requirements {
+  margin: 20px 0;
+  padding: 16px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.password-requirements p {
+  margin: 0 0 12px;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.requirements-list {
+  margin-top: 8px;
+}
+
+.requirement {
+  margin-bottom: 6px;
+  color: #999;
+  font-size: 13px;
+  position: relative;
+  padding-left: 20px;
+}
+
+.requirement::before {
+  content: "✕";
+  position: absolute;
+  left: 0;
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+.requirement.valid {
+  color: #27ae60;
+}
+
+.requirement.valid::before {
+  content: "✓";
+  color: #27ae60;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.submit-btn {
+  padding: 14px 24px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: #357abd;
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-input-wrapper input {
+  padding-right: 45px; /* Space for toggle button */
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  padding: 6px;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  border-radius: 3px;
+  transition: background-color 0.3s;
+}
+
+.toggle-password:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Welcome header styling for login */
+.login-header {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.login-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+}
+
+.login-header p {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .login-form-container {
+    max-width: 95%;
+    padding: 2rem;
+  }
+}

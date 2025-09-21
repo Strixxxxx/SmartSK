@@ -1,0 +1,545 @@
+--Database Creation Query
+
+create database smartSK
+
+go
+use smartSK;
+go
+
+--Barangays Table
+CREATE TABLE barangays (
+    barangayID INT PRIMARY KEY IDENTITY(1,1),
+    barangayName NVARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO barangays (barangayName) VALUES
+('San Bartolome'),
+('Nagkaisang Nayon');
+
+-- Roles Table
+CREATE TABLE roles (
+    roleID INT PRIMARY KEY IDENTITY(1,1),
+    roleName NVARCHAR(50) NOT NULL UNIQUE
+);
+
+INSERT INTO roles (roleName) VALUES
+('MA'),
+('SA'),
+('SKC'),
+('SKO');
+
+--Account Table
+CREATE TABLE userInfo (
+    userID INT PRIMARY KEY IDENTITY(1,1),
+    username NVARCHAR(20) NOT NULL UNIQUE,
+    passKey NVARCHAR(255) NOT NULL,
+    fullName NVARCHAR(50) NOT NULL,
+    position INT NOT NULL,
+    barangay INT NOT NULL,
+    emailAddress NVARCHAR(50) NOT NULL,
+    phoneNumber NVARCHAR(11) NOT NULL,
+    isDefaultPassword BIT DEFAULT 1,
+    CONSTRAINT FK_Role FOREIGN KEY (position) REFERENCES roles(roleID),
+    CONSTRAINT FK_Barangay FOREIGN KEY (barangay) REFERENCES barangays(barangayID)
+);
+
+--Session Logs Table
+create table sessions(
+sessionID NVARCHAR(255) primary key,
+userID INT,
+created_at DATETIME NOT NULL DEFAULT GETDATE(), 
+expires_at DATETIME,
+foreign key (userID) references userInfo(userID)
+);
+
+--Audit Trail Table
+CREATE TABLE audit_trail (
+    auditID INT PRIMARY KEY IDENTITY(1, 1),
+    userID INT NULL,
+    tableName NVARCHAR(128) NULL,
+    recordID INT NULL,
+    actions NVARCHAR(50) NOT NULL,
+    old_value NVARCHAR(MAX) NULL,
+    new_value NVARCHAR(MAX) NULL,
+    descriptions NVARCHAR(255) NOT NULL,
+    client_ip NVARCHAR(45) NULL,
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (userID) REFERENCES userInfo(userID),
+);
+
+--New Audit Trail Table
+
+CREATE TABLE [audit trail] (
+    auditID NVARCHAR(16) PRIMARY KEY,
+    userID INT NULL,
+    moduleName NVARCHAR(128) NULL,
+    actions NVARCHAR(50) NOT NULL,
+    old_value NVARCHAR(MAX) NULL,
+    new_value NVARCHAR(MAX) NULL,
+    descriptions NVARCHAR(255) NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (userID) REFERENCES userInfo(userID),
+);
+
+--Status Lookup Table
+CREATE TABLE StatusLookup (
+    StatusID INT PRIMARY KEY,
+    StatusName NVARCHAR(255) NOT NULL
+);
+
+INSERT INTO StatusLookup (StatusID, StatusName) VALUES
+(1, 'Pending Review'),
+(2, 'Revision Requested'),
+(3, 'Proposal Accepted'),
+(4, 'Proposal Rejected'),
+(5, 'In Compilation'),
+(6, 'Brgy. Captain''s Review'),
+(7, 'Submitted to LGU'),
+(8, 'LGU Revision Requested'),
+(9, 'LGU Approval'),
+(10, 'LGU Rejected');
+
+--Projects Table
+CREATE TABLE projects (
+    projectID INT IDENTITY(1,1) PRIMARY KEY,
+    reference_number VARCHAR(255) UNIQUE NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description NVARCHAR(MAX),
+    userID INT NOT NULL,
+    status INT NOT NULL,
+    submittedDate DATETIME DEFAULT GETDATE(),
+    file_path VARCHAR(255),
+    file_name VARCHAR(255),
+    remarks NVARCHAR(MAX),
+    reviewedBy NVARCHAR(50),
+    CONSTRAINT FK_ProjectStatus FOREIGN KEY (status) REFERENCES StatusLookup(StatusID)
+);
+
+--Raw Data Tables(Including rawDataDetails, rawData, & rawDataTrack)
+
+CREATE TABLE rawDataDetails (
+    rddID INT PRIMARY KEY IDENTITY(1,1),
+    ppa NVARCHAR(255) NOT NULL,
+    category NVARCHAR(100) NOT NULL,
+    committee NVARCHAR(255) NOT NULL
+);
+
+CREATE TABLE rawData (
+    dataID INT PRIMARY KEY IDENTITY(1,1),
+    rddID INT NOT NULL,
+    year INT NOT NULL,
+    target NVARCHAR(50) NULL,
+    budget INT NULL,
+    CONSTRAINT FK_rddID FOREIGN KEY (rddID) REFERENCES rawDataDetails(rddID)
+);
+
+CREATE TABLE rawDataTrack (
+    trackID INT PRIMARY KEY IDENTITY(1,1),
+    dataIDStart INT NOT NULL,
+    dataIDEnd INT NOT NULL,
+    yearStart INT,
+    yearEnd INT,
+    portal VARCHAR(255),
+    dateUpload DATETIME NOT NULL
+);
+
+--Archive Related Tables
+
+CREATE TABLE userInfoARC (
+    userID INT PRIMARY KEY IDENTITY(1,1),
+    username NVARCHAR(20) NOT NULL UNIQUE,
+    passKey NVARCHAR(255) NOT NULL,
+    fullName NVARCHAR(50) NOT NULL,
+    position INT NOT NULL,
+    barangay INT NOT NULL,
+    emailAddress NVARCHAR(50) NOT NULL,
+    phoneNumber NVARCHAR(11) NOT NULL,
+    isDefaultPassword BIT DEFAULT 1,
+    CONSTRAINT FK_Role_ARC FOREIGN KEY (position) REFERENCES roles(roleID),
+    CONSTRAINT FK_Barangay_ARC FOREIGN KEY (barangay) REFERENCES barangays(barangayID)
+);
+
+CREATE TABLE projectsARC (
+    projectID INT IDENTITY(1,1) PRIMARY KEY,
+    reference_number VARCHAR(255) UNIQUE NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    description NVARCHAR(MAX),
+    userID INT NOT NULL,
+    status INT NOT NULL,
+    submittedDate DATETIME DEFAULT GETDATE(),
+    file_path VARCHAR(255),
+    file_name VARCHAR(255),
+    remarks NVARCHAR(MAX),
+    reviewedBy NVARCHAR(50),
+    CONSTRAINT FK_ProjectStatus_ARC FOREIGN KEY (status) REFERENCES StatusLookup(StatusID)
+);
+
+--Stored Procedures
+
+--Status Creation for the Project
+
+CREATE PROCEDURE StatusNames
+AS
+BEGIN
+    SELECT
+        p.projectID,
+        p.reference_number,
+        p.title,
+        p.description,
+        p.submittedDate,
+        p.reviewedBy,
+        p.remarks,
+        s.StatusName 
+    FROM
+        projects p
+    JOIN
+        StatusLookup s ON p.status = s.StatusID;
+END;
+GO
+
+--Compilation of the Raw Data
+
+CREATE PROCEDURE [Raw Data]
+    @ppaFilter NVARCHAR(255) = NULL,
+    @committeeFilter NVARCHAR(255) = NULL,
+    @categoryFilter NVARCHAR(255) = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Get all distinct years from rawData table
+    DECLARE @Years TABLE (year INT);
+    INSERT INTO @Years (year)
+    SELECT DISTINCT year
+    FROM rawData
+    WHERE year IS NOT NULL
+    ORDER BY year;
+
+    -- Check if any years were found
+    IF NOT EXISTS (SELECT 1 FROM @Years)
+    BEGIN
+        SELECT
+            CAST(NULL AS NVARCHAR(255)) AS ppa,
+            CAST(NULL AS NVARCHAR(255)) AS category,
+            CAST(NULL AS NVARCHAR(255)) AS committee,
+            CAST(NULL AS INT) AS dummy_target, -- Placeholder columns for an empty set
+            CAST(NULL AS INT) AS dummy_budget
+        WHERE 1 = 0;
+        RETURN;
+    END;
+
+    -- Build the dynamic part of the SQL query for year-based columns
+    DECLARE @DynamicPivotColumns NVARCHAR(MAX) = N'';
+    DECLARE @CurrentYear INT;
+
+    DECLARE years_cursor CURSOR FOR SELECT year FROM @Years;
+    OPEN years_cursor;
+    FETCH NEXT FROM years_cursor INTO @CurrentYear;
+
+    WHILE @@FETCH_STATUS = 0
+    BEGIN
+        -- **FIX IS HERE:** Changed 'T' to 'rd' (the alias for rawData in the main query)
+        SET @DynamicPivotColumns = @DynamicPivotColumns +
+            N', MAX(CASE WHEN rd.year = ' + CAST(@CurrentYear AS NVARCHAR(4)) + N' THEN rd.target END) AS [' + CAST(@CurrentYear AS NVARCHAR(4)) + N'_target]' +
+            N', MAX(CASE WHEN rd.year = ' + CAST(@CurrentYear AS NVARCHAR(4)) + N' THEN rd.budget END) AS [' + CAST(@CurrentYear AS NVARCHAR(4)) + N'_budget]';
+
+        FETCH NEXT FROM years_cursor INTO @CurrentYear;
+    END;
+    CLOSE years_cursor;
+    DEALLOCATE years_cursor;
+
+    -- Build the main query with filters and dynamic columns
+    DECLARE @SqlQuery NVARCHAR(MAX);
+    SET @SqlQuery = N'
+        SELECT
+            rdd.ppa,
+            rdd.category,
+            rdd.committee' + @DynamicPivotColumns + N'
+        FROM rawDataDetails rdd
+        LEFT JOIN rawData rd ON rdd.rddID = rd.rddID
+        WHERE 1=1'; -- Placeholder to easily append WHERE clauses
+
+    -- Add conditional WHERE clauses for filtering (using parameterized execution for security)
+    IF @ppaFilter IS NOT NULL AND LEN(@ppaFilter) > 0
+        SET @SqlQuery = @SqlQuery + N' AND rdd.ppa LIKE @ppaPattern';
+
+    IF @committeeFilter IS NOT NULL AND LEN(@committeeFilter) > 0
+        SET @SqlQuery = @SqlQuery + N' AND rdd.committee = @committeeFilter';
+
+    IF @categoryFilter IS NOT NULL AND LEN(@categoryFilter) > 0
+        SET @SqlQuery = @SqlQuery + N' AND rdd.category = @categoryFilter';
+
+    SET @SqlQuery = @SqlQuery + N'
+        GROUP BY
+            rdd.ppa,
+            rdd.category,
+            rdd.committee
+        ORDER BY
+            rdd.ppa, rdd.category, rdd.committee;';
+
+    -- Prepare and execute the dynamic SQL
+    DECLARE @Params NVARCHAR(MAX) = N'@ppaPattern NVARCHAR(255), @committeeFilter NVARCHAR(255), @categoryFilter NVARCHAR(255)';
+    DECLARE @PpaPatternValue NVARCHAR(255) = '%' + @ppaFilter + '%';
+
+    EXEC sp_executesql @SqlQuery, @Params,
+        @ppaPattern = @PpaPatternValue,
+        @committeeFilter = @committeeFilter,
+        @categoryFilter = @categoryFilter;
+END;
+
+--Account Archiving
+
+
+CREATE PROCEDURE accArchived
+    -- Input parameter: The ID of the user to archive
+    @userID INT
+AS
+BEGIN
+    -- Use SET NOCOUNT ON to prevent extra result sets from interfering with SELECT statements.
+    SET NOCOUNT ON;
+
+    -- Start a transaction to ensure the insert and delete operations are atomic.
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        -- Check if the user exists in the main table before proceeding.
+        IF EXISTS (SELECT 1 FROM dbo.userInfo WHERE userID = @userID)
+        BEGIN
+            -- Enable IDENTITY_INSERT for the archive table.
+            -- This allows us to insert the original userID value into the archive table's identity column.
+            SET IDENTITY_INSERT dbo.userInfoARC ON;
+
+            -- Step 1: Insert the record into the archive table.
+            INSERT INTO dbo.userInfoARC (
+                userID, username, passKey, fullName, position, barangay,
+                emailAddress, phoneNumber, isDefaultPassword
+            )
+            SELECT
+                userID, username, passKey, fullName, position, barangay,
+                emailAddress, phoneNumber, isDefaultPassword
+            FROM
+                dbo.userInfo
+            WHERE
+                userID = @userID;
+
+            -- Disable IDENTITY_INSERT as it's no longer needed.
+            SET IDENTITY_INSERT dbo.userInfoARC OFF;
+
+            -- Step 2: Delete the record from the original table.
+            DELETE FROM dbo.userInfo
+            WHERE userID = @userID;
+
+            -- If both steps succeed, commit the transaction.
+            COMMIT TRANSACTION;
+            PRINT 'User with ID ' + CAST(@userID AS VARCHAR) + ' was successfully archived.';
+        END
+        ELSE
+        BEGIN
+            -- If user does not exist, rollback to do nothing and print a message.
+            ROLLBACK TRANSACTION;
+            PRINT 'Error: User with ID ' + CAST(@userID AS VARCHAR) + ' not found. No action taken.';
+        END
+    END TRY
+    BEGIN CATCH
+        -- If any error occurs, roll back the entire transaction.
+        ROLLBACK TRANSACTION;
+        PRINT 'An error occurred. Transaction rolled back.';
+        -- Re-throw the original error for the client to see.
+        THROW;
+    END CATCH
+END
+GO
+
+--Project Archiving
+
+CREATE PROCEDURE prjArchived
+    -- Input parameter: The ID of the project to archive
+    @projectID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Start a transaction for the move operation.
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        -- Check if the project exists before attempting to move it.
+        IF EXISTS (SELECT 1 FROM dbo.projects WHERE projectID = @projectID)
+        BEGIN
+            -- Enable IDENTITY_INSERT to preserve the original projectID.
+            SET IDENTITY_INSERT dbo.projectsARC ON;
+
+            -- Step 1: Copy the project data to the archive table.
+            INSERT INTO dbo.projectsARC (
+                projectID, reference_number, title, description, userID, status,
+                submittedDate, file_path, file_name, remarks, reviewedBy
+            )
+            SELECT
+                projectID, reference_number, title, description, userID, status,
+                submittedDate, file_path, file_name, remarks, reviewedBy
+            FROM
+                dbo.projects
+            WHERE
+                projectID = @projectID;
+
+            -- Disable IDENTITY_INSERT.
+            SET IDENTITY_INSERT dbo.projectsARC OFF;
+
+            -- Step 2: Delete the project from the main table.
+            DELETE FROM dbo.projects
+            WHERE projectID = @projectID;
+
+            -- If all goes well, commit the changes.
+            COMMIT TRANSACTION;
+            PRINT 'Project with ID ' + CAST(@projectID AS VARCHAR) + ' was successfully archived.';
+        END
+        ELSE
+        BEGIN
+             -- If project does not exist, rollback to do nothing and print a message.
+            ROLLBACK TRANSACTION;
+            PRINT 'Error: Project with ID ' + CAST(@projectID AS VARCHAR) + ' not found. No action taken.';
+        END
+    END TRY
+    BEGIN CATCH
+        -- If an error occurs, undo all changes.
+        ROLLBACK TRANSACTION;
+        PRINT 'An error occurred. Transaction rolled back.';
+        THROW;
+    END CATCH
+END
+GO
+
+--Account RETURN
+
+CREATE PROCEDURE accReturn
+    -- Input parameter: The ID of the user to return from the archive
+    @userID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- A transaction ensures the entire operation succeeds or fails as a single unit.
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        -- PRE-FLIGHT CHECKS --
+        -- 1. Ensure the user actually exists in the archive.
+        IF NOT EXISTS (SELECT 1 FROM dbo.userInfoARC WHERE userID = @userID)
+        BEGIN
+            PRINT 'Error: User with ID ' + CAST(@userID AS VARCHAR) + ' not found in the archive. No action taken.';
+            ROLLBACK TRANSACTION;
+            RETURN; -- Exit the procedure
+        END
+
+        -- 2. Ensure the user does NOT already exist in the main table to avoid primary key conflicts.
+        IF EXISTS (SELECT 1 FROM dbo.userInfo WHERE userID = @userID)
+        BEGIN
+            PRINT 'Error: User with ID ' + CAST(@userID AS VARCHAR) + ' already exists in the main userInfo table. Cannot restore.';
+            ROLLBACK TRANSACTION;
+            RETURN; -- Exit the procedure
+        END
+
+        -- Let's move the data
+        -- Enable IDENTITY_INSERT to insert a specific value into the identity column of the main table.
+        SET IDENTITY_INSERT dbo.userInfo ON;
+
+        -- Step 1: Insert the record from the archive back into the main table.
+        INSERT INTO dbo.userInfo (
+            userID, username, passKey, fullName, position, barangay,
+            emailAddress, phoneNumber, isDefaultPassword
+        )
+        SELECT
+            userID, username, passKey, fullName, position, barangay,
+            emailAddress, phoneNumber, isDefaultPassword
+        FROM
+            dbo.userInfoARC
+        WHERE
+            userID = @userID;
+
+        -- Always disable IDENTITY_INSERT immediately after use.
+        SET IDENTITY_INSERT dbo.userInfo OFF;
+
+        -- Step 2: Delete the record from the archive table.
+        DELETE FROM dbo.userInfoARC
+        WHERE userID = @userID;
+
+        -- If all steps were successful, commit the transaction.
+        COMMIT TRANSACTION;
+        PRINT 'User with ID ' + CAST(@userID AS VARCHAR) + ' was successfully returned from the archive.';
+
+    END TRY
+    BEGIN CATCH
+        -- If an error occurred, roll back all changes.
+        ROLLBACK TRANSACTION;
+        PRINT 'An error occurred. Transaction rolled back.';
+        -- Re-throw the error to the calling application.
+        THROW;
+    END CATCH
+END
+GO
+
+--Projects return
+
+CREATE PROCEDURE prjReturn
+    -- Input parameter: The ID of the project to return from the archive
+    @projectID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        -- PRE-FLIGHT CHECKS --
+        -- 1. Check if the project is in the archive.
+        IF NOT EXISTS (SELECT 1 FROM dbo.projectsARC WHERE projectID = @projectID)
+        BEGIN
+            PRINT 'Error: Project with ID ' + CAST(@projectID AS VARCHAR) + ' not found in the archive. No action taken.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- 2. Check if the project ID already exists in the main projects table.
+        IF EXISTS (SELECT 1 FROM dbo.projects WHERE projectID = @projectID)
+        BEGIN
+            PRINT 'Error: Project with ID ' + CAST(@projectID AS VARCHAR) + ' already exists in the main projects table. Cannot restore.';
+            ROLLBACK TRANSACTION;
+            RETURN;
+        END
+
+        -- Enable IDENTITY_INSERT on the destination table.
+        SET IDENTITY_INSERT dbo.projects ON;
+
+        -- Step 1: Copy the project data from the archive back to the main table.
+        INSERT INTO dbo.projects (
+            projectID, reference_number, title, description, userID, status,
+            submittedDate, file_path, file_name, remarks, reviewedBy
+        )
+        SELECT
+            projectID, reference_number, title, description, userID, status,
+            submittedDate, file_path, file_name, remarks, reviewedBy
+        FROM
+            dbo.projectsARC
+        WHERE
+            projectID = @projectID;
+
+        -- Disable IDENTITY_INSERT.
+        SET IDENTITY_INSERT dbo.projects OFF;
+
+        -- Step 2: Delete the project from the archive table.
+        DELETE FROM dbo.projectsARC
+        WHERE projectID = @projectID;
+
+        -- Commit the transaction if everything succeeded.
+        COMMIT TRANSACTION;
+        PRINT 'Project with ID ' + CAST(@projectID AS VARCHAR) + ' was successfully returned from the archive.';
+
+    END TRY
+    BEGIN CATCH
+        -- If any error happens, cancel the transaction.
+        ROLLBACK TRANSACTION;
+        PRINT 'An error occurred. Transaction rolled back.';
+        THROW;
+    END CATCH
+END
+GO
