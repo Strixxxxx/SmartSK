@@ -8,10 +8,10 @@ const getBaseURL = (): string => {
   
   const hostname = window.location.hostname;
   if (hostname === 'localhost') {
-    return 'http://localhost:3000';
+    return 'https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net:3000';
   }
   
-  return `http://${hostname}:3000`;
+  return `https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net:3000`;
 };
 
 // Create axios instance instead of modifying global defaults
