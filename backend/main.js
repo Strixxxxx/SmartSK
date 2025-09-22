@@ -75,45 +75,36 @@ app.use((req, res, next) => {
   next();
 });
 
-// Routes that don't need authentication
+// --- PUBLIC ROUTES ---
+// Routes that don't need authentication and are publicly accessible.
+
 app.get('/api/validate-token', validateToken);
 
-// Routes - check each router before using it
+// Login router
 if (loginRouter && typeof loginRouter === 'function') {
   app.use('/api/login', loginRouter);
 } else {
   console.error('loginRouter is not a valid middleware function');
 }
 
+// Forgot password router
 if (forgotPasswordRoutes && typeof forgotPasswordRoutes === 'function') {
   app.use('/api/forgotpassword', forgotPasswordRoutes);
 } else {
   console.error('forgotPasswordRoutes is not a valid middleware function');
 }
 
-// Middleware that excludes certain paths
-const protectRoutesExcept = (paths) => {
-  return (req, res, next) => {
-    // Skip authentication for specified paths
-    if (paths.some(path => req.path.startsWith(path))) {
-      return next();
-    }
-    
-    // Apply authentication middleware for all other paths
-    return authMiddleware(req, res, next);
-  };
-};
 
-// Apply the middleware to all routes
-app.use(protectRoutesExcept([
-  '/api/login',
-  '/api/register',
-  '/api/forgotpassword',
-  '/api/validate-token'
-]));
+// --- AUTHENTICATION MIDDLEWARE ---
+// All routes defined after this point will be protected by the authMiddleware.
+app.use(authMiddleware);
 
-// Protected routes that need authentication
-app.post('/api/logout', authMiddleware, logout);
+
+// --- PROTECTED ROUTES ---
+// These routes require a valid token to be accessed.
+
+// Logout route
+app.post('/api/logout', logout);
 
 // Admin routes
 if (accountCreationRouter && typeof accountCreationRouter === 'function') {
@@ -176,7 +167,7 @@ if (rawDataRouter && typeof rawDataRouter === 'function') {
 app.use('/api/admin', routeGuard.verifyToken, routeGuard.isAdmin);
 
 // Add or update the user-info endpoint
-app.get('/api/user-data', authMiddleware, async (req, res) => {
+app.get('/api/user-data', async (req, res) => {
   try {
     const pool = await getConnection();
     const userResult = await pool.request()
