@@ -13,7 +13,6 @@ const os = require('os');
 // Import the other js files
 const routeGuard = require('./routeGuard/routeGuard');
 const { getConnection, sql } = require('./database/database');
-const loginRouter = require('./login/login');
 const forgotPasswordRoutes = require('./forgotpassword/forgotPassword');
 const accountCreationRouter = require('./Admin/accountCreation');
 const rolesRouter = require('./Admin/roles');
@@ -81,11 +80,7 @@ app.use((req, res, next) => {
 app.get('/api/validate-token', validateToken);
 
 // Login router
-if (loginRouter && typeof loginRouter === 'function') {
-  app.use('/api/login', loginRouter);
-} else {
-  console.error('loginRouter is not a valid middleware function');
-}
+app.post('/api/login', login);
 
 // Forgot password router
 if (forgotPasswordRoutes && typeof forgotPasswordRoutes === 'function') {
@@ -106,9 +101,12 @@ app.use(authMiddleware);
 // Logout route
 app.post('/api/logout', logout);
 
-// Admin routes
+// Admin routes - applying admin-specific guards before mounting the routers.
+app.use('/api/admin', routeGuard.verifyToken, routeGuard.isAdmin);
+
 if (accountCreationRouter && typeof accountCreationRouter === 'function') {
-  app.use('/api/admin', accountCreationRouter);
+  // Using a more specific path to avoid conflicts
+  app.use('/api/admin/accounts', accountCreationRouter);
 } else {
   console.error('accountCreationRouter is not a valid middleware function');
 }
@@ -126,7 +124,8 @@ if(backupRouter && typeof backupRouter === 'function') {
 }
 
 if (sessionLogRouter && typeof sessionLogRouter === 'function') {
-  app.use('/api/admin', sessionLogRouter);
+  // Using a more specific path to avoid conflicts
+  app.use('/api/admin/sessionlog', sessionLogRouter);
 } else {
   console.error('sessionLogRouter is not a valid middleware function');
 }
@@ -162,9 +161,6 @@ if (rawDataRouter && typeof rawDataRouter === 'function') {
 }
 
 // Check PyBridge modules - removed duplicate validation since it's handled in import section above
-
-// Protect admin routes on the backend
-app.use('/api/admin', routeGuard.verifyToken, routeGuard.isAdmin);
 
 // Add or update the user-info endpoint
 app.get('/api/user-data', async (req, res) => {
