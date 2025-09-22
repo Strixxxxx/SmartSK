@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcrypt');
 const { getConnection, sql } = require('../database/database');
 const path = require('path');
 const dotenv = require('dotenv');
@@ -121,7 +122,7 @@ const login = async (req, res) => {
     const pool = await getConnection();
     const result = await pool.request()
       .input('username', sql.VarChar, username)
-      .query('SELECT * FROM userInfo WHERE userName = @username');
+      .query('SELECT * FROM userInfo WHERE username = @username');
     
     if (result.recordset.length === 0) {
       return res.status(401).json({ success: false, message: 'Invalid username or password' });
@@ -129,14 +130,16 @@ const login = async (req, res) => {
     
     const user = result.recordset[0];
     
-    if (password !== user.password) {
+    // Securely compare the provided password with the stored hash from the 'passKey' column
+    const passwordMatch = await bcrypt.compare(password, user.passKey);
+    if (!passwordMatch) {
       return res.status(401).json({ success: false, message: 'Invalid username or password' });
     }
     
     const sessionID = await createSession(user.userID);
     
     const token = jwt.sign(
-      { userId: user.userID, username: user.userName, sessionID: sessionID },
+      { userId: user.userID, username: user.username, sessionID: sessionID },
       jwtConfig.secret,
       { expiresIn: jwtConfig.expiresIn }
     );
@@ -145,7 +148,7 @@ const login = async (req, res) => {
       success: true,
       message: 'Login successful',
       token,
-      user: { userId: user.userID, username: user.userName, fullName: user.fullName, position: user.position }
+      user: { userId: user.userID, username: user.username, fullName: user.fullName, position: user.position }
     });
   } catch (error) {
     console.error('Login error');

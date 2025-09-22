@@ -25,7 +25,7 @@ router.post('/request', async (req, res) => {
     // Check if user exists
     const userResult = await pool.request()
       .input('username', sql.VarChar, username)
-      .query('SELECT userID, emailAddress FROM userInfo WHERE userName = @username');
+      .query('SELECT userID, emailAddress FROM userInfo WHERE username = @username');
     
     if (userResult.recordset.length === 0) {
       return res.status(404).json({
@@ -228,7 +228,7 @@ router.post('/reset', async (req, res) => {
     await pool.request()
       .input('username', sql.VarChar, username)
       .input('passKey', sql.VarChar, hashedPassword)
-      .query('UPDATE userInfo SET passKey = @passKey WHERE userName = @username');
+      .query('UPDATE userInfo SET passKey = @passKey WHERE username = @username');
     
     // Clear OTP
     otpStore.delete(username);
