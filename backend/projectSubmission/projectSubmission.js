@@ -3,7 +3,7 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const { v4: uuidv4 } = require('uuid');
+const uuidv4 = require('uuid4');
 const { getConnection, sql } = require('../database/database');
 const { authMiddleware } = require('../session/session');
 const { addAuditTrail } = require('../audit/auditService');
@@ -11,7 +11,7 @@ const { addAuditTrail } = require('../audit/auditService');
 // Multer configuration (no changes needed)
 const storage = multer.diskStorage({
   destination: function(req, file, cb) {
-    const uploadDir = path.join('D:', 'Projects', 'Projects', 'smartSK', 'projects');
+    const uploadDir = path.join(__dirname, '..', '..', 'projects');
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
@@ -139,7 +139,7 @@ router.get('/download/:filename', authMiddleware, async (req, res) => {
   try {
     const { filename } = req.params;
     const sanitizedFilename = path.basename(filename);
-    const filePath = path.join('D:', 'Projects', 'Projects', 'smartSK', 'projects', sanitizedFilename);
+    const filePath = path.join(__dirname, '..', '..', 'projects', sanitizedFilename);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ success: false, message: 'File not found' });
