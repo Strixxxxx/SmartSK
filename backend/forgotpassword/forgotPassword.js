@@ -264,6 +264,18 @@ router.post('/reset', async (req, res) => {
       });
     }
     
+    // Atomically mark the OTP as used to prevent race conditions
+    const updateOtpResult = await pool.request()
+      .input('otpID', sql.Int, otpData.otpID)
+      .query('UPDATE otpStore SET isUsed = 1 WHERE otpID = @otpID AND isUsed = 0');
+
+    if (updateOtpResult.rowsAffected[0] === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'This verification code has already been used or is invalid.'
+      });
+    }
+
     // Hash the password with bcrypt using a standard salt round value (e.g., 12)
     const hashedPassword = await bcrypt.hash(newPassword, 12);
     
@@ -272,9 +284,6 @@ router.post('/reset', async (req, res) => {
       .input('username', sql.VarChar, username)
       .input('passKey', sql.VarChar, hashedPassword)
       .query('UPDATE userInfo SET passKey = @passKey WHERE username = @username');
-    
-    // OTP is valid and used, so delete it
-    await pool.request().input('otpID', sql.Int, otpData.otpID).query('DELETE FROM otpStore WHERE otpID = @otpID');
 
     addAuditTrail({
         actor: 'C',

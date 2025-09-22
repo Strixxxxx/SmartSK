@@ -1,13 +1,6 @@
 --Frontend (Browser's Console)
 
-sessions.tsx:32 
- GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/admin/sessions 404 (Not Found)
-Promise.then		
-fetchSessions	@	sessions.tsx:32
-(anonymous)	@	sessions.tsx:42
-<Sessions>		
-AppRoutes	@	AppRoutes.tsx:86
-
+Failed to load resource: the server responded with a status of 404 (Not Found)
 axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -19,13 +12,8 @@ axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
 </body>
 </html>
 (anonymous)	@	axiosConfig.ts:101
-Promise.then		
-fetchSessions	@	sessions.tsx:32
-(anonymous)	@	sessions.tsx:42
-<Sessions>		
-AppRoutes	@	AppRoutes.tsx:86
 sessions.tsx:36 
-AxiosError {message: 'Request failed with status code 404', name: 'AxiosError', code: 'ERR_BAD_REQUEST', config: {…}, request: XMLHttpRequest, …}
+AxiosError
 code
 : 
 "ERR_BAD_REQUEST"
@@ -54,17 +42,8 @@ stack
 : 
 Error
 fetchSessions	@	sessions.tsx:36
-await in fetchSessions		
-(anonymous)	@	sessions.tsx:42
-<Sessions>		
-AppRoutes	@	AppRoutes.tsx:86
-sessions.tsx:32 
- GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/admin/sessions 404 (Not Found)
-Promise.then		
-fetchSessions	@	sessions.tsx:32
-(anonymous)	@	sessions.tsx:42
-<Sessions>		
-AppRoutes	@	AppRoutes.tsx:86
+smartsk-backend-fsc6…pi/admin/sessions:1 
+ Failed to load resource: the server responded with a status of 404 (Not Found)
 axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,13 +55,8 @@ axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
 </body>
 </html>
 (anonymous)	@	axiosConfig.ts:101
-Promise.then		
-fetchSessions	@	sessions.tsx:32
-(anonymous)	@	sessions.tsx:42
-<Sessions>		
-AppRoutes	@	AppRoutes.tsx:86
 sessions.tsx:36 
-AxiosError {message: 'Request failed with status code 404', name: 'AxiosError', code: 'ERR_BAD_REQUEST', config: {…}, request: XMLHttpRequest, …}
+AxiosError
 code
 : 
 "ERR_BAD_REQUEST"
@@ -111,15 +85,20 @@ stack
 : 
 Error
 fetchSessions	@	sessions.tsx:36
-await in fetchSessions		
-(anonymous)	@	sessions.tsx:42
-<Sessions>		
-AppRoutes	@	AppRoutes.tsx:86
-
 
 --Backend(Azure Portal's Log Stream)
 
-Unable to open a connection to your app. This may be due to any network security groups or IP restriction rules that you have placed on your app. To use log streaming, please make sure you are able to access your app directly from your current network.
+2025-09-22T04:16:52.913Z INFO  - dcf9164e728d Extracting 4KB / 4KB
+2025-09-22T04:16:52.914Z INFO  - dcf9164e728d Pull complete
+2025-09-22T04:16:53.923Z INFO  - 445fff30179a Extracting 384KB / 16MB
+2025-09-22T04:16:54.012Z INFO  - 445fff30179a Extracting 1MB / 16MB
+2025-09-22T04:16:54.168Z INFO  - 445fff30179a Extracting 2MB / 16MB
+2025-09-22T04:16:54.402Z INFO  - 445fff30179a Extracting 4MB / 16MB
+2025-09-22T04:16:54.515Z INFO  - 445fff30179a Extracting 4MB / 16MB
+2025-09-22T04:16:54.903Z INFO  - 445fff30179a Extracting 6MB / 16MB
+2025-09-22T04:16:55.678Z INFO  - 445fff30179a Extracting 8MB / 16MB
+2025-09-22T04:16:55.774Z INFO  - 445fff30179a Extracting 8MB / 16MB
+2025-09-22T04:16:56.175Z INFO  - 445fff30179a Extracting 9MB / 16MB
 2025-09-22T04:16:56.498Z INFO  - 445fff30179a Extracting 10MB / 16MB
 2025-09-22T04:16:56.717Z INFO  - 445fff30179a Extracting 10MB / 16MB
 2025-09-22T04:16:56.929Z INFO  - 445fff30179a Extracting 11MB / 16MB
@@ -438,7 +417,7 @@ Unable to open a connection to your app. This may be due to any network security
 2025-09-22T04:14:59.245Z INFO  - fd9ecfda18c5 Extracting 11MB / 67MB
 2025-09-22T04:14:59.594Z INFO  - fd9ecfda18c5 Extracting 12MB / 67MB
 2025-09-22T04:14:59.891Z INFO  - fd9ecfda18c5 Extracting 12MB / 67MB
-2025-09-22T04:15:00.396Z INFO  - fd9ecfda18c5 Extracting 14MB / 67MB
+2025-09-22T04:15:00.396Z INFO  - fd9ecfda18c5 Extracting 14MB /67MB
 2025-09-22T04:15:00.505Z INFO  - fd9ecfda18c5 Extracting 15MB / 67MB
 2025-09-22T04:15:01.105Z INFO  - fd9ecfda18c5 Extracting 16MB / 67MB
 2025-09-22T04:15:02.388Z INFO  - fd9ecfda18c5 Extracting 18MB / 67MB
@@ -1062,61 +1041,50 @@ Unable to open a connection to your app. This may be due to any network security
 2025-09-22T07:58:04.2337234Z Starting metrics collection.
 2025-09-22T07:58:04.2340259Z Container is running.
 2025-09-22T07:58:04.3516931Z Container start method finished after 9378 ms.
-2025-09-22T07:58:57  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/22/2025 04:12:51/home/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt)
-2025-09-22T03:57:50  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/08ee629c992e-5d2c1cb7-893f-4a5e-a911-3176fe7a2a88.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/08ee629c992e-5d2c1cb7-893f-4a5e-a911-3176fe7a2a88.txt)
-2025-09-22T04:25:19  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/1d83561841af-d7edaacf-20c3-46a7-b6cc-2e17bd956c62.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/1d83561841af-d7edaacf-20c3-46a7-b6cc-2e17bd956c62.txt)
-2025-09-22T02:57:00  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/21c45da2a211-a3b3e32b-f83c-4e3c-a734-f64b00f85956.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/21c45da2a211-a3b3e32b-f83c-4e3c-a734-f64b00f85956.txt)
-2025-09-22T02:23:35  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,53, ScmType: GitHubAction/home/LogFiles/kudu/trace/279cfa160b2d-102812d4-f49b-4268-b140-ffe0fe4b93c9.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/279cfa160b2d-102812d4-f49b-4268-b140-ffe0fe4b93c9.txt)
-2025-09-22T07:58:56  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/384afc849e60-2451b35a-47c7-481f-8b90-0520d961671d.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/384afc849e60-2451b35a-47c7-481f-8b90-0520d961671d.txt)
-2025-09-22T04:18:35  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/44171915c362-d238b7a9-ea89-47a4-92cf-3e74ab4c490b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/44171915c362-d238b7a9-ea89-47a4-92cf-3e74ab4c490b.txt)
-2025-09-22T03:13:30  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/46e159476525-dd4a208f-d4af-4c68-b904-8a1fc5567bff.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/46e159476525-dd4a208f-d4af-4c68-b904-8a1fc5567bff.txt)
-2025-09-22T07:52:25  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 826,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/4a4cfc2fbaf2-407eedf5-e084-472a-8e66-426d8e895e6b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4a4cfc2fbaf2-407eedf5-e084-472a-8e66-426d8e895e6b.txt)
-2025-09-22T02:45:00  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,36, ScmType: GitHubAction/home/LogFiles/kudu/trace/4be0f6086e0d-d1661b33-3548-443c-80d1-5c17163d0e58.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4be0f6086e0d-d1661b33-3548-443c-80d1-5c17163d0e58.txt)
-2025-09-22T03:35:34  Startup Request, url: /api/settings, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/503ebfa3f129-8b93a67e-fdd6-4fbb-a01f-c3b49034f161.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/503ebfa3f129-8b93a67e-fdd6-4fbb-a01f-c3b49034f161.txt)
-2025-09-22T07:57:13  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/82c3e73d756a-e1f92c88-cd3b-4837-8c6b-59953439f87f.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/82c3e73d756a-e1f92c88-cd3b-4837-8c6b-59953439f87f.txt)
-2025-09-22T07:39:02  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/8fbee2be81fa-8a0746e5-9021-480f-8fac-4bab4c800cdc.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/8fbee2be81fa-8a0746e5-9021-480f-8fac-4bab4c800cdc.txt)
-2025-09-22T03:41:41  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%224a285fb3db697547d1f6cd1bbf86bef737a942bc%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22main.js%2C%20forgotPassword.js%2C%20session.js%20update%22%7D, method: POST, type: request, pid: 835,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/9abfc888a81f-03ad1d18-f2ab-4e34-97bc-7ca7b7b3bd6a.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/9abfc888a81f-03ad1d18-f2ab-4e34-97bc-7ca7b7b3bd6a.txt)
-2025-09-21T15:59:36  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,7, ScmType: None/home/LogFiles/kudu/trace/a99927180ed3-f895a2b6-8205-47b8-8472-2ccbcba4018e.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a99927180ed3-f895a2b6-8205-47b8-8472-2ccbcba4018e.txt)
-2025-09-22T06:01:24  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,25, ScmType: GitHubAction/home/LogFiles/kudu/trace/c79f80c56bd4-4dc605dc-d2c3-402f-a7ed-93e9ef7642a9.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c79f80c56bd4-4dc605dc-d2c3-402f-a7ed-93e9ef7642a9.txt)
-2025-09-22T03:14:16  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%2295f0b93d9ad2b1cbe3983b4d5e5eeaef6a71785b%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22Merge%20branch%20%27main%27%20of%20https%3A%2F%2Fgithub.com%2FBratnya%2FSmartSK%5CnUpdating%20the%20main.js%20routing%5Cn--INSERT--%22%7D, method: POST, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/c86f2806b484-a21c81d5-761a-4e82-99b4-859a1c230fe2.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c86f2806b484-a21c81d5-761a-4e82-99b4-859a1c230fe2.txt)
-2025-09-22T03:44:59  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%228311e931d5b107ab693563904492566793b3cd42%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22main.js%20update%20batch2%22%7D, method: POST, type: request, pid: 825,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/d0a02b341d13-5956db7a-ccc7-47bb-a76a-9ae50123d096.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d0a02b341d13-5956db7a-ccc7-47bb-a76a-9ae50123d096.txt)
-2025-09-22T07:44:13  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,18, ScmType: GitHubAction/home/LogFiles/kudu/trace/d435402bdd06-899148fb-e5f1-4bed-9880-8dd6b244c1e7.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d435402bdd06-899148fb-e5f1-4bed-9880-8dd6b244c1e7.txt)
-2025-09-22T04:46:40  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/d93ea344c104-2f4fd10c-ffb5-4962-8b9b-9a57bfccb93c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d93ea344c104-2f4fd10c-ffb5-4962-8b9b-9a57bfccb93c.txt)
-2025-09-22T04:26:21  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 821,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/dbb6c3ef99ba-69f99403-efac-4c75-8e00-e2d1becced99.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/dbb6c3ef99ba-69f99403-efac-4c75-8e00-e2d1becced99.txt)
-2025-09-22T04:14:17  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/e32cbc6f25a5-eb2c3efe-76cc-45ad-b3ee-c1268f283a8c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/e32cbc6f25a5-eb2c3efe-76cc-45ad-b3ee-c1268f283a8c.txt)
-2025-09-22T04:13:18  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/ee8c2db37d2e-74a25790-3d5c-4964-bce0-0ace65397edb.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/ee8c2db37d2e-74a25790-3d5c-4964-bce0-0ace65397edb.txt)
-2025-09-21T16:03:48  Startup Request, url: /api/settings, method: GET, type: request, pid: 821,1,5, ScmType: GitHubAction/home/LogFiles/2025_09_21_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_21_lw0sdlwk0005KT_docker.log)
-2025-09-21T16:50:57.4741125Z Site is running with deployment version: 4ec10318-c9df-4ff4-82f8-995b414eca36
-2025-09-21T16:50:57.4782073Z Site started.
-2025-09-21T16:50:57.5474418Z Site is running with patch version: 22.17.0
-2025-09-21T17:49:56.8528218Z Container is terminating. Grace period: 5 seconds.
-2025-09-21T17:49:56.9975652Z Stop and delete container. Retry count = 0
-2025-09-21T17:49:57.0053587Z Stopping container: 6bf7fd44f304_smartsk-backend.
-2025-09-21T17:50:02.6104150Z Deleting container: 6bf7fd44f304_smartsk-backend. Retry count = 0
-2025-09-21T17:50:17.0859387Z Container spec TerminationMessagePolicy  path
-2025-09-21T17:50:17.0878608Z Container is terminated. Total time elapsed: 20215 ms.
-2025-09-21T17:50:17.0985143Z Site: smartsk-backend stopped./home/LogFiles/2025_09_22_lw0sdlwk0005KT_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_default_docker.log)
-2025-09-22T04:16:58.708652662Z     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
-2025-09-22T04:16:58.708655862Z     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
-2025-09-22T04:16:58.708659162Z     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
-2025-09-22T04:16:58.708662362Z     at node:internal/main/run_main_module:36:49 {
-2025-09-22T04:16:58.708665462Z   code: 'MODULE_NOT_FOUND',
-2025-09-22T04:16:58.708668662Z   requireStack: []
-2025-09-22T04:16:58.708671962Z }
-2025-09-22T04:16:58.708674962Z
-2025-09-22T04:16:58.708684762Z Node.js v22.17.0/home/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log)
-2025-09-22T07:58:00.2517677Z Successfully created stderr named pipe at: /podr/container/pipe/9cecf363fa62_smartsk-backend/stderr_3d9c64bc1bdf47048ff475cbe22a8eca.
-2025-09-22T07:58:00.2520822Z Opening named pipe /podr/container/pipe/9cecf363fa62_smartsk-backend/stderr_3d9c64bc1bdf47048ff475cbe22a8eca for reading in non-blocking mode.
-2025-09-22T07:58:00.2522219Z Successfully opened named pipe: /podr/container/pipe/9cecf363fa62_smartsk-backend/stderr_3d9c64bc1bdf47048ff475cbe22a8eca.
-2025-09-22T07:58:00.2523337Z Successfully removed non-blocking flag from /podr/container/pipe/9cecf363fa62_smartsk-backend/stderr_3d9c64bc1bdf47048ff475cbe22a8eca.
-2025-09-22T07:58:00.2524563Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T07:58:04.0050944Z Starting container: 9cecf363fa62_smartsk-backend.
-2025-09-22T07:58:04.2162323Z Starting watchers and probes.
-2025-09-22T07:58:04.2337234Z Starting metrics collection.
-2025-09-22T07:58:04.2340259Z Container is running.
-2025-09-22T07:58:04.3516931Z Container start method finished after 9378 ms.Ending Log Tail of existing logs ---Starting Live Log Stream ---
-2025-09-22T07:59:58  No new trace in the past 1 min(s).
 2025-09-22T08:00:47.5711407Z Site startup probe succeeded after 162.8797258 seconds.
 2025-09-22T08:01:04.0013229Z Site is running with deployment version: ccd20acc-1113-44a3-b861-7dac4c2f33a5
 2025-09-22T08:01:04.0372832Z Site started.
 2025-09-22T08:01:04.6016218Z Site is running with patch version: 22.17.0
+2025-09-22T08:08:16.8810837Z Container is terminating. Grace period: 5 seconds.
+2025-09-22T08:08:17.4192318Z Stop and delete container. Retry count = 0
+2025-09-22T08:08:17.4194193Z Stopping container: 9cecf363fa62_smartsk-backend.
+2025-09-22T08:08:22.8494771Z Deleting container: 9cecf363fa62_smartsk-backend. Retry count = 0
+2025-09-22T08:08:39.7690074Z Container spec TerminationMessagePolicy  path
+2025-09-22T08:08:39.7771342Z Container isterminated. Total time elapsed: 22894 ms.
+2025-09-22T08:08:39.7783794Z Site: smartsk-backend stopped.
+2025-09-22T08:23:36.7624470Z Container start method called.
+2025-09-22T08:23:36.7630839Z Establishing network.
+2025-09-22T08:23:36.7632016Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
+2025-09-22T08:23:39.1021839Z Container is starting.
+2025-09-22T08:23:39.1197488Z Establishing user namespace if not established already.
+2025-09-22T08:23:39.1286044Z Establishing network if not established already.
+2025-09-22T08:23:39.1296663Z Mounting volumes.
+2025-09-22T08:23:39.1299681Z Nested mountpoint
+2025-09-22T08:23:39.1838613Z Nested mountpoint volatile/logs
+2025-09-22T08:23:39.2327860Z Nested mountpoint
+2025-09-22T08:23:39.2707147Z Nested mountpoint
+2025-09-22T08:23:39.3555564Z Nested mountpoint
+2025-09-22T08:23:39.4342070Z Nested mountpoint
+2025-09-22T08:23:39.4804965Z Nested mountpoint
+2025-09-22T08:23:42.5388050Z Creating container.
+2025-09-22T08:23:42.5389154Z Creating pipes for streaming container io.
+2025-09-22T08:23:42.5390094Z Creating stdout named pipe at /podr/container/pipe/8d5bebd7f198_smartsk-backend/stdout_2978a4b1a67641d0805c3e48fbbba399.
+2025-09-22T08:23:42.5392793Z Successfully created stdout named pipe at: /podr/container/pipe/8d5bebd7f198_smartsk-backend/stdout_2978a4b1a67641d0805c3e48fbbba399.
+2025-09-22T08:23:42.5393724Z Opening named pipe /podr/container/pipe/8d5bebd7f198_smartsk-backend/stdout_2978a4b1a67641d0805c3e48fbbba399 for reading in non-blocking mode.
+2025-09-22T08:23:42.5395187Z Successfully opened named pipe: /podr/container/pipe/8d5bebd7f198_smartsk-backend/stdout_2978a4b1a67641d0805c3e48fbbba399.
+2025-09-22T08:23:42.5396532Z Successfully removed non-blocking flag from /podr/container/pipe/8d5bebd7f198_smartsk-backend/stdout_2978a4b1a67641d0805c3e48fbbba399.
+2025-09-22T08:23:42.5397616Z Creating stderr named pipe at /podr/container/pipe/8d5bebd7f198_smartsk-backend/stderr_444ab6242e314eb69bd0695143fa1ecc.
+2025-09-22T08:23:42.5399011Z Successfully created stderr named pipe at: /podr/container/pipe/8d5bebd7f198_smartsk-backend/stderr_444ab6242e314eb69bd0695143fa1ecc.
+2025-09-22T08:23:42.5399879Z Opening named pipe /podr/container/pipe/8d5bebd7f198_smartsk-backend/stderr_444ab6242e314eb69bd0695143fa1ecc for reading in non-blocking mode.
+2025-09-22T08:23:42.5401018Z Successfully opened named pipe: /podr/container/pipe/8d5bebd7f198_smartsk-backend/stderr_444ab6242e314eb69bd0695143fa1ecc.
+2025-09-22T08:23:42.5401910Z Successfully removed non-blocking flag from /podr/container/pipe/8d5bebd7f198_smartsk-backend/stderr_444ab6242e314eb69bd0695143fa1ecc.
+2025-09-22T08:23:42.5402820Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:22-lts_20250724.2.tuxprod
+2025-09-22T08:23:44.4694598Z Starting container: 8d5bebd7f198_smartsk-backend.
+2025-09-22T08:23:44.6030798Z Starting watchers and probes.
+2025-09-22T08:23:44.6033195Z Starting metrics collection.
+2025-09-22T08:23:44.6034537Z Container is running.
+2025-09-22T08:23:45.3108505Z Container start method finished after 8548 ms.
+2025-09-22T08:26:15.0730181Z Site startup probe succeeded after 149.5530988 seconds.
+2025-09-22T08:26:33.5615305Z Site is running with deployment version: 7805a2f1-ec25-407d-be56-1abd0c8f8f5d
+2025-09-22T08:26:33.5786164Z Site started.
+2025-09-22T08:26:33.8194729Z Site is running with patch version: 22.17.0
