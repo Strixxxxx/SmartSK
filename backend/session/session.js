@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
+const uuidv4 = require('uuid4');
 const bcrypt = require('bcrypt');
 const { getConnection, sql } = require('../database/database');
 const path = require('path');
@@ -110,117 +110,7 @@ async function createSession(userID) {
   }
 }
 
-// Login function
-const login = async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    
-    if (!username || !password) {
-      return res.status(400).json({ success: false, message: 'Username and password are required' });
-    }
-    
-    const pool = await getConnection();
-    const result = await pool.request()
-      .input('username', sql.VarChar, username)
-      .query(`
-        SELECT u.userID, u.username, u.passKey, u.fullName, r.roleName as position 
-        FROM userInfo u 
-        LEFT JOIN roles r ON u.position = r.roleID 
-        WHERE u.username = @username
-      `);
-    
-    if (result.recordset.length === 0) {
-      return res.status(401).json({ success: false, message: 'Invalid username or password' });
-    }
-    
-    const user = result.recordset[0];
-    
-    // Securely compare the provided password with the stored hash from the 'passKey' column
-    const passwordMatch = await bcrypt.compare(password, user.passKey);
-    if (!passwordMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid username or password' });
-    }
-    
-    const sessionID = await createSession(user.userID);
-    
-    const token = jwt.sign(
-      { userId: user.userID, username: user.username, sessionID: sessionID },
-      jwtConfig.secret,
-      { expiresIn: jwtConfig.expiresIn }
-    );
-    
-    return res.json({
-      success: true,
-      message: 'Login successful',
-      token,
-      user: { userId: user.userID, username: user.username, fullName: user.fullName, position: user.position || '' }
-    });
-  } catch (error) {
-    console.error('Login error');
-    return res.status(500).json({ success: false, message: 'An error occurred during login' });
-  }
-};
 
-// Logout function
-const logout = async (req, res) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ success: false, message: 'No token provided' });
-    
-    const decoded = jwt.verify(token, jwtConfig.secret);
-    if (!decoded.sessionID) return res.status(401).json({ success: false, message: 'Invalid token format' });
-    
-    const pool = await getConnection();
-    const currentTime = new Date(getPhilippineTime());
-    
-    await pool.request()
-      .input('sessionID', sql.VarChar, decoded.sessionID)
-      .input('currentTime', sql.DateTime2, currentTime)
-      .query('UPDATE sessions SET expires_at = @currentTime WHERE sessionID = @sessionID AND expires_at IS NULL');
-    
-    // Remove from active sessions map
-    activeSessions.delete(decoded.sessionID);
-    
-    return res.json({ success: true, message: 'Logged out successfully' });
-  } catch (error) {
-    console.error('Logout error');
-    return res.status(error instanceof jwt.JsonWebTokenError ? 401 : 500).json({ 
-      success: false, 
-      message: error instanceof jwt.JsonWebTokenError ? 'Invalid token' : 'An error occurred during logout' 
-    });
-  }
-};
-
-// Validate token function
-const validateToken = async (req, res) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ success: false, message: 'No token provided' });
-
-    const decoded = jwt.verify(token, jwtConfig.secret);
-    if (!decoded.sessionID) return res.status(401).json({ success: false, message: 'Invalid token format' });
-
-    const pool = await getConnection();
-    const result = await pool.request()
-      .input('sessionID', sql.VarChar, decoded.sessionID)
-      .query('SELECT * FROM sessions WHERE sessionID = @sessionID AND expires_at IS NULL');
-
-    if (result.recordset.length === 0) {
-      return res.status(401).json({ success: false, message: 'Session expired or not found' });
-    }
-
-    // Session is valid, update last seen time
-    activeSessions.set(decoded.sessionID, { lastSeen: new Date(getPhilippineTime()), userID: decoded.userId });
-
-    return res.json({ success: true, message: 'Token is valid', userId: decoded.userId });
-  } catch (error) {
-    console.error('Token validation error');
-    return res.status(error instanceof jwt.JsonWebTokenError ? 401 : 500).json({ 
-      success: false, 
-      message: error instanceof jwt.JsonWebTokenError ? 'Invalid token' : 'An error occurred during token validation' 
-    });
-  }
-};
 
 // Authentication middleware
 const authMiddleware = async (req, res, next) => {
@@ -290,9 +180,6 @@ initializeActiveSessions();
 
 module.exports = {
   createSession,
-  login,
-  logout,
-  validateToken,
   authMiddleware,
   getUserInfo
 };
