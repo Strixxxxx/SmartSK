@@ -2,9 +2,7 @@
 
 create database smartSK
 
-go
-use smartSK;
-go
+--Run the Query once the database was created
 
 --Barangays Table
 CREATE TABLE barangays (

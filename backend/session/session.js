@@ -153,7 +153,7 @@ const login = async (req, res) => {
       success: true,
       message: 'Login successful',
       token,
-      user: { userId: user.userID, username: user.username, fullName: user.fullName, position: user.position }
+      user: { userId: user.userID, username: user.username, fullName: user.fullName, position: user.position || '' }
     });
   } catch (error) {
     console.error('Login error');
@@ -262,7 +262,7 @@ const authMiddleware = async (req, res, next) => {
       userId: user.userID,
       username: user.username,
       fullName: user.fullName,
-      position: user.position,
+      position: user.position || '', // Ensure position is always a string to prevent null reference errors
       sessionID: decoded.sessionID
     };
 
