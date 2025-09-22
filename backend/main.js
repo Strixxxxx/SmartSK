@@ -102,7 +102,7 @@ app.use(authMiddleware);
 app.post('/api/logout', logout);
 
 // Admin routes - applying admin-specific guards before mounting the routers.
-app.use('/api/admin', routeGuard.verifyToken, routeGuard.isAdmin);
+app.use('/api/admin', routeGuard.isAdmin);
 
 if (accountCreationRouter && typeof accountCreationRouter === 'function') {
   // Using a more specific path to avoid conflicts

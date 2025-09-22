@@ -264,8 +264,8 @@ router.post('/reset', async (req, res) => {
       });
     }
     
-    // Hash the password with bcrypt using salt rounds of 17
-    const hashedPassword = await bcrypt.hash(newPassword, 17);
+    // Hash the password with bcrypt using a standard salt round value (e.g., 12)
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
     
     // Update passKey with the hashed password
     await pool.request()
