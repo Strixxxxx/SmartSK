@@ -101,34 +101,40 @@ app.use(authMiddleware);
 // Logout route
 app.post('/api/logout', logout);
 
-// Admin routes - applying admin-specific guards before mounting the routers.
-app.use('/api/admin', routeGuard.isAdmin);
+// --- ADMIN ROUTES ---
+// Create a main router for all admin-related endpoints.
+const adminRouter = express.Router();
 
+// Apply the isAdmin guard to all routes on this router.
+adminRouter.use(routeGuard.isAdmin);
+
+// Mount the specific admin routers onto the main admin router.
 if (accountCreationRouter && typeof accountCreationRouter === 'function') {
-  // Using a more specific path to avoid conflicts
-  app.use('/api/admin/accounts', accountCreationRouter);
+  adminRouter.use('/accounts', accountCreationRouter);
 } else {
   console.error('accountCreationRouter is not a valid middleware function');
 }
 
 if (rolesRouter && typeof rolesRouter === 'function') {
-  app.use('/api/admin/roles', rolesRouter);
+  adminRouter.use('/roles', rolesRouter);
 } else {
   console.error('rolesRouter is not a valid middleware function');
 }
 
 if(backupRouter && typeof backupRouter === 'function') {
-  app.use('/api/admin/backup', backupRouter);
+  adminRouter.use('/backup', backupRouter);
 } else {
   console.error('backupRouter is not a valid middleware function');
 }
 
 if (sessionLogRouter && typeof sessionLogRouter === 'function') {
-  // Using a more specific path to avoid conflicts
-  app.use('/api/admin/sessions', sessionLogRouter);
+  adminRouter.use('/sessions', sessionLogRouter);
 } else {
   console.error('sessionLogRouter is not a valid middleware function');
 }
+
+// Mount the consolidated admin router to the app.
+app.use('/api/admin', adminRouter);
 
 if (projectSubmissionRouter && typeof projectSubmissionRouter === 'function') {
   app.use('/api/projects', projectSubmissionRouter);

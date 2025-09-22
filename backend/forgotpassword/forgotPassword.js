@@ -133,7 +133,7 @@ router.post('/verify-otp', async (req, res) => {
     }
     
     // Check if OTP has been used
-    if (otpData.used) {
+    if (otpData.isUsed) {
       return res.status(400).json({
         success: false,
         message: 'This verification code has already been used. Please request a new one.'
@@ -163,7 +163,7 @@ router.post('/verify-otp', async (req, res) => {
       addAuditTrail({
         actor: 'C',
         module: 'F',
-        userID: null,
+        userID: userID,
         actions: 'verify-otp-failure',
         oldValue: null,
         newValue: `username: ${username}`,
@@ -179,7 +179,7 @@ router.post('/verify-otp', async (req, res) => {
     addAuditTrail({
         actor: 'C',
         module: 'F',
-        userID: null,
+        userID: userID,
         actions: 'verify-otp-success',
         oldValue: null,
         newValue: `username: ${username}`,
@@ -279,7 +279,7 @@ router.post('/reset', async (req, res) => {
     addAuditTrail({
         actor: 'C',
         module: 'F',
-        userID: null,
+        userID: userID,
         actions: 'reset-password',
         oldValue: null,
         newValue: null,
