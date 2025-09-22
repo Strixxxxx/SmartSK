@@ -122,7 +122,12 @@ const login = async (req, res) => {
     const pool = await getConnection();
     const result = await pool.request()
       .input('username', sql.VarChar, username)
-      .query('SELECT * FROM userInfo WHERE username = @username');
+      .query(`
+        SELECT u.userID, u.username, u.passKey, u.fullName, r.roleName as position 
+        FROM userInfo u 
+        LEFT JOIN roles r ON u.position = r.roleID 
+        WHERE u.username = @username
+      `);
     
     if (result.recordset.length === 0) {
       return res.status(401).json({ success: false, message: 'Invalid username or password' });
