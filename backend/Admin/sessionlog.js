@@ -3,7 +3,7 @@ const { getConnection, sql } = require('../database/database');
 const router = express.Router();
 
 // GET all session logs
-router.get('/sessions', async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { search, startDate, endDate } = req.query;
     const pool = await getConnection();
