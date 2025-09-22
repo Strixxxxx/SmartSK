@@ -125,7 +125,7 @@ if(backupRouter && typeof backupRouter === 'function') {
 
 if (sessionLogRouter && typeof sessionLogRouter === 'function') {
   // Using a more specific path to avoid conflicts
-  app.use('/api/admin/sessionlog', sessionLogRouter);
+  app.use('/api/admin/sessions', sessionLogRouter);
 } else {
   console.error('sessionLogRouter is not a valid middleware function');
 }
@@ -312,14 +312,40 @@ const upload = multer({
   }
 });
 
-// Create a simple progress tracking mechanism
-const analysisProgress = new Map();
-
 // Add a new endpoint to check progress
-app.get('/api/predictive-analysis/progress/:id', (req, res) => {
+app.get('/api/predictive-analysis/progress/:id', async (req, res) => {
   const progressId = req.params.id;
-  const progress = analysisProgress.get(progressId) || { status: 'unknown', progress: 0 };
-  res.json(progress);
+  try {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('jobID', sql.VarChar, progressId)
+      .query('SELECT * FROM analysisJobs WHERE jobID = @jobID');
+
+    if (result.recordset.length === 0) {
+      return res.json({ status: 'unknown', progress: 0 });
+    }
+
+    const job = result.recordset[0];
+    let responseData = {
+      status: job.status,
+      progress: job.progress,
+    };
+
+    if (job.status === 'completed' && job.result) {
+      try {
+        responseData.result = JSON.parse(job.result);
+      } catch (e) {
+        responseData.error = "Failed to parse analysis result.";
+      }
+    } else if (job.status === 'error' && job.errorMessage) {
+      responseData.error = job.errorMessage;
+    }
+
+    res.json(responseData);
+  } catch (error) {
+    console.error('Error fetching analysis progress:', error);
+    res.status(500).json({ status: 'error', progress: 100, error: 'Failed to fetch progress' });
+  }
 });
 
 // Determine the correct Python executable based on the OS
@@ -338,10 +364,17 @@ const PYTHON_EXECUTABLE = getPythonExecutable();
 
 // File upload endpoint for predictive analysis
 app.post('/api/predictive-analysis/upload', upload.single('file'), async (req, res) => {
+  const analysisId = Date.now().toString();
   try {
-    // Create a unique ID for this analysis request
-    const analysisId = Date.now().toString();
-    analysisProgress.set(analysisId, { status: 'starting', progress: 5 });
+    const pool = await getConnection();
+    await pool.request()
+      .input('jobID', sql.VarChar, analysisId)
+      .input('status', sql.VarChar, 'starting')
+      .input('progress', sql.Int, 5)
+      .query(`
+        INSERT INTO analysisJobs (jobID, status, progress, updatedAt) 
+        VALUES (@jobID, @status, @progress, GETDATE())
+      `);
     
     // Send an immediate response with the analysis ID so the frontend can start polling
     res.json({
@@ -356,7 +389,11 @@ app.post('/api/predictive-analysis/upload', upload.single('file'), async (req, r
     if (req.file) {
       const filePath = req.file.path;
       console.log("File uploaded.");
-      analysisProgress.set(analysisId, { status: 'reading_file', progress: 10 });
+      await pool.request()
+        .input('jobID', sql.VarChar, analysisId)
+        .input('status', sql.VarChar, 'reading_file')
+        .input('progress', sql.Int, 10)
+        .query('UPDATE analysisJobs SET status = @status, progress = @progress, updatedAt = GETDATE() WHERE jobID = @jobID');
       
       // Handle different file types
       const fileExtension = path.extname(filePath).toLowerCase();
@@ -370,18 +407,24 @@ app.post('/api/predictive-analysis/upload', upload.single('file'), async (req, r
         // For PDF files, use pdf-parse
         try {
           const dataBuffer = fs.readFileSync(filePath);
-          analysisProgress.set(analysisId, { status: 'parsing_pdf', progress: 20 });
+          await pool.request()
+            .input('jobID', sql.VarChar, analysisId)
+            .input('status', sql.VarChar, 'parsing_pdf')
+            .input('progress', sql.Int, 20)
+            .query('UPDATE analysisJobs SET status = @status, progress = @progress, updatedAt = GETDATE() WHERE jobID = @jobID');
+
           const pdfData = await pdfParse(dataBuffer);
           fileContent = pdfData.text;
           console.log("PDF content extracted, length:", fileContent.length);
         } catch (pdfError) {
           console.error("Error parsing PDF:", pdfError);
           fileContent = `Error extracting content from PDF: ${req.file.originalname}`;
-          analysisProgress.set(analysisId, { 
-            status: 'error', 
-            progress: 100,
-            error: `Error extracting content from PDF: ${pdfError.message}`
-          });
+          await pool.request()
+            .input('jobID', sql.VarChar, analysisId)
+            .input('status', sql.VarChar, 'error')
+            .input('progress', sql.Int, 100)
+            .input('errorMessage', sql.NVarChar, `Error extracting content from PDF: ${pdfError.message}`)
+            .query('UPDATE analysisJobs SET status = @status, progress = @progress, errorMessage = @errorMessage, updatedAt = GETDATE() WHERE jobID = @jobID');
           return;
         }
       } 
@@ -396,15 +439,20 @@ app.post('/api/predictive-analysis/upload', upload.single('file'), async (req, r
       }
     } else {
       console.log("No file received in the request");
-      analysisProgress.set(analysisId, { 
-        status: 'error', 
-        progress: 100,
-        error: 'No file uploaded'
-      });
+      await pool.request()
+        .input('jobID', sql.VarChar, analysisId)
+        .input('status', sql.VarChar, 'error')
+        .input('progress', sql.Int, 100)
+        .input('errorMessage', sql.NVarChar, 'No file uploaded')
+        .query('UPDATE analysisJobs SET status = @status, progress = @progress, errorMessage = @errorMessage, updatedAt = GETDATE() WHERE jobID = @jobID');
       return;
     }
     
-    analysisProgress.set(analysisId, { status: 'preparing_analysis', progress: 30 });
+    await pool.request()
+      .input('jobID', sql.VarChar, analysisId)
+      .input('status', sql.VarChar, 'preparing_analysis')
+      .input('progress', sql.Int, 30)
+      .query('UPDATE analysisJobs SET status = @status, progress = @progress, updatedAt = GETDATE() WHERE jobID = @jobID');
     
     // Get analysis options from request body
     const options = {
@@ -424,35 +472,36 @@ app.post('/api/predictive-analysis/upload', upload.single('file'), async (req, r
     };
     
     console.log("Sending options to Python.");
-    analysisProgress.set(analysisId, { status: 'sending_to_ai', progress: 40 });
+    await pool.request()
+      .input('jobID', sql.VarChar, analysisId)
+      .input('status', sql.VarChar, 'sending_to_ai')
+      .input('progress', sql.Int, 40)
+      .query('UPDATE analysisJobs SET status = @status, progress = @progress, updatedAt = GETDATE() WHERE jobID = @jobID');
     
     // Call Python script with options using PyBridgePA
     try {
       const analysisResult = await PyBridgePA.runPredictiveAnalysis(options);
-      analysisProgress.set(analysisId, { 
-        status: 'completed', 
-        progress: 100,
-        result: analysisResult
-      });
+      await pool.request()
+        .input('jobID', sql.VarChar, analysisId)
+        .input('status', sql.VarChar, 'completed')
+        .input('progress', sql.Int, 100)
+        .input('result', sql.NVarChar, JSON.stringify(analysisResult))
+        .query('UPDATE analysisJobs SET status = @status, progress = @progress, result = @result, updatedAt = GETDATE() WHERE jobID = @jobID');
+
     } catch (error) {
       console.error("Error in predictive analysis:", error);
-      analysisProgress.set(analysisId, { 
-        status: 'error', 
-        progress: 100,
-        error: error.message
-      });
+      await pool.request()
+        .input('jobID', sql.VarChar, analysisId)
+        .input('status', sql.VarChar, 'error')
+        .input('progress', sql.Int, 100)
+        .input('errorMessage', sql.NVarChar, error.message)
+        .query('UPDATE analysisJobs SET status = @status, progress = @progress, errorMessage = @errorMessage, updatedAt = GETDATE() WHERE jobID = @jobID');
     }
     
     // Clean up the uploaded file
     if (req.file) {
       fs.unlinkSync(req.file.path);
     }
-    
-    // Clean up progress after 30 minutes
-    setTimeout(() => {
-      analysisProgress.delete(analysisId);
-    }, 30 * 60 * 1000);
-    
   } catch (error) {
     console.error('Error in predictive analysis upload:', error);
     if (req.file) {

@@ -5,9 +5,6 @@ const bcrypt = require('bcrypt');
 const { sendPasswordResetEmail, verifyOTP } = require('../Email/email');
 const { addAuditTrail } = require('../audit/auditService');
 
-// Store OTPs temporarily (in a real app, use a database)
-const otpStore = new Map();
-
 // Request password reset
 router.post('/request', async (req, res) => {
   try {
@@ -46,13 +43,25 @@ router.post('/request', async (req, res) => {
       });
     }
     
-    // Store OTP with expiration (5 minutes instead of 1 minute)
-    otpStore.set(username, {
-      otp,
-      expires: Date.now() + 5 * 60 * 1000, // 5 minutes
-      attempts: 0,
-      used: false
-    });
+    // Hash the OTP before storing
+    const hashedOtp = await bcrypt.hash(otp, 10);
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+
+    // Invalidate any previous OTPs for this user
+    await pool.request()
+      .input('userID', sql.Int, userID)
+      .query('DELETE FROM otpStore WHERE userID = @userID');
+
+    // Store the new hashed OTP in the database
+    await pool.request()
+      .input('userID', sql.Int, userID)
+      .input('hashedOtp', sql.VarChar, hashedOtp)
+      .input('expiresAt', sql.DateTime2, expiresAt)
+      .query(`
+        INSERT INTO otpStore (userID, otpCode, expiresAt, attempts, isUsed) 
+        VALUES (@userID, @hashedOtp, @expiresAt, 0, 0)
+      `);
+
     addAuditTrail({
         actor: 'C',
         module: 'F',
@@ -77,7 +86,7 @@ router.post('/request', async (req, res) => {
 });
 
 // Verify OTP
-router.post('/verify-otp', (req, res) => {
+router.post('/verify-otp', async (req, res) => {
   try {
     const { username, otp } = req.body;
     
@@ -88,8 +97,25 @@ router.post('/verify-otp', (req, res) => {
       });
     }
     
-    const otpData = otpStore.get(username);
-    
+    const pool = await getConnection();
+    const userResult = await pool.request()
+      .input('username', sql.VarChar, username)
+      .query('SELECT userID FROM userInfo WHERE username = @username');
+
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    const { userID } = userResult.recordset[0];
+
+    // Fetch the latest, unused OTP for the user
+    const otpResult = await pool.request()
+      .input('userID', sql.Int, userID)
+      .query(`
+        SELECT * FROM otpStore 
+        WHERE userID = @userID AND isUsed = 0 
+        ORDER BY createdAt DESC
+      `);
+    const otpData = otpResult.recordset[0];
     if (!otpData) {
       return res.status(400).json({
         success: false,
@@ -98,8 +124,8 @@ router.post('/verify-otp', (req, res) => {
     }
     
     // Check if OTP has expired
-    if (Date.now() > otpData.expires) {
-      otpStore.delete(username);
+    if (new Date() > new Date(otpData.expiresAt)) {
+      await pool.request().input('otpID', sql.Int, otpData.otpID).query('DELETE FROM otpStore WHERE otpID = @otpID');
       return res.status(400).json({
         success: false,
         message: 'Verification code has expired. Please request a new one.'
@@ -114,12 +140,12 @@ router.post('/verify-otp', (req, res) => {
       });
     }
     
-    // Increment attempts
-    otpData.attempts += 1;
-    
     // Check if max attempts reached (3 attempts)
-    if (otpData.attempts > 3) {
-      otpStore.delete(username);
+    if (otpData.attempts >= 3) {
+      await pool.request()
+        .input('otpID', sql.Int, otpData.otpID)
+        .query('DELETE FROM otpStore WHERE otpID = @otpID');
+
       return res.status(400).json({
         success: false,
         message: 'Too many failed attempts. Please request a new verification code.'
@@ -127,9 +153,13 @@ router.post('/verify-otp', (req, res) => {
     }
     
     // Check if OTP matches
-    if (otpData.otp !== otp) {
-      // Update the otpData in the store with the incremented attempts
-      otpStore.set(username, otpData);
+    const otpMatch = await bcrypt.compare(otp, otpData.otpCode);
+    if (!otpMatch) {
+      // Increment attempts in the database
+      await pool.request()
+        .input('otpID', sql.Int, otpData.otpID)
+        .query('UPDATE otpStore SET attempts = attempts + 1 WHERE otpID = @otpID');
+
       addAuditTrail({
         actor: 'C',
         module: 'F',
@@ -146,9 +176,6 @@ router.post('/verify-otp', (req, res) => {
       });
     }
     
-    // Mark OTP as used
-    otpData.used = true;
-    otpStore.set(username, otpData);
     addAuditTrail({
         actor: 'C',
         module: 'F',
@@ -184,8 +211,25 @@ router.post('/reset', async (req, res) => {
       });
     }
     
-    const otpData = otpStore.get(username);
-    
+    const pool = await getConnection();
+    const userResult = await pool.request()
+      .input('username', sql.VarChar, username)
+      .query('SELECT userID FROM userInfo WHERE username = @username');
+
+    if (userResult.recordset.length === 0) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+    const { userID } = userResult.recordset[0];
+
+    // Fetch the latest, unused OTP for the user
+    const otpResult = await pool.request()
+      .input('userID', sql.Int, userID)
+      .query(`
+        SELECT * FROM otpStore 
+        WHERE userID = @userID AND isUsed = 0 
+        ORDER BY createdAt DESC
+      `);
+    const otpData = otpResult.recordset[0];
     if (!otpData) {
       return res.status(400).json({
         success: false,
@@ -194,8 +238,8 @@ router.post('/reset', async (req, res) => {
     }
     
     // Check if OTP has expired
-    if (Date.now() > otpData.expires) {
-      otpStore.delete(username);
+    if (new Date() > new Date(otpData.expiresAt)) {
+      await pool.request().input('otpID', sql.Int, otpData.otpID).query('DELETE FROM otpStore WHERE otpID = @otpID');
       return res.status(400).json({
         success: false,
         message: 'Verification code has expired. Please request a new one.'
@@ -203,7 +247,8 @@ router.post('/reset', async (req, res) => {
     }
     
     // Check if OTP matches
-    if (otpData.otp !== otp) {
+    const otpMatch = await bcrypt.compare(otp, otpData.otpCode);
+    if (!otpMatch) {
       return res.status(400).json({
         success: false,
         message: 'Invalid verification code'
@@ -222,16 +267,15 @@ router.post('/reset', async (req, res) => {
     // Hash the password with bcrypt using salt rounds of 17
     const hashedPassword = await bcrypt.hash(newPassword, 17);
     
-    const pool = await getConnection();
-    
     // Update passKey with the hashed password
     await pool.request()
       .input('username', sql.VarChar, username)
       .input('passKey', sql.VarChar, hashedPassword)
       .query('UPDATE userInfo SET passKey = @passKey WHERE username = @username');
     
-    // Clear OTP
-    otpStore.delete(username);
+    // OTP is valid and used, so delete it
+    await pool.request().input('otpID', sql.Int, otpData.otpID).query('DELETE FROM otpStore WHERE otpID = @otpID');
+
     addAuditTrail({
         actor: 'C',
         module: 'F',
