@@ -112,13 +112,13 @@ if (accountCreationRouter && typeof accountCreationRouter === 'function') {
 }
 
 if (rolesRouter && typeof rolesRouter === 'function') {
-  app.use('/api/roles', rolesRouter);
+  app.use('/api/admin/roles', rolesRouter);
 } else {
   console.error('rolesRouter is not a valid middleware function');
 }
 
 if(backupRouter && typeof backupRouter === 'function') {
-  app.use('/api/backup', backupRouter);
+  app.use('/api/admin/backup', backupRouter);
 } else {
   console.error('backupRouter is not a valid middleware function');
 }
