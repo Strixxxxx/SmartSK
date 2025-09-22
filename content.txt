@@ -1,0 +1,18 @@
+
+The output of your ls -a command shows a directory named backend. This confirms that your backend code is present on the server. The 404 Not Found errors you're getting for routes like /api/admin/users mean the server is active, but it isn't finding the specific endpoints you're requesting.
+
+Why the Error Persists 🕵️
+The 404 Not Found error isn't a deployment issue; it's a routing issue. The server is receiving the request but doesn't have a route defined to handle it. The most likely causes are:
+
+Incorrect Path: The frontend is requesting /api/admin/users, but your backend code has the route defined differently. The backend router might be using /api/users or another path entirely.
+
+Code Not Loaded: While the backend folder is present, the server might not be correctly loading your route definitions at runtime. This can happen if the app.js or server.js file is not correctly configured to use the route files in the backend directory.
+
+Next Steps to Fix the Issue 🛠️
+Navigate into the backend directory and examine its contents.
+cd backend
+
+List the files inside to confirm that your router files (e.g., routes/admin.js, routes/users.js) are there.
+ls -a
+
+Inspect the main server file (e.g., server.js or app.js) to see how the routes are being imported and used. Look for lines that look like this:

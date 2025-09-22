@@ -68,9 +68,10 @@ const isAdmin = async (req, res, next) => {
     const result = await pool.request()
       .input('userId', sql.Int, userId)
       .query(`
-        SELECT position
-        FROM userInfo
-        WHERE userID = @userId
+        SELECT r.roleName as position
+        FROM userInfo u
+        JOIN roles r ON u.position = r.roleID
+        WHERE u.userID = @userId
       `);
     
     if (result.recordset.length === 0) {
@@ -83,8 +84,8 @@ const isAdmin = async (req, res, next) => {
     
     const userPosition = result.recordset[0].position;
     
-    // Check if position is MA or contains admin
-    if (userPosition === 'MA' || userPosition === 'SA' || userPosition.toLowerCase().includes('admin')) {
+    // Check if position is MA or SA
+    if (userPosition === 'MA' || userPosition === 'SA') {
       next(); // User is an admin, proceed
     } else {
       return res.status(403).json({

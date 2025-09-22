@@ -65,381 +65,20 @@ AppRoutes	@	AppRoutes.tsx:83
 App	@	App.tsx:17
 <App>		
 (anonymous)	@	main.tsx:8
-﻿
 
 --Roles' Module
 
-GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/roles/users 404 (Not Found)
-dispatchXhrRequest @ axios.js?v=ba7498e9:1648
-xhr @ axios.js?v=ba7498e9:1528
-dispatchRequest @ axios.js?v=ba7498e9:2003
-Promise.then
-_request @ axios.js?v=ba7498e9:2206
-request @ axios.js?v=ba7498e9:2115
-Axios.<computed> @ axios.js?v=ba7498e9:2243
-wrap @ axios.js?v=ba7498e9:8
-fetchData @ Roles.tsx:56
-(anonymous) @ Roles.tsx:93
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9887
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9899
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11302
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649
-<Roles>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-AppRoutes @ AppRoutes.tsx:84
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<AppRoutes>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-App @ App.tsx:17
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<App>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-(anonymous) @ main.tsx:8Understand this error
-axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Error</title>
-</head>
-<body>
-<pre>Cannot GET /api/roles/users</pre>
-</body>
-</html>
-
-(anonymous) @ axiosConfig.ts:101
-Promise.then
-_request @ axios.js?v=ba7498e9:2206
-request @ axios.js?v=ba7498e9:2115
-Axios.<computed> @ axios.js?v=ba7498e9:2243
-wrap @ axios.js?v=ba7498e9:8
-fetchData @ Roles.tsx:56
-(anonymous) @ Roles.tsx:93
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9887
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9899
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11302
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649
-<Roles>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-AppRoutes @ AppRoutes.tsx:84
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<AppRoutes>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-App @ App.tsx:17
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<App>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-(anonymous) @ main.tsx:8Understand this error
-Roles.tsx:57  GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/roles/all 404 (Not Found)
-dispatchXhrRequest @ axios.js?v=ba7498e9:1648
-xhr @ axios.js?v=ba7498e9:1528
-dispatchRequest @ axios.js?v=ba7498e9:2003
-Promise.then
-_request @ axios.js?v=ba7498e9:2206
-request @ axios.js?v=ba7498e9:2115
-Axios.<computed> @ axios.js?v=ba7498e9:2243
-wrap @ axios.js?v=ba7498e9:8
-fetchData @ Roles.tsx:57
-(anonymous) @ Roles.tsx:93
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9887
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9899
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11302
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649
-<Roles>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-AppRoutes @ AppRoutes.tsx:84
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<AppRoutes>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-App @ App.tsx:17
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<App>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-(anonymous) @ main.tsx:8Understand this error
+Roles.tsx:57 
+ GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/roles/all 404 (Not Found)
+Promise.then		
+fetchData	@	Roles.tsx:57
+(anonymous)	@	Roles.tsx:93
+<Roles>		
+AppRoutes	@	AppRoutes.tsx:84
+<AppRoutes>		
+App	@	App.tsx:17
+<App>		
+(anonymous)	@	main.tsx:8
 axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -450,218 +89,27 @@ axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
 <pre>Cannot GET /api/roles/all</pre>
 </body>
 </html>
-
-(anonymous) @ axiosConfig.ts:101
-Promise.then
-_request @ axios.js?v=ba7498e9:2206
-request @ axios.js?v=ba7498e9:2115
-Axios.<computed> @ axios.js?v=ba7498e9:2243
-wrap @ axios.js?v=ba7498e9:8
-fetchData @ Roles.tsx:57
-(anonymous) @ Roles.tsx:93
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9887
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9899
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11302
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649
-<Roles>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-AppRoutes @ AppRoutes.tsx:84
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<AppRoutes>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-App @ App.tsx:17
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<App>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-(anonymous) @ main.tsx:8Understand this error
-Roles.tsx:56  GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/roles/users 404 (Not Found)
-dispatchXhrRequest @ axios.js?v=ba7498e9:1648
-xhr @ axios.js?v=ba7498e9:1528
-dispatchRequest @ axios.js?v=ba7498e9:2003
-Promise.then
-_request @ axios.js?v=ba7498e9:2206
-request @ axios.js?v=ba7498e9:2115
-Axios.<computed> @ axios.js?v=ba7498e9:2243
-wrap @ axios.js?v=ba7498e9:8
-fetchData @ Roles.tsx:56
-(anonymous) @ Roles.tsx:93
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-reconnectPassiveEffects @ react-dom_client.js?v=ba7498e9:10016
-doubleInvokeEffectsOnFiber @ react-dom_client.js?v=ba7498e9:11461
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11432
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-commitDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11469
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11309
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649
-<Roles>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-AppRoutes @ AppRoutes.tsx:84
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<AppRoutes>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-App @ App.tsx:17
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<App>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-(anonymous) @ main.tsx:8Understand this error
+(anonymous)	@	axiosConfig.ts:101
+Promise.then		
+fetchData	@	Roles.tsx:57
+(anonymous)	@	Roles.tsx:93
+<Roles>		
+AppRoutes	@	AppRoutes.tsx:84
+<AppRoutes>		
+App	@	App.tsx:17
+<App>		
+(anonymous)	@	main.tsx:8
+Roles.tsx:56 
+ GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/roles/users 404 (Not Found)
+Promise.then		
+fetchData	@	Roles.tsx:56
+(anonymous)	@	Roles.tsx:93
+<Roles>		
+AppRoutes	@	AppRoutes.tsx:84
+<AppRoutes>		
+App	@	App.tsx:17
+<App>		
+(anonymous)	@	main.tsx:8
 axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -672,382 +120,20 @@ axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
 <pre>Cannot GET /api/roles/users</pre>
 </body>
 </html>
-
-(anonymous) @ axiosConfig.ts:101
-Promise.then
-_request @ axios.js?v=ba7498e9:2206
-request @ axios.js?v=ba7498e9:2115
-Axios.<computed> @ axios.js?v=ba7498e9:2243
-wrap @ axios.js?v=ba7498e9:8
-fetchData @ Roles.tsx:56
-(anonymous) @ Roles.tsx:93
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-reconnectPassiveEffects @ react-dom_client.js?v=ba7498e9:10016
-doubleInvokeEffectsOnFiber @ react-dom_client.js?v=ba7498e9:11461
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11432
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-commitDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11469
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11309
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649
-<Roles>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-AppRoutes @ AppRoutes.tsx:84
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<AppRoutes>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-App @ App.tsx:17
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<App>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-(anonymous) @ main.tsx:8Understand this error
-Roles.tsx:57  GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/roles/all 404 (Not Found)
-dispatchXhrRequest @ axios.js?v=ba7498e9:1648
-xhr @ axios.js?v=ba7498e9:1528
-dispatchRequest @ axios.js?v=ba7498e9:2003
-Promise.then
-_request @ axios.js?v=ba7498e9:2206
-request @ axios.js?v=ba7498e9:2115
-Axios.<computed> @ axios.js?v=ba7498e9:2243
-wrap @ axios.js?v=ba7498e9:8
-fetchData @ Roles.tsx:57
-(anonymous) @ Roles.tsx:93
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-reconnectPassiveEffects @ react-dom_client.js?v=ba7498e9:10016
-doubleInvokeEffectsOnFiber @ react-dom_client.js?v=ba7498e9:11461
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11432
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-commitDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11469
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11309
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649
-<Roles>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-AppRoutes @ AppRoutes.tsx:84
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<AppRoutes>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-App @ App.tsx:17
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<App>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-(anonymous) @ main.tsx:8Understand this error
-axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Error</title>
-</head>
-<body>
-<pre>Cannot GET /api/roles/all</pre>
-</body>
-</html>
-
-(anonymous) @ axiosConfig.ts:101
-Promise.then
-_request @ axios.js?v=ba7498e9:2206
-request @ axios.js?v=ba7498e9:2115
-Axios.<computed> @ axios.js?v=ba7498e9:2243
-wrap @ axios.js?v=ba7498e9:8
-fetchData @ Roles.tsx:57
-(anonymous) @ Roles.tsx:93
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-reconnectPassiveEffects @ react-dom_client.js?v=ba7498e9:10016
-doubleInvokeEffectsOnFiber @ react-dom_client.js?v=ba7498e9:11461
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11432
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-commitDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11469
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11309
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649
-<Roles>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-AppRoutes @ AppRoutes.tsx:84
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<AppRoutes>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-App @ App.tsx:17
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
-renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
-renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
-updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
-beginWork @ react-dom_client.js?v=ba7498e9:7654
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
-workLoopSync @ react-dom_client.js?v=ba7498e9:10728
-renderRootSync @ react-dom_client.js?v=ba7498e9:10711
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ba7498e9:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ba7498e9:36
-<App>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
-(anonymous) @ main.tsx:8Understand this error
+(anonymous)	@	axiosConfig.ts:101
+Promise.then		
+fetchData	@	Roles.tsx:56
+(anonymous)	@	Roles.tsx:93
+<Roles>		
+AppRoutes	@	AppRoutes.tsx:84
+<AppRoutes>		
+App	@	App.tsx:17
+<App>		
+(anonymous)	@	main.tsx:8
+﻿
 
 --Session Module
 
-GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/admin/sessions 404 (Not Found)
-dispatchXhrRequest @ axios.js?v=ba7498e9:1648
-xhr @ axios.js?v=ba7498e9:1528
-dispatchRequest @ axios.js?v=ba7498e9:2003
-Promise.then
-_request @ axios.js?v=ba7498e9:2206
-request @ axios.js?v=ba7498e9:2115
-Axios.<computed> @ axios.js?v=ba7498e9:2243
-wrap @ axios.js?v=ba7498e9:8
-fetchSessions @ sessions.tsx:32
-(anonymous) @ sessions.tsx:42
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9887
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9899
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11302
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649Understand this error
 axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1058,233 +144,48 @@ axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
 <pre>Cannot GET /api/admin/sessions</pre>
 </body>
 </html>
-
-(anonymous) @ axiosConfig.ts:101
-Promise.then
-_request @ axios.js?v=ba7498e9:2206
-request @ axios.js?v=ba7498e9:2115
-Axios.<computed> @ axios.js?v=ba7498e9:2243
-wrap @ axios.js?v=ba7498e9:8
-fetchSessions @ sessions.tsx:32
-(anonymous) @ sessions.tsx:42
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9887
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9899
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11302
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649Understand this error
-sessions.tsx:36 AxiosError {message: 'Request failed with status code 404', name: 'AxiosError', code: 'ERR_BAD_REQUEST', config: {…}, request: XMLHttpRequest, …}code: "ERR_BAD_REQUEST"config: {transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}message: "Request failed with status code 404"name: "AxiosError"request: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}response: {data: '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta char…ot GET /api/admin/sessions</pre>\n</body>\n</html>\n', status: 404, statusText: 'Not Found', headers: AxiosHeaders, config: {…}, …}status: 404stack: "AxiosError: Request failed with status code 404\n    at settle (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:1229:12)\n    at XMLHttpRequest.onloadend (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:1561:7)\n    at Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:2119:41)\n    at async fetchSessions (http://localhost:5173/src/components/Admin/Session%20Log/sessions.tsx:34:24)"[[Prototype]]: Error
-fetchSessions @ sessions.tsx:36
-await in fetchSessions
-(anonymous) @ sessions.tsx:42
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9887
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9881
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9984
-recursivelyTraversePassiveMountEffects @ react-dom_client.js?v=ba7498e9:9868
-commitPassiveMountOnFiber @ react-dom_client.js?v=ba7498e9:9899
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11302
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649Understand this error
-sessions.tsx:32  GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/admin/sessions 404 (Not Found)
-dispatchXhrRequest @ axios.js?v=ba7498e9:1648
-xhr @ axios.js?v=ba7498e9:1528
-dispatchRequest @ axios.js?v=ba7498e9:2003
-Promise.then
-_request @ axios.js?v=ba7498e9:2206
-request @ axios.js?v=ba7498e9:2115
-Axios.<computed> @ axios.js?v=ba7498e9:2243
-wrap @ axios.js?v=ba7498e9:8
-fetchSessions @ sessions.tsx:32
-(anonymous) @ sessions.tsx:42
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-reconnectPassiveEffects @ react-dom_client.js?v=ba7498e9:10016
-doubleInvokeEffectsOnFiber @ react-dom_client.js?v=ba7498e9:11461
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11432
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-commitDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11469
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11309
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649Understand this error
+(anonymous)	@	axiosConfig.ts:101
+Promise.then		
+fetchSessions	@	sessions.tsx:32
+(anonymous)	@	sessions.tsx:42
+<Sessions>		
+AppRoutes	@	AppRoutes.tsx:86
+sessions.tsx:36 
+AxiosError {message: 'Request failed with status code 404', name: 'AxiosError', code: 'ERR_BAD_REQUEST', config: {…}, request: XMLHttpRequest, …}
+code
+: 
+"ERR_BAD_REQUEST"
+config
+: 
+{transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}
+message
+: 
+"Request failed with status code 404"
+name
+: 
+"AxiosError"
+request
+: 
+XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
+response
+: 
+{data: '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta char…ot GET /api/admin/sessions</pre>\n</body>\n</html>\n', status: 404, statusText: 'Not Found', headers: AxiosHeaders, config: {…}, …}
+status
+: 
+404
+stack
+: 
+"AxiosError: Request failed with status code 404\n    at settle (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:1229:12)\n    at XMLHttpRequest.onloadend (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:1561:7)\n    at Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:2119:41)\n    at async fetchSessions (http://localhost:5173/src/components/Admin/Session%20Log/sessions.tsx:34:24)"
+[[Prototype]]
+: 
+Error
+sessions.tsx:32 
+ GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/admin/sessions 404 (Not Found)
+Promise.then		
+fetchSessions	@	sessions.tsx:32
+(anonymous)	@	sessions.tsx:42
+<Sessions>		
+AppRoutes	@	AppRoutes.tsx:86
 axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1295,117 +196,47 @@ axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
 <pre>Cannot GET /api/admin/sessions</pre>
 </body>
 </html>
-
-(anonymous) @ axiosConfig.ts:101
-Promise.then
-_request @ axios.js?v=ba7498e9:2206
-request @ axios.js?v=ba7498e9:2115
-Axios.<computed> @ axios.js?v=ba7498e9:2243
-wrap @ axios.js?v=ba7498e9:8
-fetchSessions @ sessions.tsx:32
-(anonymous) @ sessions.tsx:42
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-reconnectPassiveEffects @ react-dom_client.js?v=ba7498e9:10016
-doubleInvokeEffectsOnFiber @ react-dom_client.js?v=ba7498e9:11461
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11432
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-commitDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11469
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11309
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649Understand this error
-sessions.tsx:36 AxiosError {message: 'Request failed with status code 404', name: 'AxiosError', code: 'ERR_BAD_REQUEST', config: {…}, request: XMLHttpRequest, …}code: "ERR_BAD_REQUEST"config: {transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}message: "Request failed with status code 404"name: "AxiosError"request: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}response: {data: '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta char…ot GET /api/admin/sessions</pre>\n</body>\n</html>\n', status: 404, statusText: 'Not Found', headers: AxiosHeaders, config: {…}, …}status: 404stack: "AxiosError: Request failed with status code 404\n    at settle (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:1229:12)\n    at XMLHttpRequest.onloadend (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:1561:7)\n    at Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:2119:41)\n    at async fetchSessions (http://localhost:5173/src/components/Admin/Session%20Log/sessions.tsx:34:24)"[[Prototype]]: Error
-fetchSessions @ sessions.tsx:36
-await in fetchSessions
-(anonymous) @ sessions.tsx:42
-react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17486
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-commitHookEffectListMount @ react-dom_client.js?v=ba7498e9:8460
-commitHookPassiveMountEffects @ react-dom_client.js?v=ba7498e9:8518
-reconnectPassiveEffects @ react-dom_client.js?v=ba7498e9:10016
-doubleInvokeEffectsOnFiber @ react-dom_client.js?v=ba7498e9:11461
-runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11432
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-recursivelyTraverseAndDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11438
-commitDoubleInvokeEffectsInDEV @ react-dom_client.js?v=ba7498e9:11469
-flushPassiveEffects @ react-dom_client.js?v=ba7498e9:11309
-flushPendingEffects @ react-dom_client.js?v=ba7498e9:11276
-flushSpawnedWork @ react-dom_client.js?v=ba7498e9:11250
-commitRoot @ react-dom_client.js?v=ba7498e9:11081
-commitRootWhenReady @ react-dom_client.js?v=ba7498e9:10512
-performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10457
-performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
-(anonymous) @ react-dom_client.js?v=ba7498e9:11649Understand this error
+(anonymous)	@	axiosConfig.ts:101
+Promise.then		
+fetchSessions	@	sessions.tsx:32
+(anonymous)	@	sessions.tsx:42
+<Sessions>		
+AppRoutes	@	AppRoutes.tsx:86
+sessions.tsx:36 
+AxiosError {message: 'Request failed with status code 404', name: 'AxiosError', code: 'ERR_BAD_REQUEST', config: {…}, request: XMLHttpRequest, …}
+code
+: 
+"ERR_BAD_REQUEST"
+config
+: 
+{transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}
+message
+: 
+"Request failed with status code 404"
+name
+: 
+"AxiosError"
+request
+: 
+XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
+response
+: 
+{data: '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta char…ot GET /api/admin/sessions</pre>\n</body>\n</html>\n', status: 404, statusText: 'Not Found', headers: AxiosHeaders, config: {…}, …}
+status
+: 
+404
+stack
+: 
+"AxiosError: Request failed with status code 404\n    at settle (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:1229:12)\n    at XMLHttpRequest.onloadend (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:1561:7)\n    at Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:2119:41)\n    at async fetchSessions (http://localhost:5173/src/components/Admin/Session%20Log/sessions.tsx:34:24)"
+[[Prototype]]
+: 
+Error
+fetchSessions	@	sessions.tsx:36
+await in fetchSessions		
+(anonymous)	@	sessions.tsx:42
+<Sessions>		
+AppRoutes	@	AppRoutes.tsx:86
+﻿
 
 --Backend(Azure Portal's Log Stream)
 
