@@ -49,7 +49,10 @@ dotenv.config();
 const app = express();
 
 const corsOptions = {
-  origin: ['http://localhost:5173'],
+  // Read the allowed origin from an environment variable for flexibility.
+  // Fallback to localhost for development if not set.
+  // Multiple origins can be provided as a comma-separated string.
+  origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : 'http://localhost:5173',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   credentials: true,

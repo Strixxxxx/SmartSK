@@ -264,19 +264,6 @@ router.post('/reset', async (req, res) => {
       });
     }
     
-    // Atomically delete the OTP to prevent reuse and for cleanup.
-    // If rowsAffected is 0, the OTP was already used or invalid.
-    const deleteOtpResult = await pool.request()
-      .input('otpID', sql.Int, otpData.otpID)
-      .query('DELETE FROM otpStore WHERE otpID = @otpID AND isUsed = 0');
-
-    if (deleteOtpResult.rowsAffected[0] === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'This verification code has already been used, expired, or is invalid.'
-      });
-    }
-
     // Hash the password with bcrypt using a standard salt round value (e.g., 12)
     const hashedPassword = await bcrypt.hash(newPassword, 12);
     
@@ -285,6 +272,11 @@ router.post('/reset', async (req, res) => {
       .input('username', sql.VarChar, username)
       .input('passKey', sql.VarChar, hashedPassword)
       .query('UPDATE userInfo SET passKey = @passKey WHERE username = @username');
+
+    // Now that the password has been successfully reset, invalidate the OTP.
+    await pool.request()
+      .input('otpID', sql.Int, otpData.otpID)
+      .query('DELETE FROM otpStore WHERE otpID = @otpID');
 
     addAuditTrail({
         actor: 'C',
