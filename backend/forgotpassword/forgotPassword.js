@@ -264,15 +264,16 @@ router.post('/reset', async (req, res) => {
       });
     }
     
-    // Atomically mark the OTP as used to prevent race conditions
-    const updateOtpResult = await pool.request()
+    // Atomically delete the OTP to prevent reuse and for cleanup.
+    // If rowsAffected is 0, the OTP was already used or invalid.
+    const deleteOtpResult = await pool.request()
       .input('otpID', sql.Int, otpData.otpID)
-      .query('UPDATE otpStore SET isUsed = 1 WHERE otpID = @otpID AND isUsed = 0');
+      .query('DELETE FROM otpStore WHERE otpID = @otpID AND isUsed = 0');
 
-    if (updateOtpResult.rowsAffected[0] === 0) {
+    if (deleteOtpResult.rowsAffected[0] === 0) {
       return res.status(400).json({
         success: false,
-        message: 'This verification code has already been used or is invalid.'
+        message: 'This verification code has already been used, expired, or is invalid.'
       });
     }
 

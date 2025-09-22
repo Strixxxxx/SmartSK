@@ -1,1090 +1,356 @@
 --Frontend (Browser's Console)
 
-Failed to load resource: the server responded with a status of 404 (Not Found)
-axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Error</title>
-</head>
-<body>
-<pre>Cannot GET /api/admin/sessions</pre>
-</body>
-</html>
-(anonymous)	@	axiosConfig.ts:101
-sessions.tsx:36 
-AxiosError
-code
-: 
-"ERR_BAD_REQUEST"
-config
-: 
-{transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}
-message
-: 
-"Request failed with status code 404"
-name
-: 
-"AxiosError"
-request
-: 
-XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
-response
-: 
-{data: '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta char…ot GET /api/admin/sessions</pre>\n</body>\n</html>\n', status: 404, statusText: 'Not Found', headers: AxiosHeaders, config: {…}, …}
-status
-: 
-404
-stack
-: 
-"AxiosError: Request failed with status code 404\n    at settle (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:1229:12)\n    at XMLHttpRequest.onloadend (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:1561:7)\n    at Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:2119:41)\n    at async fetchSessions (http://localhost:5173/src/components/Admin/Session%20Log/sessions.tsx:34:24)"
-[[Prototype]]
-: 
-Error
-fetchSessions	@	sessions.tsx:36
-smartsk-backend-fsc6…pi/admin/sessions:1 
- Failed to load resource: the server responded with a status of 404 (Not Found)
-axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Error</title>
-</head>
-<body>
-<pre>Cannot GET /api/admin/sessions</pre>
-</body>
-</html>
-(anonymous)	@	axiosConfig.ts:101
-sessions.tsx:36 
-AxiosError
-code
-: 
-"ERR_BAD_REQUEST"
-config
-: 
-{transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}
-message
-: 
-"Request failed with status code 404"
-name
-: 
-"AxiosError"
-request
-: 
-XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
-response
-: 
-{data: '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta char…ot GET /api/admin/sessions</pre>\n</body>\n</html>\n', status: 404, statusText: 'Not Found', headers: AxiosHeaders, config: {…}, …}
-status
-: 
-404
-stack
-: 
-"AxiosError: Request failed with status code 404\n    at settle (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:1229:12)\n    at XMLHttpRequest.onloadend (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:1561:7)\n    at Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ba7498e9:2119:41)\n    at async fetchSessions (http://localhost:5173/src/components/Admin/Session%20Log/sessions.tsx:34:24)"
-[[Prototype]]
-: 
-Error
-fetchSessions	@	sessions.tsx:36
+Access to XMLHttpRequest at 'https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/login' from origin 'http://localhost:5173' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+axiosConfig.ts:118 Network error - no response received: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}onabort: ƒ handleAbort()onerror: ƒ handleError()onload: nullonloadend: ƒ onloadend()onloadstart: nullonprogress: nullonreadystatechange: nullontimeout: ƒ handleTimeout()readyState: 4response: ""responseText: ""responseType: ""responseURL: ""responseXML: nullstatus: 0statusText: ""timeout: 300000upload: XMLHttpRequestUpload {onloadstart: null, onprogress: null, onabort: null, onerror: null, onload: null, …}withCredentials: true[[Prototype]]: XMLHttpRequest
+(anonymous) @ axiosConfig.ts:118
+Promise.then
+_request @ axios.js?v=ba7498e9:2206
+request @ axios.js?v=ba7498e9:2115
+httpMethod @ axios.js?v=ba7498e9:2253
+wrap @ axios.js?v=ba7498e9:8
+login @ auth.ts:171
+login @ AuthContext.tsx:105
+handleSubmit @ Login.tsx:87
+executeDispatch @ react-dom_client.js?v=ba7498e9:11736
+runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
+processDispatchQueue @ react-dom_client.js?v=ba7498e9:11772
+(anonymous) @ react-dom_client.js?v=ba7498e9:12182
+batchedUpdates$1 @ react-dom_client.js?v=ba7498e9:2628
+dispatchEventForPluginEventSystem @ react-dom_client.js?v=ba7498e9:11877
+dispatchEvent @ react-dom_client.js?v=ba7498e9:14792
+dispatchDiscreteEvent @ react-dom_client.js?v=ba7498e9:14773
+<form>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
+Login @ Login.tsx:136
+react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
+renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
+renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
+updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
+beginWork @ react-dom_client.js?v=ba7498e9:7654
+runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
+performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
+workLoopSync @ react-dom_client.js?v=ba7498e9:10728
+renderRootSync @ react-dom_client.js?v=ba7498e9:10711
+performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
+(anonymous) @ react-dom_client.js?v=ba7498e9:11649Understand this error
+auth.ts:171  POST https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/login net::ERR_FAILED
+dispatchXhrRequest @ axios.js?v=ba7498e9:1648
+xhr @ axios.js?v=ba7498e9:1528
+dispatchRequest @ axios.js?v=ba7498e9:2003
+Promise.then
+_request @ axios.js?v=ba7498e9:2206
+request @ axios.js?v=ba7498e9:2115
+httpMethod @ axios.js?v=ba7498e9:2253
+wrap @ axios.js?v=ba7498e9:8
+login @ auth.ts:171
+login @ AuthContext.tsx:105
+handleSubmit @ Login.tsx:87
+executeDispatch @ react-dom_client.js?v=ba7498e9:11736
+runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
+processDispatchQueue @ react-dom_client.js?v=ba7498e9:11772
+(anonymous) @ react-dom_client.js?v=ba7498e9:12182
+batchedUpdates$1 @ react-dom_client.js?v=ba7498e9:2628
+dispatchEventForPluginEventSystem @ react-dom_client.js?v=ba7498e9:11877
+dispatchEvent @ react-dom_client.js?v=ba7498e9:14792
+dispatchDiscreteEvent @ react-dom_client.js?v=ba7498e9:14773
+<form>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ba7498e9:250
+Login @ Login.tsx:136
+react_stack_bottom_frame @ react-dom_client.js?v=ba7498e9:17424
+renderWithHooksAgain @ react-dom_client.js?v=ba7498e9:4281
+renderWithHooks @ react-dom_client.js?v=ba7498e9:4217
+updateFunctionComponent @ react-dom_client.js?v=ba7498e9:6619
+beginWork @ react-dom_client.js?v=ba7498e9:7654
+runWithFiberInDEV @ react-dom_client.js?v=ba7498e9:1485
+performUnitOfWork @ react-dom_client.js?v=ba7498e9:10868
+workLoopSync @ react-dom_client.js?v=ba7498e9:10728
+renderRootSync @ react-dom_client.js?v=ba7498e9:10711
+performWorkOnRoot @ react-dom_client.js?v=ba7498e9:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ba7498e9:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ba7498e9:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=ba7498e9:11558
+(anonymous) @ react-dom_client.js?v=ba7498e9:11649Understand this error
 
 --Backend(Azure Portal's Log Stream)
 
-2025-09-22T04:16:52.913Z INFO  - dcf9164e728d Extracting 4KB / 4KB
-2025-09-22T04:16:52.914Z INFO  - dcf9164e728d Pull complete
-2025-09-22T04:16:53.923Z INFO  - 445fff30179a Extracting 384KB / 16MB
-2025-09-22T04:16:54.012Z INFO  - 445fff30179a Extracting 1MB / 16MB
-2025-09-22T04:16:54.168Z INFO  - 445fff30179a Extracting 2MB / 16MB
-2025-09-22T04:16:54.402Z INFO  - 445fff30179a Extracting 4MB / 16MB
-2025-09-22T04:16:54.515Z INFO  - 445fff30179a Extracting 4MB / 16MB
-2025-09-22T04:16:54.903Z INFO  - 445fff30179a Extracting 6MB / 16MB
-2025-09-22T04:16:55.678Z INFO  - 445fff30179a Extracting 8MB / 16MB
-2025-09-22T04:16:55.774Z INFO  - 445fff30179a Extracting 8MB / 16MB
-2025-09-22T04:16:56.175Z INFO  - 445fff30179a Extracting 9MB / 16MB
-2025-09-22T04:16:56.498Z INFO  - 445fff30179a Extracting 10MB / 16MB
-2025-09-22T04:16:56.717Z INFO  - 445fff30179a Extracting 10MB / 16MB
-2025-09-22T04:16:56.929Z INFO  - 445fff30179a Extracting 11MB / 16MB
-2025-09-22T04:16:57.586Z INFO  - 445fff30179a Extracting 12MB / 16MB
-2025-09-22T04:16:57.906Z INFO  - 445fff30179a Extracting 13MB / 16MB
-2025-09-22T04:16:58.527Z INFO  - 445fff30179a Extracting 15MB / 16MB
-2025-09-22T04:16:59.214Z INFO  - 445fff30179a Extracting 15MB / 16MB
-2025-09-22T04:16:59.852Z INFO  - 445fff30179a Extracting 15MB / 16MB
-2025-09-22T04:17:00.389Z INFO  - 445fff30179a Extracting 16MB / 16MB
-2025-09-22T04:17:00.425Z INFO  - 445fff30179a Pull complete
-2025-09-22T04:17:00.429Z INFO  - d4686acd0aaf Extracting 727B / 727B
-2025-09-22T04:17:00.437Z INFO  - d4686acd0aaf Extracting 727B / 727B
-2025-09-22T04:17:00.453Z INFO  - d4686acd0aaf Pull complete
-2025-09-22T04:17:00.462Z INFO  - 5505b5508946 Extracting 120B / 120B
-2025-09-22T04:17:00.468Z INFO  - 5505b5508946 Extracting 120B / 120B
-2025-09-22T04:17:00.483Z INFO  - 5505b5508946 Pull complete
-2025-09-22T04:17:00.719Z INFO  - 4705ecae348e Extracting 640KB / 30MB
-2025-09-22T04:17:01.065Z INFO  - 4705ecae348e Extracting 3MB / 30MB
-2025-09-22T04:17:01.814Z INFO  - 4705ecae348e Extracting 7MB / 30MB
-2025-09-22T04:17:01.814Z INFO  - 4705ecae348e Extracting 8MB / 30MB
-2025-09-22T04:17:02.331Z INFO  - 4705ecae348e Extracting 10MB / 30MB
-2025-09-22T04:17:02.955Z INFO  - 4705ecae348e Extracting 11MB / 30MB
-2025-09-22T04:17:03.506Z INFO  - 4705ecae348e Extracting 13MB / 30MB
-2025-09-22T04:17:04.654Z INFO  - 4705ecae348e Extracting 18MB / 30MB
-2025-09-22T04:17:05.147Z INFO  - 4705ecae348e Extracting 19MB / 30MB
-2025-09-22T04:17:05.399Z INFO  - 4705ecae348e Extracting 21MB / 30MB
-2025-09-22T04:17:06.478Z INFO  - 4705ecae348e Extracting 30MB / 30MB
-2025-09-22T04:17:06.478Z INFO  - 4705ecae348e Extracting 30MB / 30MB
-2025-09-22T04:17:06.478Z INFO  - 4705ecae348e Pull complete
-2025-09-22T04:17:06.478Z INFO  - 29d2d9adb309 Extracting 154B / 154B
-2025-09-22T04:17:06.478Z INFO  - 29d2d9adb309 Extracting 154B / 154B
-2025-09-22T04:17:06.481Z INFO  - 29d2d9adb309 Pull complete
-2025-09-22T04:17:06.819Z INFO  - 7294c5074fcb Extracting 512KB / 10MB
-2025-09-22T04:17:06.914Z INFO  - 7294c5074fcb Extracting 896KB / 10MB
-2025-09-22T04:17:07.341Z INFO  - 7294c5074fcb Extracting 2MB / 10MB
-2025-09-22T04:17:07.540Z INFO  - 7294c5074fcb Extracting 3MB / 10MB
-2025-09-22T04:17:07.743Z INFO  - 7294c5074fcb Extracting 5MB / 10MB
-2025-09-22T04:17:09.004Z INFO  - 7294c5074fcb Extracting 9MB / 10MB
-2025-09-22T04:17:09.004Z INFO  - 7294c5074fcb Extracting 10MB / 10MB
-2025-09-22T04:17:09.004Z INFO  - 7294c5074fcb Pull complete
-2025-09-22T04:17:09.004Z INFO  - 71af4ce4af58 Extracting 91B / 91B
-2025-09-22T04:17:09.004Z INFO  - 71af4ce4af58 Extracting 91B / 91B
-2025-09-22T04:17:09.004Z INFO  - 71af4ce4af58 Pull complete
-2025-09-22T04:17:09.004Z INFO  - c3966e466b66 Extracting 2MB / 3MB
-2025-09-22T04:17:09.022Z INFO  - c3966e466b66 Extracting 3MB / 3MB
-2025-09-22T04:17:09.116Z INFO  - c3966e466b66 Extracting 3MB / 3MB
-2025-09-22T04:17:09.171Z INFO  - c3966e466b66 Extracting 3MB / 3MB
-2025-09-22T04:17:09.226Z INFO  - c3966e466b66 Pull complete
-2025-09-22T04:17:09.719Z INFO  - c18c71402346 Extracting 2MB / 4MB
-2025-09-22T04:17:09.888Z INFO  - c18c71402346 Extracting 4MB / 4MB
-2025-09-22T04:17:09.935Z INFO  - c18c71402346 Pull complete
-2025-09-22T04:17:09.938Z INFO  - bb21c236e66b Extracting 32KB / 159KB
-2025-09-22T04:17:09.996Z INFO  - bb21c236e66b Extracting 159KB / 159KB
-2025-09-22T04:17:10.013Z INFO  - bb21c236e66b Pull complete
-2025-09-22T04:17:10.090Z INFO  - 1fabb3940e9f Extracting 290B / 290B
-2025-09-22T04:17:10.101Z INFO  - 1fabb3940e9f Extracting 290B / 290B
-2025-09-22T04:17:10.115Z INFO  - 1fabb3940e9f Pull complete
-2025-09-22T04:17:10.128Z INFO  - 880d3cdd5e5e Extracting 289B / 289B
-2025-09-22T04:17:10.140Z INFO  - 880d3cdd5e5e Extracting 289B / 289B
-2025-09-22T04:17:10.223Z INFO  - 880d3cdd5e5e Pull complete
-2025-09-22T04:17:10.469Z INFO  - b8b65e111215 Extracting 320KB / 14MB
-2025-09-22T04:17:10.612Z INFO  - b8b65e111215 Extracting 960KB / 14MB
-2025-09-22T04:17:11.007Z INFO  - b8b65e111215 Extracting 2MB / 14MB
-2025-09-22T04:17:11.121Z INFO  - b8b65e111215 Extracting 4MB / 14MB
-2025-09-22T04:17:11.266Z INFO  - b8b65e111215 Extracting 5MB / 14MB
-2025-09-22T04:17:11.356Z INFO  - b8b65e111215 Extracting 6MB / 14MB
-2025-09-22T04:17:11.702Z INFO  - b8b65e111215 Extracting 9MB / 14MB
-2025-09-22T04:17:12.012Z INFO  - b8b65e111215 Extracting 10MB / 14MB
-2025-09-22T04:17:12.237Z INFO  - b8b65e111215 Extracting 10MB / 14MB
-2025-09-22T04:17:12.849Z INFO  - b8b65e111215 Extracting 10MB / 14MB
-2025-09-22T04:17:13.105Z INFO  - b8b65e111215 Extracting 11MB / 14MB
-2025-09-22T04:17:14.266Z INFO  - b8b65e111215 Extracting 14MB / 14MB
-2025-09-22T04:17:14.314Z INFO  - b8b65e111215 Extracting 14MB / 14MB
-2025-09-22T04:17:14.345Z INFO  - b8b65e111215 Pull complete
-2025-09-22T04:17:14.411Z INFO  -  Digest: sha256:c6b2ef843d6563d5e4de4fc215ed70767a024502327712fce37342fe3f2e5d75
-2025-09-22T04:17:14.411Z INFO  -  Status: Downloaded newer image for mcr.microsoft.com/appsvc/middleware:stage5
-2025-09-22T04:17:14.478Z INFO  - Pull Image successful, Time taken: 105 Seconds
-2025-09-22T04:17:16.712Z INFO  - Starting container for site
-2025-09-22T04:17:16.712Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_69af9c9d_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net -e WEBSITE_INSTANCE_ID=8f6ec0650f826e23f288755375fc57d9276bf0ceae68106ea7334ab7f2d22d46 mcr.microsoft.com/appsvc/middleware:stage5 REDACTED
-2025-09-22T04:17:16.712Z INFO  - Logging is not enabled for this container.Please use https://aka.ms/linux-diagnostics to enable logging to see container logs here.O  - 9853498c3852 Downloading 41MB / 53MB
-2025-09-22T04:13:21.463Z INFO  - fd9ecfda18c5 Downloading 39MB / 67MB
-2025-09-22T04:13:21.669Z INFO  - e7443d264769 Downloading 39MB / 52MB
-2025-09-22T04:13:21.814Z INFO  - 9853498c3852 Downloading 42MB / 53MB
-2025-09-22T04:13:21.931Z INFO  - c19952135643 Downloading 40MB / 46MB
-2025-09-22T04:13:22.098Z INFO  - fd9ecfda18c5 Downloading 40MB / 67MB
-2025-09-22T04:13:22.789Z INFO  - c19952135643 Downloading 41MB / 46MB
-2025-09-22T04:13:22.931Z INFO  - e7443d264769 Downloading 41MB / 52MB
-2025-09-22T04:13:22.932Z INFO  - 9853498c3852 Downloading 43MB / 53MB
-2025-09-22T04:13:23.123Z INFO  - fd9ecfda18c5 Downloading 41MB / 67MB
-2025-09-22T04:13:23.425Z INFO  - fd9ecfda18c5 Downloading 42MB / 67MB
-2025-09-22T04:13:23.425Z INFO  - c19952135643 Downloading 42MB / 46MB
-2025-09-22T04:13:23.806Z INFO  - 9853498c3852 Downloading 44MB / 53MB
-2025-09-22T04:13:23.900Z INFO  - fd9ecfda18c5 Downloading 43MB / 67MB
-2025-09-22T04:13:24.318Z INFO  - 9853498c3852 Downloading 45MB / 53MB
-2025-09-22T04:13:24.320Z INFO  - c19952135643 Downloading 45MB / 46MB
-2025-09-22T04:13:24.491Z INFO  - e7443d264769 Downloading 47MB / 52MB
-2025-09-22T04:13:24.519Z INFO  - fd9ecfda18c5 Downloading 45MB / 67MB
-2025-09-22T04:13:24.680Z INFO  - e7443d264769 Downloading 48MB / 52MB
-2025-09-22T04:13:24.726Z INFO  - 9853498c3852 Downloading 46MB / 53MB
-2025-09-22T04:13:24.755Z INFO  - fd9ecfda18c5 Downloading 46MB / 67MB
-2025-09-22T04:13:24.757Z INFO  - c19952135643 Verifying Checksum
-2025-09-22T04:13:24.897Z INFO  - c19952135643 Download complete
-2025-09-22T04:13:24.924Z INFO  - 9853498c3852 Downloading 47MB / 53MB
-2025-09-22T04:13:25.030Z INFO  - 9853498c3852 Downloading 48MB / 53MB
-2025-09-22T04:13:25.114Z INFO  - e7443d264769 Downloading 49MB / 52MB
-2025-09-22T04:13:25.330Z INFO  - fd9ecfda18c5 Downloading 47MB / 67MB
-2025-09-22T04:13:25.513Z INFO  - e7443d264769 Downloading 50MB / 52MB
-2025-09-22T04:13:25.844Z INFO  - fd9ecfda18c5 Downloading 48MB / 67MB
-2025-09-22T04:13:26.088Z INFO  - 9853498c3852 Downloading 50MB / 53MB
-2025-09-22T04:13:26.265Z INFO  - e7443d264769 Downloading 51MB / 52MB
-2025-09-22T04:13:26.360Z INFO  - 9853498c3852 Downloading 52MB / 53MB
-2025-09-22T04:13:26.360Z INFO  - fd9ecfda18c5 Downloading 50MB / 67MB
-2025-09-22T04:13:26.546Z INFO  - e7443d264769 Verifying Checksum
-2025-09-22T04:13:26.546Z INFO  - e7443d264769 Download complete
-2025-09-22T04:13:26.755Z INFO  - 9853498c3852 Verifying Checksum
-2025-09-22T04:13:26.953Z INFO  - 9853498c3852 Download complete
-2025-09-22T04:13:27.361Z INFO  - fd9ecfda18c5 Downloading 54MB / 67MB
-2025-09-22T04:13:27.557Z INFO  - fd9ecfda18c5 Downloading 55MB / 67MB
-2025-09-22T04:13:28.064Z INFO  - fd9ecfda18c5 Downloading 57MB / 67MB
-2025-09-22T04:13:28.213Z INFO  - fd9ecfda18c5 Downloading 58MB / 67MB
-2025-09-22T04:13:28.429Z INFO  - fd9ecfda18c5 Downloading 59MB / 67MB
-2025-09-22T04:13:28.660Z INFO  - fd9ecfda18c5 Downloading 61MB / 67MB
-2025-09-22T04:13:29.152Z INFO  - fd9ecfda18c5 Downloading 62MB / 67MB
-2025-09-22T04:13:30.178Z INFO  - fd9ecfda18c5 Verifying Checksum
-2025-09-22T04:13:30.178Z INFO  - fd9ecfda18c5 Download complete
-2025-09-22T04:13:30.600Z INFO  - c19952135643 Extracting 960KB / 46MB
-2025-09-22T04:13:32.504Z INFO  - c19952135643 Extracting 1MB / 46MB
-2025-09-22T04:13:34.289Z INFO  - c19952135643 Extracting 2MB / 46MB
-2025-09-22T04:13:35.344Z INFO  - c19952135643 Extracting 3MB / 46MB
-2025-09-22T04:13:37.160Z INFO  - c19952135643 Extracting 4MB / 46MB
-2025-09-22T04:13:37.659Z INFO  - c19952135643 Extracting 5MB / 46MB
-2025-09-22T04:13:39.362Z INFO  - c19952135643 Extracting 6MB / 46MB
-2025-09-22T04:13:40.798Z INFO  - c19952135643 Extracting 7MB / 46MB
-2025-09-22T04:13:42.580Z INFO  - c19952135643 Extracting 8MB / 46MB
-2025-09-22T04:13:45.475Z INFO  - c19952135643 Extracting 9MB / 46MB
-2025-09-22T04:13:46.793Z INFO  - c19952135643 Extracting 10MB / 46MB
-2025-09-22T04:13:49.446Z INFO  - c19952135643 Extracting 11MB / 46MB
-2025-09-22T04:13:50.879Z INFO  - c19952135643 Extracting 12MB / 46MB
-2025-09-22T04:13:51.659Z INFO  - c19952135643 Extracting 13MB / 46MB
-2025-09-22T04:13:52.178Z INFO  - c19952135643 Extracting 14MB / 46MB
-2025-09-22T04:13:52.601Z INFO  - c19952135643 Extracting 15MB / 46MB
-2025-09-22T04:13:53.411Z INFO  - c19952135643 Extracting 15MB / 46MB
-2025-09-22T04:13:54.069Z INFO  - c19952135643 Extracting 17MB / 46MB
-2025-09-22T04:13:55.118Z INFO  - c19952135643 Extracting 18MB / 46MB
-2025-09-22T04:13:55.735Z INFO  - c19952135643 Extracting 19MB / 46MB
-2025-09-22T04:13:56.429Z INFO  - c19952135643 Extracting 20MB / 46MB
-2025-09-22T04:13:57.190Z INFO  - c19952135643 Extracting 22MB / 46MB
-2025-09-22T04:13:58.294Z INFO  - c19952135643 Extracting 25MB / 46MB
-2025-09-22T04:13:58.429Z INFO  - c19952135643 Extracting 26MB / 46MB
-2025-09-22T04:13:58.851Z INFO  - c19952135643 Extracting 30MB / 46MB
-2025-09-22T04:13:58.974Z INFO  - c19952135643 Extracting 31MB / 46MB
-2025-09-22T04:13:59.157Z INFO  - c19952135643 Extracting 32MB / 46MB
-2025-09-22T04:14:00.123Z INFO  - c19952135643 Extracting 37MB / 46MB
-2025-09-22T04:14:00.709Z INFO  - c19952135643 Extracting 38MB / 46MB
-2025-09-22T04:14:00.939Z INFO  - c19952135643 Extracting 39MB / 46MB
-2025-09-22T04:14:02.111Z INFO  - c19952135643 Extracting 42MB / 46MB
-2025-09-22T04:14:03.841Z INFO  - c19952135643 Extracting 44MB / 46MB
-2025-09-22T04:14:06.326Z INFO  - c19952135643 Extracting 45MB / 46MB
-2025-09-22T04:14:06.662Z INFO  - c19952135643 Extracting 46MB / 46MB
-2025-09-22T04:14:07.181Z INFO  - c19952135643 Pull complete
-2025-09-22T04:14:07.472Z INFO  - b49b2c83cf45 Extracting 1MB / 35MB
-2025-09-22T04:14:07.956Z INFO  - b49b2c83cf45 Extracting 4MB / 35MB
-2025-09-22T04:14:08.419Z INFO  - b49b2c83cf45 Extracting 6MB / 35MB
-2025-09-22T04:14:08.755Z INFO  - b49b2c83cf45 Extracting 7MB / 35MB
-2025-09-22T04:14:08.961Z INFO  - b49b2c83cf45 Extracting 11MB / 35MB
-2025-09-22T04:14:09.049Z INFO  - b49b2c83cf45 Extracting 14MB / 35MB
-2025-09-22T04:14:09.180Z INFO  - b49b2c83cf45 Extracting 15MB / 35MB
-2025-09-22T04:14:09.320Z INFO  - b49b2c83cf45 Extracting 16MB / 35MB
-2025-09-22T04:14:09.454Z INFO  - b49b2c83cf45 Extracting 17MB / 35MB
-2025-09-22T04:14:09.602Z INFO  - b49b2c83cf45 Extracting 18MB / 35MB
-2025-09-22T04:14:10.142Z INFO  - b49b2c83cf45 Extracting 19MB / 35MB
-2025-09-22T04:14:10.869Z INFO  - b49b2c83cf45 Extracting 22MB / 35MB
-2025-09-22T04:14:11.107Z INFO  - b49b2c83cf45 Extracting 24MB / 35MB
-2025-09-22T04:14:11.736Z INFO  - b49b2c83cf45 Extracting 28MB / 35MB
-2025-09-22T04:14:12.031Z INFO  - b49b2c83cf45 Extracting 31MB / 35MB
-2025-09-22T04:14:12.185Z INFO  - b49b2c83cf45 Extracting 34MB / 35MB
-2025-09-22T04:14:12.737Z INFO  - b49b2c83cf45 Extracting 35MB / 35MB
-2025-09-22T04:14:12.788Z INFO  - b49b2c83cf45 Pull complete
-2025-09-22T04:14:12.926Z INFO  - a7350ec49683 Extracting 832KB / 3MB
-2025-09-22T04:14:13.048Z INFO  - a7350ec49683 Extracting 1MB / 3MB
-2025-09-22T04:14:13.147Z INFO  - a7350ec49683 Extracting 2MB / 3MB
-2025-09-22T04:14:13.428Z INFO  - a7350ec49683 Extracting 3MB / 3MB
-2025-09-22T04:14:13.439Z INFO  - a7350ec49683 Pull complete
-2025-09-22T04:14:13.449Z INFO  - ca64976d1f75 Extracting 387B / 387B
-2025-09-22T04:14:13.465Z INFO  - ca64976d1f75 Extracting 387B / 387B
-2025-09-22T04:14:13.479Z INFO  - ca64976d1f75 Pull complete
-2025-09-22T04:14:13.484Z INFO  - 9c231cb2d468 Extracting 32KB / 1MB
-2025-09-22T04:14:13.619Z INFO  - 9c231cb2d468 Extracting 1MB / 1MB
-2025-09-22T04:14:13.666Z INFO  - 9c231cb2d468 Pull complete
-2025-09-22T04:14:13.684Z INFO  - 6d5ed858bc79 Extracting 32KB / 39KB
-2025-09-22T04:14:13.826Z INFO  - 6d5ed858bc79 Extracting 39KB / 39KB
-2025-09-22T04:14:13.840Z INFO  - 6d5ed858bc79 Pull complete
-2025-09-22T04:14:13.852Z INFO  - b147e1d819b6 Extracting 10KB / 10KB
-2025-09-22T04:14:13.866Z INFO  - b147e1d819b6 Extracting 10KB / 10KB
-2025-09-22T04:14:13.883Z INFO  - b147e1d819b6 Pull complete
-2025-09-22T04:14:13.888Z INFO  - bddeee446dea Extracting 14KB / 14KB
-2025-09-22T04:14:13.911Z INFO  - bddeee446dea Extracting 14KB / 14KB
-2025-09-22T04:14:13.933Z INFO  - bddeee446dea Pull complete
-2025-09-22T04:14:13.999Z INFO  - 3bba0ee51794 Extracting 281KB / 281KB
-2025-09-22T04:14:14.027Z INFO  - 3bba0ee51794 Pull complete
-2025-09-22T04:14:14.032Z INFO  - 5b5c68b4e022 Extracting 10KB / 10KB
-2025-09-22T04:14:14.045Z INFO  - 5b5c68b4e022 Extracting 10KB / 10KB
-2025-09-22T04:14:14.065Z INFO  - 5b5c68b4e022 Pull complete
-2025-09-22T04:14:14.069Z INFO  - 589fad460b75 Extracting 32KB / 1MB
-2025-09-22T04:14:14.159Z INFO  - 589fad460b75 Extracting 1MB / 1MB
-2025-09-22T04:14:14.853Z INFO  - 589fad460b75 Pull complete
-2025-09-22T04:14:14.853Z INFO  - a4ac82e1650a Extracting 32KB / 1MB
-2025-09-22T04:14:14.853Z INFO  - a4ac82e1650a Extracting 928KB / 1MB
-2025-09-22T04:14:14.853Z INFO  - a4ac82e1650a Extracting 1MB / 1MB
-2025-09-22T04:14:14.853Z INFO  - a4ac82e1650a Pull complete
-2025-09-22T04:14:14.853Z INFO  - 6f8965d4e41b Extracting 3KB / 3KB
-2025-09-22T04:14:14.853Z INFO  - 6f8965d4e41b Extracting 3KB / 3KB
-2025-09-22T04:14:14.853Z INFO  - 6f8965d4e41b Pull complete
-2025-09-22T04:14:14.853Z INFO  - 4f4fb700ef54 Extracting 32B / 32B
-2025-09-22T04:14:14.853Z INFO  - 4f4fb700ef54 Extracting 32B / 32B
-2025-09-22T04:14:14.853Z INFO  - 4f4fb700ef54 Pull complete
-2025-09-22T04:14:14.853Z INFO  - e7443d264769 Extracting 6MB / 52MB
-2025-09-22T04:14:14.991Z INFO  - e7443d264769 Extracting 12MB / 52MB
-2025-09-22T04:14:15.926Z INFO  - e7443d264769 Extracting 31MB / 52MB
-2025-09-22T04:14:16.398Z INFO  - e7443d264769 Extracting 36MB / 52MB
-2025-09-22T04:14:16.794Z INFO  - e7443d264769 Extracting 47MB / 52MB
-2025-09-22T04:14:17.431Z INFO  - e7443d264769 Extracting 51MB / 52MB
-2025-09-22T04:14:17.542Z INFO  - e7443d264769 Extracting 52MB / 52MB
-2025-09-22T04:14:17.615Z INFO  - e7443d264769 Pull complete
-2025-09-22T04:14:17.892Z INFO  - 9853498c3852 Extracting 544KB / 53MB
-2025-09-22T04:14:18.785Z INFO  - 9853498c3852 Extracting 2MB / 53MB
-2025-09-22T04:14:18.785Z INFO  - 9853498c3852 Extracting 3MB / 53MB
-2025-09-22T04:14:19.281Z INFO  - 9853498c3852 Extracting 5MB / 53MB
-2025-09-22T04:14:19.383Z INFO  - 9853498c3852 Extracting 6MB / 53MB
-2025-09-22T04:14:20.021Z INFO  - 9853498c3852 Extracting 7MB / 53MB
-2025-09-22T04:14:21.822Z INFO  - 9853498c3852 Extracting 10MB / 53MB
-2025-09-22T04:14:23.476Z INFO  - 9853498c3852 Extracting 22MB / 53MB
-2025-09-22T04:14:23.477Z INFO  - 9853498c3852 Extracting 23MB / 53MB
-2025-09-22T04:14:23.581Z INFO  - 9853498c3852 Extracting 24MB / 53MB
-2025-09-22T04:14:23.953Z INFO  - 9853498c3852 Extracting 26MB / 53MB
-2025-09-22T04:14:24.300Z INFO  - 9853498c3852 Extracting 27MB / 53MB
-2025-09-22T04:14:24.870Z INFO  - 9853498c3852 Extracting 32MB / 53MB
-2025-09-22T04:14:25.014Z INFO  - 9853498c3852 Extracting 33MB / 53MB
-2025-09-22T04:14:25.136Z INFO  - 9853498c3852 Extracting 34MB / 53MB
-2025-09-22T04:14:25.286Z INFO  - 9853498c3852 Extracting 35MB / 53MB
-2025-09-22T04:14:25.428Z INFO  - 9853498c3852 Extracting 36MB / 53MB
-2025-09-22T04:14:25.540Z INFO  - 9853498c3852 Extracting 37MB / 53MB
-2025-09-22T04:14:25.731Z INFO  - 9853498c3852 Extracting 38MB / 53MB
-2025-09-22T04:14:26.637Z INFO  - 9853498c3852 Extracting 42MB / 53MB
-2025-09-22T04:14:27.237Z INFO  - 9853498c3852 Extracting 43MB / 53MB
-2025-09-22T04:14:27.675Z INFO  - 9853498c3852 Extracting 44MB / 53MB
-2025-09-22T04:14:28.235Z INFO  - 9853498c3852 Extracting 45MB / 53MB
-2025-09-22T04:14:28.695Z INFO  - 9853498c3852 Extracting 46MB / 53MB
-2025-09-22T04:14:29.194Z INFO  - 9853498c3852 Extracting 47MB / 53MB
-2025-09-22T04:14:29.770Z INFO  - 9853498c3852 Extracting 48MB / 53MB
-2025-09-22T04:14:30.257Z INFO  - 9853498c3852 Extracting 49MB / 53MB
-2025-09-22T04:14:31.257Z INFO  - 9853498c3852 Extracting 51MB / 53MB
-2025-09-22T04:14:31.567Z INFO  - 9853498c3852 Extracting 52MB / 53MB
-2025-09-22T04:14:32.284Z INFO  - 9853498c3852 Extracting 53MB / 53MB
-2025-09-22T04:14:33.316Z INFO  - 9853498c3852 Extracting 53MB / 53MB
-2025-09-22T04:14:33.552Z INFO  - 9853498c3852 Pull complete
-2025-09-22T04:14:33.691Z INFO  - 6d39a250ce6f Extracting 1MB / 11MB
-2025-09-22T04:14:34.410Z INFO  - 6d39a250ce6f Extracting 4MB / 11MB
-2025-09-22T04:14:34.851Z INFO  - 6d39a250ce6f Extracting 7MB / 11MB
-2025-09-22T04:14:34.859Z INFO  - 6d39a250ce6f Extracting 8MB / 11MB
-2025-09-22T04:14:35.435Z INFO  - 6d39a250ce6f Extracting 8MB / 11MB
-2025-09-22T04:14:35.727Z INFO  - 6d39a250ce6f Extracting 9MB / 11MB
-2025-09-22T04:14:36.260Z INFO  - 6d39a250ce6f Extracting 9MB / 11MB
-2025-09-22T04:14:36.729Z INFO  - 6d39a250ce6f Extracting 10MB / 11MB
-2025-09-22T04:14:36.913Z INFO  - 6d39a250ce6f Extracting 10MB / 11MB
-2025-09-22T04:14:37.833Z INFO  - 6d39a250ce6f Extracting 11MB / 11MB
-2025-09-22T04:14:38.026Z INFO  - 6d39a250ce6f Pull complete
-2025-09-22T04:14:38.234Z INFO  - ab00bebea334 Extracting 1MB / 16MB
-2025-09-22T04:14:38.375Z INFO  - ab00bebea334 Extracting 1MB / 16MB
-2025-09-22T04:14:38.497Z INFO  - ab00bebea334 Extracting 2MB / 16MB
-2025-09-22T04:14:38.611Z INFO  - ab00bebea334 Extracting 3MB / 16MB
-2025-09-22T04:14:39.068Z INFO  - ab00bebea334 Extracting 5MB / 16MB
-2025-09-22T04:14:39.244Z INFO  - ab00bebea334 Extracting 6MB / 16MB
-2025-09-22T04:14:39.679Z INFO  - ab00bebea334 Extracting 8MB / 16MB
-2025-09-22T04:14:40.586Z INFO  - ab00bebea334 Extracting 8MB / 16MB
-2025-09-22T04:14:40.936Z INFO  - ab00bebea334 Extracting 8MB / 16MB
-2025-09-22T04:14:41.216Z INFO  - ab00bebea334 Extracting 9MB / 16MB
-2025-09-22T04:14:41.686Z INFO  - ab00bebea334 Extracting 9MB / 16MB
-2025-09-22T04:14:42.511Z INFO  - ab00bebea334 Extracting 10MB / 16MB
-2025-09-22T04:14:43.451Z INFO  - ab00bebea334 Extracting 11MB / 16MB
-2025-09-22T04:14:43.882Z INFO  - ab00bebea334 Extracting 11MB / 16MB
-2025-09-22T04:14:44.328Z INFO  - ab00bebea334 Extracting 12MB / 16MB
-2025-09-22T04:14:45.575Z INFO  - ab00bebea334 Extracting 13MB / 16MB
-2025-09-22T04:14:45.902Z INFO  - ab00bebea334 Extracting 13MB / 16MB
-2025-09-22T04:14:47.327Z INFO  - ab00bebea334 Extracting 14MB / 16MB
-2025-09-22T04:14:48.026Z INFO  - ab00bebea334 Extracting 14MB / 16MB
-2025-09-22T04:14:48.915Z INFO  - ab00bebea334 Extracting 14MB / 16MB
-2025-09-22T04:14:51.094Z INFO  - ab00bebea334 Extracting 15MB / 16MB
-2025-09-22T04:14:51.999Z INFO  - ab00bebea334 Extracting 15MB / 16MB
-2025-09-22T04:14:54.183Z INFO  - ab00bebea334 Extracting 16MB / 16MB
-2025-09-22T04:14:54.348Z INFO  - ab00bebea334 Extracting 16MB / 16MB
-2025-09-22T04:14:54.348Z INFO  - ab00bebea334 Extracting 16MB / 16MB
-2025-09-22T04:14:54.868Z INFO  - ab00bebea334 Pull complete
-2025-09-22T04:14:54.875Z INFO  - c81914910915 Extracting 126B / 126B
-2025-09-22T04:14:54.886Z INFO  - c81914910915 Extracting 126B / 126B
-2025-09-22T04:14:54.896Z INFO  - c81914910915 Pull complete
-2025-09-22T04:14:55.232Z INFO  - ddfd7346bfba Extracting 1MB / 5MB
-2025-09-22T04:14:55.324Z INFO  - ddfd7346bfba Extracting 3MB / 5MB
-2025-09-22T04:14:55.615Z INFO  - ddfd7346bfba Extracting 5MB / 5MB
-2025-09-22T04:14:55.710Z INFO  - ddfd7346bfba Extracting 5MB / 5MB
-2025-09-22T04:14:55.916Z INFO  - ddfd7346bfba Pull complete
-2025-09-22T04:14:55.927Z INFO  - c769700e4a44 Extracting 948B / 948B
-2025-09-22T04:14:55.942Z INFO  - c769700e4a44 Extracting 948B / 948B
-2025-09-22T04:14:56.027Z INFO  - c769700e4a44 Pull complete
-2025-09-22T04:14:56.060Z INFO  - 367c9c93200b Extracting 1KB / 1KB
-2025-09-22T04:14:56.070Z INFO  - 367c9c93200b Extracting 1KB / 1KB
-2025-09-22T04:14:56.168Z INFO  - 367c9c93200b Pull complete
-2025-09-22T04:14:56.214Z INFO  - 81378fd52fac Extracting 137B / 137B
-2025-09-22T04:14:56.244Z INFO  - 81378fd52fac Extracting 137B / 137B
-2025-09-22T04:14:56.273Z INFO  - 81378fd52fac Pull complete
-2025-09-22T04:14:57.609Z INFO  - fd9ecfda18c5 Extracting 4MB / 67MB
-2025-09-22T04:14:58.026Z INFO  - fd9ecfda18c5 Extracting 5MB / 67MB
-2025-09-22T04:14:58.127Z INFO  - fd9ecfda18c5 Extracting 6MB / 67MB
-2025-09-22T04:14:58.751Z INFO  - fd9ecfda18c5 Extracting 8MB / 67MB
-2025-09-22T04:14:59.049Z INFO  - fd9ecfda18c5 Extracting 10MB / 67MB
-2025-09-22T04:14:59.245Z INFO  - fd9ecfda18c5 Extracting 11MB / 67MB
-2025-09-22T04:14:59.594Z INFO  - fd9ecfda18c5 Extracting 12MB / 67MB
-2025-09-22T04:14:59.891Z INFO  - fd9ecfda18c5 Extracting 12MB / 67MB
-2025-09-22T04:15:00.396Z INFO  - fd9ecfda18c5 Extracting 14MB /67MB
-2025-09-22T04:15:00.505Z INFO  - fd9ecfda18c5 Extracting 15MB / 67MB
-2025-09-22T04:15:01.105Z INFO  - fd9ecfda18c5 Extracting 16MB / 67MB
-2025-09-22T04:15:02.388Z INFO  - fd9ecfda18c5 Extracting 18MB / 67MB
-2025-09-22T04:15:03.011Z INFO  - fd9ecfda18c5 Extracting 20MB / 67MB
-2025-09-22T04:15:03.485Z INFO  - fd9ecfda18c5 Extracting 21MB / 67MB
-2025-09-22T04:15:03.974Z INFO  - fd9ecfda18c5 Extracting 23MB / 67MB
-2025-09-22T04:15:04.251Z INFO  - fd9ecfda18c5 Extracting 26MB / 67MB
-2025-09-22T04:15:04.277Z INFO  - fd9ecfda18c5 Extracting 27MB / 67MB
-2025-09-22T04:15:04.630Z INFO  - fd9ecfda18c5 Extracting 29MB / 67MB
-2025-09-22T04:15:05.099Z INFO  - fd9ecfda18c5 Extracting 31MB / 67MB
-2025-09-22T04:15:05.695Z INFO  - fd9ecfda18c5 Extracting 35MB / 67MB
-2025-09-22T04:15:06.714Z INFO  - fd9ecfda18c5 Extracting 40MB / 67MB
-2025-09-22T04:15:07.348Z INFO  - fd9ecfda18c5 Extracting 41MB / 67MB
-2025-09-22T04:15:08.354Z INFO  - fd9ecfda18c5 Extracting 44MB / 67MB
-2025-09-22T04:15:08.785Z INFO  - fd9ecfda18c5 Extracting 46MB / 67MB
-2025-09-22T04:15:09.315Z INFO  - fd9ecfda18c5 Extracting 47MB / 67MB
-2025-09-22T04:15:10.308Z INFO  - fd9ecfda18c5 Extracting 51MB / 67MB
-2025-09-22T04:15:11.547Z INFO  - fd9ecfda18c5 Extracting 58MB / 67MB
-2025-09-22T04:15:13.624Z INFO  - fd9ecfda18c5 Extracting 67MB / 67MB
-2025-09-22T04:15:14.081Z INFO  - fd9ecfda18c5 Pull complete
-2025-09-22T04:15:14.099Z INFO  - accbef6a859b Extracting 1KB / 1KB
-2025-09-22T04:15:14.132Z INFO  - accbef6a859b Extracting 1KB / 1KB
-2025-09-22T04:15:14.159Z INFO  - accbef6a859b Pull complete
-2025-09-22T04:15:14.185Z INFO  - 50579af796ea Extracting 1KB / 1KB
-2025-09-22T04:15:14.211Z INFO  - 50579af796ea Extracting 1KB / 1KB
-2025-09-22T04:15:14.249Z INFO  - 50579af796ea Pull complete
-2025-09-22T04:15:14.260Z INFO  - f515f047c378 Extracting 3KB / 3KB
-2025-09-22T04:15:14.288Z INFO  - f515f047c378 Extracting 3KB / 3KB
-2025-09-22T04:15:14.342Z INFO  - f515f047c378 Pull complete
-2025-09-22T04:15:14.354Z INFO  - 726fa8d4ed16 Extracting 156B / 156B
-2025-09-22T04:15:14.382Z INFO  - 726fa8d4ed16 Extracting 156B / 156B
-2025-09-22T04:15:14.473Z INFO  - 726fa8d4ed16 Pull complete
-2025-09-22T04:15:14.512Z INFO  - 1ca5d31144ac Extracting 13KB / 13KB
-2025-09-22T04:15:14.561Z INFO  - 1ca5d31144ac Extracting 13KB / 13KB
-2025-09-22T04:15:14.602Z INFO  - 1ca5d31144ac Pull complete
-2025-09-22T04:15:14.614Z INFO  - d35c15ecf7c3 Extracting 1KB / 1KB
-2025-09-22T04:15:14.673Z INFO  - d35c15ecf7c3 Extracting 1KB / 1KB
-2025-09-22T04:15:14.705Z INFO  - d35c15ecf7c3 Pull complete
-2025-09-22T04:15:14.742Z INFO  - bb19cf2d87d2 Extracting 271B / 271B
-2025-09-22T04:15:14.773Z INFO  - bb19cf2d87d2 Extracting 271B / 271B
-2025-09-22T04:15:14.821Z INFO  - bb19cf2d87d2 Pull complete
-2025-09-22T04:15:14.856Z INFO  - b9fb3fc165df Extracting 270B / 270B
-2025-09-22T04:15:14.901Z INFO  - b9fb3fc165df Extracting 270B / 270B
-2025-09-22T04:15:14.960Z INFO  - b9fb3fc165df Pull complete
-2025-09-22T04:15:15.170Z INFO  - 37b276c339a9 Extracting 123B / 123B
-2025-09-22T04:15:15.201Z INFO  - 37b276c339a9 Extracting 123B / 123B
-2025-09-22T04:15:15.239Z INFO  - 37b276c339a9 Pull complete
-2025-09-22T04:15:15.265Z INFO  - 641973008da1 Extracting 418B / 418B
-2025-09-22T04:15:15.305Z INFO  - 641973008da1 Extracting 418B / 418B
-2025-09-22T04:15:15.428Z INFO  - 641973008da1 Pull complete
-2025-09-22T04:15:15.525Z INFO  - 8a4a7fae06a0 Extracting 1KB / 1KB
-2025-09-22T04:15:15.594Z INFO  - 8a4a7fae06a0 Extracting 1KB / 1KB
-2025-09-22T04:15:15.659Z INFO  - 8a4a7fae06a0 Pull complete
-2025-09-22T04:15:16.375Z INFO  - f1db0f079fc7 Extracting 160KB / 1MB
-2025-09-22T04:15:16.714Z INFO  - f1db0f079fc7 Extracting 320KB / 1MB
-2025-09-22T04:15:16.793Z INFO  - f1db0f079fc7 Extracting 480KB / 1MB
-2025-09-22T04:15:17.269Z INFO  - f1db0f079fc7 Extracting 608KB / 1MB
-2025-09-22T04:15:17.480Z INFO  - f1db0f079fc7 Extracting 992KB / 1MB
-2025-09-22T04:15:17.968Z INFO  - f1db0f079fc7 Extracting 1MB / 1MB
-2025-09-22T04:15:18.196Z INFO  - f1db0f079fc7 Extracting 1MB / 1MB
-2025-09-22T04:15:18.793Z INFO  - f1db0f079fc7 Extracting 1MB / 1MB
-2025-09-22T04:15:18.934Z INFO  - f1db0f079fc7 Pull complete
-2025-09-22T04:15:18.938Z INFO  - 44346c801d5d Extracting 133B / 133B
-2025-09-22T04:15:18.948Z INFO  - 44346c801d5d Extracting 133B / 133B
-2025-09-22T04:15:18.960Z INFO  - 44346c801d5d Pull complete
-2025-09-22T04:15:19.038Z INFO  -  Digest: sha256:87e250814d46e564f3e6e6b16a772471fdfa9c507e10415be73c4300f6a97cd4
-2025-09-22T04:15:19.046Z INFO  -  Status: Downloaded newer image for 10.1.0.5:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T04:15:19.169Z INFO  - Pull Image successful, Time taken: 143 Seconds
-2025-09-22T04:15:23.500Z INFO  - Starting container for site
-2025-09-22T04:15:23.500Z INFO  - docker run -d --expose=3000 --name smartsk-backend_0_69af9c9d -e WEBSITE_USE_DIAGNOSTIC_SERVER=true -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net -e WEBSITE_INSTANCE_ID=8f6ec0650f826e23f288755375fc57d9276bf0ceae68106ea7334ab7f2d22d46 -e NODE_OPTIONS=--require /agents/nodejs/build/src/Loader.js appsvc/node:22-lts_20250724.2.tuxprod REDACTED
-2025-09-22T04:15:23.515Z INFO  - Logging is not enabled for this container.Please use https://aka.ms/linux-diagnostics to enable logging to see container logs here.
-2025-09-22T04:17:22.243Z INFO  - Initiating warmup request to container smartsk-backend_0_69af9c9d for site smartsk-backend
-2025-09-22T04:17:24.811Z ERROR - Container smartsk-backend_0_69af9c9d for site smartsk-backend has exited, failing site start
-2025-09-22T04:17:24.811Z INFO  - Initiating warmup request to container smartsk-backend_0_69af9c9d_middleware for site smartsk-backend
-2025-09-22T04:17:43.114Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_69af9c9d_middleware. Elapsed time = 20.9563056 sec
-2025-09-22T04:17:43.989Z INFO  - Container smartsk-backend_0_69af9c9d_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
-2025-09-22T04:17:44.064Z ERROR - Container smartsk-backend_0_69af9c9d didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
-2025-09-22T04:17:44.695Z INFO  - Stopping site smartsk-backend because it failed during startup.
-2025-09-22T04:26:07.8029125Z Container start method called.
-2025-09-22T04:26:07.8030521Z Establishing network.
-2025-09-22T04:26:07.8031531Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T04:26:09.3442170Z Container is starting.
-2025-09-22T04:26:09.3443974Z Establishing user namespace if not established already.
-2025-09-22T04:26:09.3445696Z Establishing network if not established already.
-2025-09-22T04:26:09.3450165Z Mounting volumes.
-2025-09-22T04:26:09.3453475Z Nested mountpoint
-2025-09-22T04:26:09.4040184Z Nested mountpoint volatile/logs
-2025-09-22T04:26:09.4418639Z Nested mountpoint
-2025-09-22T04:26:09.4837000Z Nested mountpoint
-2025-09-22T04:26:09.5122254Z Nested mountpoint
-2025-09-22T04:26:09.5220423Z Nested mountpoint
-2025-09-22T04:26:09.5692863Z Nested mountpoint
-2025-09-22T04:26:10.4319150Z Creating container.
-2025-09-22T04:26:10.4579753Z Creating pipes for streaming container io.
-2025-09-22T04:26:10.4581757Z Creating stdout named pipe at /podr/container/pipe/f6137ffe48e5_smartsk-backend/stdout_72201cff9cd24657b0eac727c1ed9a6e.
-2025-09-22T04:26:10.4584853Z Successfully created stdout named pipe at: /podr/container/pipe/f6137ffe48e5_smartsk-backend/stdout_72201cff9cd24657b0eac727c1ed9a6e.
-2025-09-22T04:26:10.4598496Z Opening named pipe /podr/container/pipe/f6137ffe48e5_smartsk-backend/stdout_72201cff9cd24657b0eac727c1ed9a6e for reading in non-blocking mode.
-2025-09-22T04:26:10.4601781Z Successfully opened named pipe: /podr/container/pipe/f6137ffe48e5_smartsk-backend/stdout_72201cff9cd24657b0eac727c1ed9a6e.
-2025-09-22T04:26:10.4607138Z Successfully removed non-blocking flag from /podr/container/pipe/f6137ffe48e5_smartsk-backend/stdout_72201cff9cd24657b0eac727c1ed9a6e.
-2025-09-22T04:26:10.4609452Z Creating stderr named pipe at /podr/container/pipe/f6137ffe48e5_smartsk-backend/stderr_a54437418ecc462a8bd533d19e3bf0ca.
-2025-09-22T04:26:10.4611559Z Successfully created stderr named pipe at: /podr/container/pipe/f6137ffe48e5_smartsk-backend/stderr_a54437418ecc462a8bd533d19e3bf0ca.
-2025-09-22T04:26:10.4613081Z Opening named pipe /podr/container/pipe/f6137ffe48e5_smartsk-backend/stderr_a54437418ecc462a8bd533d19e3bf0ca for reading in non-blocking mode.
-2025-09-22T04:26:10.4677338Z Successfully opened named pipe: /podr/container/pipe/f6137ffe48e5_smartsk-backend/stderr_a54437418ecc462a8bd533d19e3bf0ca.
-2025-09-22T04:26:10.4698020Z Successfully removed non-blocking flag from /podr/container/pipe/f6137ffe48e5_smartsk-backend/stderr_a54437418ecc462a8bd533d19e3bf0ca.
-2025-09-22T04:26:10.4700065Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T04:26:11.2278189Z Starting container: f6137ffe48e5_smartsk-backend.
-2025-09-22T04:26:11.3047173Z Starting watchers and probes.
-2025-09-22T04:26:11.3058529Z Starting metrics collection.
-2025-09-22T04:26:11.3061899Z Container is running.
-2025-09-22T04:26:12.5346684Z Container start method finished after 4731 ms.
-2025-09-22T04:27:54.2896197Z Site startup probe succeeded after 101.6280175 seconds.
-2025-09-22T04:28:14.5400194Z Site is running with deployment version: e6ae6463-3a9f-4194-91cc-563a8f00a43c
-2025-09-22T04:28:14.5574030Z Site started.
-2025-09-22T04:28:14.7910604Z Site is running with patch version: 22.17.0
-2025-09-22T04:44:32.5287636Z Container start method called.
-2025-09-22T04:44:32.5364273Z Establishing network.
-2025-09-22T04:44:32.5377382Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T04:44:33.9752404Z Container is starting.
-2025-09-22T04:44:33.9864667Z Establishing user namespace if not established already.
-2025-09-22T04:44:33.9868696Z Establishing network if not established already.
-2025-09-22T04:44:33.9870911Z Mounting volumes.
-2025-09-22T04:44:33.9947261Z Nested mountpoint
-2025-09-22T04:44:34.0553434Z Nested mountpoint volatile/logs
-2025-09-22T04:44:34.0818808Z Nested mountpoint
-2025-09-22T04:44:34.1629257Z Nested mountpoint
-2025-09-22T04:44:34.1790714Z Nested mountpoint
-2025-09-22T04:44:34.1978919Z Nested mountpoint
-2025-09-22T04:44:34.2817933Z Nested mountpoint
-2025-09-22T04:44:35.7650952Z Creating container.
-2025-09-22T04:44:35.7669443Z Creating pipes for streaming container io.
-2025-09-22T04:44:35.7671518Z Creating stdout named pipe at /podr/container/pipe/71cc78057308_smartsk-backend/stdout_30cc22b602274aa78aca0d077540287d.
-2025-09-22T04:44:35.7839457Z Successfully created stdout named pipe at: /podr/container/pipe/71cc78057308_smartsk-backend/stdout_30cc22b602274aa78aca0d077540287d.
-2025-09-22T04:44:35.7847191Z Opening named pipe /podr/container/pipe/71cc78057308_smartsk-backend/stdout_30cc22b602274aa78aca0d077540287d for reading in non-blocking mode.
-2025-09-22T04:44:35.7853624Z Successfully opened named pipe: /podr/container/pipe/71cc78057308_smartsk-backend/stdout_30cc22b602274aa78aca0d077540287d.
-2025-09-22T04:44:35.7925923Z Successfully removed non-blocking flag from /podr/container/pipe/71cc78057308_smartsk-backend/stdout_30cc22b602274aa78aca0d077540287d.
-2025-09-22T04:44:35.7937951Z Creating stderr named pipe at /podr/container/pipe/71cc78057308_smartsk-backend/stderr_a3eb07e6b78044878bc9d93798246036.
-2025-09-22T04:44:35.7948434Z Successfully created stderr named pipe at: /podr/container/pipe/71cc78057308_smartsk-backend/stderr_a3eb07e6b78044878bc9d93798246036.
-2025-09-22T04:44:35.7958030Z Opening named pipe /podr/container/pipe/71cc78057308_smartsk-backend/stderr_a3eb07e6b78044878bc9d93798246036 for reading in non-blocking mode.
-2025-09-22T04:44:35.8401514Z Successfully opened named pipe: /podr/container/pipe/71cc78057308_smartsk-backend/stderr_a3eb07e6b78044878bc9d93798246036.
-2025-09-22T04:44:35.8403987Z Successfully removed non-blocking flag from /podr/container/pipe/71cc78057308_smartsk-backend/stderr_a3eb07e6b78044878bc9d93798246036.
-2025-09-22T04:44:35.8411637Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T04:44:36.9872702Z Starting container: 71cc78057308_smartsk-backend.
-2025-09-22T04:44:37.1675523Z Starting watchers and probes.
-2025-09-22T04:44:37.1755039Z Starting metrics collection.
-2025-09-22T04:44:37.1918181Z Container is running.
-2025-09-22T04:44:39.4913075Z Container start method finished after 6960 ms.
-2025-09-22T04:45:14.8006510Z Site startup probe failed after 35.1628715 seconds.
-2025-09-22T04:45:15.3145294Z Failed to start site. Revert by stopping site.
-2025-09-22T04:45:15.4509135Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T04:45:16.4909843Z Stop and delete container. Retry count = 0
-2025-09-22T04:45:16.4914323Z Stopping container: 71cc78057308_smartsk-backend.
-2025-09-22T04:45:21.0009728Z Deleting container: 71cc78057308_smartsk-backend. Retry count = 0
-2025-09-22T04:45:37.6109429Z Container spec TerminationMessagePolicy  path
-2025-09-22T04:45:37.6121150Z Container is terminated. Total time elapsed: 22153 ms.
-2025-09-22T04:45:37.6122474Z Site container: smartsk-backend terminated during site startup.
-2025-09-22T04:45:37.6215858Z Site: smartsk-backend stopped.
-2025-09-22T04:46:03.9962792Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T04:46:04.2795928Z Stop and delete container. Retry count = 0
-2025-09-22T04:46:04.3467330Z Stopping container: f6137ffe48e5_smartsk-backend.
-2025-09-22T04:46:13.4768475Z Deleting container: f6137ffe48e5_smartsk-backend. Retry count = 0
-2025-09-22T04:46:24.6334232Z Container spec TerminationMessagePolicy  path
-2025-09-22T04:46:24.6421909Z Container is terminated. Total time elapsed: 20645 ms.
-2025-09-22T04:46:24.6588192Z Site: smartsk-backend stopped.
-2025-09-22T04:46:54.3919659Z Container start method called.
-2025-09-22T04:46:54.3968870Z Establishing network.
-2025-09-22T04:46:54.3970031Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T04:46:55.5738926Z Container is starting.
-2025-09-22T04:46:55.5740113Z Establishing user namespace if not established already.
-2025-09-22T04:46:55.5751318Z Establishing network if not established already.
-2025-09-22T04:46:55.5756387Z Mounting volumes.
-2025-09-22T04:46:55.5840940Z Nested mountpoint
-2025-09-22T04:46:55.7495468Z Nested mountpoint volatile/logs
-2025-09-22T04:46:55.7681842Z Nested mountpoint
-2025-09-22T04:46:55.7689460Z Nested mountpoint
-2025-09-22T04:46:55.7699373Z Nested mountpoint
-2025-09-22T04:46:55.8149184Z Nested mountpoint
-2025-09-22T04:46:56.1565348Z Nested mountpoint
-2025-09-22T04:46:57.3632185Z Creating container.
-2025-09-22T04:46:57.3948774Z Creating pipes for streaming container io.
-2025-09-22T04:46:57.3953033Z Creating stdout named pipe at /podr/container/pipe/528b69f2c313_smartsk-backend/stdout_6271ad8eeb4d4ab393e4f50734e111b2.
-2025-09-22T04:46:57.4052585Z Successfully created stdout named pipe at: /podr/container/pipe/528b69f2c313_smartsk-backend/stdout_6271ad8eeb4d4ab393e4f50734e111b2.
-2025-09-22T04:46:57.4220431Z Opening named pipe /podr/container/pipe/528b69f2c313_smartsk-backend/stdout_6271ad8eeb4d4ab393e4f50734e111b2 for reading in non-blocking mode.
-2025-09-22T04:46:57.4340261Z Successfully opened named pipe: /podr/container/pipe/528b69f2c313_smartsk-backend/stdout_6271ad8eeb4d4ab393e4f50734e111b2.
-2025-09-22T04:46:57.4415004Z Successfully removed non-blocking flag from /podr/container/pipe/528b69f2c313_smartsk-backend/stdout_6271ad8eeb4d4ab393e4f50734e111b2.
-2025-09-22T04:46:57.4426383Z Creating stderr named pipe at /podr/container/pipe/528b69f2c313_smartsk-backend/stderr_237616aecce2441287bcfa361b5617a1.
-2025-09-22T04:46:57.4520639Z Successfully created stderr named pipe at: /podr/container/pipe/528b69f2c313_smartsk-backend/stderr_237616aecce2441287bcfa361b5617a1.
-2025-09-22T04:46:57.4522247Z Opening named pipe /podr/container/pipe/528b69f2c313_smartsk-backend/stderr_237616aecce2441287bcfa361b5617a1 for reading in non-blocking mode.
-2025-09-22T04:46:57.4523560Z Successfully opened named pipe: /podr/container/pipe/528b69f2c313_smartsk-backend/stderr_237616aecce2441287bcfa361b5617a1.
-2025-09-22T04:46:57.4524709Z Successfully removed non-blocking flag from /podr/container/pipe/528b69f2c313_smartsk-backend/stderr_237616aecce2441287bcfa361b5617a1.
-2025-09-22T04:46:57.4597904Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T04:46:58.4694566Z Starting container: 528b69f2c313_smartsk-backend.
-2025-09-22T04:46:58.6041520Z Starting watchers and probes.
-2025-09-22T04:46:58.6200669Z Starting metrics collection.
-2025-09-22T04:46:58.6211186Z Container is running.
-2025-09-22T04:46:59.0896412Z Container start method finished after 4688 ms.
-2025-09-22T04:48:57.8200233Z Site startup probe succeeded after 118.6525649 seconds.
-2025-09-22T04:49:11.7630297Z Site is running with deployment version: ca9bd459-ac4c-43d3-9e8a-8e599d36e2f0
-2025-09-22T04:49:11.8232380Z Site started.
-2025-09-22T04:49:12.0733466Z Site is running with patch version: 22.17.0
-2025-09-22T04:49:12.5683222Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T04:49:13.1855898Z Stop and delete container. Retry count = 0
-2025-09-22T04:49:13.1867830Z Stopping container: 528b69f2c313_smartsk-backend.
-2025-09-22T04:49:19.1535491Z Deleting container: 528b69f2c313_smartsk-backend. Retry count = 0
-2025-09-22T04:49:27.3741040Z Container spec TerminationMessagePolicy  path
-2025-09-22T04:49:27.3821306Z Container is terminated. Total time elapsed: 14801 ms.
-2025-09-22T04:49:27.3841925Z Site: smartsk-backend stopped.
-2025-09-22T04:49:49.6765180Z Container start method called.
-2025-09-22T04:49:49.6767187Z Establishing network.
-2025-09-22T04:49:49.6768272Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T04:49:55.1474428Z Container is starting.
-2025-09-22T04:49:55.1476149Z Establishing user namespace if not established already.
-2025-09-22T04:49:55.1477269Z Establishing network if not established already.
-2025-09-22T04:49:55.1478283Z Mounting volumes.
-2025-09-22T04:49:55.1479842Z Nested mountpoint
-2025-09-22T04:49:55.1668759Z Nested mountpoint volatile/logs
-2025-09-22T04:49:55.1941266Z Nested mountpoint
-2025-09-22T04:49:55.8021748Z Nested mountpoint
-2025-09-22T04:49:55.8117041Z Nested mountpoint
-2025-09-22T04:49:55.8896264Z Nested mountpoint
-2025-09-22T04:49:56.0990853Z Nested mountpoint
-2025-09-22T04:49:58.3954665Z Creating container.
-2025-09-22T04:49:58.3956045Z Creating pipes for streaming container io.
-2025-09-22T04:49:58.3957000Z Creating stdout named pipe at /podr/container/pipe/64a6d0c06187_smartsk-backend/stdout_b421dd481a8e47bfa475705b7fcd8d66.
-2025-09-22T04:49:58.3959137Z Successfully created stdout named pipe at: /podr/container/pipe/64a6d0c06187_smartsk-backend/stdout_b421dd481a8e47bfa475705b7fcd8d66.
-2025-09-22T04:49:58.3960220Z Opening named pipe /podr/container/pipe/64a6d0c06187_smartsk-backend/stdout_b421dd481a8e47bfa475705b7fcd8d66 for reading in non-blocking mode.
-2025-09-22T04:49:58.3961295Z Successfully opened named pipe: /podr/container/pipe/64a6d0c06187_smartsk-backend/stdout_b421dd481a8e47bfa475705b7fcd8d66.
-2025-09-22T04:49:58.3962302Z Successfully removed non-blocking flag from /podr/container/pipe/64a6d0c06187_smartsk-backend/stdout_b421dd481a8e47bfa475705b7fcd8d66.
-2025-09-22T04:49:58.3963336Z Creating stderr named pipe at /podr/container/pipe/64a6d0c06187_smartsk-backend/stderr_59c5c17bdaed4d2aa6ed03050e1772aa.
-2025-09-22T04:49:58.3965020Z Successfully created stderr named pipe at: /podr/container/pipe/64a6d0c06187_smartsk-backend/stderr_59c5c17bdaed4d2aa6ed03050e1772aa.
-2025-09-22T04:49:58.3966300Z Opening named pipe /podr/container/pipe/64a6d0c06187_smartsk-backend/stderr_59c5c17bdaed4d2aa6ed03050e1772aa for reading in non-blocking mode.
-2025-09-22T04:49:58.3968976Z Successfully opened named pipe: /podr/container/pipe/64a6d0c06187_smartsk-backend/stderr_59c5c17bdaed4d2aa6ed03050e1772aa.
-2025-09-22T04:49:58.3970083Z Successfully removed non-blocking flag from /podr/container/pipe/64a6d0c06187_smartsk-backend/stderr_59c5c17bdaed4d2aa6ed03050e1772aa.
-2025-09-22T04:49:58.3971331Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T04:49:59.0955060Z Starting container: 64a6d0c06187_smartsk-backend.
-2025-09-22T04:49:59.1821617Z Starting watchers and probes.
-2025-09-22T04:49:59.1828864Z Starting metrics collection.
-2025-09-22T04:49:59.1830949Z Container is running.
-2025-09-22T04:49:59.4601574Z Container start method finished after 9783 ms.
-2025-09-22T04:51:14.3695110Z Site startup probe succeeded after 74.7103583 seconds.
-2025-09-22T04:51:35.2963380Z Site is running with deployment version: ca9bd459-ac4c-43d3-9e8a-8e599d36e2f0
-2025-09-22T04:51:35.3109626Z Site started.
-2025-09-22T04:51:35.5242273Z Site is running with patch version: 22.17.0
-2025-09-22T05:14:36.5884485Z Container start method called.
-2025-09-22T05:14:36.5890847Z Establishing network.
-2025-09-22T05:14:36.5892249Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T05:14:38.2797524Z Container is starting.
-2025-09-22T05:14:38.2804446Z Establishing user namespace if not established already.
-2025-09-22T05:14:38.2812220Z Establishing network if not established already.
-2025-09-22T05:14:38.2869783Z Mounting volumes.
-2025-09-22T05:14:38.2905727Z Nested mountpoint
-2025-09-22T05:14:38.3637564Z Nested mountpoint volatile/logs
-2025-09-22T05:14:38.3810576Z Nested mountpoint
-2025-09-22T05:14:38.4574951Z Nested mountpoint
-2025-09-22T05:14:38.4603631Z Nested mountpoint
-2025-09-22T05:14:38.5061800Z Nested mountpoint
-2025-09-22T05:14:38.5548570Z Nested mountpoint
-2025-09-22T05:14:39.7712039Z Creating container.
-2025-09-22T05:14:39.8083136Z Creating pipes for streaming container io.
-2025-09-22T05:14:39.8258566Z Creating stdout named pipe at /podr/container/pipe/e47c7d7a6c9e_smartsk-backend/stdout_cfcba8d7dcc840ccb05d455df42615dd.
-2025-09-22T05:14:39.8357923Z Successfully created stdout named pipe at: /podr/container/pipe/e47c7d7a6c9e_smartsk-backend/stdout_cfcba8d7dcc840ccb05d455df42615dd.
-2025-09-22T05:14:39.8377031Z Opening named pipe /podr/container/pipe/e47c7d7a6c9e_smartsk-backend/stdout_cfcba8d7dcc840ccb05d455df42615dd for reading in non-blocking mode.
-2025-09-22T05:14:39.8450597Z Successfully opened named pipe: /podr/container/pipe/e47c7d7a6c9e_smartsk-backend/stdout_cfcba8d7dcc840ccb05d455df42615dd.
-2025-09-22T05:14:39.8466220Z Successfully removed non-blocking flag from /podr/container/pipe/e47c7d7a6c9e_smartsk-backend/stdout_cfcba8d7dcc840ccb05d455df42615dd.
-2025-09-22T05:14:39.8535013Z Creating stderr named pipe at /podr/container/pipe/e47c7d7a6c9e_smartsk-backend/stderr_cf219cdcc0f34ac2b865c5a3c885c636.
-2025-09-22T05:14:39.8544184Z Successfully created stderr named pipe at: /podr/container/pipe/e47c7d7a6c9e_smartsk-backend/stderr_cf219cdcc0f34ac2b865c5a3c885c636.
-2025-09-22T05:14:39.8546179Z Opening named pipe /podr/container/pipe/e47c7d7a6c9e_smartsk-backend/stderr_cf219cdcc0f34ac2b865c5a3c885c636 for reading in non-blocking mode.
-2025-09-22T05:14:39.8548398Z Successfully opened named pipe: /podr/container/pipe/e47c7d7a6c9e_smartsk-backend/stderr_cf219cdcc0f34ac2b865c5a3c885c636.
-2025-09-22T05:14:39.8555741Z Successfully removed non-blocking flag from /podr/container/pipe/e47c7d7a6c9e_smartsk-backend/stderr_cf219cdcc0f34ac2b865c5a3c885c636.
-2025-09-22T05:14:39.8564838Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T05:14:40.6295779Z Starting container: e47c7d7a6c9e_smartsk-backend.
-2025-09-22T05:14:40.8364022Z Starting watchers and probes.
-2025-09-22T05:14:40.8705869Z Starting metrics collection.
-2025-09-22T05:14:40.8916985Z Container is running.
-2025-09-22T05:14:41.9313937Z Container start method finished after 5334 ms.
-2025-09-22T05:16:29.8872515Z Site startup probe succeeded after 107.6296735 seconds.
-2025-09-22T05:16:47.2296735Z Site is running with deployment version: 9ff754b4-f0eb-4932-b392-012bbbcbbba7
-2025-09-22T05:16:47.2435954Z Site started.
-2025-09-22T05:16:47.2572664Z Site is running with patch version: 22.17.0
-2025-09-22T05:17:07.5788177Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T05:17:07.9139976Z Stop and delete container. Retry count = 0
-2025-09-22T05:17:07.9164595Z Stopping container: 64a6d0c06187_smartsk-backend.
-2025-09-22T05:17:14.9866710Z Deleting container: 64a6d0c06187_smartsk-backend. Retry count = 0
-2025-09-22T05:17:42.0472848Z Container spec TerminationMessagePolicy  path
-2025-09-22T05:17:42.0640328Z Container is terminated. Total time elapsed: 34482 ms.
-2025-09-22T05:17:42.0653917Z Site: smartsk-backend stopped.
-2025-09-22T05:17:49.4745448Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T05:17:49.5637413Z Stop and delete container. Retry count = 0
-2025-09-22T05:17:49.6096330Z Stopping container: e47c7d7a6c9e_smartsk-backend.
-2025-09-22T05:17:54.8809391Z Deleting container: e47c7d7a6c9e_smartsk-backend. Retry count = 0
-2025-09-22T05:18:01.8670103Z Container spec TerminationMessagePolicy  path
-2025-09-22T05:18:01.8682537Z Container is terminated. Total time elapsed: 12391 ms.
-2025-09-22T05:18:01.8688141Z Site: smartsk-backend stopped.
-2025-09-22T05:18:24.0796409Z Container start method called.
-2025-09-22T05:18:24.0798031Z Establishing network.
-2025-09-22T05:18:24.0799146Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T05:18:25.4570308Z Container is starting.
-2025-09-22T05:18:25.4571674Z Establishing user namespace if not established already.
-2025-09-22T05:18:25.5893205Z Establishing network if not established already.
-2025-09-22T05:18:25.5895207Z Mounting volumes.
-2025-09-22T05:18:25.5897336Z Nested mountpoint
-2025-09-22T05:18:25.6806525Z Nested mountpoint volatile/logs
-2025-09-22T05:18:25.7290824Z Nested mountpoint
-2025-09-22T05:18:25.8148353Z Nested mountpoint
-2025-09-22T05:18:25.8160667Z Nested mountpoint
-2025-09-22T05:18:25.8344218Z Nested mountpoint
-2025-09-22T05:18:25.8622897Z Nested mountpoint
-2025-09-22T05:18:26.9562120Z Creating container.
-2025-09-22T05:18:26.9953104Z Creating pipes for streaming container io.
-2025-09-22T05:18:26.9960767Z Creating stdout named pipe at /podr/container/pipe/6a7771d107d9_smartsk-backend/stdout_61ea90b7b7d84be387f002308e6b65f8.
-2025-09-22T05:18:26.9972209Z Successfully created stdout named pipe at: /podr/container/pipe/6a7771d107d9_smartsk-backend/stdout_61ea90b7b7d84be387f002308e6b65f8.
-2025-09-22T05:18:26.9978182Z Opening named pipe /podr/container/pipe/6a7771d107d9_smartsk-backend/stdout_61ea90b7b7d84be387f002308e6b65f8 for reading in non-blocking mode.
-2025-09-22T05:18:27.0041444Z Successfully opened named pipe: /podr/container/pipe/6a7771d107d9_smartsk-backend/stdout_61ea90b7b7d84be387f002308e6b65f8.
-2025-09-22T05:18:27.0058002Z Successfully removed non-blocking flag from /podr/container/pipe/6a7771d107d9_smartsk-backend/stdout_61ea90b7b7d84be387f002308e6b65f8.
-2025-09-22T05:18:27.0059543Z Creating stderr named pipe at /podr/container/pipe/6a7771d107d9_smartsk-backend/stderr_7897456c3c9a4461bcafc3cb23d8d8f3.
-2025-09-22T05:18:27.0061046Z Successfully created stderr named pipe at: /podr/container/pipe/6a7771d107d9_smartsk-backend/stderr_7897456c3c9a4461bcafc3cb23d8d8f3.
-2025-09-22T05:18:27.0061923Z Opening named pipe /podr/container/pipe/6a7771d107d9_smartsk-backend/stderr_7897456c3c9a4461bcafc3cb23d8d8f3 for reading in non-blocking mode.
-2025-09-22T05:18:27.0143974Z Successfully opened named pipe: /podr/container/pipe/6a7771d107d9_smartsk-backend/stderr_7897456c3c9a4461bcafc3cb23d8d8f3.
-2025-09-22T05:18:27.0145879Z Successfully removed non-blocking flag from /podr/container/pipe/6a7771d107d9_smartsk-backend/stderr_7897456c3c9a4461bcafc3cb23d8d8f3.
-2025-09-22T05:18:27.0147133Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T05:18:27.7778114Z Starting container: 6a7771d107d9_smartsk-backend.
-2025-09-22T05:18:27.8752621Z Starting watchers and probes.
-2025-09-22T05:18:27.8831315Z Starting metrics collection.
-2025-09-22T05:18:27.8843227Z Container is running.
-2025-09-22T05:18:28.9128313Z Container start method finished after 4832 ms.
-2025-09-22T05:19:44.2697590Z Site startup probe succeeded after 75.2276106 seconds.
-2025-09-22T05:20:03.9890764Z Site is running with deployment version: 9ff754b4-f0eb-4932-b392-012bbbcbbba7
-2025-09-22T05:20:04.0189315Z Site started.
-2025-09-22T05:20:04.5463655Z Site is running with patch version: 22.17.0
-2025-09-22T05:44:20.3553886Z Container start method called.
-2025-09-22T05:44:20.3620774Z Establishing network.
-2025-09-22T05:44:20.3627258Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T05:44:22.1583463Z Container is starting.
-2025-09-22T05:44:22.1591365Z Establishing user namespace if not established already.
-2025-09-22T05:44:22.1606002Z Establishing network if not established already.
-2025-09-22T05:44:22.1648865Z Mounting volumes.
-2025-09-22T05:44:22.1675689Z Nested mountpoint
-2025-09-22T05:44:22.2349333Z Nested mountpoint volatile/logs
-2025-09-22T05:44:22.2695727Z Nested mountpoint
-2025-09-22T05:44:22.3359680Z Nested mountpoint
-2025-09-22T05:44:22.3375161Z Nested mountpoint
-2025-09-22T05:44:22.3481033Z Nested mountpoint
-2025-09-22T05:44:22.4208983Z Nested mountpoint
-2025-09-22T05:44:23.7114228Z Creating container.
-2025-09-22T05:44:23.7122849Z Creating pipes for streaming container io.
-2025-09-22T05:44:23.7576755Z Creating stdout named pipe at /podr/container/pipe/a4aae6ed6b6b_smartsk-backend/stdout_96c2aee2e8c24c33a4f2594ba1386d9f.
-2025-09-22T05:44:23.7637138Z Successfully created stdout named pipe at: /podr/container/pipe/a4aae6ed6b6b_smartsk-backend/stdout_96c2aee2e8c24c33a4f2594ba1386d9f.
-2025-09-22T05:44:23.7638392Z Opening named pipe /podr/container/pipe/a4aae6ed6b6b_smartsk-backend/stdout_96c2aee2e8c24c33a4f2594ba1386d9f for reading in non-blocking mode.
-2025-09-22T05:44:23.7639721Z Successfully opened named pipe: /podr/container/pipe/a4aae6ed6b6b_smartsk-backend/stdout_96c2aee2e8c24c33a4f2594ba1386d9f.
-2025-09-22T05:44:23.8092275Z Successfully removed non-blocking flag from /podr/container/pipe/a4aae6ed6b6b_smartsk-backend/stdout_96c2aee2e8c24c33a4f2594ba1386d9f.
-2025-09-22T05:44:23.8126096Z Creating stderr named pipe at /podr/container/pipe/a4aae6ed6b6b_smartsk-backend/stderr_7ca130cb84e74cad83b8fda0e4958b57.
-2025-09-22T05:44:23.8197577Z Successfully created stderr named pipe at: /podr/container/pipe/a4aae6ed6b6b_smartsk-backend/stderr_7ca130cb84e74cad83b8fda0e4958b57.
-2025-09-22T05:44:23.8287673Z Opening named pipe /podr/container/pipe/a4aae6ed6b6b_smartsk-backend/stderr_7ca130cb84e74cad83b8fda0e4958b57 for reading in non-blocking mode.
-2025-09-22T05:44:23.8293289Z Successfully opened named pipe: /podr/container/pipe/a4aae6ed6b6b_smartsk-backend/stderr_7ca130cb84e74cad83b8fda0e4958b57.
-2025-09-22T05:44:23.8317769Z Successfully removed non-blocking flag from /podr/container/pipe/a4aae6ed6b6b_smartsk-backend/stderr_7ca130cb84e74cad83b8fda0e4958b57.
-2025-09-22T05:44:23.8399824Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T05:44:25.0424401Z Starting container: a4aae6ed6b6b_smartsk-backend.
-2025-09-22T05:44:25.1850106Z Starting watchers and probes.
-2025-09-22T05:44:25.2133650Z Starting metrics collection.
-2025-09-22T05:44:25.2517262Z Container is running.
-2025-09-22T05:44:25.5842003Z Container start method finished after 5202 ms.
-2025-09-22T05:46:02.7366290Z Site startup probe succeeded after 96.9534036 seconds.
-2025-09-22T05:46:20.1959773Z Site is running with deployment version: f47c30f5-2d75-48ec-bbad-8367df640fac
-2025-09-22T05:46:20.2147245Z Site started.
-2025-09-22T05:46:20.2530326Z Site is running with patch version: 22.17.0
-2025-09-22T05:46:40.6721578Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T05:46:40.7867875Z Stop and delete container. Retry count = 0
-2025-09-22T05:46:40.7937582Z Stopping container: 6a7771d107d9_smartsk-backend.
-2025-09-22T05:46:45.9553946Z Deleting container: 6a7771d107d9_smartsk-backend. Retry count = 0
-2025-09-22T05:46:54.3789360Z Container spec TerminationMessagePolicy  path
-2025-09-22T05:46:54.3881665Z Container is terminated. Total time elapsed: 13703 ms.
-2025-09-22T05:46:54.3911275Z Site: smartsk-backend stopped.
-2025-09-22T05:50:54.0059570Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T05:50:54.2057124Z Stop and delete container. Retry count = 0
-2025-09-22T05:50:54.2136651Z Stopping container: a4aae6ed6b6b_smartsk-backend.
-2025-09-22T05:50:59.2610680Z Deleting container: a4aae6ed6b6b_smartsk-backend. Retry count = 0
-2025-09-22T05:51:05.2718775Z Container spec TerminationMessagePolicy  path
-2025-09-22T05:51:05.2734669Z Container is terminated. Total time elapsed: 11264 ms.
-2025-09-22T05:51:05.2820215Z Site: smartsk-backend stopped.
-2025-09-22T05:58:10.1869525Z Container start method called.
-2025-09-22T05:58:10.1883589Z Establishing network.
-2025-09-22T05:58:10.1885379Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T05:58:11.1220810Z Container is starting.
-2025-09-22T05:58:11.1669445Z Establishing user namespace if not established already.
-2025-09-22T05:58:11.1685278Z Establishing network if not established already.
-2025-09-22T05:58:11.1686867Z Mounting volumes.
-2025-09-22T05:58:11.1689038Z Nested mountpoint
-2025-09-22T05:58:11.1861824Z Nested mountpoint volatile/logs
-2025-09-22T05:58:11.2454387Z Nested mountpoint
-2025-09-22T05:58:11.2996014Z Nested mountpoint
-2025-09-22T05:58:11.3006484Z Nested mountpoint
-2025-09-22T05:58:11.3090539Z Nested mountpoint
-2025-09-22T05:58:11.4122002Z Nested mountpoint
-2025-09-22T05:58:12.5574323Z Creating container.
-2025-09-22T05:58:12.5575582Z Creating pipes for streaming container io.
-2025-09-22T05:58:12.5576716Z Creating stdout named pipe at /podr/container/pipe/c000710b9289_smartsk-backend/stdout_5cb921f410104c91ac915abac2e1c7ea.
-2025-09-22T05:58:12.5869484Z Successfully created stdout named pipe at: /podr/container/pipe/c000710b9289_smartsk-backend/stdout_5cb921f410104c91ac915abac2e1c7ea.
-2025-09-22T05:58:12.6057859Z Opening named pipe /podr/container/pipe/c000710b9289_smartsk-backend/stdout_5cb921f410104c91ac915abac2e1c7ea for reading in non-blocking mode.
-2025-09-22T05:58:12.6221433Z Successfully opened named pipe: /podr/container/pipe/c000710b9289_smartsk-backend/stdout_5cb921f410104c91ac915abac2e1c7ea.
-2025-09-22T05:58:12.6224428Z Successfully removed non-blocking flag from /podr/container/pipe/c000710b9289_smartsk-backend/stdout_5cb921f410104c91ac915abac2e1c7ea.
-2025-09-22T05:58:12.6228592Z Creating stderr named pipe at /podr/container/pipe/c000710b9289_smartsk-backend/stderr_f44c8405a8fa48fdb34d6319248cf563.
-2025-09-22T05:58:12.6232166Z Successfully created stderr named pipe at: /podr/container/pipe/c000710b9289_smartsk-backend/stderr_f44c8405a8fa48fdb34d6319248cf563.
-2025-09-22T05:58:12.6233218Z Opening named pipe /podr/container/pipe/c000710b9289_smartsk-backend/stderr_f44c8405a8fa48fdb34d6319248cf563 for reading in non-blocking mode.
-2025-09-22T05:58:12.6234379Z Successfully opened named pipe: /podr/container/pipe/c000710b9289_smartsk-backend/stderr_f44c8405a8fa48fdb34d6319248cf563.
-2025-09-22T05:58:12.6235249Z Successfully removed non-blocking flag from /podr/container/pipe/c000710b9289_smartsk-backend/stderr_f44c8405a8fa48fdb34d6319248cf563.
-2025-09-22T05:58:12.6236464Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T05:58:13.3724889Z Starting container: c000710b9289_smartsk-backend.
-2025-09-22T05:58:13.4520706Z Starting watchers and probes.
-2025-09-22T05:58:13.4696424Z Starting metrics collection.
-2025-09-22T05:58:13.4701744Z Container is running.
-2025-09-22T05:58:14.7547590Z Container start method finished after 4567 ms.
-2025-09-22T05:59:33.8099831Z Site startup probe succeeded after 78.962474 seconds.
-2025-09-22T05:59:47.9509771Z Site is running with deployment version: f47c30f5-2d75-48ec-bbad-8367df640fac
-2025-09-22T05:59:47.9661968Z Site started.
-2025-09-22T05:59:48.2927701Z Site is running with patch version: 22.17.0
-2025-09-22T06:20:07.0867103Z Container start method called.
-2025-09-22T06:20:07.1332731Z Establishing network.
-2025-09-22T06:20:07.1349079Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T06:20:10.0873584Z Container is starting.
-2025-09-22T06:20:10.0926109Z Establishing user namespace if not established already.
-2025-09-22T06:20:10.0997159Z Establishing network if not established already.
-2025-09-22T06:20:10.0998632Z Mounting volumes.
-2025-09-22T06:20:10.1020316Z Nested mountpoint
-2025-09-22T06:20:10.2278631Z Nested mountpoint volatile/logs
-2025-09-22T06:20:10.3321626Z Nested mountpoint
-2025-09-22T06:20:10.5128278Z Nested mountpoint
-2025-09-22T06:20:10.5135312Z Nested mountpoint
-2025-09-22T06:20:10.6258372Z Nested mountpoint
-2025-09-22T06:20:10.6751859Z Nested mountpoint
-2025-09-22T06:20:11.9676616Z Creating container.
-2025-09-22T06:20:12.0055731Z Creating pipes for streaming container io.
-2025-09-22T06:20:12.0076629Z Creating stdout named pipe at /podr/container/pipe/756864734e2a_smartsk-backend/stdout_31b66f67891f4e9ab333000b772ca4ee.
-2025-09-22T06:20:12.0227489Z Successfully created stdout named pipe at: /podr/container/pipe/756864734e2a_smartsk-backend/stdout_31b66f67891f4e9ab333000b772ca4ee.
-2025-09-22T06:20:12.0637857Z Opening named pipe /podr/container/pipe/756864734e2a_smartsk-backend/stdout_31b66f67891f4e9ab333000b772ca4ee for reading in non-blocking mode.
-2025-09-22T06:20:12.0640237Z Successfully opened named pipe: /podr/container/pipe/756864734e2a_smartsk-backend/stdout_31b66f67891f4e9ab333000b772ca4ee.
-2025-09-22T06:20:12.0646966Z Successfully removed non-blocking flag from /podr/container/pipe/756864734e2a_smartsk-backend/stdout_31b66f67891f4e9ab333000b772ca4ee.
-2025-09-22T06:20:12.0648810Z Creating stderr named pipe at /podr/container/pipe/756864734e2a_smartsk-backend/stderr_3fcc4610da4b4676967497b5cffc6ec5.
-2025-09-22T06:20:12.0651420Z Successfully created stderr named pipe at: /podr/container/pipe/756864734e2a_smartsk-backend/stderr_3fcc4610da4b4676967497b5cffc6ec5.
-2025-09-22T06:20:12.0652711Z Opening named pipe /podr/container/pipe/756864734e2a_smartsk-backend/stderr_3fcc4610da4b4676967497b5cffc6ec5 for reading in non-blocking mode.
-2025-09-22T06:20:12.0654405Z Successfully opened named pipe: /podr/container/pipe/756864734e2a_smartsk-backend/stderr_3fcc4610da4b4676967497b5cffc6ec5.
-2025-09-22T06:20:12.0999304Z Successfully removed non-blocking flag from /podr/container/pipe/756864734e2a_smartsk-backend/stderr_3fcc4610da4b4676967497b5cffc6ec5.
-2025-09-22T06:20:12.1096085Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T06:20:13.6587905Z Starting container: 756864734e2a_smartsk-backend.
-2025-09-22T06:20:13.8835495Z Starting watchers and probes.
-2025-09-22T06:20:13.8928008Z Starting metrics collection.
-2025-09-22T06:20:13.9019498Z Container is running.
-2025-09-22T06:20:14.2625570Z Container start method finished after 7163 ms.
-2025-09-22T06:21:49.8984484Z Site startup probe succeeded after 95.4944298 seconds.
-2025-09-22T06:22:16.2659846Z Site is running with deployment version: ccd20acc-1113-44a3-b861-7dac4c2f33a5
-2025-09-22T06:22:16.2864005Z Site started.
-2025-09-22T06:22:16.5153179Z Site is running with patch version: 22.17.0
-2025-09-22T06:22:39.7605727Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T06:22:40.1244401Z Stop and delete container. Retry count = 0
-2025-09-22T06:22:40.1266379Z Stopping container: c000710b9289_smartsk-backend.
-2025-09-22T06:22:46.4693447Z Deleting container: c000710b9289_smartsk-backend. Retry count = 0
-2025-09-22T06:22:59.1623100Z Container spec TerminationMessagePolicy  path
-2025-09-22T06:22:59.1713672Z Container is terminated. Total time elapsed: 19397 ms.
-2025-09-22T06:22:59.1749106Z Site: smartsk-backend stopped.
-2025-09-22T06:52:43.8732367Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T06:52:44.1015060Z Stop and delete container. Retry count = 0
-2025-09-22T06:52:44.1037723Z Stopping container: 756864734e2a_smartsk-backend.
-2025-09-22T06:52:49.1374248Z Deleting container: 756864734e2a_smartsk-backend. Retry count = 0
-2025-09-22T06:52:51.0145367Z Container get mounts received unexpected exception.
-2025-09-22T06:52:51.0153067Z Container get mounts received unexpected exception.
-2025-09-22T06:52:51.0780288Z Container get processes received unexpected exception.
-2025-09-22T06:52:51.0903095Z Container get processes received unexpected exception.
-2025-09-22T06:52:56.0935997Z Container spec TerminationMessagePolicy  path
-2025-09-22T06:52:56.1020826Z Container is terminated. Total time elapsed: 12225 ms.
-2025-09-22T06:52:56.1100589Z Site: smartsk-backend stopped.
-2025-09-22T07:42:52.5356674Z Container start method called.
-2025-09-22T07:42:52.5653104Z Establishing network.
-2025-09-22T07:42:52.5654933Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T07:42:53.9896362Z Container is starting.
-2025-09-22T07:42:53.9973783Z Establishing user namespace if not established already.
-2025-09-22T07:42:53.9995464Z Establishing network if not established already.
-2025-09-22T07:42:54.0055658Z Mounting volumes.
-2025-09-22T07:42:54.0151526Z Nested mountpoint
-2025-09-22T07:42:54.0829738Z Nested mountpoint volatile/logs
-2025-09-22T07:42:54.1404905Z Nested mountpoint
-2025-09-22T07:42:54.1816910Z Nested mountpoint
-2025-09-22T07:42:54.2079938Z Nested mountpoint
-2025-09-22T07:42:54.2093077Z Nested mountpoint
-2025-09-22T07:42:54.2895358Z Nested mountpoint
-2025-09-22T07:42:55.4331427Z Creating container.
-2025-09-22T07:42:55.4445203Z Creating pipes for streaming container io.
-2025-09-22T07:42:55.4450725Z Creating stdout named pipe at /podr/container/pipe/17b7247a420e_smartsk-backend/stdout_f17234f02d574d65b83fb806956b5801.
-2025-09-22T07:42:55.4467827Z Successfully created stdout named pipe at: /podr/container/pipe/17b7247a420e_smartsk-backend/stdout_f17234f02d574d65b83fb806956b5801.
-2025-09-22T07:42:55.4528810Z Opening named pipe /podr/container/pipe/17b7247a420e_smartsk-backend/stdout_f17234f02d574d65b83fb806956b5801 for reading in non-blocking mode.
-2025-09-22T07:42:55.4536421Z Successfully opened named pipe: /podr/container/pipe/17b7247a420e_smartsk-backend/stdout_f17234f02d574d65b83fb806956b5801.
-2025-09-22T07:42:55.4541748Z Successfully removed non-blocking flag from /podr/container/pipe/17b7247a420e_smartsk-backend/stdout_f17234f02d574d65b83fb806956b5801.
-2025-09-22T07:42:55.4544604Z Creating stderr named pipe at /podr/container/pipe/17b7247a420e_smartsk-backend/stderr_b203aa3ca6644bee984265ee8dd9d1e0.
-2025-09-22T07:42:55.4546350Z Successfully created stderr named pipe at: /podr/container/pipe/17b7247a420e_smartsk-backend/stderr_b203aa3ca6644bee984265ee8dd9d1e0.
-2025-09-22T07:42:55.4547340Z Opening named pipe /podr/container/pipe/17b7247a420e_smartsk-backend/stderr_b203aa3ca6644bee984265ee8dd9d1e0 for reading in non-blocking mode.
-2025-09-22T07:42:55.4549436Z Successfully opened named pipe: /podr/container/pipe/17b7247a420e_smartsk-backend/stderr_b203aa3ca6644bee984265ee8dd9d1e0.
-2025-09-22T07:42:55.4550591Z Successfully removed non-blocking flag from /podr/container/pipe/17b7247a420e_smartsk-backend/stderr_b203aa3ca6644bee984265ee8dd9d1e0.
-2025-09-22T07:42:55.4628034Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T07:42:56.9529290Z Starting container: 17b7247a420e_smartsk-backend.
-2025-09-22T07:42:57.0667512Z Starting watchers and probes.
-2025-09-22T07:42:57.0670253Z Starting metrics collection.
-2025-09-22T07:42:57.0676196Z Container is running.
-2025-09-22T07:42:58.1334107Z Container start method finished after 5597 ms.
-2025-09-22T07:44:34.5878880Z Site startup probe succeeded after 96.3160336 seconds.
-2025-09-22T07:44:56.9614985Z Site is running with deployment version: ccd20acc-1113-44a3-b861-7dac4c2f33a5
-2025-09-22T07:44:56.9802833Z Site started.
-2025-09-22T07:44:57.7654252Z Site is running with patch version: 22.17.0
-2025-09-22T07:49:52.2140824Z Container start method called.
-2025-09-22T07:49:52.2202604Z Establishing network.
-2025-09-22T07:49:52.2203838Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T07:50:01.9158359Z Container is starting.
-2025-09-22T07:50:01.9159568Z Establishing user namespace if not established already.
-2025-09-22T07:50:01.9160685Z Establishing network if not established already.
-2025-09-22T07:50:01.9161695Z Mounting volumes.
-2025-09-22T07:50:01.9163117Z Nested mountpoint
-2025-09-22T07:50:02.5406954Z Nested mountpoint volatile/logs
-2025-09-22T07:50:02.5892850Z Nested mountpoint
-2025-09-22T07:50:03.2228522Z Nested mountpoint
-2025-09-22T07:50:03.2237103Z Nested mountpoint
-2025-09-22T07:50:04.1319362Z Nested mountpoint
-2025-09-22T07:50:04.6299691Z Nested mountpoint
-2025-09-22T07:50:09.5904177Z Creating container.
-2025-09-22T07:50:09.5907269Z Creating pipes for streaming container io.
-2025-09-22T07:50:09.5969220Z Creating stdout named pipe at /podr/container/pipe/eab3f5b63573_smartsk-backend/stdout_33535d25d9ba4308b3c7c420ec5efc01.
-2025-09-22T07:50:09.6260442Z Successfully created stdout named pipe at: /podr/container/pipe/eab3f5b63573_smartsk-backend/stdout_33535d25d9ba4308b3c7c420ec5efc01.
-2025-09-22T07:50:09.6276187Z Opening named pipe /podr/container/pipe/eab3f5b63573_smartsk-backend/stdout_33535d25d9ba4308b3c7c420ec5efc01 for reading in non-blocking mode.
-2025-09-22T07:50:09.6278237Z Successfully opened named pipe: /podr/container/pipe/eab3f5b63573_smartsk-backend/stdout_33535d25d9ba4308b3c7c420ec5efc01.
-2025-09-22T07:50:09.6279644Z Successfully removed non-blocking flag from /podr/container/pipe/eab3f5b63573_smartsk-backend/stdout_33535d25d9ba4308b3c7c420ec5efc01.
-2025-09-22T07:50:09.6280969Z Creating stderr named pipe at /podr/container/pipe/eab3f5b63573_smartsk-backend/stderr_8745c5b95fa1442a8d23fd9a283717d9.
-2025-09-22T07:50:09.6282723Z Successfully created stderr named pipe at: /podr/container/pipe/eab3f5b63573_smartsk-backend/stderr_8745c5b95fa1442a8d23fd9a283717d9.
-2025-09-22T07:50:09.6759558Z Opening named pipe /podr/container/pipe/eab3f5b63573_smartsk-backend/stderr_8745c5b95fa1442a8d23fd9a283717d9 for reading in non-blocking mode.
-2025-09-22T07:50:09.6842736Z Successfully opened named pipe: /podr/container/pipe/eab3f5b63573_smartsk-backend/stderr_8745c5b95fa1442a8d23fd9a283717d9.
-2025-09-22T07:50:09.7497212Z Successfully removed non-blocking flag from /podr/container/pipe/eab3f5b63573_smartsk-backend/stderr_8745c5b95fa1442a8d23fd9a283717d9.
-2025-09-22T07:50:09.7512004Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T07:50:15.5776258Z Starting container: eab3f5b63573_smartsk-backend.
-2025-09-22T07:50:15.5969967Z Container start up interrupted. Revert by terminate.
-2025-09-22T07:50:15.6073148Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T07:50:15.6154826Z Stop and delete container. Retry count = 0
-2025-09-22T07:50:15.6170820Z Stopping container: eab3f5b63573_smartsk-backend.
-2025-09-22T07:50:15.9661086Z Deleting container: eab3f5b63573_smartsk-backend. Retry count = 0
-2025-09-22T07:50:16.5592053Z Container spec TerminationMessagePolicy  path
-2025-09-22T07:50:16.6843521Z Container is terminated. Total time elapsed: 1050 ms.
-2025-09-22T07:50:16.7536456Z Site container: smartsk-backend terminated during site startup.
-2025-09-22T07:50:19.2990579Z Site container: smartsk-backend terminated. Stopping the entire site.
-2025-09-22T07:50:19.3435586Z Site: smartsk-backend stopped.
-2025-09-22T07:50:28.7794319Z Container start method called.
-2025-09-22T07:50:28.7795753Z Establishing network.
-2025-09-22T07:50:28.7796901Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T07:50:31.6427760Z Container is starting.
-2025-09-22T07:50:31.6433722Z Establishing user namespace if not established already.
-2025-09-22T07:50:31.6614516Z Establishing network if not established already.
-2025-09-22T07:50:31.6619163Z Mounting volumes.
-2025-09-22T07:50:31.6624307Z Nested mountpoint
-2025-09-22T07:50:31.6900529Z Nested mountpoint volatile/logs
-2025-09-22T07:50:31.8120422Z Nested mountpoint
-2025-09-22T07:50:31.8133512Z Nested mountpoint
-2025-09-22T07:50:31.8400325Z Nested mountpoint
-2025-09-22T07:50:31.8408682Z Nested mountpoint
-2025-09-22T07:50:31.8525404Z Nested mountpoint
-2025-09-22T07:50:36.6876584Z Creating container.
-2025-09-22T07:50:36.6878660Z Creating pipes for streaming container io.
-2025-09-22T07:50:36.6879886Z Creating stdout named pipe at /podr/container/pipe/6a0401802d49_smartsk-backend/stdout_043e45c7c0fb485294d58fc2d70bd517.
-2025-09-22T07:50:36.6994458Z Successfully created stdout named pipe at: /podr/container/pipe/6a0401802d49_smartsk-backend/stdout_043e45c7c0fb485294d58fc2d70bd517.
-2025-09-22T07:50:36.7079918Z Opening named pipe /podr/container/pipe/6a0401802d49_smartsk-backend/stdout_043e45c7c0fb485294d58fc2d70bd517 for reading in non-blocking mode.
-2025-09-22T07:50:36.7081734Z Successfully opened named pipe: /podr/container/pipe/6a0401802d49_smartsk-backend/stdout_043e45c7c0fb485294d58fc2d70bd517.
-2025-09-22T07:50:36.7082756Z Successfully removed non-blocking flag from /podr/container/pipe/6a0401802d49_smartsk-backend/stdout_043e45c7c0fb485294d58fc2d70bd517.
-2025-09-22T07:50:36.7083872Z Creating stderr named pipe at /podr/container/pipe/6a0401802d49_smartsk-backend/stderr_dbb4596be93249b8933c0be37748262f.
-2025-09-22T07:50:36.7085622Z Successfully created stderr named pipe at: /podr/container/pipe/6a0401802d49_smartsk-backend/stderr_dbb4596be93249b8933c0be37748262f.
-2025-09-22T07:50:36.7086590Z Opening named pipe /podr/container/pipe/6a0401802d49_smartsk-backend/stderr_dbb4596be93249b8933c0be37748262f for reading in non-blocking mode.
-2025-09-22T07:50:36.7087731Z Successfully opened named pipe: /podr/container/pipe/6a0401802d49_smartsk-backend/stderr_dbb4596be93249b8933c0be37748262f.
-2025-09-22T07:50:36.7088748Z Successfully removed non-blocking flag from /podr/container/pipe/6a0401802d49_smartsk-backend/stderr_dbb4596be93249b8933c0be37748262f.
-2025-09-22T07:50:36.7089762Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T07:50:40.7998484Z Starting container: 6a0401802d49_smartsk-backend.
-2025-09-22T07:50:41.2051809Z Starting watchers and probes.
-2025-09-22T07:50:41.2338984Z Starting metrics collection.
-2025-09-22T07:50:41.2341281Z Container is running.
-2025-09-22T07:50:42.2343458Z Container start method finished after 13401 ms.
-2025-09-22T07:54:33.4903571Z Site startup probe failed after 231.0351423 seconds.
-2025-09-22T07:54:33.6431142Z Failed to start site. Revert by stopping site.
-2025-09-22T07:54:33.7190411Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T07:54:33.9434488Z Stop and delete container. Retry count = 0
-2025-09-22T07:54:33.9552126Z Stopping container: 6a0401802d49_smartsk-backend.
-2025-09-22T07:54:39.0105030Z Deleting container: 6a0401802d49_smartsk-backend. Retry count = 0
-2025-09-22T07:54:56.5845108Z Container spec TerminationMessagePolicy  path
-2025-09-22T07:54:56.5914970Z Container is terminated. Total time elapsed: 22867 ms.
-2025-09-22T07:54:56.5924827Z Site container: smartsk-backend terminated during site startup.
-2025-09-22T07:54:56.6054441Z Site: smartsk-backend stopped.
-2025-09-22T07:55:19.3258157Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T07:55:19.3682322Z Stop and delete container. Retry count = 0
-2025-09-22T07:55:19.3684155Z Stopping container: 17b7247a420e_smartsk-backend.
-2025-09-22T07:55:24.5907750Z Deleting container: 17b7247a420e_smartsk-backend. Retry count = 0
-2025-09-22T07:55:31.7723672Z Container spec TerminationMessagePolicy  path
-2025-09-22T07:55:31.7802991Z Container is terminated. Total time elapsed: 12440 ms.
-2025-09-22T07:55:31.7807055Z Site: smartsk-backend stopped.
-2025-09-22T07:57:54.9521235Z Container start method called.
-2025-09-22T07:57:54.9781591Z Establishing network.
-2025-09-22T07:57:54.9789205Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T07:57:57.0800411Z Container is starting.
-2025-09-22T07:57:57.0826580Z Establishing user namespace if not established already.
-2025-09-22T07:57:57.0896141Z Establishing network if not established already.
-2025-09-22T07:57:57.0901046Z Mounting volumes.
-2025-09-22T07:57:57.1573979Z Nested mountpoint
-2025-09-22T07:57:57.3175408Z Nested mountpoint volatile/logs
-2025-09-22T07:57:57.3555899Z Nested mountpoint
-2025-09-22T07:57:57.4409362Z Nested mountpoint
-2025-09-22T07:57:57.5879953Z Nested mountpoint
-2025-09-22T07:57:57.8028418Z Nested mountpoint
-2025-09-22T07:57:57.8615104Z Nested mountpoint
-2025-09-22T07:58:00.1797599Z Creating container.
-2025-09-22T07:58:00.2050766Z Creating pipes for streaming container io.
-2025-09-22T07:58:00.2154794Z Creating stdout named pipe at /podr/container/pipe/9cecf363fa62_smartsk-backend/stdout_9efce6b5db6a4d9193c437f41423d957.
-2025-09-22T07:58:00.2336224Z Successfully created stdout named pipe at: /podr/container/pipe/9cecf363fa62_smartsk-backend/stdout_9efce6b5db6a4d9193c437f41423d957.
-2025-09-22T07:58:00.2340672Z Opening named pipe /podr/container/pipe/9cecf363fa62_smartsk-backend/stdout_9efce6b5db6a4d9193c437f41423d957 for reading in non-blocking mode.
-2025-09-22T07:58:00.2344914Z Successfully opened named pipe: /podr/container/pipe/9cecf363fa62_smartsk-backend/stdout_9efce6b5db6a4d9193c437f41423d957.
-2025-09-22T07:58:00.2504351Z Successfully removed non-blocking flag from /podr/container/pipe/9cecf363fa62_smartsk-backend/stdout_9efce6b5db6a4d9193c437f41423d957.
-2025-09-22T07:58:00.2514807Z Creating stderr named pipe at /podr/container/pipe/9cecf363fa62_smartsk-backend/stderr_3d9c64bc1bdf47048ff475cbe22a8eca.
-2025-09-22T07:58:00.2517677Z Successfully created stderr named pipe at: /podr/container/pipe/9cecf363fa62_smartsk-backend/stderr_3d9c64bc1bdf47048ff475cbe22a8eca.
-2025-09-22T07:58:00.2520822Z Opening named pipe /podr/container/pipe/9cecf363fa62_smartsk-backend/stderr_3d9c64bc1bdf47048ff475cbe22a8eca for reading in non-blocking mode.
-2025-09-22T07:58:00.2522219Z Successfully opened named pipe: /podr/container/pipe/9cecf363fa62_smartsk-backend/stderr_3d9c64bc1bdf47048ff475cbe22a8eca.
-2025-09-22T07:58:00.2523337Z Successfully removed non-blocking flag from /podr/container/pipe/9cecf363fa62_smartsk-backend/stderr_3d9c64bc1bdf47048ff475cbe22a8eca.
-2025-09-22T07:58:00.2524563Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T07:58:04.0050944Z Starting container: 9cecf363fa62_smartsk-backend.
-2025-09-22T07:58:04.2162323Z Starting watchers and probes.
-2025-09-22T07:58:04.2337234Z Starting metrics collection.
-2025-09-22T07:58:04.2340259Z Container is running.
-2025-09-22T07:58:04.3516931Z Container start method finished after 9378 ms.
-2025-09-22T08:00:47.5711407Z Site startup probe succeeded after 162.8797258 seconds.
-2025-09-22T08:01:04.0013229Z Site is running with deployment version: ccd20acc-1113-44a3-b861-7dac4c2f33a5
-2025-09-22T08:01:04.0372832Z Site started.
-2025-09-22T08:01:04.6016218Z Site is running with patch version: 22.17.0
-2025-09-22T08:08:16.8810837Z Container is terminating. Grace period: 5 seconds.
-2025-09-22T08:08:17.4192318Z Stop and delete container. Retry count = 0
-2025-09-22T08:08:17.4194193Z Stopping container: 9cecf363fa62_smartsk-backend.
-2025-09-22T08:08:22.8494771Z Deleting container: 9cecf363fa62_smartsk-backend. Retry count = 0
-2025-09-22T08:08:39.7690074Z Container spec TerminationMessagePolicy  path
-2025-09-22T08:08:39.7771342Z Container isterminated. Total time elapsed: 22894 ms.
-2025-09-22T08:08:39.7783794Z Site: smartsk-backend stopped.
-2025-09-22T08:23:36.7624470Z Container start method called.
-2025-09-22T08:23:36.7630839Z Establishing network.
-2025-09-22T08:23:36.7632016Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
-2025-09-22T08:23:39.1021839Z Container is starting.
-2025-09-22T08:23:39.1197488Z Establishing user namespace if not established already.
-2025-09-22T08:23:39.1286044Z Establishing network if not established already.
-2025-09-22T08:23:39.1296663Z Mounting volumes.
-2025-09-22T08:23:39.1299681Z Nested mountpoint
-2025-09-22T08:23:39.1838613Z Nested mountpoint volatile/logs
-2025-09-22T08:23:39.2327860Z Nested mountpoint
-2025-09-22T08:23:39.2707147Z Nested mountpoint
-2025-09-22T08:23:39.3555564Z Nested mountpoint
-2025-09-22T08:23:39.4342070Z Nested mountpoint
-2025-09-22T08:23:39.4804965Z Nested mountpoint
-2025-09-22T08:23:42.5388050Z Creating container.
-2025-09-22T08:23:42.5389154Z Creating pipes for streaming container io.
-2025-09-22T08:23:42.5390094Z Creating stdout named pipe at /podr/container/pipe/8d5bebd7f198_smartsk-backend/stdout_2978a4b1a67641d0805c3e48fbbba399.
-2025-09-22T08:23:42.5392793Z Successfully created stdout named pipe at: /podr/container/pipe/8d5bebd7f198_smartsk-backend/stdout_2978a4b1a67641d0805c3e48fbbba399.
-2025-09-22T08:23:42.5393724Z Opening named pipe /podr/container/pipe/8d5bebd7f198_smartsk-backend/stdout_2978a4b1a67641d0805c3e48fbbba399 for reading in non-blocking mode.
-2025-09-22T08:23:42.5395187Z Successfully opened named pipe: /podr/container/pipe/8d5bebd7f198_smartsk-backend/stdout_2978a4b1a67641d0805c3e48fbbba399.
-2025-09-22T08:23:42.5396532Z Successfully removed non-blocking flag from /podr/container/pipe/8d5bebd7f198_smartsk-backend/stdout_2978a4b1a67641d0805c3e48fbbba399.
-2025-09-22T08:23:42.5397616Z Creating stderr named pipe at /podr/container/pipe/8d5bebd7f198_smartsk-backend/stderr_444ab6242e314eb69bd0695143fa1ecc.
-2025-09-22T08:23:42.5399011Z Successfully created stderr named pipe at: /podr/container/pipe/8d5bebd7f198_smartsk-backend/stderr_444ab6242e314eb69bd0695143fa1ecc.
-2025-09-22T08:23:42.5399879Z Opening named pipe /podr/container/pipe/8d5bebd7f198_smartsk-backend/stderr_444ab6242e314eb69bd0695143fa1ecc for reading in non-blocking mode.
-2025-09-22T08:23:42.5401018Z Successfully opened named pipe: /podr/container/pipe/8d5bebd7f198_smartsk-backend/stderr_444ab6242e314eb69bd0695143fa1ecc.
-2025-09-22T08:23:42.5401910Z Successfully removed non-blocking flag from /podr/container/pipe/8d5bebd7f198_smartsk-backend/stderr_444ab6242e314eb69bd0695143fa1ecc.
-2025-09-22T08:23:42.5402820Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:22-lts_20250724.2.tuxprod
-2025-09-22T08:23:44.4694598Z Starting container: 8d5bebd7f198_smartsk-backend.
-2025-09-22T08:23:44.6030798Z Starting watchers and probes.
-2025-09-22T08:23:44.6033195Z Starting metrics collection.
-2025-09-22T08:23:44.6034537Z Container is running.
-2025-09-22T08:23:45.3108505Z Container start method finished after 8548 ms.
-2025-09-22T08:26:15.0730181Z Site startup probe succeeded after 149.5530988 seconds.
+2025-09-22T12:42:30  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/22/2025 04:12:51/home/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt)
+2025-09-22T03:57:50  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/08ee629c992e-5d2c1cb7-893f-4a5e-a911-3176fe7a2a88.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/08ee629c992e-5d2c1cb7-893f-4a5e-a911-3176fe7a2a88.txt)
+2025-09-22T04:25:19  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/11b642f51bd8-4714892d-cff3-4edc-a491-fc0f4efb8df6.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/11b642f51bd8-4714892d-cff3-4edc-a491-fc0f4efb8df6.txt)
+2025-09-22T08:34:56  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/1d83561841af-d7edaacf-20c3-46a7-b6cc-2e17bd956c62.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/1d83561841af-d7edaacf-20c3-46a7-b6cc-2e17bd956c62.txt)
+2025-09-22T02:57:00  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/21c45da2a211-a3b3e32b-f83c-4e3c-a734-f64b00f85956.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/21c45da2a211-a3b3e32b-f83c-4e3c-a734-f64b00f85956.txt)
+2025-09-22T02:23:35  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,53, ScmType: GitHubAction/home/LogFiles/kudu/trace/279cfa160b2d-102812d4-f49b-4268-b140-ffe0fe4b93c9.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/279cfa160b2d-102812d4-f49b-4268-b140-ffe0fe4b93c9.txt)
+2025-09-22T07:58:56  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/384afc849e60-2451b35a-47c7-481f-8b90-0520d961671d.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/384afc849e60-2451b35a-47c7-481f-8b90-0520d961671d.txt)
+2025-09-22T04:18:35  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/44171915c362-d238b7a9-ea89-47a4-92cf-3e74ab4c490b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/44171915c362-d238b7a9-ea89-47a4-92cf-3e74ab4c490b.txt)
+2025-09-22T03:13:30  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/46e159476525-dd4a208f-d4af-4c68-b904-8a1fc5567bff.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/46e159476525-dd4a208f-d4af-4c68-b904-8a1fc5567bff.txt)
+2025-09-22T07:52:25  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 826,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/4a4cfc2fbaf2-407eedf5-e084-472a-8e66-426d8e895e6b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4a4cfc2fbaf2-407eedf5-e084-472a-8e66-426d8e895e6b.txt)
+2025-09-22T02:45:00  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,36, ScmType: GitHubAction/home/LogFiles/kudu/trace/4be0f6086e0d-d1661b33-3548-443c-80d1-5c17163d0e58.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4be0f6086e0d-d1661b33-3548-443c-80d1-5c17163d0e58.txt)
+2025-09-22T03:35:34  Startup Request, url: /api/settings, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/503ebfa3f129-8b93a67e-fdd6-4fbb-a01f-c3b49034f161.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/503ebfa3f129-8b93a67e-fdd6-4fbb-a01f-c3b49034f161.txt)
+2025-09-22T07:57:13  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/82c3e73d756a-e1f92c88-cd3b-4837-8c6b-59953439f87f.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/82c3e73d756a-e1f92c88-cd3b-4837-8c6b-59953439f87f.txt)
+2025-09-22T07:39:02  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/8fbee2be81fa-8a0746e5-9021-480f-8fac-4bab4c800cdc.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/8fbee2be81fa-8a0746e5-9021-480f-8fac-4bab4c800cdc.txt)
+2025-09-22T03:41:41  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%224a285fb3db697547d1f6cd1bbf86bef737a942bc%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22main.js%2C%20forgotPassword.js%2C%20session.js%20update%22%7D, method: POST, type: request, pid: 835,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/9abfc888a81f-03ad1d18-f2ab-4e34-97bc-7ca7b7b3bd6a.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/9abfc888a81f-03ad1d18-f2ab-4e34-97bc-7ca7b7b3bd6a.txt)
+2025-09-21T15:59:36  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,7, ScmType: None/home/LogFiles/kudu/trace/a99927180ed3-f895a2b6-8205-47b8-8472-2ccbcba4018e.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a99927180ed3-f895a2b6-8205-47b8-8472-2ccbcba4018e.txt)
+2025-09-22T06:01:24  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,25, ScmType: GitHubAction/home/LogFiles/kudu/trace/bb5b7a188c52-2ba750cd-b2eb-41e2-b65b-1ca8ea9cc9f8.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/bb5b7a188c52-2ba750cd-b2eb-41e2-b65b-1ca8ea9cc9f8.txt)
+2025-09-22T08:24:42  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 826,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/c3f3122091dc-e3f1d0d8-3115-42e1-acf2-a61606f12d69.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c3f3122091dc-e3f1d0d8-3115-42e1-acf2-a61606f12d69.txt)
+2025-09-22T08:09:48  Startup Request, url: /api/settings, method: GET, type: request, pid: 822,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/c79f80c56bd4-4dc605dc-d2c3-402f-a7ed-93e9ef7642a9.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c79f80c56bd4-4dc605dc-d2c3-402f-a7ed-93e9ef7642a9.txt)
+2025-09-22T03:14:16  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%2295f0b93d9ad2b1cbe3983b4d5e5eeaef6a71785b%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22Merge%20branch%20%27main%27%20of%20https%3A%2F%2Fgithub.com%2FBratnya%2FSmartSK%5CnUpdating%20the%20main.js%20routing%5Cn--INSERT--%22%7D, method: POST, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/c86f2806b484-a21c81d5-761a-4e82-99b4-859a1c230fe2.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c86f2806b484-a21c81d5-761a-4e82-99b4-859a1c230fe2.txt)
+2025-09-22T03:44:59  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%228311e931d5b107ab693563904492566793b3cd42%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22main.js%20update%20batch2%22%7D, method: POST, type: request, pid: 825,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/d0a02b341d13-5956db7a-ccc7-47bb-a76a-9ae50123d096.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d0a02b341d13-5956db7a-ccc7-47bb-a76a-9ae50123d096.txt)
+2025-09-22T07:44:13  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,18, ScmType: GitHubAction/home/LogFiles/kudu/trace/d435402bdd06-899148fb-e5f1-4bed-9880-8dd6b244c1e7.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d435402bdd06-899148fb-e5f1-4bed-9880-8dd6b244c1e7.txt)
+2025-09-22T04:46:40  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/d93ea344c104-2f4fd10c-ffb5-4962-8b9b-9a57bfccb93c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d93ea344c104-2f4fd10c-ffb5-4962-8b9b-9a57bfccb93c.txt)
+2025-09-22T04:26:21  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 821,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/dbb6c3ef99ba-69f99403-efac-4c75-8e00-e2d1becced99.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/dbb6c3ef99ba-69f99403-efac-4c75-8e00-e2d1becced99.txt)
+2025-09-22T04:14:17  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/e32cbc6f25a5-eb2c3efe-76cc-45ad-b3ee-c1268f283a8c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/e32cbc6f25a5-eb2c3efe-76cc-45ad-b3ee-c1268f283a8c.txt)
+2025-09-22T04:13:18  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/ee8c2db37d2e-74a25790-3d5c-4964-bce0-0ace65397edb.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/ee8c2db37d2e-74a25790-3d5c-4964-bce0-0ace65397edb.txt)
+2025-09-21T16:03:48  Startup Request, url: /api/settings, method: GET, type: request, pid: 821,1,5, ScmType: GitHubAction/home/LogFiles/2025_09_21_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_21_lw0sdlwk0005KT_docker.log)
+2025-09-21T16:50:57.4741125Z Site is running with deployment version: 4ec10318-c9df-4ff4-82f8-995b414eca36
+2025-09-21T16:50:57.4782073Z Site started.
+2025-09-21T16:50:57.5474418Z Site is running with patch version: 22.17.0
+2025-09-21T17:49:56.8528218Z Container is terminating. Grace period: 5 seconds.
+2025-09-21T17:49:56.9975652Z Stop and delete container. Retry count = 0
+2025-09-21T17:49:57.0053587Z Stopping container: 6bf7fd44f304_smartsk-backend.
+2025-09-21T17:50:02.6104150Z Deleting container: 6bf7fd44f304_smartsk-backend. Retry count = 0
+2025-09-21T17:50:17.0859387Z Container spec TerminationMessagePolicy  path
+2025-09-21T17:50:17.0878608Z Container is terminated. Total time elapsed: 20215 ms.
+2025-09-21T17:50:17.0985143Z Site: smartsk-backend stopped./home/LogFiles/2025_09_22_lw0sdlwk0005KT_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_default_docker.log)
+2025-09-22T04:16:58.708652662Z     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+2025-09-22T04:16:58.708655862Z     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+2025-09-22T04:16:58.708659162Z     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2025-09-22T04:16:58.708662362Z     at node:internal/main/run_main_module:36:49 {
+2025-09-22T04:16:58.708665462Z   code: 'MODULE_NOT_FOUND',
+2025-09-22T04:16:58.708668662Z   requireStack: []
+2025-09-22T04:16:58.708671962Z }
+2025-09-22T04:16:58.708674962Z
+2025-09-22T04:16:58.708684762Z Node.js v22.17.0/home/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log)
 2025-09-22T08:26:33.5615305Z Site is running with deployment version: 7805a2f1-ec25-407d-be56-1abd0c8f8f5d
 2025-09-22T08:26:33.5786164Z Site started.
 2025-09-22T08:26:33.8194729Z Site is running with patch version: 22.17.0
+2025-09-22T08:33:04.8909592Z Container is terminating. Grace period: 5 seconds.
+2025-09-22T08:33:05.6106459Z Stop and delete container. Retry count = 0
+2025-09-22T08:33:05.6115256Z Stopping container: 8d5bebd7f198_smartsk-backend.
+2025-09-22T08:33:10.6098082Z Deleting container: 8d5bebd7f198_smartsk-backend. Retry count = 0
+2025-09-22T08:33:28.7922842Z Container spec TerminationMessagePolicy  path
+2025-09-22T08:33:28.7962867Z Container is terminated. Total time elapsed: 23903 ms.
+2025-09-22T08:33:28.8056068Z Site: smartsk-backend stopped.Ending Log Tail of existing logs ---Starting Live Log Stream ---
+2025-09-22T12:43:31  No new trace in the past 1 min(s).
+2025-09-22T12:43:18.6750664Z Container start method called.
+2025-09-22T12:43:18.7224422Z Establishing network.
+2025-09-22T12:43:18.7225566Z Pulling image: appsvc/node:22-lts_20250724.2.tuxprod.
+2025-09-22T12:43:23.2538546Z Container is starting.
+2025-09-22T12:43:23.2539632Z Establishing user namespace if not established already.
+2025-09-22T12:43:23.2540501Z Establishing network if not established already.
+2025-09-22T12:43:23.2541353Z Mounting volumes.
+2025-09-22T12:43:23.2618183Z Nested mountpoint
+2025-09-22T12:43:23.2830236Z Nested mountpoint volatile/logs
+2025-09-22T12:43:23.3975018Z Nested mountpoint
+2025-09-22T12:43:23.5095698Z Nested mountpoint
+2025-09-22T12:43:23.5372642Z Nested mountpoint
+2025-09-22T12:43:23.7394415Z Nested mountpoint
+2025-09-22T12:43:23.9316585Z Nested mountpoint
+2025-09-22T12:43:28.7920815Z Creating container.
+2025-09-22T12:43:28.7923692Z Creating pipes for streaming container io.
+2025-09-22T12:43:28.7925710Z Creating stdout named pipe at /podr/container/pipe/fee01e6c68d0_smartsk-backend/stdout_96c072c149f04538a53d33487dbd129f.
+2025-09-22T12:43:28.8009230Z Successfully created stdout named pipe at: /podr/container/pipe/fee01e6c68d0_smartsk-backend/stdout_96c072c149f04538a53d33487dbd129f.
+2025-09-22T12:43:28.8104234Z Opening named pipe /podr/container/pipe/fee01e6c68d0_smartsk-backend/stdout_96c072c149f04538a53d33487dbd129f for reading in non-blocking mode.
+2025-09-22T12:43:28.8106515Z Successfully opened named pipe: /podr/container/pipe/fee01e6c68d0_smartsk-backend/stdout_96c072c149f04538a53d33487dbd129f.
+2025-09-22T12:43:28.8107876Z Successfully removed non-blocking flag from /podr/container/pipe/fee01e6c68d0_smartsk-backend/stdout_96c072c149f04538a53d33487dbd129f.
+2025-09-22T12:43:28.8109369Z Creating stderr named pipe at /podr/container/pipe/fee01e6c68d0_smartsk-backend/stderr_2ec586f934cb4c7ebc4c5a475cd1a8f2.
+2025-09-22T12:43:28.8199078Z Successfully created stderr named pipe at: /podr/container/pipe/fee01e6c68d0_smartsk-backend/stderr_2ec586f934cb4c7ebc4c5a475cd1a8f2.
+2025-09-22T12:43:28.8200614Z Opening named pipe /podr/container/pipe/fee01e6c68d0_smartsk-backend/stderr_2ec586f934cb4c7ebc4c5a475cd1a8f2 for reading in non-blocking mode.
+2025-09-22T12:43:28.8206542Z Successfully opened named pipe: /podr/container/pipe/fee01e6c68d0_smartsk-backend/stderr_2ec586f934cb4c7ebc4c5a475cd1a8f2.
+2025-09-22T12:43:28.8225195Z Successfully removed non-blocking flag from /podr/container/pipe/fee01e6c68d0_smartsk-backend/stderr_2ec586f934cb4c7ebc4c5a475cd1a8f2.
+2025-09-22T12:43:28.8226816Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
+2025-09-22T12:44:08  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/22/2025 04:12:51/home/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt)
+2025-09-22T03:57:50  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/08ee629c992e-5d2c1cb7-893f-4a5e-a911-3176fe7a2a88.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/08ee629c992e-5d2c1cb7-893f-4a5e-a911-3176fe7a2a88.txt)
+2025-09-22T04:25:19  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/11b642f51bd8-4714892d-cff3-4edc-a491-fc0f4efb8df6.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/11b642f51bd8-4714892d-cff3-4edc-a491-fc0f4efb8df6.txt)
+2025-09-22T08:34:56  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/1d83561841af-d7edaacf-20c3-46a7-b6cc-2e17bd956c62.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/1d83561841af-d7edaacf-20c3-46a7-b6cc-2e17bd956c62.txt)
+2025-09-22T02:57:00  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/21c45da2a211-a3b3e32b-f83c-4e3c-a734-f64b00f85956.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/21c45da2a211-a3b3e32b-f83c-4e3c-a734-f64b00f85956.txt)
+2025-09-22T02:23:35  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,53, ScmType: GitHubAction/home/LogFiles/kudu/trace/279cfa160b2d-102812d4-f49b-4268-b140-ffe0fe4b93c9.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/279cfa160b2d-102812d4-f49b-4268-b140-ffe0fe4b93c9.txt)
+2025-09-22T07:58:56  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/384afc849e60-2451b35a-47c7-481f-8b90-0520d961671d.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/384afc849e60-2451b35a-47c7-481f-8b90-0520d961671d.txt)
+2025-09-22T04:18:35  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/44171915c362-d238b7a9-ea89-47a4-92cf-3e74ab4c490b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/44171915c362-d238b7a9-ea89-47a4-92cf-3e74ab4c490b.txt)
+2025-09-22T03:13:30  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/46e159476525-dd4a208f-d4af-4c68-b904-8a1fc5567bff.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/46e159476525-dd4a208f-d4af-4c68-b904-8a1fc5567bff.txt)
+2025-09-22T07:52:25  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 826,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/4a4cfc2fbaf2-407eedf5-e084-472a-8e66-426d8e895e6b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4a4cfc2fbaf2-407eedf5-e084-472a-8e66-426d8e895e6b.txt)
+2025-09-22T02:45:00  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,36, ScmType: GitHubAction/home/LogFiles/kudu/trace/4be0f6086e0d-d1661b33-3548-443c-80d1-5c17163d0e58.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4be0f6086e0d-d1661b33-3548-443c-80d1-5c17163d0e58.txt)
+2025-09-22T03:35:34  Startup Request, url: /api/settings, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/4f9a7dd6aef6-00bdc477-581a-47f5-b625-b60fe8b3798c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4f9a7dd6aef6-00bdc477-581a-47f5-b625-b60fe8b3798c.txt)
+2025-09-22T12:44:08  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/503ebfa3f129-8b93a67e-fdd6-4fbb-a01f-c3b49034f161.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/503ebfa3f129-8b93a67e-fdd6-4fbb-a01f-c3b49034f161.txt)
+2025-09-22T07:57:13  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/82c3e73d756a-e1f92c88-cd3b-4837-8c6b-59953439f87f.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/82c3e73d756a-e1f92c88-cd3b-4837-8c6b-59953439f87f.txt)
+2025-09-22T07:39:02  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/8fbee2be81fa-8a0746e5-9021-480f-8fac-4bab4c800cdc.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/8fbee2be81fa-8a0746e5-9021-480f-8fac-4bab4c800cdc.txt)
+2025-09-22T03:41:41  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%224a285fb3db697547d1f6cd1bbf86bef737a942bc%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22main.js%2C%20forgotPassword.js%2C%20session.js%20update%22%7D, method: POST, type: request, pid: 835,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/9abfc888a81f-03ad1d18-f2ab-4e34-97bc-7ca7b7b3bd6a.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/9abfc888a81f-03ad1d18-f2ab-4e34-97bc-7ca7b7b3bd6a.txt)
+2025-09-21T15:59:36  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,7, ScmType: None/home/LogFiles/kudu/trace/a99927180ed3-f895a2b6-8205-47b8-8472-2ccbcba4018e.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a99927180ed3-f895a2b6-8205-47b8-8472-2ccbcba4018e.txt)
+2025-09-22T06:01:24  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,25, ScmType: GitHubAction/home/LogFiles/kudu/trace/bb5b7a188c52-2ba750cd-b2eb-41e2-b65b-1ca8ea9cc9f8.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/bb5b7a188c52-2ba750cd-b2eb-41e2-b65b-1ca8ea9cc9f8.txt)
+2025-09-22T08:24:42  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 826,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/c3f3122091dc-e3f1d0d8-3115-42e1-acf2-a61606f12d69.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c3f3122091dc-e3f1d0d8-3115-42e1-acf2-a61606f12d69.txt)
+2025-09-22T08:09:48  Startup Request, url: /api/settings, method: GET, type: request, pid: 822,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/c79f80c56bd4-4dc605dc-d2c3-402f-a7ed-93e9ef7642a9.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c79f80c56bd4-4dc605dc-d2c3-402f-a7ed-93e9ef7642a9.txt)
+2025-09-22T03:14:16  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%2295f0b93d9ad2b1cbe3983b4d5e5eeaef6a71785b%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22Merge%20branch%20%27main%27%20of%20https%3A%2F%2Fgithub.com%2FBratnya%2FSmartSK%5CnUpdating%20the%20main.js%20routing%5Cn--INSERT--%22%7D, method: POST, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/c86f2806b484-a21c81d5-761a-4e82-99b4-859a1c230fe2.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c86f2806b484-a21c81d5-761a-4e82-99b4-859a1c230fe2.txt)
+2025-09-22T03:44:59  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%228311e931d5b107ab693563904492566793b3cd42%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22main.js%20update%20batch2%22%7D, method: POST, type: request, pid: 825,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/d0a02b341d13-5956db7a-ccc7-47bb-a76a-9ae50123d096.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d0a02b341d13-5956db7a-ccc7-47bb-a76a-9ae50123d096.txt)
+2025-09-22T07:44:13  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,18, ScmType: GitHubAction/home/LogFiles/kudu/trace/d435402bdd06-899148fb-e5f1-4bed-9880-8dd6b244c1e7.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d435402bdd06-899148fb-e5f1-4bed-9880-8dd6b244c1e7.txt)
+2025-09-22T04:46:40  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/d93ea344c104-2f4fd10c-ffb5-4962-8b9b-9a57bfccb93c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d93ea344c104-2f4fd10c-ffb5-4962-8b9b-9a57bfccb93c.txt)
+2025-09-22T04:26:21  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 821,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/dbb6c3ef99ba-69f99403-efac-4c75-8e00-e2d1becced99.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/dbb6c3ef99ba-69f99403-efac-4c75-8e00-e2d1becced99.txt)
+2025-09-22T04:14:17  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/e32cbc6f25a5-eb2c3efe-76cc-45ad-b3ee-c1268f283a8c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/e32cbc6f25a5-eb2c3efe-76cc-45ad-b3ee-c1268f283a8c.txt)
+2025-09-22T04:13:18  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/ee8c2db37d2e-74a25790-3d5c-4964-bce0-0ace65397edb.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/ee8c2db37d2e-74a25790-3d5c-4964-bce0-0ace65397edb.txt)
+2025-09-21T16:03:48  Startup Request, url: /api/settings, method: GET, type: request, pid: 821,1,5, ScmType: GitHubAction/home/LogFiles/2025_09_21_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_21_lw0sdlwk0005KT_docker.log)
+2025-09-21T16:50:57.4741125Z Site is running with deployment version: 4ec10318-c9df-4ff4-82f8-995b414eca36
+2025-09-21T16:50:57.4782073Z Site started.
+2025-09-21T16:50:57.5474418Z Site is running with patch version: 22.17.0
+2025-09-21T17:49:56.8528218Z Container is terminating. Grace period: 5 seconds.
+2025-09-21T17:49:56.9975652Z Stop and delete container. Retry count = 0
+2025-09-21T17:49:57.0053587Z Stopping container: 6bf7fd44f304_smartsk-backend.
+2025-09-21T17:50:02.6104150Z Deleting container: 6bf7fd44f304_smartsk-backend. Retry count = 0
+2025-09-21T17:50:17.0859387Z Container spec TerminationMessagePolicy  path
+2025-09-21T17:50:17.0878608Z Container is terminated. Total time elapsed: 20215 ms.
+2025-09-21T17:50:17.0985143Z Site: smartsk-backend stopped./home/LogFiles/2025_09_22_lw0sdlwk0005KT_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_default_docker.log)
+2025-09-22T04:16:58.708652662Z     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+2025-09-22T04:16:58.708655862Z     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+2025-09-22T04:16:58.708659162Z     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2025-09-22T04:16:58.708662362Z     at node:internal/main/run_main_module:36:49 {
+2025-09-22T04:16:58.708665462Z   code: 'MODULE_NOT_FOUND',
+2025-09-22T04:16:58.708668662Z   requireStack: []
+2025-09-22T04:16:58.708671962Z }
+2025-09-22T04:16:58.708674962Z
+2025-09-22T04:16:58.708684762Z Node.js v22.17.0/home/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log)
+2025-09-22T12:43:28.8199078Z Successfully created stderr named pipe at: /podr/container/pipe/fee01e6c68d0_smartsk-backend/stderr_2ec586f934cb4c7ebc4c5a475cd1a8f2.
+2025-09-22T12:43:28.8200614Z Opening named pipe /podr/container/pipe/fee01e6c68d0_smartsk-backend/stderr_2ec586f934cb4c7ebc4c5a475cd1a8f2 for reading in non-blocking mode.
+2025-09-22T12:43:28.8206542Z Successfully opened named pipe: /podr/container/pipe/fee01e6c68d0_smartsk-backend/stderr_2ec586f934cb4c7ebc4c5a475cd1a8f2.
+2025-09-22T12:43:28.8225195Z Successfully removed non-blocking flag from /podr/container/pipe/fee01e6c68d0_smartsk-backend/stderr_2ec586f934cb4c7ebc4c5a475cd1a8f2.
+2025-09-22T12:43:28.8226816Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
+2025-09-22T12:43:31.6628021Z Starting container: fee01e6c68d0_smartsk-backend.
+2025-09-22T12:43:31.8919948Z Starting watchers and probes.
+2025-09-22T12:43:31.8965719Z Starting metrics collection.
+2025-09-22T12:43:31.8967374Z Container is running.
+2025-09-22T12:43:32.2899263Z Container start method finished after 13614 ms.Ending Log Tail of existing logs ---Starting Live Log Stream ---
+2025-09-22T12:45:09  No new trace in the past 1 min(s).
+2025-09-22T12:46:10  No new trace in the past 2 min(s).
+2025-09-22T12:46:16.3074682Z Container has finished running with exit code: 1.
+2025-09-22T12:46:16.3256134Z Container is terminating. Grace period: 5 seconds.
+2025-09-22T12:46:16.4603370Z Stop and delete container. Retry count = 0
+2025-09-22T12:46:16.5127685Z Stopping container: fee01e6c68d0_smartsk-backend.
+2025-09-22T12:46:16.9457679Z Deleting container: fee01e6c68d0_smartsk-backend. Retry count = 0
+2025-09-22T12:46:34.3726500Z Container spec TerminationMessagePolicy  path
+2025-09-22T12:46:34.3834855Z Container is terminated. Total time elapsed: 18038 ms.
+2025-09-22T12:46:34.4005848Z Site container: smartsk-backend terminated during site startup.
+2025-09-22T12:46:34.4684689Z Site startup probe failed after 181.9711305 seconds.
+2025-09-22T12:46:34.8946030Z Failed to start site. Revert by stopping site.
+2025-09-22T12:46:34.9531112Z Site: smartsk-backend stopped.
+2025-09-22T12:46:50.493Z INFO  - Starting container for site
+2025-09-22T12:46:50.496Z INFO  - docker run -d --expose=3000 --name smartsk-backend_0_cbe0fecb -e WEBSITE_USE_DIAGNOSTIC_SERVER=true -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net -e WEBSITE_INSTANCE_ID=8f6ec0650f826e23f288755375fc57d9276bf0ceae68106ea7334ab7f2d22d46 -e NODE_OPTIONS=--require /agents/nodejs/build/src/Loader.js appsvc/node:22-lts_20250724.2.tuxprod REDACTED
+2025-09-22T12:46:50.497Z INFO  - Logging is not enabled for this container.Please use https://aka.ms/linux-diagnostics to enable logging to see container logs here.TNAME=smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net -e WEBSITE_INSTANCE_ID=8f6ec0650f826e23f288755375fc57d9276bf0ceae68106ea7334ab7f2d22d46 mcr.microsoft.com/appsvc/middleware:stage5 REDACTED
+2025-09-22T12:47:07.718Z INFO  - Logging is not enabled for this container.Please use https://aka.ms/linux-diagnostics to enable logging to see container logs here.. Elapsed time = 42.7642662 sec
+2025-09-22T12:48:28.829Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_cbe0fecb. Elapsed time = 66.0852234 sec
+2025-09-22T12:48:51.479Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_cbe0fecb. Elapsed time = 88.6908531 sec
+2025-09-22T12:49:11.607Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_cbe0fecb. Elapsed time = 108.8632274 sec
+2025-09-22T12:46:55.373548299Z    _____
+2025-09-22T12:46:55.374160706Z   /  _  \ __________ _________   ____
+2025-09-22T12:46:55.374166206Z  /  /_\  \\___   /  |  \_  __ \_/ __ \
+2025-09-22T12:46:55.374169106Z /    |    \/    /|  |  /|  | \/\  ___/
+2025-09-22T12:46:55.374171606Z \____|__  /_____ \____/ |__|    \___  >
+2025-09-22T12:46:55.374174506Z         \/      \/                  \/
+2025-09-22T12:46:55.374177006Z A P P   S E R V I C E   O N   L I N U X
+2025-09-22T12:46:55.374179506Z
+2025-09-22T12:46:55.374181806Z Documentation: http://aka.ms/webapp-linux
+2025-09-22T12:46:55.374184306Z NodeJS quickstart: https://aka.ms/node-qs
+2025-09-22T12:46:55.374186706Z NodeJS Version : v22.17.0
+2025-09-22T12:46:55.374189106Z Note: Any data outside '/home' is not persisted
+2025-09-22T12:46:55.374191606Z
+2025-09-22T12:47:05.904117897Z Starting OpenBSD Secure Shell server: sshd.
+2025-09-22T12:47:05.923400717Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-09-22T12:47:05.990258279Z Updating certificates in /etc/ssl/certs...
+2025-09-22T12:47:46.017373476Z rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+2025-09-22T12:47:46.634900678Z 4 added, 0 removed; done.
+2025-09-22T12:47:46.738169999Z Running hooks in /etc/ca-certificates/update.d...
+2025-09-22T12:47:46.865080576Z done.
+2025-09-22T12:47:47.187860879Z CA certificates copied and updated successfully.
+2025-09-22T12:47:48.206035929Z Starting periodic command scheduler: cron.
+2025-09-22T12:47:48.657989133Z Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2025-09-22T12:47:48.666641627Z Could not find operation ID in manifest. Generating an operation id...
+2025-09-22T12:47:48.667508637Z Build Operation ID: 3b64934b-57e5-4b0c-9ccd-7d5bc7ad62e8
+2025-09-22T12:47:51.045145762Z Environment Variables for Application Insight's IPA Codeless Configuration exists..
+2025-09-22T12:47:51.186353801Z Writing output script to '/opt/startup/startup.sh'
+2025-09-22T12:47:51.364191075Z Running #!/bin/sh
+2025-09-22T12:47:51.364220075Z
+2025-09-22T12:47:51.364224975Z # Enter the source directory to make sure the script runs where the user expects
+2025-09-22T12:47:51.364228975Z cd "/home/site/wwwroot"
+2025-09-22T12:47:51.364232975Z
+2025-09-22T12:47:51.364236475Z export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
+2025-09-22T12:47:51.364240175Z if [ -z "$PORT" ]; then
+2025-09-22T12:47:51.364243975Z 		export PORT=8080
+2025-09-22T12:47:51.364248375Z fi
+2025-09-22T12:47:51.364251775Z
+2025-09-22T12:47:51.364255175Z echo Found tar.gz based node_modules.
+2025-09-22T12:47:51.364283775Z extractionCommand="tar -xzf node_modules.tar.gz -C /node_modules"
+2025-09-22T12:47:51.364288175Z echo "Removing existing modules directory from root..."
+2025-09-22T12:47:51.364290775Z rm -fr /node_modules
+2025-09-22T12:47:51.364293375Z mkdir -p /node_modules
+2025-09-22T12:47:51.364295875Z echo Extracting modules...
+2025-09-22T12:47:51.364298475Z $extractionCommand
+2025-09-22T12:47:51.364300875Z export NODE_PATH="/node_modules":$NODE_PATH
+2025-09-22T12:47:51.364303675Z export PATH=/node_modules/.bin:$PATH
+2025-09-22T12:47:51.364306175Z if [ -d node_modules ]; then
+2025-09-22T12:47:51.364308675Z     mv -f node_modules _del_node_modules || true
+2025-09-22T12:47:51.364311175Z fi
+2025-09-22T12:47:51.364313675Z
+2025-09-22T12:47:51.364410975Z if [ -d /node_modules ]; then
+2025-09-22T12:47:51.364417975Z     ln -sfn /node_modules ./node_modules
+2025-09-22T12:47:51.364421375Z fi
+2025-09-22T12:47:51.364423875Z
+2025-09-22T12:47:51.364426275Z echo "Done."
+2025-09-22T12:47:51.364428975Z PATH="$PATH:/home/site/wwwroot" cd backend && npm install && node main.js
+2025-09-22T12:47:51.680161085Z Found tar.gz based node_modules.
+2025-09-22T12:47:51.680188385Z Removing existing modules directory from root...
+2025-09-22T12:47:51.839433541Z Extracting modules...
+2025-09-22T12:48:57.079001272Z Done.
+2025-09-22T12:49:04.047022065Z npm info using npm@10.9.2
+2025-09-22T12:49:04.072528633Z npm info using node@v22.17.0
+2025-09-22T12:49:08.481159019Z npm http fetch GET 200 https://registry.npmjs.org/npm 1551ms
+2025-09-22T12:49:09.929879629Z npm http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 1013ms
+2025-09-22T12:49:10.136335097Z npm http fetch GET 200 https://registry.npmjs.org/multer 170ms (cache miss)
+2025-09-22T12:49:10.207325442Z npm http fetch GET 200 https://registry.npmjs.org/lodash 250ms (cache miss)
+2025-09-22T12:49:10.402371690Z npm http fetch GET 200 https://registry.npmjs.org/axios 446ms (cache miss)
+2025-09-22T12:49:10.749750737Z npm http fetch GET 200 https://registry.npmjs.org/sql 776ms (cache miss)
+2025-09-22T12:49:10.977329987Z
+2025-09-22T12:49:10.977359987Z up to date, audited 182 packages in 8s
+2025-09-22T12:49:10.997176782Z
+2025-09-22T12:49:10.997194882Z 30 packages are looking for funding
+2025-09-22T12:49:10.997200183Z   run `npm fund` for details
+2025-09-22T12:49:10.997204483Z
+2025-09-22T12:49:10.997208383Z 4 vulnerabilities (1 moderate, 2 high, 1 critical)
+2025-09-22T12:49:10.997212683Z
+2025-09-22T12:49:10.997216683Z To address issues that do not require attention, run:
+2025-09-22T12:49:10.997239983Z   npm audit fix
+2025-09-22T12:49:10.997243683Z
+2025-09-22T12:49:10.997246383Z Some issues need review, and may require choosing
+2025-09-22T12:49:10.997249183Z a different dependency.
+2025-09-22T12:49:10.997252083Z
+2025-09-22T12:49:10.997254683Z Run `npm audit` for details.
+2025-09-22T12:49:11.006549122Z npm notice
+2025-09-22T12:49:11.006564622Z npm notice New major version of npm available! 10.9.2 -> 11.6.0
+2025-09-22T12:49:11.006568622Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0
+2025-09-22T12:49:11.006571122Z npm notice To update run: npm install -g npm@11.6.0
+2025-09-22T12:49:11.006573622Z npm notice
+2025-09-22T12:49:11.007831941Z npm info ok
+2025-09-22T12:49:20.165406038Z Initializing active sessions from database...
+2025-09-22T12:49:20.214323077Z node:internal/modules/cjs/loader:1404
+2025-09-22T12:49:20.214636680Z   throw err;
+2025-09-22T12:49:20.214647680Z   ^
+2025-09-22T12:49:20.214650980Z
+2025-09-22T12:49:20.214653880Z Error: Cannot find module './projectSubmission/projectSubmission'
+2025-09-22T12:49:20.214657080Z Require stack:
+2025-09-22T12:49:20.214659980Z - /home/site/wwwroot/backend/main.js
+2025-09-22T12:49:20.214663180Z     at Function._resolveFilename (node:internal/modules/cjs/loader:1401:15)
+2025-09-22T12:49:20.214666280Z     at defaultResolveImpl (node:internal/modules/cjs/loader:1057:19)
+2025-09-22T12:49:20.214669180Z     at resolveForCJSWithHooks (node:internal/modules/cjs/loader:1062:22)
+2025-09-22T12:49:20.214672080Z     at Function._load (node:internal/modules/cjs/loader:1211:37)
+2025-09-22T12:49:20.214675080Z     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+2025-09-22T12:49:20.214677880Z     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+2025-09-22T12:49:20.214680780Z     at Module.<anonymous> (node:internal/modules/cjs/loader:1487:12)
+2025-09-22T12:49:20.214684180Z     at Module.patchedRequire (/agents/nodejs/node_modules/diagnostic-channel/dist/src/patchRequire.js:16:46)
+2025-09-22T12:49:20.214687181Z     at Module.patchedRequire (/agents/nodejs/node_modules/require-in-the-middle/index.js:194:34)
+2025-09-22T12:49:20.214690181Z     at Hook._require.Module.require (/agents/nodejs/node_modules/require-in-the-middle/index.js:142:27) {
+2025-09-22T12:49:20.214693181Z   code: 'MODULE_NOT_FOUND',
+2025-09-22T12:49:20.214695981Z   requireStack: [ '/home/site/wwwroot/backend/main.js' ]
+2025-09-22T12:49:20.215384288Z }
+2025-09-22T12:49:20.215389588Z
+2025-09-22T12:49:20.215392388Z Node.js v22.17.0
+2025-09-22T12:49:22.521Z ERROR - Container smartsk-backend_0_cbe0fecb for site smartsk-backend has exited, failing site start
+2025-09-22T12:49:22.529Z INFO  - Initiating warmup request to container smartsk-backend_0_cbe0fecb_middleware for site smartsk-backend
+2025-09-22T12:49:23.555Z INFO  - Container smartsk-backend_0_cbe0fecb_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
+2025-09-22T12:49:23.722Z ERROR - Container smartsk-backend_0_cbe0fecb didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
+2025-09-22T12:49:24.264Z INFO  - Stopping site smartsk-backend because it failed during startup.
