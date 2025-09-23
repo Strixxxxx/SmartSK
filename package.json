@@ -4,6 +4,6 @@
   "description": "Root package.json for SmartSK monorepo deployment",
   "scripts": {
     "prestart": "npm install --prefix backend",
-    "start": "node backend/main.js"
+    "start": "cd backend && node main.js"
   }
 }
