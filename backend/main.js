@@ -21,7 +21,7 @@ const sessionLogRouter = require('./Admin/sessionlog');
 const projectSubmissionRouter = require('./projectSubmission/projectSubmission');
 const emailRouter = require('./Email/email').router;
 const loginRouter = require('./login/login');
-const { authMiddleware } = require('./session/session');
+const { authMiddleware, logout, validateToken } = require('./session/session');
 const projectReviewRouter = require('./projectReview/projectReview');
 const auditRouter = require('./audit/auditService').router;
 const rawDataRouter = require('./rawdata/rawData');
@@ -80,10 +80,7 @@ app.use((req, res, next) => {
 // --- PUBLIC ROUTES ---
 // Routes that don't need authentication and are publicly accessible.
 
-app.get('/api/validate-token', validateToken);
-
-// Login router
-app.post('/api/login', login);
+app.use('/api/login', loginRouter);
 
 // Forgot password router
 if (forgotPasswordRoutes && typeof forgotPasswordRoutes === 'function') {
@@ -100,6 +97,8 @@ app.use(authMiddleware);
 
 // --- PROTECTED ROUTES ---
 // These routes require a valid token to be accessed.
+
+app.get('/api/validate-token', validateToken);
 
 // Logout route
 app.post('/api/logout', logout);

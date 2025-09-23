@@ -178,8 +178,41 @@ const getUserInfo = async (req, res) => {
 // Initialize active sessions on startup
 initializeActiveSessions();
 
+async function logout(req, res) {
+  try {
+    const sessionID = req.user.sessionID;
+    if (sessionID) {
+      const pool = await getConnection();
+      await pool.request()
+        .input('sessionID', sql.VarChar, sessionID)
+        .input('currentTime', sql.DateTime2, new Date(getPhilippineTime()))
+        .query('UPDATE sessions SET expires_at = @currentTime WHERE sessionID = @sessionID AND expires_at IS NULL');
+      
+      activeSessions.delete(sessionID);
+    }
+    if (res && !res.headersSent) {
+        res.json({ success: true, message: 'Logged out successfully' });
+    }
+  } catch (error) {
+    console.error('Error during logout process:', error);
+    if (res && !res.headersSent) {
+        res.status(500).json({ success: false, message: 'Logout failed' });
+    }
+  }
+}
+
+const validateToken = (req, res) => {
+  if (req.user) {
+    res.json({ success: true, message: 'Token is valid', user: req.user });
+  } else {
+    res.status(401).json({ success: false, message: 'Authentication failed' });
+  }
+};
+
 module.exports = {
   createSession,
   authMiddleware,
-  getUserInfo
+  getUserInfo,
+  logout,
+  validateToken
 };
