@@ -1,4 +1,10 @@
 {
+  "name": "smartsk-monorepo",
+  "version": "1.0.0",
+  "description": "Root package.json for SmartSK monorepo deployment",
+  "scripts": {
+    "start": "node backend/main.js"
+  },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
