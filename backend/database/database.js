@@ -1,17 +1,12 @@
 const sql = require('mssql');
-const path = require('path');
-const dotenv = require('dotenv');
 
-// Load environment variables from .env file
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
-
-// Database configuration from environment variables with extended timeouts
+// Database configuration is loaded from environment variables provided by the platform.
 const dbConfig = {
-  server: process.env.DB_SERVER || '',
+  server: process.env.DB_SERVER,
   database: process.env.DB_DATABASE,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  port: parseInt(process.env.DB_PORT, 10),
+  port: parseInt(process.env.DB_PORT, 10) || 1433,
   requestTimeout: 300000, // 5 minutes
   connectionTimeout: 30000, // 30 seconds
   pool: {
@@ -29,7 +24,7 @@ const dbConfig = {
 
 // Validate configuration before creating connection
 if (!dbConfig.server) {
-  console.error('Database configuration error');
+  console.error('FATAL ERROR: DB_SERVER environment variable is not set.');
   process.exit(1);
 }
 
@@ -39,28 +34,25 @@ const poolConnect = pool.connect();
 
 // Handle connection events
 pool.on('connect', () => {
-  console.log('Database connected successfully');
+  console.log('Database connected successfully.');
 });
 
+// Log detailed pool errors
 pool.on('error', (err) => {
-  console.error('Database pool error');
+  console.error('Database Pool Error:', err);
 });
 
-// Handle connection errors
+// Handle initial connection errors and exit loudly
 poolConnect.catch(err => {
-  console.error('Database connection error');
+  console.error('FATAL: Initial database connection failed:', err);
+  process.exit(1);
 });
 
 // Export the pool for use in other modules
 module.exports = {
   getConnection: async () => {
-    try {
-      await poolConnect;
-      return pool;
-    } catch (err) {
-      console.error('Database connection error');
-      throw err;
-    }
+    await poolConnect; // Ensures the initial connection is complete before returning the pool
+    return pool;
   },
   sql: sql
 };

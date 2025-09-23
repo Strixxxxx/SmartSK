@@ -4,10 +4,12 @@
 --Backend(Azure Portal's Log Stream)
 
 Connected!
-2025-09-23T14:08:11  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/23/2025 09:20:34/home/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt)
+2025-09-23T14:48:32  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/23/2025 09:20:34/home/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt)
 2025-09-22T03:57:50  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/03a8a751efff-ea9b94d4-5784-44d0-95b8-59e8bdac354e.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03a8a751efff-ea9b94d4-5784-44d0-95b8-59e8bdac354e.txt)
 2025-09-23T06:42:52    Outgoing response, type: response, statusCode: 409, statusText: Conflict/home/LogFiles/kudu/trace/03a8a751efff-f0c217d7-58b3-46fb-98ef-d367d83a9c15.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03a8a751efff-f0c217d7-58b3-46fb-98ef-d367d83a9c15.txt)
-2025-09-23T05:48:10  Startup Request, url: /api/settings, method: GET, type: request, pid: 825,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/07f431701055-3b46c7c8-c15d-460b-9550-5d7ae267faf5.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/07f431701055-3b46c7c8-c15d-460b-9550-5d7ae267faf5.txt)
+2025-09-23T05:48:10  Startup Request, url: /api/settings, method: GET, type: request, pid: 825,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/0582958a54a4-d03dcf92-9575-4936-815a-03bdf20fce77.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0582958a54a4-d03dcf92-9575-4936-815a-03bdf20fce77.txt)
+2025-09-23T14:47:40          Error occurred, type: error, text: Could not find file '/home/site/locks/deployment/info.lock'., stackTrace:    at Interop.ThrowExceptionForIoErrno(ErrorInfo errorInfo, String path, Boolean isDirError)at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, UnixFileMode openPermissions, Int64& fileLength, UnixFileMode& filePermissions, Boolean failForSymlink, Boolean& wasSymlink, Func`4 createOpenException)at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Encoding encoding, Int32 bufferSize)at System.IO.File.ReadAllText(String path, Encoding encoding)at Kudu.Core.AllSafeLinuxLock.IsLockValid() in /tmp/KuduLite/Kudu.Core/AllSafeLinuxLock.cs:line 97at Kudu.Core.AllSafeLinuxLock.get_IsHeld() in /tmp/KuduLite/Kudu.Core/AllSafeLinuxLock.cs:line 42/home/LogFiles/kudu/trace/0582958a54a4-f0d239d0-d796-40d4-8137-4678559f7cae.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0582958a54a4-f0d239d0-d796-40d4-8137-4678559f7cae.txt)
+2025-09-23T14:09:16  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/07f431701055-3b46c7c8-c15d-460b-9550-5d7ae267faf5.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/07f431701055-3b46c7c8-c15d-460b-9550-5d7ae267faf5.txt)
 2025-09-23T13:14:03  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/08ee629c992e-5d2c1cb7-893f-4a5e-a911-3176fe7a2a88.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/08ee629c992e-5d2c1cb7-893f-4a5e-a911-3176fe7a2a88.txt)
 2025-09-22T04:25:19  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/0abad35b801a-761fe80c-0498-4110-890d-f4fee4577d52.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0abad35b801a-761fe80c-0498-4110-890d-f4fee4577d52.txt)
 2025-09-23T12:39:35  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsbY9G&sid=SvEoqrTq6QQNflObAAAA, method: POST, type: request, pid: 823,1,17, ScmType: GitHubAction/home/LogFiles/kudu/trace/0b6d09385c60-2ec37a91-97e5-49cf-a79c-b35ab9682f57.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0b6d09385c60-2ec37a91-97e5-49cf-a79c-b35ab9682f57.txt)
@@ -141,15 +143,20 @@ Connected!
 2025-09-23T09:21:54.505168110Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0
 2025-09-23T09:21:54.505170275Z npm notice To update run: npm install -g npm@11.6.0
 2025-09-23T09:21:54.505172259Z npm notice/home/LogFiles/2025_09_23_lw1sdlwk0006H5_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw1sdlwk0006H5_docker.log)
-2025-09-23T13:23:37.0476834Z Container is terminated. Total time elapsed: 6444 ms.
-2025-09-23T13:23:37.0496016Z Site container: smartsk-backend terminated during site startup.
-2025-09-23T13:23:37.0574273Z Site: smartsk-backend stopped.
-2025-09-23T13:24:00.3685402Z Container is terminating. Grace period: 5 seconds.
-2025-09-23T13:24:00.7581272Z Stop and delete container. Retry count = 0
-2025-09-23T13:24:00.7585787Z Stopping container: 188a1225bd22_smartsk-backend.
-2025-09-23T13:24:06.5742279Z Deleting container: 188a1225bd22_smartsk-backend. Retry count = 0
-2025-09-23T13:24:24.4042367Z Container spec TerminationMessagePolicy  path
-2025-09-23T13:24:24.4149678Z Container is terminated. Total time elapsed: 23947 ms.
-2025-09-23T13:24:24.4159319Z Site: smartsk-backend stopped.Ending Log Tail of existing logs ---Starting Live Log Stream ---
-
---Kudus' Console
+2025-09-23T14:48:22.7893860Z Site startup probe failed after 34.3647342 seconds.
+2025-09-23T14:48:23.9395799Z Failed to start site. Revert by stopping site.
+2025-09-23T14:48:24.0935465Z Container is terminating. Grace period: 5 seconds.
+2025-09-23T14:48:24.5232794Z Stop and delete container. Retry count = 0
+2025-09-23T14:48:24.5236068Z Stopping container: 530fc797d270_smartsk-backend.
+2025-09-23T14:48:29.7319145Z Deleting container: 530fc797d270_smartsk-backend. Retry count = 0
+2025-09-23T14:48:31.5863247Z Container spec TerminationMessagePolicy  path
+2025-09-23T14:48:31.5880995Z Container is terminated. Total time elapsed: 7474 ms.
+2025-09-23T14:48:31.5887157Z Site container: smartsk-backend terminated during site startup.
+2025-09-23T14:48:31.5964008Z Site: smartsk-backend stopped.Ending Log Tail of existing logs ---Starting Live Log Stream ---
+2025-09-23T14:48:55.6134323Z Container is terminating. Grace period: 5 seconds.
+2025-09-23T14:48:55.6421403Z Stop and delete container. Retry count = 0
+2025-09-23T14:48:55.6424320Z Stopping container: 46fa644bb611_smartsk-backend.
+2025-09-23T14:49:00.8144898Z Deleting container: 46fa644bb611_smartsk-backend. Retry count = 0
+2025-09-23T14:49:02.9993072Z Container spec TerminationMessagePolicy  path
+2025-09-23T14:49:03.0059677Z Container is terminated. Total time elapsed: 7385 ms.
+2025-09-23T14:49:03.0069568Z Site: smartsk-backend stopped.
