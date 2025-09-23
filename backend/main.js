@@ -22,7 +22,6 @@ const projectSubmissionRouter = require('./projectSubmission/projectSubmission')
 const emailRouter = require('./Email/email').router;
 const loginRouter = require('./login/login');
 const { authMiddleware } = require('./session/session');
-const loginRouter = require('./login/login');
 const projectReviewRouter = require('./projectReview/projectReview');
 const auditRouter = require('./audit/auditService').router;
 const rawDataRouter = require('./rawdata/rawData');

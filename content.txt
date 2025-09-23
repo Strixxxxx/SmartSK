@@ -1,64 +1,33 @@
-Based on the logs you've provided, it appears the application is failing to start because of a missing or corrupt module. The error message MODULE_NOT_FOUND indicates that a dependency required by your main.js file cannot be found. This likely happened after you updated your package.json file.
+That's an excellent step to troubleshoot the build process, and it's a common issue with monorepos or projects with nested package.json files.
 
-To fix this, you'll need to make sure the application dependencies are installed correctly during your deployment.
+The log entry from your previous attempt showed: Node.js v22.17.0/home/LogFiles/2025_09_22_lw0sdlwk0005KT_default_docker.log and the error:
 
-Analysis of the Log
-The log for 2025_09_22_lw0sdlwk0005KT_default_docker.log shows the following critical error:
+{
+  code: 'MODULE_NOT_FOUND',
+  requireStack: [ '/home/site/wwwroot/backend/main.js' ]
+}
+This error indicates that the application is running, but it can't find a module that main.js depends on. The MODULE_NOT_FOUND error usually happens when Node.js can't locate a dependency, and the most common reason for this is that npm install either wasn't run or wasn't run in the correct directory.
 
-code: 'MODULE_NOT_FOUND',
-requireStack: [ '/home/site/wwwroot/backend/main.js' ]
-This means when your Node.js application tried to start up by running main.js, it immediately crashed because a necessary module was not present.
+By adding --prefix backend to your npm install command, you're explicitly telling the deployment script to run the installation inside the backend directory. However, the subsequent log entries you've provided show a new issue: Container smartsk-backend_0_ebea6a8c_middleware didn't respond to HTTP pings on port: 3000. Failing site start. This new error means the container is starting but your application isn't listening on the specified port.
 
-Your most recent commit log entry also mentions updating package.json, which is the exact file that lists your application's dependencies. When you change this file, you must run npm install or yarn install to download and install the new or updated modules.
+Here's why this might be happening and what you should check next:
 
-The container logs from 2025_09_23 further confirm the issue, as the container exits and fails to respond to pings on port 3000, which is the expected behavior when a Node.js app crashes on startup.
+Port Configuration: Azure App Service expects your application to listen on the port specified by the PORT environment variable, which is 3000 in your case as per the docker run command in the log. You need to ensure your Node.js application is configured to use process.env.PORT to set its listening port. Many frameworks (like Express.js) do this by default, but if you have hardcoded the port (e.g., app.listen(8080)), it won't work.
 
-Recommended Fix
-You need to ensure that your deployment process includes a step to install the Node.js dependencies.
+Middleware container: The logs show smartsk-backend_0_ebea6a8c_middleware. Azure App Service may use a separate middleware container for features like CORS or authentication. The docker run command shows the middleware container is running on port 8181, which seems to be correct. However, the next error is for the main application container: Container smartsk-backend_0_ebea6a8c didn't respond to HTTP pings on port: 3000. This suggests the main container is the one failing, not the middleware one. The middleware seems to be running correctly and is ready to forward requests to your application on port 3000.
 
-Check your deployment script: Review your CI/CD pipeline or deployment script. Make sure it contains a command like npm install or yarn install that runs after the new code is pulled but before the application is started.
+To fix this, you should:
 
-Verify the deployed files: If you are manually deploying, ensure that you have uploaded the node_modules directory along with your other files, or you've run npm install in the correct directory on the server itself.
+Check your application's index.js or app.js file. Make sure the server is listening on the PORT environment variable. It should look something like this:
 
-By ensuring the npm install command runs on the server with the updated package.json, you will install the missing modules and resolve the MODULE_NOT_FOUND error, allowing your application to start successfully.
+JavaScript
 
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
+This ensures that when your application is deployed to Azure, it will listen on the port that Azure specifies.
 
+Verify the start script in your package.json file in the backend folder. The start script is what the container will use to launch your application. A common issue is the start command not correctly pointing to your main file. For example, if your main file is named main.js inside the backend folder, your start script should be node backend/main.js or node main.js depending on the working directory context set in your deployment.
 
-
-
-
-
-
-how to check the deployment script?
-
-
-To check your deployment script, you'll need to look at your source control repository and the Azure App Service configuration. Based on the ScmType: GitHubAction messages in your logs, your deployment is likely handled by a GitHub Actions workflow.
-
-1. Check Your GitHub Actions Workflow
-The most direct way to check your deployment script is to look in your GitHub repository for the workflow file.
-
-Navigate to your GitHub repository.
-
-Look for a .github/workflows directory.
-
-Inside this directory, find the YAML file that defines your deployment workflow (e.g., azure-webapps-node.yml).
-
-This file contains the steps your CI/CD pipeline executes. You should find a step that builds your Node.js application. Make sure it includes a command to install dependencies, such as npm install or yarn install, before the deployment step.
-
-2. Check Azure App Service Deployment Center
-You can also check the configuration directly in the Azure portal.
-
-Go to the Azure portal and select your App Service.
-
-In the left navigation menu, find the Deployment Center.
-
-This section will show you the configured source (GitHub) and the workflow file being used for continuous deployment. You can even view the logs of past deployments directly from here, which may give you more clues if the build step is failing.
-
-3. Kudu Deployment Script
-If you're not using a standard GitHub Action and have a custom deployment script, it would be in a file named .deployment in the root of your repository, or it could be defined as a custom command in the Kudu settings.
-
-You can access the Kudu console by going to https://<your-app-name>.scm.azurewebsites.net/.
-
-From here, you can navigate the file system to inspect the deployed files, including any custom deployment scripts.
-
-By checking these locations, you should be able to confirm that the npm install command is a part of your deployment process, which will fix the MODULE_NOT_FOUND error.
+Once you've made these changes, push them to your GitHub repository and trigger a new deployment. This should resolve the port issue and allow your container to start successfully.
