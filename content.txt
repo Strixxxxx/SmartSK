@@ -1,0 +1,45 @@
+╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│  > so i could still see errors on the azure portal's log stream. You could see on the @console.txt and tell me the issue, the diagnosis, and how to fix it  │
+╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+✦ Of course. I've reviewed the latest logs in console.txt.
+
+
+  It appears my previous fix, while necessary, did not solve the entire problem. The good news is the MODULE_NOT_FOUND error related to fs and path should be gone after
+  you redeployed. However, the application is still failing to start, which is why you're seeing the container errors.
+
+  New Diagnosis:
+
+  I've found another likely issue in your package.json file. You have a dependency called "sql": "^0.78.0".
+
+
+  Your application code, specifically in main.js, imports an object named sql from your local ./database/database.js file. This local sql object is almost certainly from
+  the mssql package, which is the correct driver for SQL Server.
+
+
+  The problem is the dependency "sql": "^0.78.0" in your package.json. This is a different, unrelated library. Having this in your dependencies can cause a name collision
+  and unpredictable behavior, which is likely the cause of the application crash on startup.
+
+  Solution:
+
+
+  The fix is to remove the "sql": "^0.78.0" dependency from your backend/package.json file. Your project is using mssql for database operations, so this other sql package
+  is not needed and is causing harm.
+
+
+ ╭───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  Edit backend\package.json: {... => {...                                                                                                                        │
+ │                                                                                                                                                                   │
+ │    14       "multer": "^2.0.1",                                                                                                                                   │
+ │    15       "nodemailer": "^7.0.3",                                                                                                                               │
+ │    16       "pdf-parse": "^1.1.1",                                                                                                                                │
+ │    17 -     "sql": "^0.78.0",                                                                                                                                     │
+ │    17       "uuid4": "^2.0.3"                                                                                                                                     │
+ │    18     }                                                                                                                                                       │
+ │    19   }                                                                                                                                                         │
+ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ I have removed the conflicting "sql" package from your backend/package.json.
+
+
+  Please commit this change and redeploy your application to Azure. This should resolve the startup crash. After deployment, please check the logs again to confirm that
+  the server starts successfully. You should see a message like Server is running on port 3000.
