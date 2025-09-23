@@ -1,6 +1,12 @@
-process.on('uncaughtException', err => {
-  console.error('There was an uncaught error', err);
-  process.exit(1); // mandatory (as per the Node.js docs)
+// Add global error handlers to catch silent crashes
+process.on('uncaughtException', (err, origin) => {
+  console.error(`Caught exception: ${err}\n` + `Exception origin: ${origin}`);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
 });
 
 // Import the necessary modules
