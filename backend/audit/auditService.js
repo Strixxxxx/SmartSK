@@ -89,7 +89,7 @@ router.get('/', async (req, res) => {
         const pool = await getConnection();
         const result = await pool.request().query(`
             SELECT t1.auditID, t2.username, t1.moduleName, t1.actions, t1.descriptions, t1.old_value, t1.new_value, 
-                   FORMAT(t1.created_at, 'MM/dd/yyyy, hh:mm tt') as created_at
+                   FORMAT(DATEADD(hour, 8, t1.created_at), 'MM/dd/yyyy, hh:mm tt') as created_at
             FROM [audit trail] as t1
             LEFT JOIN userInfo as t2 ON t1.userID = t2.userID
             ORDER BY t1.created_at DESC

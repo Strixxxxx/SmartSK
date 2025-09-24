@@ -102,8 +102,8 @@ const Sessions: React.FC<SessionsProps> = () => {
               <tr key={session.sessionID}>
                 <td>{session.userName}</td>
                 <td>{session.fullName}</td>
-                <td>{new Date(session.created_at).toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true, year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}</td>
-                <td>{session.expires_at ? new Date(session.expires_at).toLocaleString('en-US', { timeZone: 'Asia/Manila', hour12: true, year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Active'}</td>
+                <td>{session.created_at}</td>
+                <td>{session.expires_at ? session.expires_at : 'Active'}</td>
               </tr>
             ))}
           </tbody>

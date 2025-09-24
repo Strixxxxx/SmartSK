@@ -12,7 +12,6 @@ process.on('unhandledRejection', (reason, promise) => {
 // Import the necessary modules
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const path = require('path');
 const multer = require('multer');
