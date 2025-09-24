@@ -574,6 +574,11 @@ app.post('/api/predictive-analysis/custom-options', async (req, res) => {
   }
 });
 
+// Health Check Endpoint
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 // Define the port
 const PORT = process.env.PORT || process.env.WEBSITES_PORT || 3000;
 
