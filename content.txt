@@ -1,370 +1,715 @@
-Thanks for sharing the full log output—it clarifies what’s happening now.
+2025-09-22T13:13:30.354324462Z Node.js v22.17.0/home/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log) 2025-09-22T20:30:20.320Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage5 2025-09-22T20:30:21.300Z INFO  - Pull Image successful, Time taken: 23 Seconds 2025-09-22T20:30:28.423Z INFO  - Starting container for site 2025-09-22T20:30:28.429Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_ef54df6b_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HO2025-09-22T20:31:17.329Z INFO  - Initiating warmup request to container smartsk-backend_0_ef54df6b for site smartsk-backend 2025-09-22T20:34:11.076Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_ef54df6b. Elapsed time = 174.2072552 sec 2025-09-22T20:35:06.298Z INFO  - Container smartsk-backend_0_ef54df6b for site smartsk-backend initialized successfully and is ready to serve requests. 2025-09-22T20:35:07.048Z INFO  - Initiating warmup request to container smartsk-backend_0_ef54df6b_middleware for site smartsk-backend 2025-09-22T20:35:51.013Z ERROR - Container smartsk-backend_0_ef54df6b_middleware for site smartsk-backend did not start within expected time limit. Elapsed time = 274.1557191 sec 2025-09-22T20:35:52.227Z ERROR - Container smartsk-backend_0_ef54df6b_middleware didn't respond to HTTP pings on port: 8181. Failing site start. See container logs for debugging. 2025-09-22T20:35:56.756Z INFO  - Stopping site smartsk-backend because it failed during startup./home/LogFiles/2025_09_22_lw0sdlwk0005KT_easyauth_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_easyauth_docker.log) 2025-09-22T20:31:06.332456283Z Updated CA certificates 2025-09-22T20:31:53.739998123Z warn: Microsoft.AspNetCore.Hosting.Diagnostics[15] 2025-09-22T20:31:53.740649229Z       Overriding HTTP_PORTS '8080' and HTTPS_PORTS ''. Binding to values defined by URLS instead 'http://0.0.0.0:8181'. 2025-09-22T20:33:40.866124094Z warn: Microsoft.AspNetCore.Server.Kestrel[22] 2025-09-22T20:33:41.101346602Z       As of "09/22/2025 20:33:19 +00:00", the heartbeat has been running for "00:00:01.5129484" which is longer than "00:00:01". This could be caused by thread pool starvation./home/LogFiles/2025_09_23_lw0sdlwk0005KT_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw0sdlwk0005KT_default_docker.log) 2025-09-23T03:48:52.940881006Z     at Object..js (node:internal/modules/cjs/loader:1895:10) 2025-09-23T03:48:52.940884806Z     at Module.load (node:internal/modules/cjs/loader:1465:32) 2025-09-23T03:48:52.940888806Z     at Function._load (node:internal/modules/cjs/loader:1282:12) 2025-09-23T03:48:52.940892706Z     at TracingChannel.traceSync (node:diagnostics_channel:322:14) 2025-09-23T03:48:52.940896507Z     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24) 2025-09-23T03:48:52.940916107Z     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5) 2025-09-23T03:48:52.942450824Z     at node:internal/main/run_main_module:36:49 2025-09-23T03:48:52.942538325Z 2025-09-23T03:48:52.942551525Z Node.js v22.17.0/home/LogFiles/2025_09_23_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw0sdlwk0005KT_docker.log) 2025-09-23T03:45:12.032Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage5 2025-09-23T03:45:13.634Z INFO  - Pull Image successful, Time taken: 10 Seconds 2025-09-23T03:45:16.937Z INFO  - Starting container for site 2025-09-23T03:45:16.938Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_ebea6a8c_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HO2025-09-23T03:45:59.533Z INFO  - Initiating warmup request to container smartsk-backend_0_ebea6a8c for site smartsk-backend 2025-09-23T03:48:02.005Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_ebea6a8c. Elapsed time = 122.4791987 sec 2025-09-23T03:49:14.398Z ERROR - Container smartsk-backend_0_ebea6a8c for site smartsk-backend has exited, failing site start 2025-09-23T03:49:14.416Z INFO  - Initiating warmup request to container smartsk-backend_0_ebea6a8c_middleware for site smartsk-backend 2025-09-23T03:49:24.518Z INFO  - Container smartsk-backend_0_ebea6a8c_middleware for site smartsk-backend initialized successfully and is ready to serve requests. 2025-09-23T03:49:24.658Z ERROR - Container smartsk-backend_0_ebea6a8c didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging. 2025-09-23T03:49:25.288Z INFO  - Stopping site smartsk-backend because it failed during startup./home/LogFiles/2025_09_23_lw1sdlwk0006H5_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw1sdlwk0006H5_default_docker.log) 2025-09-23T09:21:54.464687447Z     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5) 2025-09-23T09:21:54.464689324Z     at node:internal/main/run_main_module:36:49 2025-09-23T09:21:54.465752990Z 2025-09-23T09:21:54.465759628Z Node.js v22.17.0 2025-09-23T09:21:54.505130380Z npm notice 2025-09-23T09:21:54.505164325Z npm notice New major version of npm available! 10.9.2 -> 11.6.0 2025-09-23T09:21:54.505168110Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0 2025-09-23T09:21:54.505170275Z npm notice To update run: npm install -g npm@11.6.0 2025-09-23T09:21:54.505172259Z npm notice/home/LogFiles/2025_09_23_lw1sdlwk0006H5_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw1sdlwk0006H5_docker.log) 2025-09-23T15:32:46.1660974Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:22-lts_20250724.2.tuxprod 2025-09-23T15:32:49.3549717Z Starting container: ec1fb9ce4304_smartsk-backend. 2025-09-23T15:32:49.7644198Z Starting watchers and probes. 2025-09-23T15:32:49.7919210Z Starting metrics collection. 2025-09-23T15:32:49.8035564Z Container is running. 2025-09-23T15:32:50.5784858Z Container start method finished after 12359 ms. 2025-09-23T15:34:14.5288952Z Site startup probe succeeded after 83.6877085 seconds. 2025-09-23T15:34:31.7049956Z Site is running with deployment version: 9423950c-9e82-4fd5-8975-5e12d6206baa 2025-09-23T15:34:31.7155561Z Site started. 2025-09-23T15:34:32.0005024Z Site is running with patch version: 22.17.0/home/LogFiles/2025_09_24_lw1sdlwk0006H5_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_default_docker.log) 2025-09-24T04:48:18.276942062Z - /home/site/wwwroot/Admin/accountCreation.js 2025-09-24T04:48:18.276945306Z - /home/site/wwwroot/main.js 2025-09-24T04:48:18.276947912Z Exception origin: uncaughtException 2025-09-24T04:48:18.276950368Z npm http fetch GET 200 https://registry.npmjs.org/npm 474ms 2025-09-24T04:48:18.276952834Z npm notice 2025-09-24T04:48:18.276955303Z npm notice New major version of npm available! 10.9.2 -> 11.6.0 2025-09-24T04:48:18.276958166Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0 2025-09-24T04:48:18.276960801Z npm notice To update run: npm install -g npm@11.6.0 2025-09-24T04:48:18.276963249Z npm notice/home/LogFiles/2025_09_24_lw1sdlwk0006H5_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_docker.log) 2025-09-24T04:46:53.868Z INFO  - Starting container for site 2025-09-24T04:46:53.939Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_4f50b3c0_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOS2025-09-24T04:46:59.583Z INFO  - Initiating warmup request to container smartsk-backend_0_4f50b3c0 for site smartsk-backend 2025-09-24T04:47:22.781Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_4f50b3c0. Elapsed time = 23.2067242 sec 2025-09-24T04:47:45.264Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_4f50b3c0. Elapsed time = 45.689856 sec 2025-09-24T04:48:08.305Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_4f50b3c0. Elapsed time = 68.7306216 sec 2025-09-24T04:48:19.487Z ERROR - Container smartsk-backend_0_4f50b3c0 for site smartsk-backend has exited, failing site start 2025-09-24T04:48:19.488Z INFO  - Initiating warmup request to container smartsk-backend_0_4f50b3c0_middleware for site smartsk-backend 2025-09-24T04:48:20.887Z INFO  - Container smartsk-backend_0_4f50b3c0_middleware for site smartsk-backend initialized successfully and is ready to serve requests. 2025-09-24T04:48:20.920Z ERROR - Container smartsk-backend_0_4f50b3c0 didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging. 2025-09-24T04:48:21.058Z INFO  - Stopping site smartsk-backend because it failed during startup.Ending Log Tail of existing logs ---Starting Live Log Stream ---  
 
-Key Errors in the Azure Log
+i need your diagnosis on this log stream that came from the azure portal
+ChatGPT said:
 
-Node “MODULE_NOT_FOUND”
+Here’s a structured diagnosis of the Azure App Service log stream you posted, focusing on what the messages mean and the most likely root causes:
 
-code: 'MODULE_NOT_FOUND',
-requireStack: [ '/home/site/wwwroot/backend/main.js' ]
+1️⃣ Key Symptoms From the Logs
 
+Multiple startup attempts:
 
-This means Node is starting main.js, but inside it a require() call is failing because the module isn’t present or the path is wrong.
-
-Port-ping failure
-
-ERROR - Container ... didn't respond to HTTP pings on port: 3000. Failing site start.
+ERROR - Container smartsk-backend_* didn't respond to HTTP pings on port: 3000. Failing site start.
 
 
-Azure tried to reach your container on port 3000 and got no HTTP response.
+Azure tries to “warm up” the container by sending HTTP pings, but never receives a response.
 
-No useful runtime error
-The container exits almost immediately (“Container is terminated … Total time elapsed: 7 s”), which is consistent with Node throwing an unhandled MODULE_NOT_FOUND before the Express server ever calls app.listen().
+Conflicting port expectations:
 
-Why the “listen on all IPv4” change isn’t your blocker
-
-Your app.listen(process.env.PORT || 3000) change to 0.0.0.0 was fine and is the correct Azure pattern.
-But that code is never even reached, because Node dies on a missing module before Express starts.
-
-What to Check in Your Codebase
-
-Look at the very top of /backend/main.js.
-The stack trace stops at:
-
-Module.<anonymous> (node:internal/modules/cjs/loader:1487:12)
-requireStack: [ '/home/site/wwwroot/backend/main.js' ]
+Binding to values defined by URLS instead 'http://0.0.0.0:8181'
+...
+ERROR - ... didn't respond to HTTP pings on port: 3000
 
 
-That means a direct require() at the top of main.js (or one of its immediate imports) is failing.
+The container listens on 8181, but Azure’s health probe expects 3000.
 
-Typical culprits:
+Thread pool starvation warnings (Kestrel):
 
-A relative path typo like require('./database') when the file was moved/renamed.
-
-A package you require('something') but never listed in dependencies (only in devDependencies), so Azure’s production install didn’t include it.
-
-Case sensitivity: works on Windows but fails on Linux because of a capital letter mismatch.
-
-Example: require('./Config') vs a file named config.js.
-
-Verify your build/deployment folder
-After GitHub Action deploy, Azure runs in /home/site/wwwroot.
-Make sure your repo’s backend files—including node_modules—are actually present there.
-From the Kudu console:
-
-cd /home/site/wwwroot/backend
-ls -l
+heartbeat has been running for "00:00:01.5129484" which is longer than "00:00:01"
 
 
-Check for:
+Not fatal, but shows the container is under some load or blocking at startup.
 
-main.js
+Node.js version & exit traces:
 
-any modules you import directly (e.g., database, routes, etc.)
-
-a populated node_modules folder.
-
-Check package.json dependencies
-Any library you require() must be in "dependencies", not only "devDependencies".
-Azure uses npm install --production, which skips devDeps.
-
-How to Fix
-
-If it’s a missing local file – correct the require path or rename the file to match case exactly.
-
-If it’s a missing package – move it to dependencies and redeploy:
-
-npm install <package> --save
-git commit -am "fix: add missing dependency"
-git push
+Node.js v22.17.0
+at Object..js (node:internal/modules/cjs/loader:1895:10)
+...
+uncaughtException
 
 
-Confirm Azure sees it – after the next deployment, use Kudu console again to verify node_modules/<package> exists.
+A JavaScript file in /home/site/wwwroot is throwing an uncaught exception and crashing the process.
+
+2️⃣ Most Likely Root Causes
+Area	Evidence	Why It Matters
+Port mismatch	Azure health probe is set to 3000, container actually binds to 8181	The App Service will kill the container if it doesn’t respond on the expected port.
+Startup crash	uncaughtException stack traces right after warmup	Your Node.js app may crash before listening, causing the “didn’t respond” errors.
+Environment misconfiguration	-e PORT=3000 is passed to the container but your app may still use a hardcoded port (like 8181)	If you ignore process.env.PORT, Azure’s probe will fail.
+3️⃣ Recommended Fixes
+
+Confirm the Port Binding
+
+In your Node.js app, listen on the port Azure provides:
+
+const port = process.env.PORT || 3000;
+app.listen(port, () => console.log(`Listening on ${port}`));
+
+
+Remove any hard-coded 8181.
+
+Align Azure Settings
+
+In the Azure Portal → App Service → Configuration → General settings
+
+Set “Startup Command” appropriately or clear it if not needed.
+
+Ensure no custom WEBSITES_PORT or PORT settings conflict.
+
+Check for Application Crash
+
+The uncaughtException means your code (e.g. main.js or Admin/accountCreation.js) is throwing at startup.
+
+Attach to the Kudu/SCM console or enable “Always On” and Application Logging to capture full stack traces.
+
+Run the same Docker image locally:
+
+docker run -p 3000:3000 your-image
+
+
+to reproduce and see the real error.
+
+Update npm / Dependencies
+
+Optional but recommended: update npm (npm install -g npm@latest) and re-deploy to avoid known issues with Node 22.
+
+4️⃣ Quick Checklist
+
+ Make sure app.listen(process.env.PORT) is used.
+
+ Verify no second server (like Kestrel) is also trying to bind on a different port.
+
+ Test container locally with same environment variables as Azure.
+
+ Inspect Admin/accountCreation.js and main.js for runtime errors.
+
+Summary
+
+Your Azure App Service container fails health checks because the application either crashes or is listening on the wrong port.
+Fix your Node.js startup to respect process.env.PORT, re-deploy, and verify with local docker run. Once the container responds on the port Azure probes (default 3000 unless overridden), the “didn’t respond to HTTP pings” errors should disappear.
+
+You said:
+// Define the port
+const PORT = process.env.PORT || 3000;
+
+// Start the server
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(Server is running on port ${PORT});
+});
+
+so for the confirm the port binding, as you can see from the code snippet from the above, it listen to the port which was 3000 that was saved on the environment variable of azure portal, and it listens to any ipv4 addresses
+ChatGPT said:
+
+Your snippet is already correct for Azure’s requirement—you’re listening on process.env.PORT and on 0.0.0.0, so the simple “wrong port” explanation isn’t the whole story.
+Given that, here’s what the logs and configuration point to next:
+
+1️⃣ What the Logs Actually Show
+
+Environment vs. Probe Port
+
+-e PORT=3000
+Overriding HTTP_PORTS '8080' and HTTPS_PORTS ''.
+Binding to values defined by URLS instead 'http://0.0.0.0:8181'
+ERROR - didn't respond to HTTP pings on port: 3000
+
+
+Azure injects PORT=3000, but the platform’s middleware (App Service Linux container) still binds the internal reverse-proxy/Kestrel to 8181.
+That means Azure expects your container to answer on 3000, but inside the container the default listener is 8181.
+
+2️⃣ Why This Happens
+
+On App Service for Linux, when you use a custom image or Node runtime with a startup command, Azure sometimes sets WEBSITES_PORT (or HTTP_PORTS) to 8181.
+
+If the container’s internal proxy is routing traffic to 8181, but your Node app is bound to 3000, the health probe to 3000 never succeeds—even though your code is “right.”
+
+3️⃣ How to Resolve
+
+Option A – Use Azure’s Provided Port Variable
+
+Replace:
+
+const PORT = process.env.PORT || 3000;
+
+
+with:
+
+const PORT = process.env.PORT || process.env.WEBSITES_PORT || 3000;
+
+
+This covers both cases—if Azure internally switches to 8181, your app will follow.
+
+Option B – Pin the Probe to 3000
+
+If you want to stay on 3000:
+
+Go to Azure Portal → App Service → Configuration → General settings.
+
+Add / confirm an App Setting
+
+Name: WEBSITES_PORT
+
+Value: 3000
+
+Save and restart.
+
+This tells the App Service health probe to target 3000 explicitly.
+
+4️⃣ Also Double-Check
+
+Startup Command: In “Configuration → General settings,” clear any custom startup command if you aren’t using it.
+
+Application Crashes: The uncaughtException in Admin/accountCreation.js / main.js can still cause intermittent exits.
+Make sure you run the same container locally with:
+
+docker run -e PORT=3000 -p 3000:3000 <image>
+
+
+and confirm it stays up.
+
+✅ Bottom Line
+
+Your code is fine.
+The mismatch is between Azure’s probe port and your listening port because App Service’s default is often 8181.
+Either read WEBSITES_PORT or force Azure to probe 3000 to stop the repeated “didn’t respond to HTTP pings on port: 3000” errors.
+
+You said:
+2025-09-22T13:13:30.354324462Z Node.js v22.17.0/home/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log)
+2025-09-22T20:30:20.320Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage5
+2025-09-22T20:30:21.300Z INFO  - Pull Image successful, Time taken: 23 Seconds
+2025-09-22T20:30:28.423Z INFO  - Starting container for site
+2025-09-22T20:30:28.429Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_ef54df6b_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HO2025-09-22T20:31:17.329Z INFO  - Initiating warmup request to container smartsk-backend_0_ef54df6b for site smartsk-backend
+2025-09-22T20:34:11.076Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_ef54df6b. Elapsed time = 174.2072552 sec
+2025-09-22T20:35:06.298Z INFO  - Container smartsk-backend_0_ef54df6b for site smartsk-backend initialized successfully and is ready to serve requests.
+2025-09-22T20:35:07.048Z INFO  - Initiating warmup request to container smartsk-backend_0_ef54df6b_middleware for site smartsk-backend
+2025-09-22T20:35:51.013Z ERROR - Container smartsk-backend_0_ef54df6b_middleware for site smartsk-backend did not start within expected time limit. Elapsed time = 274.1557191 sec
+2025-09-22T20:35:52.227Z ERROR - Container smartsk-backend_0_ef54df6b_middleware didn't respond to HTTP pings on port: 8181. Failing site start. See container logs for debugging.
+2025-09-22T20:35:56.756Z INFO  - Stopping site smartsk-backend because it failed during startup./home/LogFiles/2025_09_22_lw0sdlwk0005KT_easyauth_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_easyauth_docker.log)
+2025-09-22T20:31:06.332456283Z Updated CA certificates
+2025-09-22T20:31:53.739998123Z warn: Microsoft.AspNetCore.Hosting.Diagnostics[15]
+2025-09-22T20:31:53.740649229Z       Overriding HTTP_PORTS '8080' and HTTPS_PORTS ''. Binding to values defined by URLS instead 'http://0.0.0.0:8181'.
+2025-09-22T20:33:40.866124094Z warn: Microsoft.AspNetCore.Server.Kestrel[22]
+2025-09-22T20:33:41.101346602Z       As of "09/22/2025 20:33:19 +00:00", the heartbeat has been running for "00:00:01.5129484" which is longer than "00:00:01". This could be caused by thread pool starvation./home/LogFiles/2025_09_23_lw0sdlwk0005KT_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw0sdlwk0005KT_default_docker.log)
+2025-09-23T03:48:52.940881006Z     at Object..js (node:internal/modules/cjs/loader:1895:10)
+2025-09-23T03:48:52.940884806Z     at Module.load (node:internal/modules/cjs/loader:1465:32)
+2025-09-23T03:48:52.940888806Z     at Function._load (node:internal/modules/cjs/loader:1282:12)
+2025-09-23T03:48:52.940892706Z     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+2025-09-23T03:48:52.940896507Z     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+2025-09-23T03:48:52.940916107Z     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2025-09-23T03:48:52.942450824Z     at node:internal/main/run_main_module:36:49
+2025-09-23T03:48:52.942538325Z
+2025-09-23T03:48:52.942551525Z Node.js v22.17.0/home/LogFiles/2025_09_23_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw0sdlwk0005KT_docker.log)
+2025-09-23T03:45:12.032Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage5
+2025-09-23T03:45:13.634Z INFO  - Pull Image successful, Time taken: 10 Seconds
+2025-09-23T03:45:16.937Z INFO  - Starting container for site
+2025-09-23T03:45:16.938Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_ebea6a8c_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HO2025-09-23T03:45:59.533Z INFO  - Initiating warmup request to container smartsk-backend_0_ebea6a8c for site smartsk-backend
+2025-09-23T03:48:02.005Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_ebea6a8c. Elapsed time = 122.4791987 sec
+2025-09-23T03:49:14.398Z ERROR - Container smartsk-backend_0_ebea6a8c for site smartsk-backend has exited, failing site start
+2025-09-23T03:49:14.416Z INFO  - Initiating warmup request to container smartsk-backend_0_ebea6a8c_middleware for site smartsk-backend
+2025-09-23T03:49:24.518Z INFO  - Container smartsk-backend_0_ebea6a8c_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
+2025-09-23T03:49:24.658Z ERROR - Container smartsk-backend_0_ebea6a8c didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
+2025-09-23T03:49:25.288Z INFO  - Stopping site smartsk-backend because it failed during startup./home/LogFiles/2025_09_23_lw1sdlwk0006H5_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw1sdlwk0006H5_default_docker.log)
+2025-09-23T09:21:54.464687447Z     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2025-09-23T09:21:54.464689324Z     at node:internal/main/run_main_module:36:49
+2025-09-23T09:21:54.465752990Z
+2025-09-23T09:21:54.465759628Z Node.js v22.17.0
+2025-09-23T09:21:54.505130380Z npm notice
+2025-09-23T09:21:54.505164325Z npm notice New major version of npm available! 10.9.2 -> 11.6.0
+2025-09-23T09:21:54.505168110Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0
+2025-09-23T09:21:54.505170275Z npm notice To update run: npm install -g npm@11.6.0
+2025-09-23T09:21:54.505172259Z npm notice/home/LogFiles/2025_09_23_lw1sdlwk0006H5_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw1sdlwk0006H5_docker.log)
+2025-09-23T15:32:46.1660974Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:22-lts_20250724.2.tuxprod
+2025-09-23T15:32:49.3549717Z Starting container: ec1fb9ce4304_smartsk-backend.
+2025-09-23T15:32:49.7644198Z Starting watchers and probes.
+2025-09-23T15:32:49.7919210Z Starting metrics collection.
+2025-09-23T15:32:49.8035564Z Container is running.
+2025-09-23T15:32:50.5784858Z Container start method finished after 12359 ms.
+2025-09-23T15:34:14.5288952Z Site startup probe succeeded after 83.6877085 seconds.
+2025-09-23T15:34:31.7049956Z Site is running with deployment version: 9423950c-9e82-4fd5-8975-5e12d6206baa
+2025-09-23T15:34:31.7155561Z Site started.
+2025-09-23T15:34:32.0005024Z Site is running with patch version: 22.17.0/home/LogFiles/2025_09_24_lw1sdlwk0006H5_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_default_docker.log)
+2025-09-24T04:55:51.540909969Z - /home/site/wwwroot/Admin/accountCreation.js
+2025-09-24T04:55:51.540912846Z - /home/site/wwwroot/main.js
+2025-09-24T04:55:51.540926229Z Exception origin: uncaughtException
+2025-09-24T04:55:51.571845060Z npm http fetch GET 200 https://registry.npmjs.org/npm 458ms
+2025-09-24T04:55:51.590857630Z npm notice
+2025-09-24T04:55:51.590900780Z npm notice New major version of npm available! 10.9.2 -> 11.6.0
+2025-09-24T04:55:51.590905333Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0
+2025-09-24T04:55:51.590908410Z npm notice To update run: npm install -g npm@11.6.0
+2025-09-24T04:55:51.590911123Z npm notice/home/LogFiles/2025_09_24_lw1sdlwk0006H5_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_docker.log)
+2025-09-24T04:54:52.381Z INFO  - Pull Image successful, Time taken: 1 Seconds
+2025-09-24T04:54:52.924Z INFO  - Starting container for site
+2025-09-24T04:54:52.924Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_7337dc45_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOS2025-09-24T04:54:58.849Z INFO  - Initiating warmup request to container smartsk-backend_0_7337dc45 for site smartsk-backend
+2025-09-24T04:55:20.190Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_7337dc45. Elapsed time = 21.3410104 sec
+2025-09-24T04:55:38.803Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_7337dc45. Elapsed time = 39.9540299 sec
+2025-09-24T04:55:52.370Z ERROR - Container smartsk-backend_0_7337dc45 for site smartsk-backend has exited, failing site start
+2025-09-24T04:55:52.396Z INFO  - Initiating warmup request to container smartsk-backend_0_7337dc45_middleware for site smartsk-backend
+2025-09-24T04:55:53.729Z INFO  - Container smartsk-backend_0_7337dc45_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
+2025-09-24T04:55:53.827Z ERROR - Container smartsk-backend_0_7337dc45 didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
+2025-09-24T04:55:55.831Z INFO  - Stopping site smartsk-backend because it failed during startup.Ending Log Tail of existing logs ---Starting Live Log Stream ---
+
+so i remove the custom startup command because earlier, it has 'npm start' startup command and as you can see, there is still an error
+ChatGPT said:
+
+Thanks for sharing the full log.
+Your code already listens on the correct port, and removing the custom startup command was a good step.
+Looking carefully at these new entries we can see two separate problems:
+
+1️⃣ Azure Port Handling
+docker run -d --expose=8181 ...
+...
+didn't respond to HTTP pings on port: 3000
+
+
+The container image Azure launches always exposes 8181, while the App Service health probe still expects 3000.
+
+This mismatch comes from Azure’s default Linux worker image (mcr.microsoft.com/appsvc/middleware) which overrides HTTP_PORTS to 8181 when no explicit WEBSITES_PORT is set.
+
+Fix
+
+Set the App Setting:
+
+Name	Value
+WEBSITES_PORT	3000
+
+Portal → App Service → Configuration → Application settings → New setting.
+This forces Azure to probe 3000 instead of assuming 8181.
+
+2️⃣ Application Crash
+Exception origin: uncaughtException
+- /home/site/wwwroot/Admin/accountCreation.js
+- /home/site/wwwroot/main.js
+
+
+Even when the probe matches, your app is crashing during startup.
+
+This means Node never stays alive long enough to answer the warm-up ping.
+
+What to Do
+
+Check the actual runtime error
+
+Open the Kudu console:
+https://<yoursite>.scm.azurewebsites.net/DebugConsole
+
+Run npm start manually inside /home/site/wwwroot to see the full stack trace.
+
+Add a global handler (for logging only) to surface the exception if it happens before your logger starts:
+
+process.on('uncaughtException', err => {
+  console.error('Uncaught exception at startup:', err);
+  process.exit(1);
+});
+
+
+Deploy again and check the Application Log Stream.
+
+Run locally with same environment
+
+PORT=3000 npm start
+
+
+If it crashes locally, you’ll get the exact error immediately.
+
+✅ Action Checklist
+
+ Add App Setting WEBSITES_PORT=3000 and restart.
+
+ Inspect Admin/accountCreation.js and main.js for any top-level code that might throw (e.g., missing env vars, DB connection errors).
+
+ Reproduce locally with PORT=3000 npm start.
 
 Bottom Line
 
-The current failure is not about listening on IPv4 anymore.
-Your container never starts because a module required by /backend/main.js cannot be found.
-Track down that require() at the top of main.js (or its first-level imports) and ensure:
+The deployment is failing for two reasons:
 
-correct file path & case,
+Health probe mismatch (8181 vs 3000) → fix with WEBSITES_PORT.
 
-package listed under "dependencies",
+Startup crash inside your own code (accountCreation.js/main.js) → debug in Kudu or locally to find the real stack trace.
 
-file actually deployed to /home/site/wwwroot/backend.
-
-Once that missing module is resolved, the app will start and Azure’s port-ping will succeed.
-
-Here’s an objective look at Gemini CLI’s most recent reasoning and edits.
-
-✅ What Gemini Did Correctly
-
-Recognized that your earlier changes didn’t surface any new stack trace.
-That is important context: if you truly redeployed with global error handlers and detailed DB-connection logging, and still see only Azure’s generic container-exit messages, the problem really is happening very early—before your handlers execute.
-
-Noted that Azure App Service already injects environment variables.
-Removing the call to dotenv.config() is a valid simplification. In production Azure Linux containers you normally rely on process.env, and you don’t need a local .env file.
-
-⚠️ Where the Reasoning Over-reaches
-
-Assuming dotenv could cause a “pre-execution” crash is weak.
-dotenv is harmless if no .env file exists; it simply returns an empty object. It’s not known to terminate a process on its own.
-So, while removing it isn’t harmful, it’s unlikely to be the cause of a container that dies before printing anything.
-
-Not addressing the clear “MODULE_NOT_FOUND” from your earlier log.
-Your latest console.txt (the one you asked about previously) showed:
-
-code: 'MODULE_NOT_FOUND',
-requireStack: [ '/home/site/wwwroot/backend/main.js' ]
-
-
-That points to a missing dependency or a wrong require() path.
-Eliminating dotenv does nothing to solve that.
-
-No verification of actual deployment contents.
-The logical next step is to check—via the Kudu console or GitHub Action logs—that the needed files and node_modules really exist in /home/site/wwwroot/backend, and that every package required in main.js is listed in "dependencies".
-Gemini skipped that.
-
-Balanced Assessment
-
-Removing dotenv and its entry from package.json is not harmful and is a reasonable cleanup for Azure.
-
-But it is very unlikely to fix the real failure.
-The real blocker is still a missing module or file that main.js tries to require() (case-sensitive path, package not in dependencies, or deployment path issue).
-
-Recommended Next Step (still outstanding)
-
-In the Azure Kudu console:
-
-cd /home/site/wwwroot/backend
-ls -l
-
-
-Make sure:
-
-main.js and all files you require() are present and match exact case.
-
-node_modules contains every library you import (express, cors, jsonwebtoken, mssql, etc.).
-
-Verify package.json has all runtime packages under "dependencies", not just "devDependencies".
-
-Verdict
-
-Gemini’s final change (removing dotenv) was not harmful and is clean-up appropriate for Azure, but it does not address the real cause of the persistent crash.
-The decisive issue remains the MODULE_NOT_FOUND error—most likely a missing dependency or incorrect path—which Gemini did not tackle.
+Solve both and the container should stay up without further manual startup commands.
 
 You said:
+So i forgot to tell this but i didnt commit and push the changes for this const logic
 
-kudu_ssh_user@2e893cd2fa54:/$ cd /home/site/wwwroot/backend
-kudu_ssh_user@2e893cd2fa54:~/site/wwwroot/backend$ ls -l
-total 64
-drwxrwxrwx 2 nobody nogroup 4096 Sep 23 13:02 AI
-drwxrwxrwx 2 nobody nogroup drwxrwxrwx 2 nobody nogroup drwxrwxrwx 2 nobody nogroup drwxrwxrwx 2 nobody nogroup drwxrwxrwx 2 nobody nogroup drwxrwxrwx 2 nobody nogroup drwxrwxrwx 2 nobody nogroup -rwxrwxrwx 1 nobody nogroup
-4096 Sep 23 13:02 Admin 4096 Sep 23 13:02 Email 4096 Sep 23 13:02 audit 4096 Sep 23 13:02 config 4096 Sep 23 13:02 database 4096 Sep 23 13:02 forgotpassword 4096 Sep 23 13:02 login 21166 Sep 23 13:00 main.js
-drwxrwxrwx 2 nobody nogroup 4096 Sep 23 13:02 node_modules -rwxrwxrwx 1 nobody nogroup 75359 Sep 23 13:00 package-lock.json
--IWXIWXIWX 1 nobody nogroup drwxrwxrwx 2 nobody nogroup drwxrwxrwx 2 nobody nogroup drwxrwxrwx 2 nobody nogroup drwxrwxrwx 2 nobody nogroup drwxrwxrwx 2 nobody nogroup drwxrwxrwx 2 nobody nogroup drwxrwxrwx 2 nobody nogroup
-379 Sep 23 13:00 package.json
-4096 Sep 23 13:02 projectReview 4096 Sep 23 13:02 projectSubmission 4096 Sep 22 14:24 projectlSubmission 4096 Sep 23 13:02 pyBridge 4096 Sep 23 13:02 rawdata 4096 Sep 23 13:02 routeGuard 4096 Sep 23 13:02 session
+const PORT = process.env.PORT || process.env.WEBSITES_PORT || 3000;
 
-so i did the ls -l and here was the content
+I didnt commit or push yet because im using mobile data so  i need to save some data for my internet connection
 ChatGPT said:
 
-Thanks for providing the ls -l output—it’s very revealing.
+Ah, that explains a lot.
+Your deployed container is still running the old code that only checks process.env.PORT, so it never sees WEBSITES_PORT and therefore keeps listening on 3000 while Azure’s health probe expects 8181.
 
-What the Listing Shows
-drwxrwxrwx 2 nobody nogroup 4096 Sep 23 13:02 projectSubmission
-drwxrwxrwx 2 nobody nogroup 4096 Sep 22 14:24 projectlSubmission   ← **notice the extra “l”**
+Here’s how that lines up with the symptoms:
 
+What you saw	Why it happened
+Binding to values defined by URLS instead 'http://0.0.0.0:8181'	Azure decided the container’s probe port is 8181.
+didn't respond to HTTP pings on port: 3000	Your app (old code) only listens on 3000.
+App keeps restarting	Health check fails → Azure restarts the container.
+What to Do Next
 
-You have two similarly named folders:
+Commit and Push the Change
 
-projectSubmission
-
-projectlSubmission (with a lowercase L after “project”)
-
-Linux (and Azure App Service) are case-sensitive.
-If your code has a require() like:
-
-require('./ProjectSubmission/someFile');
-
-
-or even a subtle typo like:
-
-require('./projectlSubmission/someFile'); // accidental "l"
-
-
-it will work on Windows (case-insensitive) but fail on Linux with:
-
-MODULE_NOT_FOUND
-
-
-That matches the earlier error:
-
-Error: Cannot find module ...
-requireStack: [ '/home/site/wwwroot/backend/main.js' ]
-
-Likely Root Cause
-
-In main.js (or a module it imports), there’s a require() pointing to the wrongly cased or misspelled folder.
-
-Your local dev machine (Windows) didn’t complain, so it deployed fine, but Azure’s Linux host is strict.
-
-How to Fix
-
-Search your backend code for the mis-spelled path.
-From your project root on your local machine:
-
-grep -R "projectlSubmission" backend
-
-
-or
-
-grep -R "ProjectSubmission" backend
-
-
-Adjust if you suspect a different case.
-
-Pick one correct name (for example projectSubmission) and:
-
-Rename the folder in your repo to exactly match the casing you want:
-
-git mv backend/projectlSubmission backend/projectSubmission
-
-
-(or vice versa, but choose one).
-
-Update every require() or import to match that exact spelling and case.
-
-Commit and push the change, then redeploy to Azure.
-
-Verify after redeploy
-Use the Kudu console again:
-
-ls backend
-
-
-Make sure only the correctly spelled folder exists.
-
-Key Takeaway
-
-The crash is not about dotenv or other environment variables.
-It’s a case-sensitive path mismatch—a very common “works on Windows, breaks on Linux” problem.
-
-Fix the spelling/casing of your import paths and this MODULE_NOT_FOUND error should disappear, allowing the Node process to start and Azure’s health probe to succeed.
-
-You said:
-so in the local machine, the projectlSubmission folder was the old folder because I renamed it into projectSubmission folder so how can i make sure to remove the projectlSubmission?
-ChatGPT said:
-
-On Windows, Git can leave the old directory around when you only change the case or slightly rename a folder, because the local file system is case-insensitive.
-That’s why projectlSubmission is still in the repo even though you renamed it to projectSubmission.
-
-Here’s the reliable way to remove the stray projectlSubmission from the repository so it no longer deploys to Azure.
-
-1️⃣ Remove the folder from the Git index
-
-From your project root (on your development machine):
-
-git rm -r --cached backend/projectlSubmission
-
-
---cached tells Git: “stop tracking this path in the repo,” but doesn’t delete the local files immediately.
-
--r removes the whole directory from tracking.
-
-⚠️ Make sure you spell the folder exactly as it appears in the repository (projectlSubmission, with the extra l).
-
-2️⃣ Commit the removal
-git commit -m "Remove old folder projectlSubmission"
-
-3️⃣ Push to the remote repository
-git push
-
-4️⃣ Verify the remote repository
-
-Check on GitHub (or your remote) that backend/projectlSubmission no longer appears in the file tree.
-
-5️⃣ Redeploy to Azure
-
-After the push, redeploy your app (or let your GitHub Action/CI pipeline deploy automatically).
-The next Azure deployment will not copy projectlSubmission, so only the correct projectSubmission folder will remain.
-
-Optional local cleanup
-
-If you also want to delete the stale directory from your local disk:
-
-rm -rf backend/projectlSubmission
-
-
-(Or delete it using File Explorer.)
-
-✅ Summary
-
-git rm -r --cached backend/projectlSubmission
-
-git commit -m "Remove old folder projectlSubmission"
-
-git push
-
-This ensures the extra folder is completely removed from the repository and from future Azure deployments.
-
-You said:
-PS D:\Projects\Projects\smartSK> git rm -r --cached backend/projectlSubmission
->> 
-fatal: pathspec 'backend/projectlSubmission' did not match any files
-
-It says here
-ChatGPT said:
-
-That message means Git doesn’t think the path backend/projectlSubmission exists in the repository—even though you still see that folder on Azure.
-This happens when you renamed the folder on Windows (case-insensitive) and committed, so Git already believes the old name is gone, but the case-sensitive Azure deploy kept the orphaned directory from an earlier push.
-
-You need to remove it from the remote copy rather than the local index.
-
-Here are a few ways to clean it up:
-
-1️⃣ Check what Git is actually tracking
-
-Run this from the project root:
-
-git ls-files | grep -i projectsubmission
-
-
-Look for any entry whose name differs only by case (e.g. backend/projectSubmission vs. backend/projectlSubmission).
-If nothing with the extra “l” appears, the folder is indeed not tracked anymore.
-
-2️⃣ Delete it directly in Azure/Kudu
-
-Since the folder is no longer in the repo, the simplest fix is to delete the leftover directory on the server:
-
-Go to the Kudu console (https://<yourapp>.scm.azurewebsites.net/DebugConsole).
-
-Navigate to /home/site/wwwroot/backend.
-
-Click the trash icon next to projectlSubmission or run:
-
-rm -rf projectlSubmission
-
-
-Because Git is no longer tracking it, it will not be re-created on the next deployment.
-
-3️⃣ If you want Git to force a clean slate
-
-You can also tell Azure to redeploy a completely clean copy:
-
-In your local repo:
-
-git commit --allow-empty -m "Trigger clean redeploy"
+git add .
+git commit -m "Use WEBSITES_PORT fallback for Azure"
 git push
 
 
-In the Azure Portal → Deployment Center, use Redeploy or Sync to force a full deployment.
+Deploy again when you have a stable connection.
 
-This ensures Azure wipes the wwwroot folder before copying files.
+Optional Quick Work-Around Until You Can Push
 
-✅ Summary
+Go to Azure Portal → App Service → Configuration → Application settings.
 
-The error shows Git already dropped backend/projectlSubmission.
+Add an app setting:
 
-The extra directory on Azure is just a stale artifact.
+Name: PORT
+Value: 3000
 
-Delete it in Kudu (rm -rf projectlSubmission) or trigger a clean redeploy so only the correct projectSubmission remains.
+
+This forces Azure to probe the same port you’re actually using now (3000).
+
+It’s only a temporary band-aid—your code change is the real fix.
+
+After Deployment
+
+Once the new build (with
+
+const PORT = process.env.PORT || process.env.WEBSITES_PORT || 3000;
+
+
+) is live, you can remove the temporary PORT override and rely on the logic in code.
+
+Summary:
+The production container doesn’t have the WEBSITES_PORT fallback yet, so Azure and your app are talking past each other. Push that change when you can, redeploy, and the health checks should finally succeed.
+
+You said:
+Oh about that, i already have a environment variable for the PORT which was 3000. I cant send the screenshot to prove but i already have it on the environment variable on the azure portal
+ChatGPT said:
+
+Got it—if you already have an App Setting named PORT with value 3000, then Azure will still inject PORT=3000 into the container.
+That means the current deployed code (the old version without the WEBSITES_PORT fallback) is listening on 3000—just as you intended.
+
+So the real problem is that Azure’s health probe sometimes ignores your PORT setting and defaults to its own internal port (8181) when no WEBSITES_PORT setting is present.
+That’s why the logs still show:
+
+Binding to values defined by URLS instead 'http://0.0.0.0:8181'
+didn't respond to HTTP pings on port: 3000
+
+What This Means
+
+Azure isn’t confused by your code.
+
+It’s the platform choosing a different default probe port because WEBSITES_PORT is missing.
+
+Reliable Fix
+
+Even though you have PORT=3000, you should also add this explicit App Setting:
+
+Name	Value
+WEBSITES_PORT	3000
+
+This tells the App Service load balancer and health probe to always target port 3000, no guessing.
+
+Steps:
+
+Azure Portal → Your App Service → Configuration → Application settings.
+
+Add:
+
+Name: WEBSITES_PORT
+Value: 3000
+
+
+Save and restart the App Service.
+
+Why Your Code Change Still Helps
+
+Your new code with:
+
+const PORT = process.env.PORT || process.env.WEBSITES_PORT || 3000;
+
+
+remains good practice.
+
+If Azure ever switches to providing only WEBSITES_PORT (which happens for some custom containers), your app will follow.
+
+But the immediate deployment issue will disappear once WEBSITES_PORT is set in the portal.
+
+Bottom line:
+Even with PORT=3000 set, you need to add WEBSITES_PORT=3000 in the Azure App Settings so the health probe stops defaulting to 8181. Your code is fine; it’s Azure’s probe configuration that’s mismatched.
+
+You said:
+So i commit and push the changes by github mobile app, restarted the azure portal via mobile browser's desktop site mode, and i still got error logs. Here is the log from the the log stream of azure portal
+
+2025-09-22T13:13:30.354324462Z Node.js v22.17.0/home/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log)
+2025-09-22T20:30:20.320Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage5
+2025-09-22T20:30:21.300Z INFO  - Pull Image successful, Time taken: 23 Seconds
+2025-09-22T20:30:28.423Z INFO  - Starting container for site
+2025-09-22T20:30:28.429Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_ef54df6b_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HO2025-09-22T20:31:17.329Z INFO  - Initiating warmup request to container smartsk-backend_0_ef54df6b for site smartsk-backend
+2025-09-22T20:34:11.076Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_ef54df6b. Elapsed time = 174.2072552 sec
+2025-09-22T20:35:06.298Z INFO  - Container smartsk-backend_0_ef54df6b for site smartsk-backend initialized successfully and is ready to serve requests.
+2025-09-22T20:35:07.048Z INFO  - Initiating warmup request to container smartsk-backend_0_ef54df6b_middleware for site smartsk-backend
+2025-09-22T20:35:51.013Z ERROR - Container smartsk-backend_0_ef54df6b_middleware for site smartsk-backend did not start within expected time limit. Elapsed time = 274.1557191 sec
+2025-09-22T20:35:52.227Z ERROR - Container smartsk-backend_0_ef54df6b_middleware didn't respond to HTTP pings on port: 8181. Failing site start. See container logs for debugging.
+2025-09-22T20:35:56.756Z INFO  - Stopping site smartsk-backend because it failed during startup./home/LogFiles/2025_09_22_lw0sdlwk0005KT_easyauth_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_easyauth_docker.log)
+2025-09-22T20:31:06.332456283Z Updated CA certificates
+2025-09-22T20:31:53.739998123Z warn: Microsoft.AspNetCore.Hosting.Diagnostics[15]
+2025-09-22T20:31:53.740649229Z       Overriding HTTP_PORTS '8080' and HTTPS_PORTS ''. Binding to values defined by URLS instead 'http://0.0.0.0:8181'.
+2025-09-22T20:33:40.866124094Z warn: Microsoft.AspNetCore.Server.Kestrel[22]
+2025-09-22T20:33:41.101346602Z       As of "09/22/2025 20:33:19 +00:00", the heartbeat has been running for "00:00:01.5129484" which is longer than "00:00:01". This could be caused by thread pool starvation./home/LogFiles/2025_09_23_lw0sdlwk0005KT_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw0sdlwk0005KT_default_docker.log)
+2025-09-23T03:48:52.940881006Z     at Object..js (node:internal/modules/cjs/loader:1895:10)
+2025-09-23T03:48:52.940884806Z     at Module.load (node:internal/modules/cjs/loader:1465:32)
+2025-09-23T03:48:52.940888806Z     at Function._load (node:internal/modules/cjs/loader:1282:12)
+2025-09-23T03:48:52.940892706Z     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+2025-09-23T03:48:52.940896507Z     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+2025-09-23T03:48:52.940916107Z     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2025-09-23T03:48:52.942450824Z     at node:internal/main/run_main_module:36:49
+2025-09-23T03:48:52.942538325Z
+2025-09-23T03:48:52.942551525Z Node.js v22.17.0/home/LogFiles/2025_09_23_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw0sdlwk0005KT_docker.log)
+2025-09-23T03:45:12.032Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage5
+2025-09-23T03:45:13.634Z INFO  - Pull Image successful, Time taken: 10 Seconds
+2025-09-23T03:45:16.937Z INFO  - Starting container for site
+2025-09-23T03:45:16.938Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_ebea6a8c_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HO2025-09-23T03:45:59.533Z INFO  - Initiating warmup request to container smartsk-backend_0_ebea6a8c for site smartsk-backend
+2025-09-23T03:48:02.005Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_ebea6a8c. Elapsed time = 122.4791987 sec
+2025-09-23T03:49:14.398Z ERROR - Container smartsk-backend_0_ebea6a8c for site smartsk-backend has exited, failing site start
+2025-09-23T03:49:14.416Z INFO  - Initiating warmup request to container smartsk-backend_0_ebea6a8c_middleware for site smartsk-backend
+2025-09-23T03:49:24.518Z INFO  - Container smartsk-backend_0_ebea6a8c_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
+2025-09-23T03:49:24.658Z ERROR - Container smartsk-backend_0_ebea6a8c didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
+2025-09-23T03:49:25.288Z INFO  - Stopping site smartsk-backend because it failed during startup./home/LogFiles/2025_09_23_lw1sdlwk0006H5_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw1sdlwk0006H5_default_docker.log)
+2025-09-23T09:21:54.464687447Z     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2025-09-23T09:21:54.464689324Z     at node:internal/main/run_main_module:36:49
+2025-09-23T09:21:54.465752990Z
+2025-09-23T09:21:54.465759628Z Node.js v22.17.0
+2025-09-23T09:21:54.505130380Z npm notice
+2025-09-23T09:21:54.505164325Z npm notice New major version of npm available! 10.9.2 -> 11.6.0
+2025-09-23T09:21:54.505168110Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0
+2025-09-23T09:21:54.505170275Z npm notice To update run: npm install -g npm@11.6.0
+2025-09-23T09:21:54.505172259Z npm notice/home/LogFiles/2025_09_23_lw1sdlwk0006H5_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw1sdlwk0006H5_docker.log)
+2025-09-23T15:32:46.1660974Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:22-lts_20250724.2.tuxprod
+2025-09-23T15:32:49.3549717Z Starting container: ec1fb9ce4304_smartsk-backend.
+2025-09-23T15:32:49.7644198Z Starting watchers and probes.
+2025-09-23T15:32:49.7919210Z Starting metrics collection.
+2025-09-23T15:32:49.8035564Z Container is running.
+2025-09-23T15:32:50.5784858Z Container start method finished after 12359 ms.
+2025-09-23T15:34:14.5288952Z Site startup probe succeeded after 83.6877085 seconds.
+2025-09-23T15:34:31.7049956Z Site is running with deployment version: 9423950c-9e82-4fd5-8975-5e12d6206baa
+2025-09-23T15:34:31.7155561Z Site started.
+2025-09-23T15:34:32.0005024Z Site is running with patch version: 22.17.0/home/LogFiles/2025_09_24_lw1sdlwk0006H5_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_default_docker.log)
+2025-09-24T04:55:51.540909969Z - /home/site/wwwroot/Admin/accountCreation.js
+2025-09-24T04:55:51.540912846Z - /home/site/wwwroot/main.js
+2025-09-24T04:55:51.540926229Z Exception origin: uncaughtException
+2025-09-24T04:55:51.571845060Z npm http fetch GET 200 https://registry.npmjs.org/npm 458ms
+2025-09-24T04:55:51.590857630Z npm notice
+2025-09-24T04:55:51.590900780Z npm notice New major version of npm available! 10.9.2 -> 11.6.0
+2025-09-24T04:55:51.590905333Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0
+2025-09-24T04:55:51.590908410Z npm notice To update run: npm install -g npm@11.6.0
+2025-09-24T04:55:51.590911123Z npm notice/home/LogFiles/2025_09_24_lw1sdlwk0006H5_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_docker.log)
+2025-09-24T04:54:52.381Z INFO  - Pull Image successful, Time taken: 1 Seconds
+2025-09-24T04:54:52.924Z INFO  - Starting container for site
+2025-09-24T04:54:52.924Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_7337dc45_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOS2025-09-24T04:54:58.849Z INFO  - Initiating warmup request to container smartsk-backend_0_7337dc45 for site smartsk-backend
+2025-09-24T04:55:20.190Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_7337dc45. Elapsed time = 21.3410104 sec
+2025-09-24T04:55:38.803Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_7337dc45. Elapsed time = 39.9540299 sec
+2025-09-24T04:55:52.370Z ERROR - Container smartsk-backend_0_7337dc45 for site smartsk-backend has exited, failing site start
+2025-09-24T04:55:52.396Z INFO  - Initiating warmup request to container smartsk-backend_0_7337dc45_middleware for site smartsk-backend
+2025-09-24T04:55:53.729Z INFO  - Container smartsk-backend_0_7337dc45_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
+2025-09-24T04:55:53.827Z ERROR - Container smartsk-backend_0_7337dc45 didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
+2025-09-24T04:55:55.831Z INFO  - Stopping site smartsk-backend because it failed during startup.Ending Log Tail of existing logs ---Starting Live Log Stream ---
+ChatGPT said:
+
+The new log tells us two key things:
+
+1️⃣ The container still passes the probe check only when it can actually run
+ERROR - Container … didn't respond to HTTP pings on port: 3000
+…
+Exception origin: uncaughtException
+- /home/site/wwwroot/Admin/accountCreation.js
+- /home/site/wwwroot/main.js
+
+
+Azure does try to probe port 3000 now (your commit is fine).
+
+The container fails because your Node app crashes before it ever starts listening, so the probe times out.
+
+This is no longer a port-binding issue—the health check can’t reach a crashed process.
+
+2️⃣ There’s an uncaught exception at startup
+
+The lines:
+
+Exception origin: uncaughtException
+- /home/site/wwwroot/Admin/accountCreation.js
+- /home/site/wwwroot/main.js
+
+
+mean that code executed as soon as the app loads throws an error that isn’t caught.
+Until you fix that runtime error, Azure will keep reporting “didn’t respond to HTTP pings.”
+
+How to Find the Actual Error
+
+Open a console inside the running container
+
+Go to your site’s Kudu console:
+https://<yoursite>.scm.azurewebsites.net/DebugConsole
+
+cd site/wwwroot
+
+Run your start command manually:
+
+npm start
+
+
+You should see the full stack trace right away.
+
+Check Application Logs
+
+Azure Portal → App Service → “Log Stream” (Application Logs, not just Docker logs).
+
+Make sure console.error is enabled in package.json or that you haven’t disabled logging.
+
+Reproduce Locally
+
+Pull the same branch you deployed.
+
+Run with the same environment:
+
+PORT=3000 npm start
+
+
+If you see the crash locally, it will print the real error.
+
+Common Causes (based on the files listed)
+
+Missing environment variable used at the top of Admin/accountCreation.js or main.js.
+
+Database connection that fails synchronously (e.g., await at top level).
+
+Syntax/require error (wrong path, missing module, etc.).
+
+Next Steps Checklist
+
+ Inspect Admin/accountCreation.js and main.js for top-level code that can throw.
+
+ Run the app manually in Kudu to capture the stack trace.
+
+ Fix the underlying bug (e.g., handle missing env var, wrap async calls).
+
+✅ Bottom Line
+
+Your port configuration is now correct.
+The deployment fails because the Node process crashes at startup with an uncaught exception in Admin/accountCreation.js or main.js.
+Find that stack trace in Kudu or by running locally with the same environment to pinpoint and fix the bug.
+
+Now that I see the full log, the port binding part is already fine — Azure is probing port 3000.
+
+The real reason the site keeps failing is here:
+
+Exception origin: uncaughtException
+- /home/site/wwwroot/Admin/accountCreation.js
+- /home/site/wwwroot/main.js
+
+
+That means your Node.js app crashes at startup before it can even listen(), so the health probe times out.
+
+What to do
+
+Open Kudu console
+
+Go to:
+https://<yoursite>.scm.azurewebsites.net/DebugConsole
+
+cd site/wwwroot
+
+Run npm start manually.
+
+You’ll see the real stack trace that shows exactly why it’s crashing.
+
+Check for common causes in Admin/accountCreation.js and main.js:
+
+A missing or mis-named require() / import.
+
+A missing environment variable (e.g., DB connection string).
+
+A database or API call happening at the top level without error handling.
+
+Syntax errors that only show up at runtime.
+
+Reproduce locally with the same env
+
+PORT=3000 npm start
+
+
+If it crashes, the console will show the real error immediately.
+
+✅ Bottom line:
+Your port setup is fixed — the problem now is an uncaught runtime error inside accountCreation.js or main.js. Run it manually in Kudu or locally with the same env to see the exact error and fix it.
+
+Do you want me to guide you step-by-step how to run the app inside Kudu so you can capture the stack trace?
+
+You said:
+console.txt
+Document
+as you can see from the screenshot, there was a missing module which was the express on the main.js. Also ill send you the log stream which would be on the console.txt
+ChatGPT said:
+
+The Kudu console screenshot shows the root cause:
+
+Caught exception: Error: Cannot find module 'express'
+Require stack:
+- /home/site/wwwroot/main.js
+
+
+Your app is crashing because the Express package isn’t installed in the deployed environment. Azure can’t serve requests until all dependencies are present.
+
+Why this happens
+
+The deployment zip did not include node_modules (which is normal—Azure should run npm install during build).
+
+Either express is missing from package.json dependencies or the build step didn’t run.
+
+How to fix
+
+Check package.json
+Make sure express is listed under "dependencies" (not just "devDependencies"):
+
+"dependencies": {
+  "express": "^4.19.0",
+  ...
+}
+
+
+Re-install locally
+
+npm install express
+
+
+This updates package.json and package-lock.json if needed.
+
+Commit and push
+Push the updated package.json and package-lock.json to GitHub.
+
+Trigger a fresh Azure build
+
+If using GitHub Actions, the push will redeploy and Azure will run npm install automatically.
+
+Or in the Azure Portal → Deployment Center → click Sync or Redeploy.
+
+(Optional) Manual quick fix in Kudu
+For a temporary test you can run:
+
+npm install express --save
+
+
+inside /home/site/wwwroot, but this will be wiped on the next deployment—so rely on step 3 for a permanent solution.
+
+Once Express is in your production dependencies and a new deployment runs, the Cannot find module 'express' error will disappear and your container should start normally.
+
+ChatGPT can make mistakes. Check important info.
