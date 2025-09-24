@@ -1,0 +1,102 @@
+/* Archive.css */
+
+.archive-container {
+  padding: 2rem;
+  background-color: #f4f7f9;
+}
+
+.archive-header {
+  margin-bottom: 2rem;
+}
+
+.archive-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.archive-tabs {
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #dee2e6;
+}
+
+.archive-tab {
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #495057;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.archive-tab:hover {
+  color: #007bff;
+}
+
+.archive-tab.active {
+  color: #007bff;
+  border-bottom-color: #007bff;
+}
+
+.archive-content {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.archive-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.archive-table th,
+.archive-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.archive-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+}
+
+.archive-table tbody tr:hover {
+  background-color: #f1f3f5;
+}
+
+.restore-btn {
+  padding: 0.5rem 1rem;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.restore-btn:hover {
+  background-color: #218838;
+}
+
+.restore-btn:disabled {
+  background-color: #a5d6a7;
+  cursor: not-allowed;
+}
+
+.loading-message,
+.error-message {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+  color: #6c757d;
+}
+
+.error-message {
+  color: #dc3545;
+}

@@ -51,21 +51,6 @@ foreign key (userID) references userInfo(userID)
 );
 
 --Audit Trail Table
-CREATE TABLE audit_trail (
-    auditID INT PRIMARY KEY IDENTITY(1, 1),
-    userID INT NULL,
-    tableName NVARCHAR(128) NULL,
-    recordID INT NULL,
-    actions NVARCHAR(50) NOT NULL,
-    old_value NVARCHAR(MAX) NULL,
-    new_value NVARCHAR(MAX) NULL,
-    descriptions NVARCHAR(255) NOT NULL,
-    client_ip NVARCHAR(45) NULL,
-    created_at DATETIME NOT NULL DEFAULT GETDATE(),
-    FOREIGN KEY (userID) REFERENCES userInfo(userID),
-);
-
---New Audit Trail Table
 
 CREATE TABLE [audit trail] (
     auditID NVARCHAR(16) PRIMARY KEY,

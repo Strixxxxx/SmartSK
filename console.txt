@@ -1,5 +1,10 @@
+--Frontend (Browser's Console)
+
+
+--Backend(Azure Portal's Log Stream)
+
 Connected!
-2025-09-24T12:14:09  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/24/2025 12:12:10/home/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt)
+2025-09-24T12:59:53  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/24/2025 12:50:40/home/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt)
 2025-09-22T03:57:50  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/03a8a751efff-ea9b94d4-5784-44d0-95b8-59e8bdac354e.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03a8a751efff-ea9b94d4-5784-44d0-95b8-59e8bdac354e.txt)
 2025-09-23T06:42:52    Outgoing response, type: response, statusCode: 409, statusText: Conflict/home/LogFiles/kudu/trace/03a8a751efff-f0c217d7-58b3-46fb-98ef-d367d83a9c15.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03a8a751efff-f0c217d7-58b3-46fb-98ef-d367d83a9c15.txt)
 2025-09-23T05:48:10  Startup Request, url: /api/settings, method: GET, type: request, pid: 825,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/03b00b859602-bfb12284-a7b7-42fa-b009-15138c49a5fb.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03b00b859602-bfb12284-a7b7-42fa-b009-15138c49a5fb.txt)
@@ -28,7 +33,8 @@ Connected!
 2025-09-22T14:08:26  Startup Request, url: /api/deployments/latest?deployer=OneDeploy&time=2025-09-22_14-00-42Z, method: GET, type: request, pid: 825,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/384afc849e60-2451b35a-47c7-481f-8b90-0520d961671d.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/384afc849e60-2451b35a-47c7-481f-8b90-0520d961671d.txt)
 2025-09-22T04:18:35  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/3fedeb6f74f6-5d5d4d4f-2b4a-4356-b7b1-e6f5bff60580.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/3fedeb6f74f6-5d5d4d4f-2b4a-4356-b7b1-e6f5bff60580.txt)
 2025-09-23T14:02:59  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/44171915c362-d238b7a9-ea89-47a4-92cf-3e74ab4c490b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/44171915c362-d238b7a9-ea89-47a4-92cf-3e74ab4c490b.txt)
-2025-09-22T03:13:30  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/46e159476525-dd4a208f-d4af-4c68-b904-8a1fc5567bff.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/46e159476525-dd4a208f-d4af-4c68-b904-8a1fc5567bff.txt)
+2025-09-22T03:13:30  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/444cc434fce3-d6252a45-32f5-47c9-b4e5-dd44f1dcabf3.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/444cc434fce3-d6252a45-32f5-47c9-b4e5-dd44f1dcabf3.txt)
+2025-09-24T12:55:13  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=Pbxo845&sid=Ky9eqEqE96P7OJgsAAAC, method: POST, type: request, pid: 830,1,17, ScmType: GitHubAction/home/LogFiles/kudu/trace/46e159476525-dd4a208f-d4af-4c68-b904-8a1fc5567bff.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/46e159476525-dd4a208f-d4af-4c68-b904-8a1fc5567bff.txt)
 2025-09-22T07:52:25  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 826,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/4a4cfc2fbaf2-407eedf5-e084-472a-8e66-426d8e895e6b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4a4cfc2fbaf2-407eedf5-e084-472a-8e66-426d8e895e6b.txt)
 2025-09-22T02:45:00  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,36, ScmType: GitHubAction/home/LogFiles/kudu/trace/4be0f6086e0d-d1661b33-3548-443c-80d1-5c17163d0e58.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4be0f6086e0d-d1661b33-3548-443c-80d1-5c17163d0e58.txt)
 2025-09-22T03:35:34  Startup Request, url: /api/settings, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/4f9a7dd6aef6-00bdc477-581a-47f5-b625-b60fe8b3798c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4f9a7dd6aef6-00bdc477-581a-47f5-b625-b60fe8b3798c.txt)
@@ -154,22 +160,75 @@ Connected!
 2025-09-23T15:34:31.7049956Z Site is running with deployment version: 9423950c-9e82-4fd5-8975-5e12d6206baa
 2025-09-23T15:34:31.7155561Z Site started.
 2025-09-23T15:34:32.0005024Z Site is running with patch version: 22.17.0/home/LogFiles/2025_09_24_lw1sdlwk0006H5_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_default_docker.log)
-2025-09-24T12:13:50.160224769Z - /home/site/wwwroot/Admin/accountCreation.js
-2025-09-24T12:13:50.160227281Z - /home/site/wwwroot/main.js
-2025-09-24T12:13:50.160229778Z Exception origin: uncaughtException
-2025-09-24T12:13:50.160232521Z npm http fetch GET 200 https://registry.npmjs.org/npm 590ms
-2025-09-24T12:13:50.208657885Z npm notice
-2025-09-24T12:13:50.208683099Z npm notice New major version of npm available! 10.9.2 -> 11.6.0
-2025-09-24T12:13:50.208686837Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0
-2025-09-24T12:13:50.208689577Z npm notice To update run: npm install -g npm@11.6.0
-2025-09-24T12:13:50.208692554Z npm notice/home/LogFiles/2025_09_24_lw1sdlwk0006H5_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_docker.log)
-2025-09-24T12:12:49.656Z INFO  - Pull Image successful, Time taken: 10 Seconds
-2025-09-24T12:12:51.300Z INFO  - Starting container for site
-2025-09-24T12:12:51.300Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_0bfd95a5_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WE2025-09-24T12:13:01.049Z INFO  - Initiating warmup request to container smartsk-backend_0_0bfd95a5 for site smartsk-backend
-2025-09-24T12:13:23.219Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_0bfd95a5. Elapsed time = 22.1779241 sec
-2025-09-24T12:13:43.723Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_0bfd95a5. Elapsed time = 42.6720015 sec
-2025-09-24T12:13:52.971Z ERROR - Container smartsk-backend_0_0bfd95a5 for site smartsk-backend has exited, failing site start
-2025-09-24T12:13:52.972Z INFO  - Initiating warmup request to container smartsk-backend_0_0bfd95a5_middleware for site smartsk-backend
-2025-09-24T12:13:54.603Z INFO  - Container smartsk-backend_0_0bfd95a5_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
-2025-09-24T12:13:54.753Z ERROR - Container smartsk-backend_0_0bfd95a5 didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
-2025-09-24T12:13:54.965Z INFO  - Stopping site smartsk-backend because it failed during startup.Ending Log Tail of existing logs ---Starting Live Log Stream ---
+2025-09-24T12:58:02.073820052Z       at process.processTimers (node:internal/timers:523:7) {
+2025-09-24T12:58:02.073822069Z     code: 'ETIMEOUT'
+2025-09-24T12:58:02.073824037Z   }
+2025-09-24T12:58:02.073826157Z }
+2025-09-24T12:58:15.930338965Z npm notice
+2025-09-24T12:58:15.930371180Z npm notice New major version of npm available! 10.9.2 -> 11.6.0
+2025-09-24T12:58:15.930375064Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0
+2025-09-24T12:58:15.930377502Z npm notice To update run: npm install -g npm@11.6.0
+2025-09-24T12:58:15.930379946Z npm notice/home/LogFiles/2025_09_24_lw1sdlwk0006H5_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_docker.log)
+2025-09-24T12:56:00.0412418Z Starting metrics collection.
+2025-09-24T12:56:00.1513004Z Container is running.
+2025-09-24T12:56:01.1276512Z Container start method finished after 18991 ms.
+2025-09-24T12:58:59.2398835Z Site startup probe succeeded after 177.7021628 seconds.
+2025-09-24T12:59:59.5089211Z Site is running with deployment version: d1ee711d-8849-4139-8304-cb4692c79bf1
+2025-09-24T12:59:59.5882618Z Site started.
+2025-09-24T13:00:01.3043413Z Site is running with patch version: 22.17.0
+2025-09-24T13:00:01.9013949Z Container is terminating. Grace period: 5 seconds.
+2025-09-24T13:00:03.2950551Z Stop and delete container. Retry count = 0
+2025-09-24T13:00:03.3161809Z Stopping container: f9693788f2da_smartsk-backend./home/LogFiles/2025_09_24_lw1sdlwk0006H5_easyauth_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_easyauth_docker.log)
+2025-09-24T12:54:08.658273401Z Updated CA certificates
+2025-09-24T12:55:29.016875640Z warn: Microsoft.AspNetCore.Hosting.Diagnostics[15]
+2025-09-24T12:55:29.198757607Z       Overriding HTTP_PORTS '8080' and HTTPS_PORTS ''. Binding to values defined by URLS instead 'http://0.0.0.0:8181'.
+2025-09-24T12:58:16.510308048Z warn: Microsoft.AspNetCore.Server.Kestrel[22]
+2025-09-24T12:58:16.878335541Z       As of "09/24/2025 12:58:04 +00:00", the heartbeat has been running for "00:00:01.3672876" which is longer than "00:00:01". This could be caused by thread pool starvation.Ending Log Tail of existing logs ---Starting Live Log Stream ---
+2025-09-24T12:59:59.5089211Z Site is running with deployment version: d1ee711d-8849-4139-8304-cb4692c79bf1
+2025-09-24T12:59:59.5882618Z Site started.
+2025-09-24T13:00:01.3043413Z Site is running with patch version: 22.17.0
+2025-09-24T13:00:01.9013949Z Container is terminating. Grace period: 5 seconds.
+2025-09-24T13:00:03.2950551Z Stop and delete container. Retry count = 0
+2025-09-24T13:00:03.3161809Z Stopping container: f9693788f2da_smartsk-backend.
+2025-09-24T13:00:10.4204854Z Deleting container: f9693788f2da_smartsk-backend. Retry count = 0
+2025-09-24T13:00:16.5969108Z Container spec TerminationMessagePolicy  path
+2025-09-24T13:00:16.6061600Z Container is terminated. Total time elapsed: 14687 ms.
+2025-09-24T13:00:16.7466375Z Site: smartsk-backend stopped.
+
+--Kudu Console
+
+    __ __          __      __    _ __     
+   / //_/_  _ ____/ /_  __/ /   (_) /____ 
+  / ,< / / / / __  / / / / /   / / __/ _  
+ / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
+/_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/ 
+
+                                          
+DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
+
+Documentation: http://aka.ms/webapp-linux
+Kudu Version : 20250623.5
+Commit       : 353543ec4c45fcbfd4750522d32c94e23b31927a
+
+kudu_ssh_user@99aae70cc758:/$ cd site/wwwroot
+kudu_ssh_user@99aae70cc758:~/site/wwwroot$ npm list express
+wwwroot@ /home/site/wwwroot
+└── (empty)
+
+    __ __          __      __    _ __     
+   / //_/_  _ ____/ /_  __/ /   (_) /____ 
+  / ,< / / / / __  / / / / /   / / __/ _  
+ / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
+/_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/ 
+
+                                          
+DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
+
+Documentation: http://aka.ms/webapp-linux
+Kudu Version : 20250623.5
+Commit       : 353543ec4c45fcbfd4750522d32c94e23b31927a
+
+kudu_ssh_user@ea352fd4bc97:/$ cd site/wwwroot/backend
+kudu_ssh_user@ea352fd4bc97:~/site/wwwroot/backend$ npm list express
+backend@ /home/site/wwwroot/backend
+└── express@5.1.0

@@ -31,7 +31,7 @@ import RawData from './components/Admin/Raw Data/rawdata';
 import AuditTrail from './components/Admin/Audit Trail/audit';
 import SessionLog from './components/Admin/Session Log/sessions';
 import Backup from './components/Admin/Backup/Backup';
-import AdminPlaceholder from './components/Admin/AdminPlaceholder';
+import Archive from './components/Admin/Archive/Archive';
 
 const AppRoutes: React.FC = () => {
   const { user, isLoading } = useAuth();
@@ -85,7 +85,7 @@ const AppRoutes: React.FC = () => {
           <Route path="raw-data" element={<RawData />} />
           <Route path="sessions" element={<SessionLog />} />
           <Route path="audit-trail" element={<AuditTrail />} />
-          <Route path="archive" element={<AdminPlaceholder />} />
+          <Route path="archive" element={<Archive />} />
           <Route path="backup" element={<Backup />} />
         </Route>
       </Route>

@@ -36,6 +36,9 @@ const { authMiddleware, logout, validateToken } = require('./session/session');
 const projectReviewRouter = require('./projectReview/projectReview');
 const auditRouter = require('./audit/auditService').router;
 const rawDataRouter = require('./rawdata/rawData');
+const archiveRouter = require('./Admin/archive');
+const accArchiveRouter = require('./Admin/accArchive');
+const projArchiveRouter = require('./Admin/projArchive');
 
 // Import the new PyBridge modules with error handling
 let PyBridgeFC, PyBridgePA;
@@ -139,6 +142,14 @@ if (sessionLogRouter && typeof sessionLogRouter === 'function') {
   adminRouter.use('/sessions', sessionLogRouter);
 } else {
   console.error('sessionLogRouter is not a valid middleware function');
+}
+
+if (archiveRouter && typeof archiveRouter === 'function') {
+  adminRouter.use('/archive', archiveRouter);
+  adminRouter.use('/archive/accounts', accArchiveRouter);
+  adminRouter.use('/archive/projects', projArchiveRouter);
+} else {
+  console.error('archiveRouter is not a valid middleware function');
 }
 
 // Mount the consolidated admin router to the app.
