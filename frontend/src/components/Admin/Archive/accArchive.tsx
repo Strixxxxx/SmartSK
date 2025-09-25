@@ -8,6 +8,7 @@ interface ArchivedAccount {
   username: string;
   emailAddress: string;
   phoneNumber: string;
+  isArchived: boolean;
 }
 
 const AccArchive: React.FC = () => {
@@ -74,6 +75,7 @@ const AccArchive: React.FC = () => {
               <th>Username</th>
               <th>Email</th>
               <th>Phone Number</th>
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -84,6 +86,11 @@ const AccArchive: React.FC = () => {
                 <td>{acc.username}</td>
                 <td>{acc.emailAddress}</td>
                 <td>{acc.phoneNumber}</td>
+                <td>
+                  <span className={`status ${acc.isArchived ? 'inactive' : 'active'}`}>
+                    {acc.isArchived ? 'Inactive' : 'Active'}
+                  </span>
+                </td>
                 <td>
                   <button 
                     className="restore-btn" 

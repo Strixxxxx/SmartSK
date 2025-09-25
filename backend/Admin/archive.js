@@ -21,10 +21,12 @@ router.get('/accounts', async (req, res) => {
         r.roleName as position, 
         b.barangayName as barangay, 
         u.emailAddress, 
-        u.phoneNumber
-      FROM userInfoARC u
+        u.phoneNumber,
+        u.isArchived
+      FROM userInfo u
       LEFT JOIN roles r ON u.position = r.roleID
       LEFT JOIN barangays b ON u.barangay = b.barangayID
+      WHERE u.isArchived = 1
       ORDER BY u.fullName
     `);
     res.json({ success: true, data: result.recordset });
