@@ -1,0 +1,4 @@
+[config]
+SCM_DO_BUILD_DURING_DEPLOYMENT = false
+WEBSITE_NODE_DEFAULT_VERSION = 22-lts
+command = echo "Using pre-built artifacts"

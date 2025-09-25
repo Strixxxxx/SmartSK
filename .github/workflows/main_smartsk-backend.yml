@@ -22,28 +22,42 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22.x'
+          cache: 'npm'
+          cache-dependency-path: './backend/package-lock.json'
 
-      - name: Install dependencies
+      - name: Clean install dependencies
         working-directory: ./backend
-        run: npm ci
+        run: |
+          npm ci --production --no-optional
+          npm list --depth=0
 
-      - name: npm install and test
+      - name: Verify Azure Storage Blob installation
         working-directory: ./backend
-        run: npm test --if-present
+        run: |
+          echo "Checking @azure/storage-blob installation..."
+          npm list @azure/storage-blob
+          ls -la node_modules/@azure/ || echo "No @azure modules found"
 
-      # Archive the backend folder with dependencies for deployment
+      - name: Remove unnecessary files
+        working-directory: ./backend
+        run: |
+          find node_modules -name "*.md" -delete 2>/dev/null || true
+          find node_modules -name "test*" -type d -exec rm -rf {} + 2>/dev/null || true
+          find node_modules -name "*.map" -delete 2>/dev/null || true
+
       - name: Upload backend artifacts
         uses: actions/upload-artifact@v4
         with:
           name: backend-app
           path: ./backend
+          compression-level: 6
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
       - name: Download backend artifacts
@@ -51,6 +65,14 @@ jobs:
         with:
           name: backend-app
           path: ./backend
+
+      - name: Verify node_modules before deploy
+        run: |
+          echo "Verifying node_modules structure..."
+          ls -la ./backend/
+          ls -la ./backend/node_modules/ | head -10
+          echo "Azure storage modules:"
+          ls -la ./backend/node_modules/@azure/ || echo "No @azure modules"
 
       - name: Login to Azure
         uses: azure/login@v2

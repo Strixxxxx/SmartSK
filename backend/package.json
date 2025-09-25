@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+     "postinstall": "echo 'Verifying Azure Storage Blob...' && npm list @azure/storage-blob"
   },
   "dependencies": {
     "@azure/storage-blob": "^12.28.0",
