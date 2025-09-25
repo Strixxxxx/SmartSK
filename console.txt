@@ -1,41 +1,9 @@
 --Frontend (Browser's Console)
 
-Roles.tsx:171 
- POST https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/admin/archive/accounts/2 500 (Internal Server Error)
-Promise.then		
-handleConfirmArchive	@	Roles.tsx:171
-<ForwardRef(Button2)>		
-Roles	@	Roles.tsx:450
-<Roles>		
-AppRoutes	@	AppRoutes.tsx:84
-<AppRoutes>		
-App	@	App.tsx:17
-<App>		
-(anonymous)	@	main.tsx:8
 
-axiosConfig.ts:99 Server error: 500 
-{success: false, message: 'Failed to archive account.'}
-message
-: 
-"Failed to archive account."
-success
-: 
-false
-[[Prototype]]
-: 
-Object
-(anonymous)	@	axiosConfig.ts:99
-Promise.then		
-handleConfirmArchive	@	Roles.tsx:171
-<ForwardRef(Button2)>		
-Roles	@	Roles.tsx:450
-<Roles>		
-AppRoutes	@	AppRoutes.tsx:84
-<AppRoutes>		
-App	@	App.tsx:17
-<App>		
-(anonymous)	@	main.tsx:8
-﻿
 
 --Backend(Azure Portal's Log Stream)
 
+
+
+--Kudu Console Logs
