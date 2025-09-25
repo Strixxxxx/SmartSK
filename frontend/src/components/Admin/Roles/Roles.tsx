@@ -233,27 +233,27 @@ const Roles: React.FC<RolesProps> = () => {
           </div>
           
           <div className="summary-card">
-            <div className="card-icon">🛡️</div>
+            <div className="card-icon">✔️</div>
             <div className="card-content">
-              <h3>Assigned Roles</h3>
+              <h3>Active Accounts</h3>
               <div className="card-stats">
                 <span className="stat-number">
-                  {users.filter(user => user.position && ['MA', 'SA', 'SKC', 'SKO'].includes(user.position)).length}
+                  {users.filter(user => !user.isArchived).length}
                 </span>
-                <span className="stat-label">Active Roles</span>
+                <span className="stat-label">Active Users</span>
               </div>
             </div>
           </div>
           
           <div className="summary-card">
-            <div className="card-icon">⚠️</div>
+            <div className="card-icon">🗄️</div>
             <div className="card-content">
-              <h3>Pending Assignment</h3>
+              <h3>Archived Accounts</h3>
               <div className="card-stats">
                 <span className="stat-number">
-                  {users.filter(user => !user.position || !['MA', 'SA', 'SKC', 'SKO'].includes(user.position)).length}
+                  {users.filter(user => user.isArchived).length}
                 </span>
-                <span className="stat-label">Users Without Roles</span>
+                <span className="stat-label">Archived Users</span>
               </div>
             </div>
           </div>
