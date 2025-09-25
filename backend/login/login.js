@@ -68,7 +68,7 @@ router.post('/', async (req, res) => {
     const result = await pool.request()
       .input('username', sql.VarChar, username)
       .query(`
-        SELECT u.userID, u.username, u.passKey, u.fullName, r.roleName as position, b.barangayName as barangay, u.isDefaultPassword
+        SELECT u.userID, u.username, u.passKey, u.fullName, r.roleName as position, b.barangayName as barangay, u.isDefaultPassword, u.isArchived
         FROM userInfo u
         LEFT JOIN roles r ON u.position = r.roleID
         LEFT JOIN barangays b ON u.barangay = b.barangayID
@@ -88,6 +88,18 @@ router.post('/', async (req, res) => {
         descriptions: 'Login attempt for non-existent user'
       });
       return res.status(401).json({ success: false, message: 'Invalid username or password' });
+    }
+
+    if (user.isArchived) {
+      console.log('Login failed: Account is archived');
+      logAudit({
+        actor: 'S',
+        module: 'L',
+        userID: user.userID,
+        actions: 'login-failure',
+        descriptions: 'Login attempt for archived account'
+      });
+      return res.status(401).json({ success: false, message: 'This account has been archived. Please contact an administrator.' });
     }
 
     if (user.barangay !== barangay) {
@@ -142,7 +154,8 @@ router.post('/', async (req, res) => {
         fullName: user.fullName,
         position: user.position,
         barangay: user.barangay,
-        isDefaultPassword: user.isDefaultPassword
+        isDefaultPassword: user.isDefaultPassword,
+        isArchived: user.isArchived
       }
     });
 

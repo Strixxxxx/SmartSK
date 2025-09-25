@@ -30,7 +30,7 @@ router.get('/users', routeGuard.verifyToken, routeGuard.isAdmin, async (req, res
       });
     }
     
-    // Get all users from userInfo table
+    // Get all non-archived users from userInfo table
     const result = await pool.request()
       .query(`
         SELECT 
@@ -40,10 +40,12 @@ router.get('/users', routeGuard.verifyToken, routeGuard.isAdmin, async (req, res
           r.roleName as position, 
           b.barangayName as barangay, 
           u.emailAddress, 
-          u.phoneNumber
+          u.phoneNumber,
+          u.isArchived
         FROM userInfo u
         LEFT JOIN roles r ON u.position = r.roleID
         LEFT JOIN barangays b ON u.barangay = b.barangayID
+        WHERE u.isArchived = 0
         ORDER BY u.fullName
       `);
     

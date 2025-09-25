@@ -49,18 +49,25 @@ router.post('/restore/:userId', async (req, res) => {
     const { userId } = req.params;
     try {
         const pool = await getConnection();
-        const request = pool.request();
-        request.input('userID', sql.Int, userId);
-
+        
+        // Check if the user exists and is actually archived
         const userToRestore = await pool.request()
             .input('userID', sql.Int, userId)
-            .query('SELECT username FROM userInfoARC WHERE userID = @userID');
+            .query('SELECT username, isArchived FROM userInfo WHERE userID = @userID');
 
         if (userToRestore.recordset.length === 0) {
-            return res.status(404).json({ success: false, message: 'Archived user not found.' });
+            return res.status(404).json({ success: false, message: 'User not found.' });
         }
-        const { username } = userToRestore.recordset[0];
 
+        const { username, isArchived } = userToRestore.recordset[0];
+
+        if (!isArchived) {
+            return res.status(400).json({ success: false, message: 'User is not archived.' });
+        }
+
+        // If user is found and archived, proceed with restoration
+        const request = pool.request();
+        request.input('userID', sql.Int, userId);
         await request.execute('accReturn');
 
         addAuditTrail({

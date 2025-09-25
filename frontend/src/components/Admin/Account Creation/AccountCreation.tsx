@@ -23,7 +23,7 @@ interface User {
   fullName: string;
   emailAddress: string;
   phoneNumber: string;
-  actualStatus: 'active' | 'inactive';
+  isArchived: boolean;
 }
 
 interface AccountCreationProps {}
@@ -220,8 +220,8 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
                   <td>{user.fullName}</td>
                   <td>{user.emailAddress}</td>
                   <td>{user.phoneNumber}</td>
-                  <td className={`status ${user.actualStatus}`}>
-                    {user.actualStatus}
+                  <td className={`status ${user.isArchived ? 'inactive' : 'active'}`}>
+                    {user.isArchived ? 'Inactive' : 'Active'}
                   </td>
                 </tr>
               ))}

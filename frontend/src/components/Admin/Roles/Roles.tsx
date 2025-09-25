@@ -24,6 +24,7 @@ interface User {
   position: string;
   barangay: string;
   roleName?: string;
+  isArchived: boolean;
 }
 
 interface Role {
@@ -46,6 +47,8 @@ const Roles: React.FC<RolesProps> = () => {
   const [userToEdit, setUserToEdit] = useState<User | null>(null);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [selectedRole, setSelectedRole] = useState<string>('');
+  const [userToArchive, setUserToArchive] = useState<User | null>(null);
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState<boolean>(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -152,6 +155,53 @@ const Roles: React.FC<RolesProps> = () => {
     }
   };
 
+  const handleArchiveClick = (user: User) => {
+    setUserToArchive(user);
+    setShowArchiveConfirm(true);
+  };
+
+  const handleCancelArchive = () => {
+    setUserToArchive(null);
+    setShowArchiveConfirm(false);
+  };
+
+  const handleConfirmArchive = async () => {
+    if (userToArchive) {
+      setIsLoading(true);
+      try {
+        const response = await axiosInstance.post(`/api/admin/archive/accounts/${userToArchive.userID}`);
+
+        if (response.data.success) {
+          toast.success(`User ${userToArchive.fullName} archived successfully.`);
+          const usersResponse = await axiosInstance.get('/api/roles/users');
+          if (usersResponse.data.success) {
+            setUsers(usersResponse.data.users);
+          }
+        } else {
+          throw new Error(response.data.message || 'Failed to archive user');
+        }
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        
+        if (axiosError.response?.status === 401) {
+          toast.error('Authentication failed. Please log in again.');
+          navigate('/login');
+          return;
+        }
+        
+        if (axiosError.response?.status === 403) {
+          toast.error('Access denied. You do not have permission to perform this action.');
+          return;
+        }
+        
+        toast.error((axiosError.response?.data as any)?.message || axiosError.message || 'An error occurred while archiving the user.');
+      } finally {
+        setIsLoading(false);
+        handleCancelArchive();
+      }
+    }
+  };
+
   if (isLoading) {
     return (
       <div className={`roles-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
@@ -250,8 +300,8 @@ const Roles: React.FC<RolesProps> = () => {
                         </td>
                         <td>{user.barangay}</td>
                         <td>
-                          <span className={`status-badge ${user.position && ['MA', 'SA', 'SKC', 'SKO'].includes(user.position) ? 'status-active' : 'status-pending'}`}>
-                            {user.position && ['MA', 'SA', 'SKC', 'SKO'].includes(user.position) ? 'Active' : 'Pending'}
+                          <span className={`status-badge ${user.isArchived ? 'status-inactive' : 'status-active'}`}>
+                            {user.isArchived ? 'Inactive' : 'Active'}
                           </span>
                         </td>
                         <td>
@@ -260,6 +310,13 @@ const Roles: React.FC<RolesProps> = () => {
                             onClick={() => handleEditClick(user)}
                           >
                             {!user.position || !['MA', 'SA', 'SKC', 'SKO'].includes(user.position) ? '➕ Add Role' : '✏️ Change Role'}
+                          </button>
+                          <button
+                            className="action-btn change-role"
+                            onClick={() => handleArchiveClick(user)}
+                            style={{ marginLeft: '8px' }}
+                          >
+                            Archive
                           </button>
                         </td>
                       </tr>
@@ -365,6 +422,34 @@ const Roles: React.FC<RolesProps> = () => {
               }}
             >
               Save Changes
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={showArchiveConfirm}
+          onClose={handleCancelArchive}
+          PaperProps={{
+            style: {
+              borderRadius: '20px',
+              padding: '10px'
+            }
+          }}
+        >
+          <DialogTitle sx={{ fontSize: '1.5rem', fontWeight: 600 }}>
+            Archive User
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to archive the user "{userToArchive?.fullName}"?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, gap: 1 }}>
+            <Button onClick={handleCancelArchive} sx={{ borderRadius: '12px', px: 3, color: '#64748b', border: '1px solid #e2e8f0' }}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmArchive} variant="contained" color="error" sx={{ borderRadius: '12px', px: 3 }}>
+              Archive
             </Button>
           </DialogActions>
         </Dialog>

@@ -103,6 +103,10 @@ if (forgotPasswordRoutes && typeof forgotPasswordRoutes === 'function') {
   console.error('forgotPasswordRoutes is not a valid middleware function');
 }
 
+// Health Check Endpoint
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
 
 // --- AUTHENTICATION MIDDLEWARE ---
 // All routes defined after this point will be protected by the authMiddleware.
@@ -572,11 +576,6 @@ app.post('/api/predictive-analysis/custom-options', async (req, res) => {
     console.error('Error in predictive analysis:', error);
     res.status(500).json({ error: error.message });
   }
-});
-
-// Health Check Endpoint
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
 });
 
 // Define the port

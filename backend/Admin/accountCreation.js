@@ -20,7 +20,7 @@ router.get('/users', authMiddleware, async (req, res) => {
     // Get database connection
     const pool = await getConnection();
 
-    // Fetch all users
+    // Fetch all non-archived users
     const users = await pool.request()
       .query(`
         SELECT 
@@ -28,8 +28,9 @@ router.get('/users', authMiddleware, async (req, res) => {
           fullName,
           emailAddress,
           phoneNumber,
-          isDefaultPassword
+          isArchived
         FROM userInfo
+        WHERE isArchived = 0
         ORDER BY fullName ASC
       `);
 
@@ -39,7 +40,7 @@ router.get('/users', authMiddleware, async (req, res) => {
       fullName: user.fullName,
       emailAddress: user.emailAddress,
       phoneNumber: user.phoneNumber,
-      actualStatus: user.isDefaultPassword ? 'inactive' : 'active'
+      actualStatus: user.isArchived ? 'inactive' : 'active'
     }));
 
     return res.status(200).json({
