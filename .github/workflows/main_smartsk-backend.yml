@@ -27,7 +27,7 @@ jobs:
         working-directory: ./backend
         run: npm ci
 
-      - name: Run tests
+      - name: npm install and test
         working-directory: ./backend
         run: npm test --if-present
 
@@ -41,12 +41,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
-      id-token: write
-      contents: read
+      id-token: write #This is required for requesting the JWT
+      contents: read #This is required for actions/checkout
 
     steps:
       - name: Download backend artifacts

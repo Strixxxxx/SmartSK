@@ -1,35 +1,74 @@
-name: Build and deploy Node.js backend app to Azure WebApp
+##[debug]Evaluating condition for step: 'Login to Azure'
+##[debug]Evaluating: success()
+##[debug]Evaluating success:
+##[debug]=> true
+##[debug]Result: true
+##[debug]Starting: Login to Azure
+##[debug]Register post job cleanup for action: azure/login@v2
+##[debug]Loading inputs
+##[debug]Evaluating: secrets.AZUREAPPSERVICE_CLIENTID_F3C59CAD920D4D2488E5081F5E02AD69
+##[debug]Evaluating Index:
+##[debug]..Evaluating secrets:
+##[debug]..=> Object
+##[debug]..Evaluating String:
+##[debug]..=> 'AZUREAPPSERVICE_CLIENTID_F3C59CAD920D4D2488E5081F5E02AD69'
+##[debug]=> '***'
+##[debug]Result: '***'
+##[debug]Evaluating: secrets.AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1
+##[debug]Evaluating Index:
+##[debug]..Evaluating secrets:
+##[debug]..=> Object
+##[debug]..Evaluating String:
+##[debug]..=> 'AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1'
+##[debug]=> '***'
+##[debug]Result: '***'
+##[debug]Evaluating: secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE
+##[debug]Evaluating Index:
+##[debug]..Evaluating secrets:
+##[debug]..=> Object
+##[debug]..Evaluating String:
+##[debug]..=> 'AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE'
+##[debug]=> '***'
+##[debug]Result: '***'
+##[debug]Loading env
+Run azure/login@v2
+::add-mask::***
+Running Azure CLI Login.
+##[debug]Azure CLI path: /usr/bin/az
+##[debug]Azure CLI version used:
+##[debug]{
+##[debug]  "azure-cli": "2.77.0",
+##[debug]  "azure-cli-core": "2.77.0",
+##[debug]  "azure-cli-telemetry": "1.1.0",
+##[debug]  "extensions": {
+##[debug]    "azure-devops": "1.0.2"
+##[debug]  }
+##[debug]}
+##[debug]
+/usr/bin/az cloud set -n azurecloud
+Done setting cloud: "azurecloud"
+##[debug]ID token url is https://run-actions-1-azure-eastus.actions.githubusercontent.com/89//idtoken/9dd37fe5-e71d-4cd4-b102-e8e23d75e6d3/b806fc4c-3b5d-52e1-ae07-77bb8f375db7?api-version=2.0&audience=api%3A%2F%2FAzureADTokenExchange
+::add-mask::***
+::add-mask::***
+Federated token details:
+ issuer - https://token.actions.githubusercontent.com
+ subject claim - repo:Bratnya/SmartSK:environment:Production
+ audience - api://AzureADTokenExchange
+ job_workflow_ref - Bratnya/SmartSK/.github/workflows/main_smartsk-backend.yml@refs/heads/main
+Attempting Azure CLI login by using OIDC...
+Error: AADSTS700213: No matching federated identity record found for presented assertion subject 'repo:Bratnya/SmartSK:environment:Production'. Check your federated identity credential Subject, Audience and Issuer against the presented assertion. https://learn.microsoft.com/entra/workload-id/workload-identity-federation Trace ID: 65205302-11e3-456d-a201-18727bb46e00 Correlation ID: ca557f4d-c042-4365-bdbc-bb73c1b9e611 Timestamp: 2025-09-25 12:33:12Z
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - "backend/**"
+Error: Run the command below to authenticate interactively; additional arguments may be added as needed:
+az logout
+az login
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "22.x"
-
-      - name: Install backend dependencies
-        working-directory: ./backend
-        run: npm ci
-
-      # ✅ No need to copy node_modules into itself
-      # node_modules is already inside backend after npm ci
-
-      - name: Deploy to Azure WebApp
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: "smartSK-backend" # your App Service name
-          slot-name: "Production"
-          package: ./backend
+Error: Login failed with Error: The process '/usr/bin/az' failed with exit code 1. Double check if the 'auth-type' is correct. Refer to https://github.com/Azure/login#readme for more information.
+##[debug]Error: The process '/usr/bin/az' failed with exit code 1
+##[debug]    at ExecState._setResult (/home/runner/work/_actions/azure/login/v2/lib/main/index.js:2333:25)
+##[debug]    at ExecState.CheckComplete (/home/runner/work/_actions/azure/login/v2/lib/main/index.js:2316:18)
+##[debug]    at ChildProcess.<anonymous> (/home/runner/work/_actions/azure/login/v2/lib/main/index.js:2210:27)
+##[debug]    at ChildProcess.emit (node:events:524:28)
+##[debug]    at maybeClose (node:internal/child_process:1104:16)
+##[debug]    at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+##[debug]Node Action run completed with exit code 1
+##[debug]Finishing: Login to Azure
