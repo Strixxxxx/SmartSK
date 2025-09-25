@@ -195,39 +195,53 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
 
   return (
     <div className={`account-creation-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-      <div className="users-table-container">
-        <div className="users-table-header">
-          <h2>Existing Accounts</h2>
-          <Button variant="contained" color="primary" onClick={handleOpenModal} className="create-account-btn">
-            Create Account
-          </Button>
+      <div className="account-creation-content">
+        <div className="page-header">
+          <div className="header-content">
+            <h1 className="page-title">Account Creation</h1>
+            <p className="page-subtitle">Create and manage user accounts in the system.</p>
+          </div>
+          <button onClick={handleOpenModal} className="create-account-btn">
+            <span className="btn-icon">+</span> Create Account
+          </button>
         </div>
-        {loading ? <div className="loading">Refreshing...</div> : (
-          <table className="users-table">
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Full Name</th>
-                <th>Email Address</th>
-                <th>Phone Number</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.userName}>
-                  <td>{user.userName}</td>
-                  <td>{user.fullName}</td>
-                  <td>{user.emailAddress}</td>
-                  <td>{user.phoneNumber}</td>
-                  <td className={`status ${user.isArchived ? 'inactive' : 'active'}`}>
-                    {user.isArchived ? 'Inactive' : 'Active'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+
+        <div className="table-card">
+          <div className="table-header">
+            <h3>Existing Accounts</h3>
+            <p>List of all registered users</p>
+          </div>
+          <div className="users-table-container">
+            {loading ? <div className="loading">Refreshing...</div> : (
+              <table className="users-table">
+                <thead>
+                  <tr>
+                    <th>Username</th>
+                    <th>Full Name</th>
+                    <th>Email Address</th>
+                    <th>Phone Number</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.userName}>
+                      <td>{user.userName}</td>
+                      <td>{user.fullName}</td>
+                      <td>{user.emailAddress}</td>
+                      <td>{user.phoneNumber}</td>
+                      <td>
+                        <span className={`status ${user.isArchived ? 'inactive' : 'active'}`}>
+                          {user.isArchived ? 'Inactive' : 'Active'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
       </div>
 
       <Dialog open={isModalOpen} onClose={handleCloseModal}>

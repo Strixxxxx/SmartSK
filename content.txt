@@ -1,116 +1,69 @@
-AI Prompt: Create a Full-Stack Archiving Module
-Your Role: You are an expert senior full-stack developer specializing in Node.js and React.
+Looking at your conversation with Gemini CLI, I'll provide a comprehensive diagnosis of its performance:
+Overall Rating: B+ (Good with notable strengths and minor issues)
+Decision Making: A-
+Strengths:
 
-Situation
-You are assigned to the "SmartSK" project, an existing project monitoring system. To improve performance and data management, the system requires a new module to handle the archiving of user accounts and projects. This will move inactive records from the primary tables to corresponding archive tables, keeping the main application responsive while preserving data integrity. The database schema and stored procedures for these actions have already been created and tested.
+Excellent architectural understanding - Correctly identified that main.js doesn't need to import storage.js directly due to proper modular design
+Smart fallback implementation - Proactively added secondary credentials with proper validation logic
+Security-first approach - Implemented SAS URLs for temporary access instead of direct blob URLs
+Proper access control - Added authorization checks ensuring only file owners and reviewers (SKC, MA, SA) can download files
 
-Task
-Your task is to build the complete frontend and backend logic for this archiving module. The module must allow an authorized administrator to view lists of archived accounts and projects, and restore them to the active database tables on demand.
+Minor Issues:
 
-Technology Stack:
+Could have been more explicit about error handling strategies for Azure connection failures
 
-Backend: Node.js with Express.js
+Code Structure: A
+Excellent practices:
 
-Database: Microsoft SQL Server (MSSQL)
+Clean separation of concerns - Created dedicated storage.js module for Azure operations
+Proper error handling - Comprehensive try-catch blocks with meaningful error messages
+Security best practices - Using memory storage for multer, generating time-limited SAS URLs
+Environment variable management - Proper fallback mechanism for credentials
+Database integration - Correctly modified queries to store filenames instead of full URLs
 
-Frontend: React Vite with TypeScript
+Code quality highlights:
+javascript// Good: Fallback credential logic
+const useSecondary = !primaryConnectionString || !primaryKey;
+const connectionString = useSecondary ? secondaryConnectionString : primaryConnectionString;
 
-Styling: Local CSS Modules (.module.css)
+// Good: Proper SAS URL generation with time limits
+expiresOn: new Date(new Date().valueOf() + 60 * 60 * 1000), // 1 hour
+permissions: BlobSASPermissions.parse("r"), // Read permission
+Response Quality: B+
+Strengths:
 
-Action
-You will implement the solution based on the predefined file structure and database logic. Ensure your code is clean, efficient, and includes proper error handling.
+Clear explanations of what each modification accomplishes
+Step-by-step approach showing the logical progression
+Responsive to feedback - Quickly addressed your concerns about fallback credentials
+Good documentation with inline comments explaining complex logic
 
-1. Backend Development (Node.js / Express)
-You have two files to work in: accArchive.js and projArchive.js. These will contain the API routes. Assume a database connection file (db.js) that exports a configured mssql connection pool already exists.
+Areas for improvement:
 
-Database Context:
+Could have provided more guidance on testing the Azure integration
+Missing discussion of potential migration strategy for existing files
 
-Target Stored Procedures: You must use the following existing stored procedures to interact with the database. Do not write raw INSERT or DELETE queries for the archiving/restoring logic.
+Identified Issues/Mistakes:
+Minor Issues Found:
 
+UUID dependency assumption - Uses uuid4 package but doesn't verify it's installed:
 
-accArchived: Moves a user from userInfo to userInfoARC. 
+javascript   const uuidv4 = require('uuid4'); // Should verify this package exists
 
+Container access level - Sets container to 'blob' access which might be too permissive:
 
-prjArchived: Moves a project from projects to projectsARC. 
+javascript   await containerClient.createIfNotExists({ access: 'blob' }); 
+   // Could be 'private' for better security
 
+Missing error specificity - Could provide more specific error messages for different Azure failure modes
 
-accReturn: Moves a user from userInfoARC back to userInfo. 
+No Major Mistakes Found - The core implementation is solid and follows Azure best practices.
+Recommendations for Improvement:
 
+Add retry logic for Azure operations
+Include file type validation before upload
+Add logging for audit trails of storage operations
+Consider adding file cleanup mechanisms for orphaned blobs
 
-prjReturn: Moves a project from projectsARC back to projects. 
-
-accArchive.js - Account Archive Routes:
-
-
-GET /api/archive/accounts: Create an endpoint to fetch all records from the userInfoARC table.  Return the list as a JSON array.
-
-POST /api/archive/accounts/restore/:userId: Create an endpoint that takes a userId from the URL parameter. Execute the accReturn stored procedure with the provided userId. Return a success message upon completion.
-
-projArchive.js - Project Archive Routes:
-
-
-GET /api/archive/projects: Create an endpoint to fetch all records from the projectsARC table.  Return the list as a JSON array.
-
-POST /api/archive/projects/restore/:projectId: Create an endpoint that takes a projectId from the URL parameter. Execute the prjReturn stored procedure with the provided projectId. Return a success message upon completion.
-
-General Backend Requirements:
-
-Wrap all database calls in try...catch blocks.
-
-Send meaningful JSON responses (e.g., { success: true, data: [...] } or { success: false, message: 'Error details' }).
-
-Ensure the main server file (index.js or app.js) imports and uses these route files.
-
-2. Frontend Development (React Vite + TypeScript)
-You will create three components: Archive.tsx (the main container), AccArchive.tsx (for accounts), and PrjArchive.tsx (for projects), along with a corresponding CSS module for styling.
-
-Archive.tsx - Main Module Component:
-
-This component will serve as the main view for the archiving module.
-
-Implement a state using useState to manage the currently active tab (e.g., 'accounts' or 'projects').
-
-Create a simple tab navigation UI with two buttons: "Archived Accounts" and "Archived Projects". Clicking a button updates the active tab state.
-
-Conditionally render the AccArchive component when the 'accounts' tab is active, and the PrjArchive component when the 'projects' tab is active.
-
-AccArchive.tsx - Archived Accounts Sub-Module:
-
-Use the useEffect hook to fetch the list of archived accounts from your backend endpoint (GET /api/archive/accounts) when the component mounts.
-
-Manage component state for loading, error, and the array of archived accounts (archivedAccounts).
-
-Display the fetched data in a clear, tabular format. Include columns for Full Name, Username, Email, Phone Number, and an Actions column.
-
-In the Actions column of each row, add a "Restore" button.
-
-When the "Restore" button is clicked, show a confirmation dialog (window.confirm()) to prevent accidental actions.
-
-If the user confirms, call the backend endpoint (POST /api/archive/accounts/restore/:userId) with the correct userId.
-
-After a successful restoration, remove the restored item from the local state to update the UI instantly and provide user feedback (e.g., a toast notification or simple alert).
-
-PrjArchive.tsx - Archived Projects Sub-Module:
-
-Follow the exact same pattern as AccArchive.tsx.
-
-Fetch data from GET /api/archive/projects.
-
-Display project data in a table. Include columns for Reference Number, Title, Submitted Date, and an Actions column.
-
-The "Restore" button should call POST /api/archive/projects/restore/:projectId.
-
-Implement the same confirmation, state management, and UI update logic.
-
-Archive.module.css - Styling:
-
-Create professional and clean styling for the module.
-
-Style the tab buttons to clearly indicate which one is active.
-
-Style the tables with appropriate padding, borders, and hover effects on rows.
-
-Style the "Restore" buttons to be easily identifiable (e.g., with a distinct color).
-
-Result
-The final output will be a fully functional, production-ready archiving module that integrates seamlessly into the existing SmartSK system. The backend will provide secure and efficient API endpoints that leverage the pre-built stored procedures. The frontend will feature a user-friendly, tabbed interface that allows administrators to easily view and restore archived accounts and projects, with clear feedback and state management. The code across the stack should be well-documented, maintainable, and adhere to industry best practices.
+Verdict:
+Gemini CLI demonstrated strong technical competence with this Azure Blob Storage integration. The code is production-ready, follows security best practices, and shows good architectural thinking. The AI correctly understood your requirements and implemented them effectively, with only minor areas for potential enhancement.
+The response shows the AI can handle complex cloud integration tasks while maintaining code quality and security standards.

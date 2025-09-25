@@ -59,56 +59,75 @@ const Sessions: React.FC<SessionsProps> = () => {
 
   return (
     <div className={`sessions-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-      <h1>Session Logs</h1>
-      <div className="filter-controls">
-        <input
-          type="text"
-          placeholder="Search by username or full name"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="search-input"
-        />
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          className="date-input"
-        />
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          className="date-input"
-        />
-        <button onClick={handleFilter}>Filter</button>
-        <button onClick={handleReload} className="reload-btn">&#x21BB;</button>
-      </div>
-      {loading ? (
-        <div>Loading...</div>
-      ) : error ? (
-        <div>{error}</div>
-      ) : (
-        <table className="sessions-table">
-          <thead>
-            <tr>
-              <th>Username</th>
-              <th>Full Name</th>
-              <th>Logged In</th>
-              <th>Logged Out</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sessions.map((session) => (
-              <tr key={session.sessionID}>
-                <td>{session.userName}</td>
-                <td>{session.fullName}</td>
-                <td>{session.created_at}</td>
-                <td>{session.expires_at ? session.expires_at : 'Active'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+        <div className="sessions-content">
+            <div className="page-header">
+                <h1 className="page-title">Session Logs</h1>
+                <p className="page-subtitle">Monitor user login and logout activities.</p>
+            </div>
+
+            <div className="controls-card">
+                <div className="controls-header">
+                    <h3>Filter Logs</h3>
+                </div>
+                <div className="filter-controls">
+                    <input
+                    type="text"
+                    placeholder="Search by username or full name"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="search-input"
+                    />
+                    <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="date-input"
+                    />
+                    <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="date-input"
+                    />
+                    <button onClick={handleFilter}>Filter</button>
+                    <button onClick={handleReload} className="reload-btn">&#x21BB;</button>
+                </div>
+            </div>
+
+            <div className="table-card">
+                <div className="table-header">
+                    <h3>Active and Past Sessions</h3>
+                </div>
+                {loading ? (
+                    <div className="loading">Loading...</div>
+                ) : error ? (
+                    <div>{error}</div>
+                ) : (
+                    <div className="table-container">
+                        <table className="sessions-table">
+                        <thead>
+                            <tr>
+                            <th>Username</th>
+                            <th>Full Name</th>
+                            <th>Logged In</th>
+                            <th>Logged Out</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {sessions.map((session) => (
+                            <tr key={session.sessionID}>
+                                <td>{session.userName}</td>
+                                <td>{session.fullName}</td>
+                                <td>{session.created_at}</td>
+                                <td>{session.expires_at ? session.expires_at : 'Active'}</td>
+                            </tr>
+                            ))}
+                        </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
+        </div>
     </div>
   );
 };

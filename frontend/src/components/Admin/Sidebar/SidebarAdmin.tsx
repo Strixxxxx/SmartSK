@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { FaBars } from 'react-icons/fa';
@@ -11,20 +11,9 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ 
-  collapsed: propCollapsed = false,
-  toggleSidebar: propToggleSidebar
+  collapsed = false,
+  toggleSidebar,
 }) => {
-  const [localCollapsed, setLocalCollapsed] = useState(propCollapsed);
-  const collapsed = propToggleSidebar ? propCollapsed : localCollapsed;
-  
-  const toggleSidebar = () => {
-    if (propToggleSidebar) {
-      propToggleSidebar();
-    } else {
-      setLocalCollapsed(!localCollapsed);
-    }
-  };
-  
   const { user, logout } = useAuth();
   const location = useLocation();
 

@@ -64,7 +64,7 @@ const AuditTrail: React.FC<AuditTrailProps> = () => {
   }, [navigate]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="loading">Loading...</div>;
   }
 
   if (error) {
@@ -73,37 +73,47 @@ const AuditTrail: React.FC<AuditTrailProps> = () => {
 
   return (
     <div className={`audit-trail-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-      <h1>Audit Trail</h1>
-      <div className="table-container">
-        <table className="audit-trail-table">
-          <thead>
-            <tr>
-              <th>Audit ID</th>
-              <th>Username</th>
-              <th>Module</th>
-              <th>Action</th>
-              <th>Description</th>
-              <th>Old Value</th>
-              <th>New Value</th>
-              <th>Timestamp</th>
-            </tr>
-          </thead>
-          <tbody>
-            {auditTrail.map((log: AuditLog, index: number) => (
-              <tr key={index}>
-                <td>{log.auditID}</td>
-                <td>{log.username || 'N/A'}</td>
-                <td>{log.moduleName}</td>
-                <td>{log.actions}</td>
-                <td>{log.descriptions}</td>
-                <td>{log.old_value}</td>
-                <td>{log.new_value}</td>
-                <td>{log.created_at}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+        <div className="audit-trail-content">
+            <div className="page-header">
+                <h1 className="page-title">Audit Trail</h1>
+                <p className="page-subtitle">Track all system activities and changes.</p>
+            </div>
+            <div className="table-card">
+                <div className="table-header">
+                    <h3>System Logs</h3>
+                </div>
+                <div className="table-container">
+                    <table className="audit-trail-table">
+                    <thead>
+                        <tr>
+                        <th>Audit ID</th>
+                        <th>Username</th>
+                        <th>Module</th>
+                        <th>Action</th>
+                        <th>Description</th>
+                        <th>Old Value</th>
+                        <th>New Value</th>
+                        <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {auditTrail.map((log: AuditLog, index: number) => (
+                        <tr key={index}>
+                            <td>{log.auditID}</td>
+                            <td>{log.username || 'N/A'}</td>
+                            <td>{log.moduleName}</td>
+                            <td>{log.actions}</td>
+                            <td>{log.descriptions}</td>
+                            <td>{log.old_value}</td>
+                            <td>{log.new_value}</td>
+                            <td>{log.created_at}</td>
+                        </tr>
+                        ))}
+                    </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
   );
 };

@@ -2,26 +2,13 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
-const uuidv4 = require('uuid4');
 const { getConnection, sql } = require('../database/database');
 const { authMiddleware } = require('../session/session');
 const { addAuditTrail } = require('../audit/auditService');
+const { uploadFile, getFileSasUrl } = require('../Storage/storage');
 
-// Multer configuration (no changes needed)
-const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    const uploadDir = path.join(__dirname, '..', '..', 'projects');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: function(req, file, cb) {
-    const uniqueFilename = `${Date.now()}-${uuidv4()}${path.extname(file.originalname)}`;
-    cb(null, uniqueFilename);
-  }
-});
+// Multer configuration for in-memory storage
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
   const allowedFileTypes = ['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx'];
@@ -36,7 +23,7 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ 
   storage: storage,
   fileFilter: fileFilter,
-  limits: { fileSize: 15 * 1024 * 1024 }
+  limits: { fileSize: 15 * 1024 * 1024 } // 15MB limit
 });
 
 // Submit a new project
@@ -48,9 +35,14 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
+    let filePath = null;
+    if (req.file) {
+        // Upload to Azure Blob Storage and get the blob name
+        filePath = await uploadFile(req.file);
+    }
+
     const referenceNumber = `PRJ-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000)}`;
     const pool = await getConnection();
-    const filePath = req.file ? req.file.filename : null;
     const userIdInt = parseInt(userId, 10);
 
     // Insert new project with status ID 1 ('Pending Review')
@@ -60,7 +52,7 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
       .input('description', sql.VarChar, description)
       .input('userID', sql.Int, userIdInt)
       .input('status', sql.Int, 1) // Set default status to 'Pending Review'
-      .input('filePath', sql.VarChar, filePath)
+      .input('filePath', sql.VarChar, filePath) // This is now the blob name
       .input('fileName', sql.VarChar, req.file ? req.file.originalname : null)
       .query(`
         INSERT INTO projects (reference_number, title, description, userID, status, submittedDate, file_path, file_name) 
@@ -85,9 +77,9 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
       referenceNumber: projectResult.recordset[0].reference_number,
       title: projectResult.recordset[0].title,
       description: projectResult.recordset[0].description,
-      status: projectResult.recordset[0].StatusName, // Use the status name
+      status: projectResult.recordset[0].StatusName,
       submittedDate: projectResult.recordset[0].submittedDate,
-      fileUrl: projectResult.recordset[0].file_path,
+      fileUrl: projectResult.recordset[0].file_path, // This is the blob name
       fileName: projectResult.recordset[0].file_name
     };
     addAuditTrail({
@@ -97,14 +89,14 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
         actions: 'submit-project',
         oldValue: null,
         newValue: `Title: ${title}`,
-        descriptions: 'User submitted a new project'
+        descriptions: 'User submitted a new project to Azure Blob Storage'
     });
 
     return res.status(201).json({ success: true, message: 'Project submitted successfully', project });
 
-  } catch (dbError) {
-    console.error('Database error');
-    return res.status(500).json({ success: false, message: 'Database error: ' + dbError.message });
+  } catch (error) {
+    console.error('Project submission error:', error);
+    return res.status(500).json({ success: false, message: 'An error occurred during project submission: ' + error.message });
   }
 });
 
@@ -114,7 +106,6 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
     const { userId } = req.params;
     const pool = await getConnection();
     
-    // Join with StatusLookup to get the status name
     const result = await pool.request()
       .input('userId', sql.Int, userId)
       .query(`
@@ -129,21 +120,37 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
     
     return res.json({ success: true, projects: result.recordset });
   } catch (error) {
-    console.error('Error fetching user projects');
+    console.error('Error fetching user projects:', error);
     return res.status(500).json({ success: false, message: 'Failed to fetch projects', error: error.message });
   }
 });
 
-// Download a project file (no changes needed)
+// Generate a SAS URL for downloading a project file
 router.get('/download/:filename', authMiddleware, async (req, res) => {
   try {
     const { filename } = req.params;
     const sanitizedFilename = path.basename(filename);
-    const filePath = path.join(__dirname, '..', '..', 'projects', sanitizedFilename);
 
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ success: false, message: 'File not found' });
+    const pool = await getConnection();
+    const projectResult = await pool.request()
+        .input('filename', sql.VarChar, sanitizedFilename)
+        .query('SELECT userID FROM projects WHERE file_path = @filename');
+
+    if (projectResult.recordset.length === 0) {
+        return res.status(404).json({ success: false, message: 'File not found.' });
     }
+
+    const projectOwnerId = projectResult.recordset[0].userID;
+    const requesterId = req.user.userId;
+    const requesterPosition = req.user.position;
+
+    // Authorize download for the owner, SKC, MA, or SA
+    if (requesterId !== projectOwnerId && !['SKC', 'MA', 'SA'].includes(requesterPosition)) {
+        return res.status(403).json({ success: false, message: 'You are not authorized to download this file.' });
+    }
+
+    const sasUrl = await getFileSasUrl(sanitizedFilename);
+
     addAuditTrail({
         actor: 'C',
         module: 'P',
@@ -151,12 +158,15 @@ router.get('/download/:filename', authMiddleware, async (req, res) => {
         actions: 'download-project-file',
         oldValue: null,
         newValue: `filename: ${filename}`,
-        descriptions: 'User downloaded a project file'
+        descriptions: 'User requested a project file download link'
     });
-    res.sendFile(filePath);
+
+    // Return the SAS URL to the client
+    res.json({ success: true, url: sasUrl });
+
   } catch (error) {
-    console.error('Error serving file');
-    return res.status(500).json({ success: false, message: 'An error occurred while serving the file' });
+    console.error('Error generating SAS URL:', error);
+    return res.status(500).json({ success: false, message: 'An error occurred while generating the file link.' });
   }
 });
 

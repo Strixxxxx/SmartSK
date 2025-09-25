@@ -202,6 +202,8 @@ const Roles: React.FC<RolesProps> = () => {
     }
   };
 
+  const activeUsers = users.filter(user => !user.isArchived);
+
   if (isLoading) {
     return (
       <div className={`roles-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
@@ -278,12 +280,12 @@ const Roles: React.FC<RolesProps> = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.length === 0 ? (
+                  {activeUsers.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="no-data">No users found</td>
+                      <td colSpan={5} className="no-data">No active users found</td>
                     </tr>
                   ) : (
-                    users.map(user => (
+                    activeUsers.map(user => (
                       <tr key={user.userID}>
                         <td>
                           <div className="user-info">
