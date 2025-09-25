@@ -39,7 +39,7 @@ const sharedKeyCredential = new StorageSharedKeyCredential(storageName, key);
  */
 async function uploadFile(file) {
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    await containerClient.createIfNotExists({ access: 'private' });
+    await containerClient.createIfNotExists();
 
     const blobName = `${Date.now()}-${uuidv4()}${path.extname(file.originalname)}`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);

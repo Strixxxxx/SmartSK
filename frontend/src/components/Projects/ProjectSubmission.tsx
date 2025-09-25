@@ -224,7 +224,7 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
                 </div>
                 <div className="form-actions">
                   <button type="button" className="cancel-btn" onClick={() => setShowSubmitForm(false)}>Cancel</button>
-                  <button type="submit" className="submit-btn" disabled={!!fileError}>Submit Project</button>
+                  <button type="submit" className="submit-btn" disabled={!!fileError}>Submit Proposal</button>
                 </div>
             </form>
           </div>
