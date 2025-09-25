@@ -1,68 +1,248 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
-name: Build and Deploy Node.js app to Azure Web App - smartSK-backend
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js version
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-
-      - name: Install dependencies
-        working-directory: ./backend
-        run: npm ci
-
-      - name: npm install and test
-        working-directory: ./backend
-        run: npm test --if-present
-
-      # Archive the backend folder with dependencies for deployment
-      - name: Upload backend artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-app
-          path: ./backend
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
-
-    steps:
-      - name: Download backend artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-app
-          path: ./backend
-
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F3C59CAD920D4D2488E5081F5E02AD69 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE }}
-
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'smartSK-backend'
-          slot-name: 'Production'
-          package: ./backend
+Connected!
+2025-09-25T13:49:39  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/25/2025 13:35:49/home/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt)
+2025-09-22T03:57:50  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/03a8a751efff-ea9b94d4-5784-44d0-95b8-59e8bdac354e.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03a8a751efff-ea9b94d4-5784-44d0-95b8-59e8bdac354e.txt)
+2025-09-23T06:42:52    Outgoing response, type: response, statusCode: 409, statusText: Conflict/home/LogFiles/kudu/trace/03a8a751efff-f0c217d7-58b3-46fb-98ef-d367d83a9c15.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03a8a751efff-f0c217d7-58b3-46fb-98ef-d367d83a9c15.txt)
+2025-09-23T05:48:10  Startup Request, url: /api/settings, method: GET, type: request, pid: 825,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/03b00b859602-bfb12284-a7b7-42fa-b009-15138c49a5fb.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03b00b859602-bfb12284-a7b7-42fa-b009-15138c49a5fb.txt)
+2025-09-23T15:33:21  Startup Request, url: /webssh/webssh2.css, method: GET, type: request, pid: 823,1,17, ScmType: GitHubAction/home/LogFiles/kudu/trace/0582958a54a4-d03dcf92-9575-4936-815a-03bdf20fce77.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0582958a54a4-d03dcf92-9575-4936-815a-03bdf20fce77.txt)
+2025-09-23T14:47:40          Error occurred, type: error, text: Could not find file '/home/site/locks/deployment/info.lock'., stackTrace:    at Interop.ThrowExceptionForIoErrno(ErrorInfo errorInfo, String path, Boolean isDirError)at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, UnixFileMode openPermissions, Int64& fileLength, UnixFileMode& filePermissions, Boolean failForSymlink, Boolean& wasSymlink, Func`4 createOpenException)at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)at System.IO.StreamReader.ValidateArgsAndOpenPath(String path, Encoding encoding, Int32 bufferSize)at System.IO.File.ReadAllText(String path, Encoding encoding)at Kudu.Core.AllSafeLinuxLock.IsLockValid() in /tmp/KuduLite/Kudu.Core/AllSafeLinuxLock.cs:line 97at Kudu.Core.AllSafeLinuxLock.get_IsHeld() in /tmp/KuduLite/Kudu.Core/AllSafeLinuxLock.cs:line 42/home/LogFiles/kudu/trace/0582958a54a4-f0d239d0-d796-40d4-8137-4678559f7cae.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0582958a54a4-f0d239d0-d796-40d4-8137-4678559f7cae.txt)
+2025-09-23T14:09:16  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/06f77b29ed64-11fd6c18-b0a8-4d40-a9c0-77a919f3009c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/06f77b29ed64-11fd6c18-b0a8-4d40-a9c0-77a919f3009c.txt)
+2025-09-25T11:35:46  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=Pc0g5jb&sid=-OxooBdWIwChvzJrAAAV, method: POST, type: request, pid: 825,1,5, ScmType: GitHubAction, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: true/home/LogFiles/kudu/trace/07f431701055-3b46c7c8-c15d-460b-9550-5d7ae267faf5.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/07f431701055-3b46c7c8-c15d-460b-9550-5d7ae267faf5.txt)
+2025-09-23T13:14:03  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/08ee629c992e-5d2c1cb7-893f-4a5e-a911-3176fe7a2a88.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/08ee629c992e-5d2c1cb7-893f-4a5e-a911-3176fe7a2a88.txt)
+2025-09-22T04:25:19  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/0abad35b801a-761fe80c-0498-4110-890d-f4fee4577d52.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0abad35b801a-761fe80c-0498-4110-890d-f4fee4577d52.txt)
+2025-09-23T12:39:35  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsbY9G&sid=SvEoqrTq6QQNflObAAAA, method: POST, type: request, pid: 823,1,17, ScmType: GitHubAction/home/LogFiles/kudu/trace/0b6d09385c60-2ec37a91-97e5-49cf-a79c-b35ab9682f57.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0b6d09385c60-2ec37a91-97e5-49cf-a79c-b35ab9682f57.txt)
+2025-09-22T20:41:18  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 824,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/0d6bd547834b-faf64f81-ca46-4254-983a-9669a8dcf453.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0d6bd547834b-faf64f81-ca46-4254-983a-9669a8dcf453.txt)
+2025-09-25T08:13:31  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,5, SCM_DO_BUILD_DURING_DEPLOYMENT: true, ScmType: GitHubAction/home/LogFiles/kudu/trace/0e8fee25973a-5a856cac-a192-4be1-97d8-581be4e21b79.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0e8fee25973a-5a856cac-a192-4be1-97d8-581be4e21b79.txt)
+2025-09-23T09:43:44  Startup Request, url: /api/settings, method: GET, type: request, pid: 821,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/11b642f51bd8-4714892d-cff3-4edc-a491-fc0f4efb8df6.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/11b642f51bd8-4714892d-cff3-4edc-a491-fc0f4efb8df6.txt)
+2025-09-22T08:34:56  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/187bbca9f842-8c9cdae4-7a9d-46e9-a0ab-42d325290dd8.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/187bbca9f842-8c9cdae4-7a9d-46e9-a0ab-42d325290dd8.txt)
+2025-09-24T04:45:55  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 821,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/1b4155d2996b-561406c9-4633-4545-9aec-e1d2f9c9cdde.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/1b4155d2996b-561406c9-4633-4545-9aec-e1d2f9c9cdde.txt)
+2025-09-23T15:09:27  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 821,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/1d83561841af-d7edaacf-20c3-46a7-b6cc-2e17bd956c62.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/1d83561841af-d7edaacf-20c3-46a7-b6cc-2e17bd956c62.txt)
+2025-09-22T02:57:00  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/1e069d932ac1-c29671bb-cff6-401d-8118-5dcd205787a6.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/1e069d932ac1-c29671bb-cff6-401d-8118-5dcd205787a6.txt)
+2025-09-22T14:43:59  Startup Request, url: /detectors, method: GET, type: request, pid: 824,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/21c45da2a211-a3b3e32b-f83c-4e3c-a734-f64b00f85956.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/21c45da2a211-a3b3e32b-f83c-4e3c-a734-f64b00f85956.txt)
+2025-09-22T02:23:35  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,53, ScmType: GitHubAction/home/LogFiles/kudu/trace/2279b46138ca-d11f27a0-c3aa-48e8-9b8b-318b4809e4bd.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/2279b46138ca-d11f27a0-c3aa-48e8-9b8b-318b4809e4bd.txt)
+2025-09-23T13:24:32  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/238b86abeeb9-5e27d883-8dcd-4af4-a295-6c39ce0d7d97.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/238b86abeeb9-5e27d883-8dcd-4af4-a295-6c39ce0d7d97.txt)
+2025-09-22T12:55:24  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,3, ScmType: GitHubAction/home/LogFiles/kudu/trace/2639c0cd8967-ddf1d01e-d22b-4556-a69a-0e7ec6b53652.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/2639c0cd8967-ddf1d01e-d22b-4556-a69a-0e7ec6b53652.txt)
+2025-09-23T11:42:41  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsOVru&sid=0MzrmrX6HGFtmbsVAAAA, method: POST, type: request, pid: 828,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/279cfa160b2d-102812d4-f49b-4268-b140-ffe0fe4b93c9.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/279cfa160b2d-102812d4-f49b-4268-b140-ffe0fe4b93c9.txt)
+2025-09-22T07:58:56  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/28b044315b8d-1ddc6c63-4920-455f-b678-20346f697688.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/28b044315b8d-1ddc6c63-4920-455f-b678-20346f697688.txt)
+2025-09-23T08:38:36  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/29bce754d8dc-04fb20a9-d672-4b85-b000-073f5c53e3f1.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/29bce754d8dc-04fb20a9-d672-4b85-b000-073f5c53e3f1.txt)
+2025-09-22T21:06:34  Startup Request, url: /api/settings, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/2aa296cfe990-cea22d76-aff8-4651-9473-534ae8450165.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/2aa296cfe990-cea22d76-aff8-4651-9473-534ae8450165.txt)
+2025-09-22T20:25:37  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/2e893cd2fa54-a9263a6e-fe51-41d6-9c64-6a747839b8cb.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/2e893cd2fa54-a9263a6e-fe51-41d6-9c64-6a747839b8cb.txt)
+2025-09-23T15:16:46  Startup Request, url: /, method: GET, type: request, pid: 823,1,3, ScmType: GitHubAction/home/LogFiles/kudu/trace/3345a16d22df-950edc84-ff52-4ad7-83e2-d012f235150c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/3345a16d22df-950edc84-ff52-4ad7-83e2-d012f235150c.txt)
+2025-09-22T14:08:26  Startup Request, url: /api/deployments/latest?deployer=OneDeploy&time=2025-09-22_14-00-42Z, method: GET, type: request, pid: 825,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/3842894b4ec0-c6bd0191-8eb6-4c91-b661-5e3c88e0df3b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/3842894b4ec0-c6bd0191-8eb6-4c91-b661-5e3c88e0df3b.txt)
+2025-09-25T00:54:04  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,15, SCM_DO_BUILD_DURING_DEPLOYMENT: true, ScmType: GitHubAction/home/LogFiles/kudu/trace/384afc849e60-2451b35a-47c7-481f-8b90-0520d961671d.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/384afc849e60-2451b35a-47c7-481f-8b90-0520d961671d.txt)
+2025-09-22T04:18:35  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/3a48c166daf5-eac8caa2-85ea-424f-9672-9d66330a60e7.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/3a48c166daf5-eac8caa2-85ea-424f-9672-9d66330a60e7.txt)
+2025-09-25T12:42:13  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 825,1,27, ScmType: GitHubAction, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: true/home/LogFiles/kudu/trace/3fedeb6f74f6-5d5d4d4f-2b4a-4356-b7b1-e6f5bff60580.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/3fedeb6f74f6-5d5d4d4f-2b4a-4356-b7b1-e6f5bff60580.txt)
+2025-09-23T14:02:59  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/44171915c362-d238b7a9-ea89-47a4-92cf-3e74ab4c490b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/44171915c362-d238b7a9-ea89-47a4-92cf-3e74ab4c490b.txt)
+2025-09-22T03:13:30  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/444cc434fce3-d6252a45-32f5-47c9-b4e5-dd44f1dcabf3.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/444cc434fce3-d6252a45-32f5-47c9-b4e5-dd44f1dcabf3.txt)
+2025-09-24T12:55:13  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=Pbxo845&sid=Ky9eqEqE96P7OJgsAAAC, method: POST, type: request, pid: 830,1,17, ScmType: GitHubAction/home/LogFiles/kudu/trace/46e159476525-dd4a208f-d4af-4c68-b904-8a1fc5567bff.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/46e159476525-dd4a208f-d4af-4c68-b904-8a1fc5567bff.txt)
+2025-09-22T07:52:25  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 826,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/47cffae46f8e-18047156-7a87-4aa7-9d80-727cdc572fa1.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/47cffae46f8e-18047156-7a87-4aa7-9d80-727cdc572fa1.txt)
+2025-09-25T01:31:24  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction, SCM_DO_BUILD_DURING_DEPLOYMENT: true/home/LogFiles/kudu/trace/4a4cfc2fbaf2-407eedf5-e084-472a-8e66-426d8e895e6b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4a4cfc2fbaf2-407eedf5-e084-472a-8e66-426d8e895e6b.txt)
+2025-09-22T02:45:00  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,36, ScmType: GitHubAction/home/LogFiles/kudu/trace/4be0f6086e0d-d1661b33-3548-443c-80d1-5c17163d0e58.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4be0f6086e0d-d1661b33-3548-443c-80d1-5c17163d0e58.txt)
+2025-09-22T03:35:34  Startup Request, url: /api/settings, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/4f9a7dd6aef6-00bdc477-581a-47f5-b625-b60fe8b3798c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/4f9a7dd6aef6-00bdc477-581a-47f5-b625-b60fe8b3798c.txt)
+2025-09-22T12:44:08  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/503ebfa3f129-8b93a67e-fdd6-4fbb-a01f-c3b49034f161.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/503ebfa3f129-8b93a67e-fdd6-4fbb-a01f-c3b49034f161.txt)
+2025-09-22T07:57:13  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/5bf393a47ce9-44f7dbad-5f5a-4130-a10f-1031d74236b0.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/5bf393a47ce9-44f7dbad-5f5a-4130-a10f-1031d74236b0.txt)
+2025-09-23T09:06:37  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/5c77d3e52d0a-f619d7dd-1e43-4290-8865-a7e541903450.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/5c77d3e52d0a-f619d7dd-1e43-4290-8865-a7e541903450.txt)
+2025-09-23T11:40:49  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsO5LJ&sid=wSTD9b1x3HhjCQkdAAAA, method: POST, type: request, pid: 820,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/5dee4becb0ab-c2f810c5-b4b8-4654-a127-4a8efa6fbed8.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/5dee4becb0ab-c2f810c5-b4b8-4654-a127-4a8efa6fbed8.txt)
+2025-09-23T11:49:55  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsQAWb&sid=_QdBMB5SIBXeC8VeAAAA, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/64d16574b59f-0ffda743-becf-4e6d-a3c1-cbdc8820c308.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/64d16574b59f-0ffda743-becf-4e6d-a3c1-cbdc8820c308.txt)
+2025-09-23T03:39:21  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/684689d2c251-383e9ec4-0aea-4192-b3ce-c03512d62da4.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/684689d2c251-383e9ec4-0aea-4192-b3ce-c03512d62da4.txt)
+2025-09-23T08:49:42  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/68e2b393bc34-debca211-9adf-4935-86ff-3864f96c19ed.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/68e2b393bc34-debca211-9adf-4935-86ff-3864f96c19ed.txt)
+2025-09-25T08:33:07  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,15, SCM_DO_BUILD_DURING_DEPLOYMENT: true, ScmType: GitHubAction/home/LogFiles/kudu/trace/6a2123476986-08b94617-62a1-4123-8972-59b1af65411b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/6a2123476986-08b94617-62a1-4123-8972-59b1af65411b.txt)
+2025-09-22T17:53:32  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 825,1,22, ScmType: GitHubAction/home/LogFiles/kudu/trace/6ae0025aec3c-56a8968e-ca6b-47b9-ade2-b2d8fbee0f6d.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/6ae0025aec3c-56a8968e-ca6b-47b9-ade2-b2d8fbee0f6d.txt)
+2025-09-23T06:46:08    Outgoing response, type: response, statusCode: 409, statusText: Conflict/home/LogFiles/kudu/trace/6ae0025aec3c-63271c43-cae5-4f93-8476-c8cf416a3a68.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/6ae0025aec3c-63271c43-cae5-4f93-8476-c8cf416a3a68.txt)
+2025-09-23T06:45:28    Outgoing response, type: response, statusCode: 409, statusText: Conflict/home/LogFiles/kudu/trace/6ae0025aec3c-cdc83a0a-da1f-4bc3-8c3e-e46085936a04.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/6ae0025aec3c-cdc83a0a-da1f-4bc3-8c3e-e46085936a04.txt)
+2025-09-23T06:45:05  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%222def27b55967ad8efcdb58ff3ca18e87c3570e9f%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22adding%20--prefix%20backend%22%7D, method: POST, type: request, pid: 821,1,15, ScmType: GitHubAction
+2025-09-23T06:45:17    Outgoing response, type: response, statusCode: 409, statusText: Conflict/home/LogFiles/kudu/trace/6ae0025aec3c-cf6b68e2-308d-4bb8-9fd7-364bc568d2ad.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/6ae0025aec3c-cf6b68e2-308d-4bb8-9fd7-364bc568d2ad.txt)
+2025-09-23T06:45:44    Outgoing response, type: response, statusCode: 409, statusText: Conflict/home/LogFiles/kudu/trace/6b1126c7daef-c8420057-d8e3-482f-ac14-342656636ca0.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/6b1126c7daef-c8420057-d8e3-482f-ac14-342656636ca0.txt)
+2025-09-22T20:39:20  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/6fa5d4fb8f22-7a79cddc-a20d-4b7b-bd9b-9fe021cd061c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/6fa5d4fb8f22-7a79cddc-a20d-4b7b-bd9b-9fe021cd061c.txt)
+2025-09-23T10:51:11  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsCkJJ&sid=Zon5_tjM-fKk5wTmAAAA, method: POST, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/70dd0ac31804-64eb6eee-9bf7-406f-9cda-458333a1c6c8.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/70dd0ac31804-64eb6eee-9bf7-406f-9cda-458333a1c6c8.txt)
+2025-09-25T01:25:36  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,5, SCM_DO_BUILD_DURING_DEPLOYMENT: true, ScmType: GitHubAction/home/LogFiles/kudu/trace/710150354c99-1080c796-5019-414d-8cf2-e06f560be60b.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/710150354c99-1080c796-5019-414d-8cf2-e06f560be60b.txt)
+2025-09-23T05:29:21  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/7bcf54126744-8cefa8bd-3cd9-4d5c-a12c-e78fb5527067.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/7bcf54126744-8cefa8bd-3cd9-4d5c-a12c-e78fb5527067.txt)
+2025-09-22T15:21:38  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 822,1,17, ScmType: GitHubAction/home/LogFiles/kudu/trace/82c3e73d756a-e1f92c88-cd3b-4837-8c6b-59953439f87f.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/82c3e73d756a-e1f92c88-cd3b-4837-8c6b-59953439f87f.txt)
+2025-09-22T07:39:02  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/84903fca8fd1-29dbd951-d597-4539-96ce-c51e21474b10.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/84903fca8fd1-29dbd951-d597-4539-96ce-c51e21474b10.txt)
+2025-09-25T01:08:34  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction, SCM_DO_BUILD_DURING_DEPLOYMENT: true/home/LogFiles/kudu/trace/8684e460c41e-c9c1bbdc-3b1b-475a-81bb-cb8875c6c28e.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/8684e460c41e-c9c1bbdc-3b1b-475a-81bb-cb8875c6c28e.txt)
+2025-09-24T16:21:20  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbyXtF9&sid=3lciGCO7-GOoh9BwAAAA, method: POST, type: request, pid: 829,1,15, SCM_DO_BUILD_DURING_DEPLOYMENT: true, ScmType: GitHubAction/home/LogFiles/kudu/trace/8755f6f66bb7-128ac995-a5d7-4972-91d0-82bd2f235684.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/8755f6f66bb7-128ac995-a5d7-4972-91d0-82bd2f235684.txt)
+2025-09-23T04:28:57  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 825,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/8d68936e02d4-17583457-3436-4401-a5dd-1c24e1725f41.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/8d68936e02d4-17583457-3436-4401-a5dd-1c24e1725f41.txt)
+2025-09-23T12:23:56  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsXy-j&sid=pEpyZ3e5N09unKSOAAAC, method: POST, type: request, pid: 821,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/8fbee2be81fa-8a0746e5-9021-480f-8fac-4bab4c800cdc.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/8fbee2be81fa-8a0746e5-9021-480f-8fac-4bab4c800cdc.txt)
+2025-09-22T03:41:41  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%224a285fb3db697547d1f6cd1bbf86bef737a942bc%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22main.js%2C%20forgotPassword.js%2C%20session.js%20update%22%7D, method: POST, type: request, pid: 835,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/9295bdccacc6-02ab995b-f3cc-4997-a434-a7aed4376425.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/9295bdccacc6-02ab995b-f3cc-4997-a434-a7aed4376425.txt)
+2025-09-24T16:17:48  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 822,1,5, ScmType: GitHubAction, SCM_DO_BUILD_DURING_DEPLOYMENT: true/home/LogFiles/kudu/trace/93a21039ae82-336a3c3a-4e98-46d4-871e-30bda3897692.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/93a21039ae82-336a3c3a-4e98-46d4-871e-30bda3897692.txt)
+2025-09-23T04:34:47  Startup Request, url: /api/deployments/latest?deployer=OneDeploy&time=2025-09-23_04-34-39Z, method: GET, type: request, pid: 824,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/98d40adb3ca1-ba0d2eaf-a619-48a6-a3b3-61dfca47fcf2.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/98d40adb3ca1-ba0d2eaf-a619-48a6-a3b3-61dfca47fcf2.txt)
+2025-09-23T03:50:49  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 822,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/99aae70cc758-3706cd97-ea61-4127-80d4-41e2d9b55933.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/99aae70cc758-3706cd97-ea61-4127-80d4-41e2d9b55933.txt)
+2025-09-24T13:01:14  Startup Request, url: /DebugConsole, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/9a6919e941ca-c5da6254-5ddb-4a1f-84ed-b64da86f6ce1.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/9a6919e941ca-c5da6254-5ddb-4a1f-84ed-b64da86f6ce1.txt)
+2025-09-24T15:28:41  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbyLqVR&sid=D36ARubE67A32bTBAAAa, method: POST, type: request, pid: 823,1,15, ScmType: GitHubAction, SCM_DO_BUILD_DURING_DEPLOYMENT: true/home/LogFiles/kudu/trace/9abfc888a81f-03ad1d18-f2ab-4e34-97bc-7ca7b7b3bd6a.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/9abfc888a81f-03ad1d18-f2ab-4e34-97bc-7ca7b7b3bd6a.txt)
+2025-09-21T15:59:36  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,7, ScmType: None/home/LogFiles/kudu/trace/a0a5a94792f0-ee488922-55b7-42fa-af69-0981e94454f0.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a0a5a94792f0-ee488922-55b7-42fa-af69-0981e94454f0.txt)
+2025-09-23T13:25:43  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=Pbsm5uI&sid=ZqRe61zx8f2Vsfw9AAAA, method: POST, type: request, pid: 824,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/a56fb03a0c39-5bc82ff1-4ae2-47b7-a770-87bdd9c94bb6.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a56fb03a0c39-5bc82ff1-4ae2-47b7-a770-87bdd9c94bb6.txt)
+2025-09-23T12:50:42  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 822,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/a5b8b1b43449-8c8ab6b8-4473-490d-8827-4d460d4c9547.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a5b8b1b43449-8c8ab6b8-4473-490d-8827-4d460d4c9547.txt)
+2025-09-22T15:23:00  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/a65cac8a815c-a1ab0f6f-b074-493a-a6ee-3ccad65dbfc0.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a65cac8a815c-a1ab0f6f-b074-493a-a6ee-3ccad65dbfc0.txt)
+2025-09-24T18:15:39  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction, SCM_DO_BUILD_DURING_DEPLOYMENT: true/home/LogFiles/kudu/trace/a7847ee3eeef-3c848800-a7b1-4284-a615-9d1e8b8a0916.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a7847ee3eeef-3c848800-a7b1-4284-a615-9d1e8b8a0916.txt)
+2025-09-25T13:28:54  Startup Request, url: /api/settings, method: GET, type: request, pid: 829,1,18, SCM_DISABLE_NODE_MODULES_COMPRESSION: false, SCM_DO_BUILD_DURING_DEPLOYMENT: false, ScmType: GitHubAction/home/LogFiles/kudu/trace/a99927180ed3-f895a2b6-8205-47b8-8472-2ccbcba4018e.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a99927180ed3-f895a2b6-8205-47b8-8472-2ccbcba4018e.txt)
+2025-09-22T06:01:24  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,25, ScmType: GitHubAction/home/LogFiles/kudu/trace/aebf43570039-c9ef49e9-e922-4c41-ba2d-3cff49e89c92.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/aebf43570039-c9ef49e9-e922-4c41-ba2d-3cff49e89c92.txt)
+2025-09-23T14:01:48  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 824,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/b75a22cae275-cf3e765d-6304-455e-aaa3-ec8715b0303d.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/b75a22cae275-cf3e765d-6304-455e-aaa3-ec8715b0303d.txt)
+2025-09-24T23:46:01  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,7, SCM_DO_BUILD_DURING_DEPLOYMENT: true, ScmType: GitHubAction/home/LogFiles/kudu/trace/bb5b7a188c52-2ba750cd-b2eb-41e2-b65b-1ca8ea9cc9f8.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/bb5b7a188c52-2ba750cd-b2eb-41e2-b65b-1ca8ea9cc9f8.txt)
+2025-09-22T08:24:42  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 826,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/bee539b818b5-0dc9ec62-d511-4a0a-98bc-788e26dae401.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/bee539b818b5-0dc9ec62-d511-4a0a-98bc-788e26dae401.txt)
+2025-09-23T15:03:08  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/c0e8ec6e69e5-8c70f242-f3ef-40bf-ab9d-bbc36cf686bc.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c0e8ec6e69e5-8c70f242-f3ef-40bf-ab9d-bbc36cf686bc.txt)
+2025-09-24T05:20:10  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,17, ScmType: GitHubAction/home/LogFiles/kudu/trace/c27e4ddd5adc-5fbd93c7-3557-40c2-8790-56f71c58f9cf.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c27e4ddd5adc-5fbd93c7-3557-40c2-8790-56f71c58f9cf.txt)
+2025-09-23T10:01:03  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/c3f3122091dc-e3f1d0d8-3115-42e1-acf2-a61606f12d69.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c3f3122091dc-e3f1d0d8-3115-42e1-acf2-a61606f12d69.txt)
+2025-09-22T08:09:48  Startup Request, url: /api/settings, method: GET, type: request, pid: 822,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/c57dc94da6b5-138a5a11-33ab-496f-a53d-1c81f6eb1189.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c57dc94da6b5-138a5a11-33ab-496f-a53d-1c81f6eb1189.txt)
+2025-09-25T01:02:35  Startup Request, url: /api/settings, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction, SCM_DO_BUILD_DURING_DEPLOYMENT: true/home/LogFiles/kudu/trace/c79f80c56bd4-4dc605dc-d2c3-402f-a7ed-93e9ef7642a9.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c79f80c56bd4-4dc605dc-d2c3-402f-a7ed-93e9ef7642a9.txt)
+2025-09-22T03:14:16  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%2295f0b93d9ad2b1cbe3983b4d5e5eeaef6a71785b%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22Merge%20branch%20%27main%27%20of%20https%3A%2F%2Fgithub.com%2FBratnya%2FSmartSK%5CnUpdating%20the%20main.js%20routing%5Cn--INSERT--%22%7D, method: POST, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/c86f2806b484-a21c81d5-761a-4e82-99b4-859a1c230fe2.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/c86f2806b484-a21c81d5-761a-4e82-99b4-859a1c230fe2.txt)
+2025-09-22T03:44:59  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%228311e931d5b107ab693563904492566793b3cd42%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22main.js%20update%20batch2%22%7D, method: POST, type: request, pid: 825,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/d0a02b341d13-5956db7a-ccc7-47bb-a76a-9ae50123d096.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d0a02b341d13-5956db7a-ccc7-47bb-a76a-9ae50123d096.txt)
+2025-09-22T07:44:13  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,18, ScmType: GitHubAction/home/LogFiles/kudu/trace/d1a52d037531-01f81f09-5936-411c-b566-152424c6730c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d1a52d037531-01f81f09-5936-411c-b566-152424c6730c.txt)
+2025-09-23T09:59:43  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 821,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/d207ce744552-9462eb3b-21aa-4f28-ab6f-c2977862393f.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d207ce744552-9462eb3b-21aa-4f28-ab6f-c2977862393f.txt)
+2025-09-25T00:44:00  Startup Request, url: /api/deployments/temp-47b53566/log/0d4ba084-3788-45cd-9b5f-5778e7290ade, method: GET, type: request, pid: 825,1,17, ScmType: GitHubAction, SCM_DO_BUILD_DURING_DEPLOYMENT: true/home/LogFiles/kudu/trace/d435402bdd06-899148fb-e5f1-4bed-9880-8dd6b244c1e7.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d435402bdd06-899148fb-e5f1-4bed-9880-8dd6b244c1e7.txt)
+2025-09-22T04:46:40  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/d66c2a764586-3162652f-2049-4602-8552-c434f851b24f.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d66c2a764586-3162652f-2049-4602-8552-c434f851b24f.txt)
+2025-09-22T16:12:52  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 824,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/d93ea344c104-2f4fd10c-ffb5-4962-8b9b-9a57bfccb93c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/d93ea344c104-2f4fd10c-ffb5-4962-8b9b-9a57bfccb93c.txt)
+2025-09-22T04:26:21  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 821,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/db88817b6a32-ea93603b-2471-49cb-a9c0-65064dae0641.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/db88817b6a32-ea93603b-2471-49cb-a9c0-65064dae0641.txt)
+2025-09-22T16:14:05  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/dbb6c3ef99ba-69f99403-efac-4c75-8e00-e2d1becced99.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/dbb6c3ef99ba-69f99403-efac-4c75-8e00-e2d1becced99.txt)
+2025-09-22T04:14:17  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/de2efd88aa5c-004402ed-4af5-4d78-b721-0994792ac0ce.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/de2efd88aa5c-004402ed-4af5-4d78-b721-0994792ac0ce.txt)
+2025-09-23T12:21:29  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsXOuP&sid=DyxDlqtc7d9hIZ7oAAAA, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/e32cbc6f25a5-eb2c3efe-76cc-45ad-b3ee-c1268f283a8c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/e32cbc6f25a5-eb2c3efe-76cc-45ad-b3ee-c1268f283a8c.txt)
+2025-09-22T04:13:18  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/e46a40f74dab-81640283-cbde-4eaa-9c32-0730cc1bd721.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/e46a40f74dab-81640283-cbde-4eaa-9c32-0730cc1bd721.txt)
+2025-09-23T13:01:31  Startup Request, url: /api/settings, method: GET, type: request, pid: 821,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/e587d8ec8278-b30507e1-81db-47e8-bd84-d5604b0a6097.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/e587d8ec8278-b30507e1-81db-47e8-bd84-d5604b0a6097.txt)
+2025-09-22T14:48:50  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/e65e72456eb6-073fa5e3-15d9-4ffd-a260-0f8f4674f6c9.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/e65e72456eb6-073fa5e3-15d9-4ffd-a260-0f8f4674f6c9.txt)
+2025-09-23T04:13:32  Startup Request, url: /api/publish?async=true&deployer=GITHUB_ONE_DEPLOY&type=zip&message=%7B%22type%22%3A%22deployment%22%2C%22sha%22%3A%22b54669fa4e9c951df30da134db38cb35f9c4f02d%22%2C%22repoName%22%3A%22Bratnya%2FSmartSK%22%2C%22actor%22%3A%22Bratnya%22%2C%22slotName%22%3A%22Production%22%2C%22commitMessage%22%3A%22updating%20package.json%22%7D, method: POST, type: request, pid: 825,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/ea352fd4bc97-9bd0ecb5-852f-4150-8e60-960f2b78c50e.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/ea352fd4bc97-9bd0ecb5-852f-4150-8e60-960f2b78c50e.txt)
+2025-09-24T13:03:55  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbxqhKM.0&sid=gHNbOxThCOcL5MDYAAAA, method: GET, type: request, pid: 831,1,7, SCM_DO_BUILD_DURING_DEPLOYMENT: true, ScmType: GitHubAction/home/LogFiles/kudu/trace/ee8c2db37d2e-74a25790-3d5c-4964-bce0-0ace65397edb.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/ee8c2db37d2e-74a25790-3d5c-4964-bce0-0ace65397edb.txt)
+2025-09-21T16:03:48  Startup Request, url: /api/settings, method: GET, type: request, pid: 821,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/f1a130e5e01d-3e33ce83-9b78-41d4-9ee5-df4196d19bd4.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/f1a130e5e01d-3e33ce83-9b78-41d4-9ee5-df4196d19bd4.txt)
+2025-09-23T10:45:43  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsBUB8&sid=9wAzuz09rqL44VBMAAAE, method: POST, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/2025_09_21_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_21_lw0sdlwk0005KT_docker.log)
+2025-09-21T16:50:57.4741125Z Site is running with deployment version: 4ec10318-c9df-4ff4-82f8-995b414eca36
+2025-09-21T16:50:57.4782073Z Site started.
+2025-09-21T16:50:57.5474418Z Site is running with patch version: 22.17.0
+2025-09-21T17:49:56.8528218Z Container is terminating. Grace period: 5 seconds.
+2025-09-21T17:49:56.9975652Z Stop and delete container. Retry count = 0
+2025-09-21T17:49:57.0053587Z Stopping container: 6bf7fd44f304_smartsk-backend.
+2025-09-21T17:50:02.6104150Z Deleting container: 6bf7fd44f304_smartsk-backend. Retry count = 0
+2025-09-21T17:50:17.0859387Z Container spec TerminationMessagePolicy  path
+2025-09-21T17:50:17.0878608Z Container is terminated. Total time elapsed: 20215 ms.
+2025-09-21T17:50:17.0985143Z Site: smartsk-backend stopped./home/LogFiles/2025_09_22_lw0sdlwk0005KT_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_default_docker.log)
+2025-09-22T13:13:30.354283661Z     at Module.<anonymous> (node:internal/modules/cjs/loader:1487:12)
+2025-09-22T13:13:30.354288161Z     at Module.patchedRequire (/agents/nodejs/node_modules/diagnostic-channel/dist/src/patchRequire.js:16:46)
+2025-09-22T13:13:30.354292361Z     at Module.patchedRequire (/agents/nodejs/node_modules/require-in-the-middle/index.js:194:34)
+2025-09-22T13:13:30.354296361Z     at Hook._require.Module.require (/agents/nodejs/node_modules/require-in-the-middle/index.js:142:27) {
+2025-09-22T13:13:30.354300461Z   code: 'MODULE_NOT_FOUND',
+2025-09-22T13:13:30.354304562Z   requireStack: [ '/home/site/wwwroot/backend/main.js' ]
+2025-09-22T13:13:30.354316362Z }
+2025-09-22T13:13:30.354320562Z
+2025-09-22T13:13:30.354324462Z Node.js v22.17.0/home/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_docker.log)
+2025-09-22T20:30:20.320Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage5
+2025-09-22T20:30:21.300Z INFO  - Pull Image successful, Time taken: 23 Seconds
+2025-09-22T20:30:28.423Z INFO  - Starting container for site
+2025-09-22T20:30:28.429Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_ef54df6b_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HO2025-09-22T20:31:17.329Z INFO  - Initiating warmup request to container smartsk-backend_0_ef54df6b for site smartsk-backend
+2025-09-22T20:34:11.076Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_ef54df6b. Elapsed time = 174.2072552 sec
+2025-09-22T20:35:06.298Z INFO  - Container smartsk-backend_0_ef54df6b for site smartsk-backend initialized successfully and is ready to serve requests.
+2025-09-22T20:35:07.048Z INFO  - Initiating warmup request to container smartsk-backend_0_ef54df6b_middleware for site smartsk-backend
+2025-09-22T20:35:51.013Z ERROR - Container smartsk-backend_0_ef54df6b_middleware for site smartsk-backend did not start within expected time limit. Elapsed time = 274.1557191 sec
+2025-09-22T20:35:52.227Z ERROR - Container smartsk-backend_0_ef54df6b_middleware didn't respond to HTTP pings on port: 8181. Failing site start. See container logs for debugging.
+2025-09-22T20:35:56.756Z INFO  - Stopping site smartsk-backend because it failed during startup./home/LogFiles/2025_09_22_lw0sdlwk0005KT_easyauth_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_22_lw0sdlwk0005KT_easyauth_docker.log)
+2025-09-22T20:31:06.332456283Z Updated CA certificates
+2025-09-22T20:31:53.739998123Z warn: Microsoft.AspNetCore.Hosting.Diagnostics[15]
+2025-09-22T20:31:53.740649229Z       Overriding HTTP_PORTS '8080' and HTTPS_PORTS ''. Binding to values defined by URLS instead 'http://0.0.0.0:8181'.
+2025-09-22T20:33:40.866124094Z warn: Microsoft.AspNetCore.Server.Kestrel[22]
+2025-09-22T20:33:41.101346602Z       As of "09/22/2025 20:33:19 +00:00", the heartbeat has been running for "00:00:01.5129484" which is longer than "00:00:01". This could be caused by thread pool starvation./home/LogFiles/2025_09_23_lw0sdlwk0005KT_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw0sdlwk0005KT_default_docker.log)
+2025-09-23T03:48:52.940881006Z     at Object..js (node:internal/modules/cjs/loader:1895:10)
+2025-09-23T03:48:52.940884806Z     at Module.load (node:internal/modules/cjs/loader:1465:32)
+2025-09-23T03:48:52.940888806Z     at Function._load (node:internal/modules/cjs/loader:1282:12)
+2025-09-23T03:48:52.940892706Z     at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+2025-09-23T03:48:52.940896507Z     at wrapModuleLoad (node:internal/modules/cjs/loader:235:24)
+2025-09-23T03:48:52.940916107Z     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2025-09-23T03:48:52.942450824Z     at node:internal/main/run_main_module:36:49
+2025-09-23T03:48:52.942538325Z
+2025-09-23T03:48:52.942551525Z Node.js v22.17.0/home/LogFiles/2025_09_23_lw0sdlwk0005KT_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw0sdlwk0005KT_docker.log)
+2025-09-23T03:45:12.032Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage5
+2025-09-23T03:45:13.634Z INFO  - Pull Image successful, Time taken: 10 Seconds
+2025-09-23T03:45:16.937Z INFO  - Starting container for site
+2025-09-23T03:45:16.938Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_ebea6a8c_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HO2025-09-23T03:45:59.533Z INFO  - Initiating warmup request to container smartsk-backend_0_ebea6a8c for site smartsk-backend
+2025-09-23T03:48:02.005Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_ebea6a8c. Elapsed time = 122.4791987 sec
+2025-09-23T03:49:14.398Z ERROR - Container smartsk-backend_0_ebea6a8c for site smartsk-backend has exited, failing site start
+2025-09-23T03:49:14.416Z INFO  - Initiating warmup request to container smartsk-backend_0_ebea6a8c_middleware for site smartsk-backend
+2025-09-23T03:49:24.518Z INFO  - Container smartsk-backend_0_ebea6a8c_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
+2025-09-23T03:49:24.658Z ERROR - Container smartsk-backend_0_ebea6a8c didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
+2025-09-23T03:49:25.288Z INFO  - Stopping site smartsk-backend because it failed during startup./home/LogFiles/2025_09_23_lw1sdlwk0006H5_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw1sdlwk0006H5_default_docker.log)
+2025-09-23T09:21:54.464687447Z     at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)
+2025-09-23T09:21:54.464689324Z     at node:internal/main/run_main_module:36:49
+2025-09-23T09:21:54.465752990Z
+2025-09-23T09:21:54.465759628Z Node.js v22.17.0
+2025-09-23T09:21:54.505130380Z npm notice
+2025-09-23T09:21:54.505164325Z npm notice New major version of npm available! 10.9.2 -> 11.6.0
+2025-09-23T09:21:54.505168110Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0
+2025-09-23T09:21:54.505170275Z npm notice To update run: npm install -g npm@11.6.0
+2025-09-23T09:21:54.505172259Z npm notice/home/LogFiles/2025_09_23_lw1sdlwk0006H5_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_23_lw1sdlwk0006H5_docker.log)
+2025-09-23T15:32:46.1660974Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:22-lts_20250724.2.tuxprod
+2025-09-23T15:32:49.3549717Z Starting container: ec1fb9ce4304_smartsk-backend.
+2025-09-23T15:32:49.7644198Z Starting watchers and probes.
+2025-09-23T15:32:49.7919210Z Starting metrics collection.
+2025-09-23T15:32:49.8035564Z Container is running.
+2025-09-23T15:32:50.5784858Z Container start method finished after 12359 ms.
+2025-09-23T15:34:14.5288952Z Site startup probe succeeded after 83.6877085 seconds.
+2025-09-23T15:34:31.7049956Z Site is running with deployment version: 9423950c-9e82-4fd5-8975-5e12d6206baa
+2025-09-23T15:34:31.7155561Z Site started.
+2025-09-23T15:34:32.0005024Z Site is running with patch version: 22.17.0/home/LogFiles/2025_09_24_lw1sdlwk00069X_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk00069X_docker.log)
+2025-09-24T18:39:12.6398703Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
+2025-09-24T18:39:13.3135859Z Starting container: 2b47b2b84a20_smartsk-backend.
+2025-09-24T18:39:13.4084233Z Starting watchers and probes.
+2025-09-24T18:39:13.4091021Z Starting metrics collection.
+2025-09-24T18:39:13.4114541Z Container is running.
+2025-09-24T18:39:13.6467419Z Container start method finished after 126376 ms.
+2025-09-24T18:39:54.5938468Z Site startup probe succeeded after 40.8970158 seconds.
+2025-09-24T18:40:33.8287833Z Site is running with deployment version: a2155d25-5d73-433b-b3be-d382517035b7
+2025-09-24T18:40:33.8339204Z Site started.
+2025-09-24T18:40:33.8786075Z Site is running with patch version: 22.17.0/home/LogFiles/2025_09_24_lw1sdlwk0006H5_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_default_docker.log)
+2025-09-24T12:58:02.073820052Z       at process.processTimers (node:internal/timers:523:7) {
+2025-09-24T12:58:02.073822069Z     code: 'ETIMEOUT'
+2025-09-24T12:58:02.073824037Z   }
+2025-09-24T12:58:02.073826157Z }
+2025-09-24T12:58:15.930338965Z npm notice
+2025-09-24T12:58:15.930371180Z npm notice New major version of npm available! 10.9.2 -> 11.6.0
+2025-09-24T12:58:15.930375064Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.0
+2025-09-24T12:58:15.930377502Z npm notice To update run: npm install -g npm@11.6.0
+2025-09-24T12:58:15.930379946Z npm notice/home/LogFiles/2025_09_24_lw1sdlwk0006H5_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_docker.log)
+2025-09-24T16:22:33.7345120Z Site is running with deployment version: a2155d25-5d73-433b-b3be-d382517035b7
+2025-09-24T16:22:33.8127045Z Site started.
+2025-09-24T16:22:33.8437692Z Site is running with patch version: 22.17.0
+2025-09-24T16:22:55.8948034Z Container is terminating. Grace period: 5 seconds.
+2025-09-24T16:22:56.5470479Z Stop and delete container. Retry count = 0
+2025-09-24T16:22:56.5473137Z Stopping container: d50ce1a14e39_smartsk-backend.
+2025-09-24T16:23:03.2087464Z Deleting container: d50ce1a14e39_smartsk-backend. Retry count = 0
+2025-09-24T16:23:09.0884007Z Container spec TerminationMessagePolicy  path
+2025-09-24T16:23:09.0982699Z Container is terminated. Total time elapsed: 13192 ms.
+2025-09-24T16:23:09.1086011Z Site: smartsk-backend stopped./home/LogFiles/2025_09_24_lw1sdlwk0006H5_easyauth_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006H5_easyauth_docker.log)
+2025-09-24T12:54:08.658273401Z Updated CA certificates
+2025-09-24T12:55:29.016875640Z warn: Microsoft.AspNetCore.Hosting.Diagnostics[15]
+2025-09-24T12:55:29.198757607Z       Overriding HTTP_PORTS '8080' and HTTPS_PORTS ''. Binding to values defined by URLS instead 'http://0.0.0.0:8181'.
+2025-09-24T12:58:16.510308048Z warn: Microsoft.AspNetCore.Server.Kestrel[22]
+2025-09-24T12:58:16.878335541Z       As of "09/24/2025 12:58:04 +00:00", the heartbeat has been running for "00:00:01.3672876" which is longer than "00:00:01". This could be caused by thread pool starvation./home/LogFiles/2025_09_24_lw1sdlwk0006IO_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006IO_docker.log)
+2025-09-24T19:54:15.6720877Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:22-lts_20250724.2.tuxprod
+2025-09-24T19:54:16.2264152Z Starting container: 0d3ac5114b8d_smartsk-backend.
+2025-09-24T19:54:16.3177038Z Starting watchers and probes.
+2025-09-24T19:54:16.3195814Z Starting metrics collection.
+2025-09-24T19:54:16.3271193Z Container is running.
+2025-09-24T19:54:17.4301347Z Container start method finished after 157638 ms.
+2025-09-24T19:55:07.6532067Z Site startup probe succeeded after 50.2207619 seconds.
+2025-09-24T19:55:34.6156926Z Site is running with deployment version: a2155d25-5d73-433b-b3be-d382517035b7
+2025-09-24T19:55:34.6168523Z Site started.
+2025-09-24T19:55:34.6653926Z Site is running with patch version: 22.17.0/home/LogFiles/2025_09_24_lw1sdlwk0006IP_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_24_lw1sdlwk0006IP_docker.log)
+2025-09-24T17:25:00.5416751Z Creating container with image: appsvc/node:22-lts_20250724.2.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:22-lts_20250724.2.tuxprod
+2025-09-24T17:25:01.5491850Z Starting container: 83762f1cd87a_smartsk-backend.
+2025-09-24T17:25:01.6994645Z Starting watchers and probes.
+2025-09-24T17:25:01.7177534Z Starting metrics collection.
+2025-09-24T17:25:01.7194405Z Container is running.
+2025-09-24T17:25:01.9799262Z Container start method finished after 103735 ms.
+2025-09-24T17:25:45.1771975Z Site startup probe succeeded after 43.1549244 seconds.
+2025-09-24T17:26:15.0979997Z Site is running with deployment version: a2155d25-5d73-433b-b3be-d382517035b7
+2025-09-24T17:26:15.1092755Z Site started.
+2025-09-24T17:26:15.3396733Z Site is running with patch version: 22.17.0/home/LogFiles/2025_09_25_lw1sdlwk0006IO_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_25_lw1sdlwk0006IO_default_docker.log)
+2025-09-25T08:48:49.552612449Z - /home/site/wwwroot/projectSubmission/projectSubmission.js
+2025-09-25T08:48:49.552616980Z - /home/site/wwwroot/main.js
+2025-09-25T08:48:49.552621625Z Exception origin: uncaughtException
+2025-09-25T08:48:49.600024546Z npm http fetch GET 200 https://registry.npmjs.org/npm 1037ms
+2025-09-25T08:48:49.621975334Z npm notice
+2025-09-25T08:48:49.622091305Z npm notice New major version of npm available! 10.9.2 -> 11.6.1
+2025-09-25T08:48:49.622098055Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.1
+2025-09-25T08:48:49.622102865Z npm notice To update run: npm install -g npm@11.6.1
+2025-09-25T08:48:49.622107403Z npm notice/home/LogFiles/2025_09_25_lw1sdlwk0006IO_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_25_lw1sdlwk0006IO_docker.log)
+2025-09-25T13:35:56.022Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage5
+2025-09-25T13:35:56.088Z INFO  - Pull Image successful, Time taken: 2 Seconds
+2025-09-25T13:35:56.636Z INFO  - Starting container for site
+2025-09-25T13:35:56.637Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_27963dbc_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEB2025-09-25T13:36:00.913Z INFO  - Initiating warmup request to container smartsk-backend_0_27963dbc for site smartsk-backend
+2025-09-25T13:36:18.291Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_27963dbc. Elapsed time = 17.3786429 sec
+2025-09-25T13:36:36.492Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_27963dbc. Elapsed time = 35.5794636 sec
+2025-09-25T13:37:00.606Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_27963dbc. Elapsed time = 59.6931063 sec
+2025-09-25T13:37:18.138Z INFO  - Container smartsk-backend_0_27963dbc for site smartsk-backend initialized successfully and is ready to serve requests.
+2025-09-25T13:37:18.208Z INFO  - Initiating warmup request to container smartsk-backend_0_27963dbc_middleware for site smartsk-backend
+2025-09-25T13:37:25.065Z INFO  - Container smartsk-backend_0_27963dbc_middleware for site smartsk-backend initialized successfully and is ready to serve requests.Ending Log Tail of existing logs ---Starting Live Log Stream ---

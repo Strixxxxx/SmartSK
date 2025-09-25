@@ -1,0 +1,76 @@
+smartSK
+├───.github
+│   └───workflows
+│       └───main_smartsk-backend.yml
+├───.vscode
+│   └───settings.json
+├───backend
+│   ├───Admin
+│   │   ├───accArchive.js
+│   │   ├───accountCreation.js
+│   │   ├───archive.js
+│   │   ├───backup.js
+│   │   ├───projArchive.js
+│   │   ├───roles.js
+│   │   └───sessionlog.js
+│   ├───AI
+│   │   ├───__init__.py
+│   │   ├───credentials.json
+│   │   ├───db_utils.py
+│   │   ├───forecast.py
+│   │   ├───pa.py
+│   │   ├───paCstm.py
+│   │   ├───paCstmTrends.py
+│   │   ├───paTrends.py
+│   │   ├───token.json
+│   │   └───__pycache__
+│   ├───audit
+│   │   └───auditService.js
+│   ├───config
+│   │   └───jwt.js
+│   ├───database
+│   │   ├───database query.txt
+│   │   └───database.js
+│   ├───Email
+│   │   └───email.js
+│   ├───forgotpassword
+│   │   └───forgotPassword.js
+│   ├───login
+│   │   └───login.js
+│   ├───projectReview
+│   │   └───projectReview.js
+│   ├───Projects
+│   ├───projectSubmission
+│   │   └───projectSubmission.js
+│   ├───pyBridge
+│   │   ├───pyBridgeFC.js
+│   │   └───pyBridgePA.js
+│   ├───rawdata
+│   │   └───rawData.js
+│   ├───routeGuard
+│   │   └───routeGuard.js
+│   ├───routes
+│   ├───session
+│   │   └───session.js
+│   ├───Storage
+│   │   └───storage.js
+│   └───uploads
+├───database_backup
+├───frontend
+│   ├───public
+│   │   ├───index.html
+│   │   └───vite.svg
+│   └───src
+│       ├───assets
+│       ├───backend connection
+│       ├───components
+│       └───context
+├───projects
+├───.gitignore
+├───console.txt
+├───content.txt
+├───original.txt
+├───package-lock.json
+├───package.json
+├───README.md
+└───tree_directory.txt

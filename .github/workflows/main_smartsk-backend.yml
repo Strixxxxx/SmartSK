@@ -55,10 +55,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: build
-    permissions:
-      id-token: write
-      contents: read
-
     steps:
       - name: Download backend artifacts
         uses: actions/download-artifact@v4
@@ -66,13 +62,14 @@ jobs:
           name: backend-app
           path: ./backend
 
-      - name: Verify node_modules before deploy
+      - name: Verify node_modules before packaging
         run: |
-          echo "Verifying node_modules structure..."
-          ls -la ./backend/
-          ls -la ./backend/node_modules/ | head -10
-          echo "Azure storage modules:"
-          ls -la ./backend/node_modules/@azure/ || echo "No @azure modules"
+          ls -la ./backend/node_modules | head
+
+      - name: Create deployment zip
+        run: |
+          cd backend
+          zip -r ../smartsk-backend.zip .
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -87,4 +84,4 @@ jobs:
         with:
           app-name: 'smartSK-backend'
           slot-name: 'Production'
-          package: ./backend
+          package: ./backend/**

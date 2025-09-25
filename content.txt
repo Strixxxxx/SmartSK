@@ -1,74 +1,154 @@
-##[debug]Evaluating condition for step: 'Login to Azure'
-##[debug]Evaluating: success()
-##[debug]Evaluating success:
-##[debug]=> true
-##[debug]Result: true
-##[debug]Starting: Login to Azure
-##[debug]Register post job cleanup for action: azure/login@v2
-##[debug]Loading inputs
-##[debug]Evaluating: secrets.AZUREAPPSERVICE_CLIENTID_F3C59CAD920D4D2488E5081F5E02AD69
-##[debug]Evaluating Index:
-##[debug]..Evaluating secrets:
-##[debug]..=> Object
-##[debug]..Evaluating String:
-##[debug]..=> 'AZUREAPPSERVICE_CLIENTID_F3C59CAD920D4D2488E5081F5E02AD69'
-##[debug]=> '***'
-##[debug]Result: '***'
-##[debug]Evaluating: secrets.AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1
-##[debug]Evaluating Index:
-##[debug]..Evaluating secrets:
-##[debug]..=> Object
-##[debug]..Evaluating String:
-##[debug]..=> 'AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1'
-##[debug]=> '***'
-##[debug]Result: '***'
-##[debug]Evaluating: secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE
-##[debug]Evaluating Index:
-##[debug]..Evaluating secrets:
-##[debug]..=> Object
-##[debug]..Evaluating String:
-##[debug]..=> 'AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE'
-##[debug]=> '***'
-##[debug]Result: '***'
-##[debug]Loading env
-Run azure/login@v2
-::add-mask::***
-Running Azure CLI Login.
-##[debug]Azure CLI path: /usr/bin/az
-##[debug]Azure CLI version used:
-##[debug]{
-##[debug]  "azure-cli": "2.77.0",
-##[debug]  "azure-cli-core": "2.77.0",
-##[debug]  "azure-cli-telemetry": "1.1.0",
-##[debug]  "extensions": {
-##[debug]    "azure-devops": "1.0.2"
-##[debug]  }
-##[debug]}
-##[debug]
-/usr/bin/az cloud set -n azurecloud
-Done setting cloud: "azurecloud"
-##[debug]ID token url is https://run-actions-1-azure-eastus.actions.githubusercontent.com/89//idtoken/9dd37fe5-e71d-4cd4-b102-e8e23d75e6d3/b806fc4c-3b5d-52e1-ae07-77bb8f375db7?api-version=2.0&audience=api%3A%2F%2FAzureADTokenExchange
-::add-mask::***
-::add-mask::***
-Federated token details:
- issuer - https://token.actions.githubusercontent.com
- subject claim - repo:Bratnya/SmartSK:environment:Production
- audience - api://AzureADTokenExchange
- job_workflow_ref - Bratnya/SmartSK/.github/workflows/main_smartsk-backend.yml@refs/heads/main
-Attempting Azure CLI login by using OIDC...
-Error: AADSTS700213: No matching federated identity record found for presented assertion subject 'repo:Bratnya/SmartSK:environment:Production'. Check your federated identity credential Subject, Audience and Issuer against the presented assertion. https://learn.microsoft.com/entra/workload-id/workload-identity-federation Trace ID: 65205302-11e3-456d-a201-18727bb46e00 Correlation ID: ca557f4d-c042-4365-bdbc-bb73c1b9e611 Timestamp: 2025-09-25 12:33:12Z
+So if you read the console.txt, it contains the log stream of a backend server in azure portal which causes an error below the comment "--Backend(Azure Portal's Log Stream) because there is missing node_modules content which could be seen below the comment "--kudu console logs" . So for a background idea, i added a new node module which was azure storage blob and i added that because i cant store files locally anymore. So i installed it and if you read carefully on the kudu console logs, it was exist on the package.json & package-lock.json but when i tried the command "ls 3 times inside of the node_modules directory, it was empty. I also tried to put multiple environment variable names(1st screenshot) just to fix it and it still showing error logs. What i want you to do was to properly analyze the evidences that i sent to you and also make sure that when it comes to sending the deployment, the node_modules is included because when i looked at the recent action on the github, inside of the zip file, all content, on the node_module has files/folders(2nd Screenshot) so im curious why when it comes to the azure portal, the node_modules was empty
 
-Error: Run the command below to authenticate interactively; additional arguments may be added as needed:
-az logout
-az login
+Looking at your evidence, I can see the core issue clearly. Your logs show the classic Azure App Service node_modules extraction problem, despite your GitHub Actions packaging correctly. Here's what's happening and the complete solution:
 
-Error: Login failed with Error: The process '/usr/bin/az' failed with exit code 1. Double check if the 'auth-type' is correct. Refer to https://github.com/Azure/login#readme for more information.
-##[debug]Error: The process '/usr/bin/az' failed with exit code 1
-##[debug]    at ExecState._setResult (/home/runner/work/_actions/azure/login/v2/lib/main/index.js:2333:25)
-##[debug]    at ExecState.CheckComplete (/home/runner/work/_actions/azure/login/v2/lib/main/index.js:2316:18)
-##[debug]    at ChildProcess.<anonymous> (/home/runner/work/_actions/azure/login/v2/lib/main/index.js:2210:27)
-##[debug]    at ChildProcess.emit (node:events:524:28)
-##[debug]    at maybeClose (node:internal/child_process:1104:16)
-##[debug]    at ChildProcess._handle.onexit (node:internal/child_process:304:5)
-##[debug]Node Action run completed with exit code 1
-##[debug]Finishing: Login to Azure
+Root Cause Analysis
+GitHub Actions is working correctly - Your package contains all node_modules
+Azure is running its own build process - The SCM_DO_BUILD_DURING_DEPLOYMENT: true in your logs confirms this
+Azure's build is failing or incomplete - This leaves node_modules empty after deployment
+Critical Issues I See:
+From your logs, I notice:
+
+SCM_DO_BUILD_DURING_DEPLOYMENT: true is appearing repeatedly
+Container startup timeouts (130+ seconds)
+node_modules.tar.gz exists but node_modules/ is empty
+Your app is crashing with module not found errors
+Complete Solution
+1. Update Your GitHub Actions Workflow
+Replace your current workflow with this fixed version:
+
+yaml
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: Build and Deploy Node.js app to Azure Web App - smartSK-backend
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+          cache-dependency-path: './backend/package-lock.json'
+
+      - name: Clean install dependencies
+        working-directory: ./backend
+        run: |
+          npm ci --production --no-optional
+          npm list --depth=0
+
+      - name: Verify Azure Storage Blob installation
+        working-directory: ./backend
+        run: |
+          echo "Checking @azure/storage-blob installation..."
+          npm list @azure/storage-blob
+          ls -la node_modules/@azure/ || echo "No @azure modules found"
+
+      - name: Remove unnecessary files
+        working-directory: ./backend
+        run: |
+          find node_modules -name "*.md" -delete 2>/dev/null || true
+          find node_modules -name "test*" -type d -exec rm -rf {} + 2>/dev/null || true
+          find node_modules -name "*.map" -delete 2>/dev/null || true
+
+      - name: Upload backend artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-app
+          path: ./backend
+          compression-level: 6
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download backend artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-app
+          path: ./backend
+
+      - name: Verify node_modules before deploy
+        run: |
+          echo "Verifying node_modules structure..."
+          ls -la ./backend/
+          ls -la ./backend/node_modules/ | head -10
+          echo "Azure storage modules:"
+          ls -la ./backend/node_modules/@azure/ || echo "No @azure modules"
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F3C59CAD920D4D2488E5081F5E02AD69 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'smartSK-backend'
+          slot-name: 'Production'
+          package: ./backend
+2. Azure App Service Configuration Changes
+In your Azure Portal, update these Application Settings:
+
+SCM_DO_BUILD_DURING_DEPLOYMENT = false
+WEBSITE_NODE_DEFAULT_VERSION = 22-lts
+SCM_DISABLE_NODE_MODULES_COMPRESSION = false
+WEBSITE_RUN_FROM_PACKAGE = 0
+3. Create .deployment File
+Create a .deployment file in your backend directory:
+
+ini
+[config]
+SCM_DO_BUILD_DURING_DEPLOYMENT = false
+WEBSITE_NODE_DEFAULT_VERSION = 22-lts
+command = echo "Using pre-built artifacts"
+4. Add package.json Scripts
+Update your package.json to include:
+
+json
+{
+  "scripts": {
+    "start": "node main.js",
+    "postinstall": "echo 'Verifying Azure Storage Blob...' && npm list @azure/storage-blob"
+  }
+}
+5. Critical Fix: Create services Directory
+Before creating the Azure Blob service files I provided earlier, ensure you create the services directory in your backend:
+
+bash
+mkdir backend/services
+Why This Fixes Your Issue
+Forces use of pre-built artifacts - SCM_DO_BUILD_DURING_DEPLOYMENT = false
+Prevents Azure from overwriting node_modules - Uses your GitHub Actions build
+Optimizes package size - Removes unnecessary files
+Adds verification steps - Confirms modules exist at each stage
+Proper caching - Speeds up builds
+Testing the Fix
+After deployment, check in Kudu console:
+
+bash
+cd site/wwwroot
+ls -la node_modules/@azure/
+npm list @azure/storage-blob
+This should now show your modules properly installed. The key insight is that Azure was trying to rebuild your app and failing, rather than using your perfectly good pre-built package from GitHub Actions.
