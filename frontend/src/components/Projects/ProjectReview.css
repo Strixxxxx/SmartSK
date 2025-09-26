@@ -71,6 +71,7 @@
   margin-top: 20px;
 }
 
+.review-button,
 .review-form .cancel-btn,
 .review-form .submit-btn {
   padding: 8px 16px;
@@ -84,6 +85,7 @@
   border: 1px solid #ddd;
 }
 
+.review-button,
 .review-form .submit-btn {
   background-color: #4285f4;
   color: white;

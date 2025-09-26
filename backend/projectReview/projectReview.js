@@ -11,11 +11,18 @@ const { authMiddleware } = require('../session/session');
 // Get all projects for review
 router.get('/all', authMiddleware, async (req, res) => {
   try {
-    // Get database connection
     const pool = await getConnection();
-    
-    // Query to get all projects with user information and the new status name
+    const userBarangay = req.user.barangay;
+
+    if (userBarangay === undefined || userBarangay === null) {
+      return res.status(400).json({
+        success: false,
+        message: 'User does not have an assigned barangay.',
+      });
+    }
+
     const result = await pool.request()
+      .input('userBarangay', sql.Int, userBarangay)
       .query(`
         SELECT p.projectID as id, p.reference_number as referenceNumber, p.title, p.description, 
                s.StatusName as status, p.submittedDate, p.file_path as fileUrl, p.file_name as fileName,
@@ -23,6 +30,7 @@ router.get('/all', authMiddleware, async (req, res) => {
         FROM projects p
         INNER JOIN userInfo u ON p.userID = u.userID
         INNER JOIN StatusLookup s ON p.status = s.StatusID
+        WHERE u.barangay = @userBarangay
         ORDER BY p.submittedDate DESC
       `);
     
@@ -31,7 +39,7 @@ router.get('/all', authMiddleware, async (req, res) => {
       projects: result.recordset
     });
   } catch (error) {
-    console.error('Error fetching projects for review');
+    console.error('Error fetching projects for review', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to fetch projects for review',

@@ -144,18 +144,17 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
     if (!filename) return;
 
     try {
-      const response = await axiosInstance.get(`/api/projects/download/${filename}`, {
-        responseType: 'blob',
-      });
-      
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = fileName || filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      const response = await axiosInstance.get(`/api/projects/download/${filename}`);
+      if (response.data.success && response.data.url) {
+        const link = document.createElement('a');
+        link.href = response.data.url;
+        link.setAttribute('download', fileName || filename);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+      } else {
+        toast.error(response.data.message || 'Could not get file URL for download.');
+      }
     } catch(err) {
       toast.error('Could not download the file.');
     }
@@ -167,14 +166,14 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
     if (!filename) return;
 
     try {
-      const response = await axiosInstance.get(`/api/projects/download/${filename}`, {
-        responseType: 'blob',
-      });
-      const blob = new Blob([response.data], { type: response.headers['content-type'] });
-      const url = window.URL.createObjectURL(blob);
-      setViewingFileUrl(url);
-      setViewingFileName(fileName || filename);
-      setShowFileViewer(true);
+      const response = await axiosInstance.get(`/api/projects/download/${filename}`);
+      if (response.data.success && response.data.url) {
+        setViewingFileUrl(response.data.url);
+        setViewingFileName(fileName || filename);
+        setShowFileViewer(true);
+      } else {
+        toast.error(response.data.message || 'Could not get file URL for viewing.');
+      }
     } catch (err) {
       toast.error('Could not load file for viewing.');
     }
