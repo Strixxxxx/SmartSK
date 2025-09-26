@@ -3,6 +3,28 @@ const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const { addAuditTrail } = require('../audit/auditService');
 
+// GET all archived projects
+router.get('/', async (req, res) => {
+  try {
+    const pool = await getConnection();
+    const result = await pool.request().query(`
+        SELECT 
+            p.projectID, 
+            p.reference_number, 
+            p.title, 
+            p.submittedDate,
+            u.fullName as submittedBy
+        FROM projectsARC p
+        LEFT JOIN userInfoARC u ON p.userID = u.userID
+        ORDER BY p.submittedDate DESC
+    `);
+    res.json({ success: true, data: result.recordset });
+  } catch (error) {
+    console.error('Error fetching archived projects:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch archived projects.' });
+  }
+});
+
 // POST to archive a project
 router.post('/:projectId', async (req, res) => {
     const { projectId } = req.params;

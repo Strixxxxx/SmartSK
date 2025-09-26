@@ -3,6 +3,33 @@ const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const { addAuditTrail } = require('../audit/auditService');
 
+// GET all archived accounts
+router.get('/', async (req, res) => {
+  try {
+    const pool = await getConnection();
+    const result = await pool.request().query(`
+      SELECT 
+        u.userID, 
+        u.username, 
+        u.fullName, 
+        r.roleName as position, 
+        b.barangayName as barangay, 
+        u.emailAddress, 
+        u.phoneNumber,
+        u.isArchived
+      FROM userInfo u
+      LEFT JOIN roles r ON u.position = r.roleID
+      LEFT JOIN barangays b ON u.barangay = b.barangayID
+      WHERE u.isArchived = 1
+      ORDER BY u.fullName
+    `);
+    res.json({ success: true, data: result.recordset });
+  } catch (error) {
+    console.error('Error fetching archived accounts:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch archived accounts.' });
+  }
+});
+
 // POST to archive an account
 router.post('/:userId', async (req, res) => {
     const { userId } = req.params;
