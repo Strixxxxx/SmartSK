@@ -1,13 +1,62 @@
 --Frontend (Browser's Console)
 
-ProjectSubmission.tsx:104 
- POST https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/projects/submit 500 (Internal Server Error)
+ProjectReview.tsx:55 
+ GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/projectreview/all 400 (Bad Request)
 Promise.then		
-handleSubmitProject	@	ProjectSubmission.tsx:104
-<form>		
-ProjectSubmission	@	ProjectSubmission.tsx:206
-<ProjectSubmission>		
-Projects	@	Projects.tsx:37
+fetchProjects	@	ProjectReview.tsx:55
+(anonymous)	@	ProjectReview.tsx:49
+<ProjectReview>		
+Projects	@	Projects.tsx:46
+<Projects>		
+AppRoutes	@	AppRoutes.tsx:71
+<AppRoutes>		
+App	@	App.tsx:17
+<App>		
+(anonymous)	@	main.tsx:8
+axiosConfig.ts:101 Client error: 400 
+{success: false, message: 'User does not have an assigned barangay.'}
+(anonymous)	@	axiosConfig.ts:101
+Promise.then		
+fetchProjects	@	ProjectReview.tsx:55
+(anonymous)	@	ProjectReview.tsx:49
+<ProjectReview>		
+Projects	@	Projects.tsx:46
+<Projects>		
+AppRoutes	@	AppRoutes.tsx:71
+<AppRoutes>		
+App	@	App.tsx:17
+<App>		
+(anonymous)	@	main.tsx:8
+ProjectReview.tsx:55 
+ GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/projectreview/all 400 (Bad Request)
+Promise.then		
+fetchProjects	@	ProjectReview.tsx:55
+(anonymous)	@	ProjectReview.tsx:49
+<ProjectReview>		
+Projects	@	Projects.tsx:46
+<Projects>		
+AppRoutes	@	AppRoutes.tsx:71
+<AppRoutes>		
+App	@	App.tsx:17
+<App>		
+(anonymous)	@	main.tsx:8
+axiosConfig.ts:101 Client error: 400 
+{success: false, message: 'User does not have an assigned barangay.'}
+message
+: 
+"User does not have an assigned barangay."
+success
+: 
+false
+[[Prototype]]
+: 
+Object
+(anonymous)	@	axiosConfig.ts:101
+Promise.then		
+fetchProjects	@	ProjectReview.tsx:55
+(anonymous)	@	ProjectReview.tsx:49
+<ProjectReview>		
+Projects	@	Projects.tsx:46
 <Projects>		
 AppRoutes	@	AppRoutes.tsx:71
 <AppRoutes>		
@@ -15,30 +64,6 @@ App	@	App.tsx:17
 <App>		
 (anonymous)	@	main.tsx:8
 
-axiosConfig.ts:99 Server error: 500 
-{success: false, message: 'An error occurred during project submission: priva…cess. The valid values are: ["container","blob"].'}
-message
-: 
-"An error occurred during project submission: private is not a valid value for options.access. The valid values are: [\"container\",\"blob\"]."
-success
-: 
-false
-[[Prototype]]
-: 
-Object
-(anonymous)	@	axiosConfig.ts:99
-Promise.then		
-handleSubmitProject	@	ProjectSubmission.tsx:104
-<form>		
-ProjectSubmission	@	ProjectSubmission.tsx:206
-<ProjectSubmission>		
-Projects	@	Projects.tsx:37
-<Projects>		
-AppRoutes	@	AppRoutes.tsx:71
-<AppRoutes>		
-App	@	App.tsx:17
-<App>		
-(anonymous)	@	main.tsx:8
 ﻿
 
 --Backend(Azure Portal's Log Stream)
