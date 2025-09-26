@@ -95,7 +95,11 @@ app.use((req, res, next) => {
 // --- PUBLIC ROUTES ---
 // Routes that don't need authentication and are publicly accessible.
 
-app.use('/api/login', loginRouter);
+if (loginRouter && typeof loginRouter === 'function') {
+  app.use('/api/login', loginRouter);
+} else {
+  console.error('loginRouter is not a valid middleware function');
+}
 
 // Forgot password router
 if (forgotPasswordRoutes && typeof forgotPasswordRoutes === 'function') {
@@ -111,7 +115,11 @@ app.get('/health', (req, res) => {
 
 // --- AUTHENTICATION MIDDLEWARE ---
 // All routes defined after this point will be protected by the authMiddleware.
-app.use(authMiddleware);
+if (authMiddleware && typeof authMiddleware === 'function') {
+  app.use(authMiddleware);
+} else {
+  console.error('authMiddleware is not a valid middleware function');
+}
 
 
 // --- PROTECTED ROUTES ---
@@ -127,7 +135,11 @@ app.post('/api/logout', logout);
 const adminRouter = express.Router();
 
 // Mount the specific admin routers onto the main admin router.
-adminRouter.use(routeGuard.isAdmin);
+if (routeGuard.isAdmin && typeof routeGuard.isAdmin === 'function') {
+  adminRouter.use(routeGuard.isAdmin);
+} else {
+  console.error('routeGuard.isAdmin is not a valid middleware function');
+}
 
 // Mount the specific admin routers onto the main admin router.
 if (accountCreationRouter && typeof accountCreationRouter === 'function') {

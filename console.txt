@@ -5,7 +5,7 @@
 --Backend(Azure Portal's Log Stream)
 
 Connected!
-2025-09-26T03:56:25  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/26/2025 03:39:50/home/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt)
+2025-09-26T05:44:46  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/26/2025 05:25:38/home/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt)
 2025-09-22T03:57:50  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/03a8a751efff-ea9b94d4-5784-44d0-95b8-59e8bdac354e.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03a8a751efff-ea9b94d4-5784-44d0-95b8-59e8bdac354e.txt)
 2025-09-23T06:42:52    Outgoing response, type: response, statusCode: 409, statusText: Conflict/home/LogFiles/kudu/trace/03a8a751efff-f0c217d7-58b3-46fb-98ef-d367d83a9c15.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03a8a751efff-f0c217d7-58b3-46fb-98ef-d367d83a9c15.txt)
 2025-09-23T05:48:10  Startup Request, url: /api/settings, method: GET, type: request, pid: 825,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/03b00b859602-bfb12284-a7b7-42fa-b009-15138c49a5fb.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03b00b859602-bfb12284-a7b7-42fa-b009-15138c49a5fb.txt)
@@ -251,24 +251,24 @@ Connected!
 2025-09-25T16:13:58.536Z INFO  - Initiating warmup request to container smartsk-backend_0_fc6a83d7_middleware for site smartsk-backend
 2025-09-25T16:13:59.946Z INFO  - Container smartsk-backend_0_fc6a83d7_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
 2025-09-25T20:57:02.877Z INFO  -/home/LogFiles/2025_09_26_lw1sdlwk0006IO_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_26_lw1sdlwk0006IO_default_docker.log)
-2025-09-26T03:41:03.526798005Z Initializing Azure Storage with primary credentials.
-2025-09-26T03:41:03.706401114Z Caught exception: TypeError: argument handler must be a function
-2025-09-26T03:41:03.706438177Z Exception origin: uncaughtException
-2025-09-26T03:41:03.745930029Z npm http fetch GET 200 https://registry.npmjs.org/npm 695ms
-2025-09-26T03:41:03.767378815Z npm notice
-2025-09-26T03:41:03.767437248Z npm notice New major version of npm available! 10.9.2 -> 11.6.1
-2025-09-26T03:41:03.767442209Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.1
-2025-09-26T03:41:03.767446066Z npm notice To update run: npm install -g npm@11.6.1
-2025-09-26T03:41:03.767449791Z npm notice/home/LogFiles/2025_09_26_lw1sdlwk0006IO_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_26_lw1sdlwk0006IO_docker.log)
-2025-09-26T03:40:03.385Z INFO  - Pull Image successful, Time taken: 3 Seconds
-2025-09-26T03:40:04.273Z INFO  - Starting container for site
-2025-09-26T03:40:04.281Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_b7a85c85_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEB2025-09-26T03:40:20.698Z INFO  - Initiating warmup request to container smartsk-backend_0_b7a85c85 for site smartsk-backend
-2025-09-26T03:40:40.876Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_b7a85c85. Elapsed time = 20.1878172 sec
-2025-09-26T03:41:00.940Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_b7a85c85. Elapsed time = 40.2522573 sec
-2025-09-26T03:41:04.528Z ERROR - Container smartsk-backend_0_b7a85c85 for site smartsk-backend has exited, failing site start
-2025-09-26T03:41:04.529Z INFO  - Initiating warmup request to container smartsk-backend_0_b7a85c85_middleware for site smartsk-backend
-2025-09-26T03:41:05.407Z INFO  - Container smartsk-backend_0_b7a85c85_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
-2025-09-26T03:41:05.495Z ERROR - Container smartsk-backend_0_b7a85c85 didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
-2025-09-26T03:41:05.618Z INFO  - Stopping site smartsk-backend because it failed during startup.Ending Log Tail of existing logs ---Starting Live Log Stream ---
+2025-09-26T05:26:32.698344450Z Initializing Azure Storage with primary credentials.
+2025-09-26T05:26:32.983633982Z Caught exception: TypeError: argument handler must be a function
+2025-09-26T05:26:32.983668212Z Exception origin: uncaughtException
+2025-09-26T05:26:33.024279319Z npm http fetch GET 200 https://registry.npmjs.org/npm 583ms
+2025-09-26T05:26:33.091987685Z npm notice
+2025-09-26T05:26:33.092016496Z npm notice New major version of npm available! 10.9.2 -> 11.6.1
+2025-09-26T05:26:33.092022419Z npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.1
+2025-09-26T05:26:33.092027101Z npm notice To update run: npm install -g npm@11.6.1
+2025-09-26T05:26:33.092031908Z npm notice/home/LogFiles/2025_09_26_lw1sdlwk0006IO_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_26_lw1sdlwk0006IO_docker.log)
+2025-09-26T05:25:45.082Z INFO  - Pull Image successful, Time taken: 1 Seconds
+2025-09-26T05:25:45.694Z INFO  - Starting container for site
+2025-09-26T05:25:45.694Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_422a076b_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173 -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEB2025-09-26T05:25:51.029Z INFO  - Initiating warmup request to container smartsk-backend_0_422a076b for site smartsk-backend
+2025-09-26T05:26:10.703Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_422a076b. Elapsed time = 19.6759502 sec
+2025-09-26T05:26:28.911Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_422a076b. Elapsed time = 37.8836773 sec
+2025-09-26T05:26:34.322Z ERROR - Container smartsk-backend_0_422a076b for site smartsk-backend has exited, failing site start
+2025-09-26T05:26:34.322Z INFO  - Initiating warmup request to container smartsk-backend_0_422a076b_middleware for site smartsk-backend
+2025-09-26T05:26:35.500Z INFO  - Container smartsk-backend_0_422a076b_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
+2025-09-26T05:26:35.592Z ERROR - Container smartsk-backend_0_422a076b didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
+2025-09-26T05:26:35.847Z INFO  - Stopping site smartsk-backend because it failed during startup.Ending Log Tail of existing logs ---Starting Live Log Stream ---
 
 --Kudu Console Logs
