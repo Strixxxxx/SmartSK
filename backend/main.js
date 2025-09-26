@@ -39,6 +39,7 @@ const rawDataRouter = require('./rawdata/rawData');
 const archiveRouter = require('./Admin/archive');
 const accArchiveRouter = require('./Admin/accArchive');
 const projArchiveRouter = require('./Admin/projArchive');
+const projListRouter = require('./Admin/projList');
 
 // Import the new PyBridge modules with error handling
 let PyBridgeFC, PyBridgePA;
