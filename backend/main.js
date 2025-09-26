@@ -157,6 +157,12 @@ if (archiveRouter && typeof archiveRouter === 'function') {
   console.error('archiveRouter is not a valid middleware function');
 }
 
+if (projListRouter && typeof projListRouter === 'function') {
+  adminRouter.use('/', projListRouter);
+} else {
+  console.error('projListRouter is not a valid middleware function');
+}
+
 // Mount the consolidated admin router to the app.
 app.use('/api/admin', adminRouter);
 

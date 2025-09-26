@@ -1,154 +1,31 @@
-So if you read the console.txt, it contains the log stream of a backend server in azure portal which causes an error below the comment "--Backend(Azure Portal's Log Stream) because there is missing node_modules content which could be seen below the comment "--kudu console logs" . So for a background idea, i added a new node module which was azure storage blob and i added that because i cant store files locally anymore. So i installed it and if you read carefully on the kudu console logs, it was exist on the package.json & package-lock.json but when i tried the command "ls 3 times inside of the node_modules directory, it was empty. I also tried to put multiple environment variable names(1st screenshot) just to fix it and it still showing error logs. What i want you to do was to properly analyze the evidences that i sent to you and also make sure that when it comes to sending the deployment, the node_modules is included because when i looked at the recent action on the github, inside of the zip file, all content, on the node_module has files/folders(2nd Screenshot) so im curious why when it comes to the azure portal, the node_modules was empty
+Based on the Azure Portal log stream, I can identify several critical issues causing the unhealthy checks and container failures:
+Primary Issues:
+1. Node.js Application Crashes with Uncaught Exceptions
+2025-09-26T03:41:03.706401114Z Caught exception: TypeError: argument handler must be a function
+2025-09-26T03:41:03.706438177Z Exception origin: uncaughtException
+2. Missing Dependencies/Module Errors
+2025-09-22T13:13:30.354296361Z     at Hook._require.Module.require (/agents/nodejs/node_modules/require-in-the-middle/index.js:142:27) {
+2025-09-22T13:13:30.354300461Z   code: 'MODULE_NOT_FOUND',
+2025-09-22T13:13:30.354304562Z   requireStack: [ '/home/site/wwwroot/backend/main.js' ]
+3. Container Health Check Failures
+The logs show repeated patterns of:
 
-Looking at your evidence, I can see the core issue clearly. Your logs show the classic Azure App Service node_modules extraction problem, despite your GitHub Actions packaging correctly. Here's what's happening and the complete solution:
+Container starts successfully
+Warmup requests are initiated
+Container fails to respond to HTTP pings on port 3000
+Site startup fails due to timeout
 
-Root Cause Analysis
-GitHub Actions is working correctly - Your package contains all node_modules
-Azure is running its own build process - The SCM_DO_BUILD_DURING_DEPLOYMENT: true in your logs confirms this
-Azure's build is failing or incomplete - This leaves node_modules empty after deployment
-Critical Issues I See:
-From your logs, I notice:
+Root Causes:
 
-SCM_DO_BUILD_DURING_DEPLOYMENT: true is appearing repeatedly
-Container startup timeouts (130+ seconds)
-node_modules.tar.gz exists but node_modules/ is empty
-Your app is crashing with module not found errors
-Complete Solution
-1. Update Your GitHub Actions Workflow
-Replace your current workflow with this fixed version:
+Code Issue: Your main.js file has a TypeError where you're passing something that isn't a function as a handler (likely in route definitions or middleware setup)
+Missing Dependencies: Some required npm packages aren't installed or properly referenced
+Port Configuration: While the container is configured for port 3000, there may be a mismatch in how your application is trying to bind to ports
 
-yaml
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
+Immediate Steps to Fix:
 
-name: Build and Deploy Node.js app to Azure Web App - smartSK-backend
+Check your main.js file for any route handlers or middleware that might not be properly defined as functions
+Verify package.json dependencies and run npm install to ensure all required packages are available
+Add proper error handling in your Node.js application to prevent uncaught exceptions from crashing the container
+Test locally to reproduce and fix the "argument handler must be a function" error before redeploying
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Node.js version
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.x'
-          cache: 'npm'
-          cache-dependency-path: './backend/package-lock.json'
-
-      - name: Clean install dependencies
-        working-directory: ./backend
-        run: |
-          npm ci --production --no-optional
-          npm list --depth=0
-
-      - name: Verify Azure Storage Blob installation
-        working-directory: ./backend
-        run: |
-          echo "Checking @azure/storage-blob installation..."
-          npm list @azure/storage-blob
-          ls -la node_modules/@azure/ || echo "No @azure modules found"
-
-      - name: Remove unnecessary files
-        working-directory: ./backend
-        run: |
-          find node_modules -name "*.md" -delete 2>/dev/null || true
-          find node_modules -name "test*" -type d -exec rm -rf {} + 2>/dev/null || true
-          find node_modules -name "*.map" -delete 2>/dev/null || true
-
-      - name: Upload backend artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: backend-app
-          path: ./backend
-          compression-level: 6
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    permissions:
-      id-token: write
-      contents: read
-
-    steps:
-      - name: Download backend artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: backend-app
-          path: ./backend
-
-      - name: Verify node_modules before deploy
-        run: |
-          echo "Verifying node_modules structure..."
-          ls -la ./backend/
-          ls -la ./backend/node_modules/ | head -10
-          echo "Azure storage modules:"
-          ls -la ./backend/node_modules/@azure/ || echo "No @azure modules"
-
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F3C59CAD920D4D2488E5081F5E02AD69 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE }}
-
-      - name: Deploy to Azure Web App
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'smartSK-backend'
-          slot-name: 'Production'
-          package: ./backend
-2. Azure App Service Configuration Changes
-In your Azure Portal, update these Application Settings:
-
-SCM_DO_BUILD_DURING_DEPLOYMENT = false
-WEBSITE_NODE_DEFAULT_VERSION = 22-lts
-SCM_DISABLE_NODE_MODULES_COMPRESSION = false
-WEBSITE_RUN_FROM_PACKAGE = 0
-3. Create .deployment File
-Create a .deployment file in your backend directory:
-
-ini
-[config]
-SCM_DO_BUILD_DURING_DEPLOYMENT = false
-WEBSITE_NODE_DEFAULT_VERSION = 22-lts
-command = echo "Using pre-built artifacts"
-4. Add package.json Scripts
-Update your package.json to include:
-
-json
-{
-  "scripts": {
-    "start": "node main.js",
-    "postinstall": "echo 'Verifying Azure Storage Blob...' && npm list @azure/storage-blob"
-  }
-}
-5. Critical Fix: Create services Directory
-Before creating the Azure Blob service files I provided earlier, ensure you create the services directory in your backend:
-
-bash
-mkdir backend/services
-Why This Fixes Your Issue
-Forces use of pre-built artifacts - SCM_DO_BUILD_DURING_DEPLOYMENT = false
-Prevents Azure from overwriting node_modules - Uses your GitHub Actions build
-Optimizes package size - Removes unnecessary files
-Adds verification steps - Confirms modules exist at each stage
-Proper caching - Speeds up builds
-Testing the Fix
-After deployment, check in Kudu console:
-
-bash
-cd site/wwwroot
-ls -la node_modules/@azure/
-npm list @azure/storage-blob
-This should now show your modules properly installed. The key insight is that Azure was trying to rebuild your app and failing, rather than using your perfectly good pre-built package from GitHub Actions.
+The container is crashing during startup due to these JavaScript errors, which prevents it from responding to Azure's health checks, resulting in the unhealthy status.
