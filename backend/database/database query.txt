@@ -131,20 +131,6 @@ CREATE TABLE rawDataTrack (
 
 --Archive Related Tables
 
-CREATE TABLE userInfoARC (
-    userID INT PRIMARY KEY IDENTITY(1,1),
-    username NVARCHAR(20) NOT NULL UNIQUE,
-    passKey NVARCHAR(255) NOT NULL,
-    fullName NVARCHAR(50) NOT NULL,
-    position INT NOT NULL,
-    barangay INT NOT NULL,
-    emailAddress NVARCHAR(50) NOT NULL,
-    phoneNumber NVARCHAR(11) NOT NULL,
-    isDefaultPassword BIT DEFAULT 1,
-    CONSTRAINT FK_Role_ARC FOREIGN KEY (position) REFERENCES roles(roleID),
-    CONSTRAINT FK_Barangay_ARC FOREIGN KEY (barangay) REFERENCES barangays(barangayID)
-);
-
 CREATE TABLE projectsARC (
     projectID INT IDENTITY(1,1) PRIMARY KEY,
     reference_number VARCHAR(255) UNIQUE NOT NULL,
@@ -299,42 +285,6 @@ BEGIN
         @categoryFilter = @categoryFilter;
 END;
 
---Account Archiving
-
-CREATE PROCEDURE accArchived
-    @userID INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    BEGIN TRANSACTION;
-    
-    BEGIN TRY
-        IF EXISTS (SELECT 1 FROM dbo.userInfo WHERE userID = @userID AND isArchived = 0)
-        BEGIN
-            -- Simply set the isArchived flag to true (1)
-            UPDATE dbo.userInfo 
-            SET isArchived = 1
-            WHERE userID = @userID;
-            
-            COMMIT TRANSACTION;
-            PRINT 'User with ID ' + CAST(@userID AS VARCHAR) + ' was successfully archived.';
-        END
-        ELSE
-        BEGIN
-            ROLLBACK TRANSACTION;
-            IF EXISTS (SELECT 1 FROM dbo.userInfo WHERE userID = @userID AND isArchived = 1)
-                PRINT 'Error: User with ID ' + CAST(@userID AS VARCHAR) + ' is already archived.';
-            ELSE
-                PRINT 'Error: User with ID ' + CAST(@userID AS VARCHAR) + ' not found.';
-        END
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        PRINT 'An error occurred during archiving. Transaction rolled back.';
-        THROW;
-    END CATCH
-END
-
 --Project Archiving
 
 CREATE PROCEDURE prjArchived
@@ -393,42 +343,6 @@ BEGIN
     END CATCH
 END
 GO
-
---Account RETURN
-
-CREATE PROCEDURE accReturn
-    @userID INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    BEGIN TRANSACTION;
-    
-    BEGIN TRY
-        IF EXISTS (SELECT 1 FROM dbo.userInfo WHERE userID = @userID AND isArchived = 1)
-        BEGIN
-            -- Simply set the isArchived flag back to false (0)
-            UPDATE dbo.userInfo 
-            SET isArchived = 0
-            WHERE userID = @userID;
-            
-            COMMIT TRANSACTION;
-            PRINT 'User with ID ' + CAST(@userID AS VARCHAR) + ' was successfully restored.';
-        END
-        ELSE
-        BEGIN
-            ROLLBACK TRANSACTION;
-            IF EXISTS (SELECT 1 FROM dbo.userInfo WHERE userID = @userID AND isArchived = 0)
-                PRINT 'Error: User with ID ' + CAST(@userID AS VARCHAR) + ' is already active.';
-            ELSE
-                PRINT 'Error: User with ID ' + CAST(@userID AS VARCHAR) + ' not found.';
-        END
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        PRINT 'An error occurred during restoration. Transaction rolled back.';
-        THROW;
-    END CATCH
-END
 
 --Projects return
 

@@ -1,7 +1,7 @@
 .admin-layout-container {
   display: flex;
   min-height: 100vh;
-  background-color: #f5f5f5;
+  background: #F5F5F5;
   position: relative; /* Needed for z-index context */
 }
 
@@ -9,7 +9,6 @@
   flex: 1;
   min-height: 100vh;
   transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  background-color: #f5f5f5;
   color: #2c3e50;
 }
 

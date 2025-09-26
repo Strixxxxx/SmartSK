@@ -167,6 +167,12 @@ if (archiveRouter && typeof archiveRouter === 'function') {
   console.error('archiveRouter is not a valid middleware function');
 }
 
+if (projArchiveRouter && typeof projArchiveRouter === 'function') {
+  adminRouter.use('/proj-archive', projArchiveRouter);
+} else {
+  console.error('projArchiveRouter is not a valid middleware function');
+}
+
 if (projListRouter && typeof projListRouter === 'function') {
   adminRouter.use('/', projListRouter);
 } else {

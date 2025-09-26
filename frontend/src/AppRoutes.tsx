@@ -27,7 +27,7 @@ import Predictive from './components/Client/PredictiveAnalysis/pa';
 import DashboardAdmin from './components/Admin/Dashboard/DashboardAdmin';
 import AccountCreation from './components/Admin/Account Creation/AccountCreation';
 import Roles from './components/Admin/Roles/Roles';
-import AdminProj from './components/Admin/Projects/AdminProj';
+import AdminProjects from './components/Admin/Projects/AdminProjects';
 import RawData from './components/Admin/Raw Data/rawdata';
 import AuditTrail from './components/Admin/Audit Trail/audit';
 import SessionLog from './components/Admin/Session Log/sessions';
@@ -82,7 +82,7 @@ const AppRoutes: React.FC = () => {
           <Route path="dashboard" element={<DashboardAdmin />} />
           <Route path="account-creation" element={<AccountCreation />} />
           <Route path="roles" element={<Roles />} />
-          <Route path="projects" element={<AdminProj />} />
+          <Route path="projects" element={<AdminProjects />} />
           <Route path="raw-data" element={<RawData />} />
           <Route path="sessions" element={<SessionLog />} />
           <Route path="audit-trail" element={<AuditTrail />} />

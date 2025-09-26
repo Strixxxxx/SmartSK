@@ -1,30 +1,19 @@
 --Frontend (Browser's Console)
 
---PDF File
-Failed to load resource: the server responded with a status of 404 (The specified blob does not exist.)Understand this error
-content-scripts.js:1 PING_SAN: Error getting tab info, : TypeError: Failed to execute 'observe' on 'MutationObserver': parameter 1 is not of type 'Node'.
-    at content-scripts.js:1:1552
-    at XMLDocument.<anonymous> (content-scripts.js:1:1640)
-(anonymous) @ content-scripts.js:1Understand this error
-content-scripts.js:1 Content Script Bridge: Sending response back to page context: Object
-injection-tss-mv3.js:1 TSS: Received response from checkDomainAndRun: Object
+Failed to load resource: the server responded with a status of 404 (Not Found)Understand this error
+axiosConfig.ts:101 Client error: 404 <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /api/admin/proj-archive/1</pre>
+</body>
+</html>
 
---Docs File
-GET https://smartskstorage.blob.core.windows.net/documents/Smart-SK-Final-v4.docx?sv=2025-07-05&st=2025-09-26T08%3A01%3A01Z&se=2025-09-26T09%3A01%3A01Z&sr=b&sp=r&sig=heY35Y%2FFaeL04p5Skrn%2F1Ia1iv6oADvNbha5o3NKwxQ%3D 404 (The specified blob does not exist.)
-handleDownloadFile @ localhost:5173/src/c…?t=1758873568360:96
-await in handleDownloadFile
-onClick @ localhost:5173/src/c…t=1758873568360:237
-executeDispatch @ localhost:5173/node_…js?v=ba7498e9:11736
-runWithFiberInDEV @ localhost:5173/node_….js?v=ba7498e9:1485
-processDispatchQueue @ localhost:5173/node_…js?v=ba7498e9:11772
-(anonymous) @ localhost:5173/node_…js?v=ba7498e9:12182
-batchedUpdates$1 @ localhost:5173/node_….js?v=ba7498e9:2628
-dispatchEventForPluginEventSystem @ localhost:5173/node_…js?v=ba7498e9:11877
-dispatchEvent @ localhost:5173/node_…js?v=ba7498e9:14792
-dispatchDiscreteEvent @ localhost:5173/node_…js?v=ba7498e9:14773Understand this error
-content-scripts.js:1 Content Script Bridge: Sending response back to page context: {isAllowListed: false, isProtectionEnabled: true, isScamsProtectionEnabled: true}
-injection-tss-mv3.js:1 TSS: Received response from checkDomainAndRun: {isAllowListed: false, isProtectionEnabled: true, isScamsProtectionEnabled: true}
-favicon.ico:1  GET https://smartskstorage.blob.core.windows.net/favicon.ico 400 (One of the request inputs is out of range.)Understand this error
+(anonymous) @ axiosConfig.ts:101Understand this error
+AdminProjects.tsx:148 Error archiving project: AxiosError
 
 --Backend(Azure Portal's Log Stream)
 
