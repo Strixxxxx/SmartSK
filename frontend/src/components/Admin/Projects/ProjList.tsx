@@ -3,23 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
-import { FaRegFilePdf, FaRegFileWord } from 'react-icons/fa';
+import { FaRegFilePdf, FaRegFileWord, FaSpinner } from 'react-icons/fa';
 
 interface Project {
   projectID: number;
-  reference_number: string;
+  referenceNumber: string;
   proposerName: string;
   title: string;
   status: string;
   submittedDate: string;
   reviewedBy: string | null;
   remarks: string | null;
-  file_name: string;
+  fileName: string;
 }
 
 const ProjList: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [fileLoading, setFileLoading] = useState<number | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,21 +54,26 @@ const ProjList: React.FC = () => {
     fetchProjects();
   }, [navigate]);
 
-  const handleViewFile = (project: Project) => {
-    const fileUrl = `${axiosInstance.defaults.baseURL}/admin/projects/file/${project.projectID}`;
-    
-    axiosInstance.get(fileUrl, { responseType: 'blob' })
-      .then(response => {
-        const file = new Blob([response.data], { type: response.headers['content-type'] });
-        const fileURL = URL.createObjectURL(file);
-        window.open(fileURL, '_blank');
-        // Delay revoking the object URL to ensure the file can be opened.
-        setTimeout(() => URL.revokeObjectURL(fileURL), 100);
-      })
-      .catch(error => {
-        console.error("Error downloading file:", error);
-        toast.error("Could not download or open the file.");
-      });
+  const handleViewFile = async (project: Project) => {
+    if (!project.fileName) {
+        toast.error('No file associated with this project.');
+        return;
+    }
+
+    setFileLoading(project.projectID);
+    try {
+        const response = await axiosInstance.get(`/api/admin/projects/file-url/${project.projectID}`);
+        if (response.data.success && response.data.url) {
+            window.open(response.data.url, '_blank');
+        } else {
+            throw new Error(response.data.message || 'Could not retrieve file URL.');
+        }
+    } catch (error) {
+        console.error("Error getting file URL:", error);
+        toast.error("Could not retrieve the file. Please try again.");
+    } finally {
+        setFileLoading(null);
+    }
   };
 
   const getStatusClassName = (status: string) => {
@@ -102,7 +108,7 @@ const ProjList: React.FC = () => {
           ) : (
             projects.map((proj) => (
               <tr key={proj.projectID}>
-                <td>{proj.reference_number}</td>
+                <td>{proj.referenceNumber}</td>
                 <td>{proj.proposerName}</td>
                 <td>{proj.title}</td>
                 <td>
@@ -115,9 +121,13 @@ const ProjList: React.FC = () => {
                 <td>{proj.remarks || 'N/A'}</td>
                 <td>
                   <div className="action-btn-group">
-                    <button onClick={() => handleViewFile(proj)} className="action-btn">
-                      {proj.file_name.toLowerCase().endsWith('.pdf') ? <FaRegFilePdf /> : <FaRegFileWord />}
-                      View File
+                    <button onClick={() => handleViewFile(proj)} className="action-btn" disabled={fileLoading === proj.projectID}>
+                      {fileLoading === proj.projectID ? (
+                        <FaSpinner className="animate-spin" />
+                      ) : (
+                        proj.fileName.toLowerCase().endsWith('.pdf') ? <FaRegFilePdf /> : <FaRegFileWord />
+                      )}
+                      {fileLoading === proj.projectID ? 'Loading...' : 'View File'}
                     </button>
                   </div>
                 </td>

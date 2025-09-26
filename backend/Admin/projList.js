@@ -2,14 +2,11 @@ const express = require('express');
 const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const routeGuard = require('../routeGuard/routeGuard');
-const path = require('path');
-const fs = require('fs');
+const { getFileSasUrl } = require('../Storage/storage');
 
 // This route fetches projects for the admin's barangay.
-// It's assumed that the `routeGuard` middleware verifies the user is an admin
-// and attaches user information (including their barangay ID) to the request object.
 router.get('/projects', routeGuard, async (req, res) => {
-    if (!req.user || !req.user.barangay) {
+    if (!req.user || req.user.barangay === undefined || req.user.barangay === null) {
         return res.status(403).json({ success: false, message: 'Unauthorized: User barangay not specified.' });
     }
 
@@ -22,15 +19,14 @@ router.get('/projects', routeGuard, async (req, res) => {
             .query(`
                 SELECT
                     p.projectID,
-                    p.reference_number,
-                    p.userID,
+                    p.reference_number AS referenceNumber,
                     u.fullName AS proposerName,
                     p.title,
                     sl.StatusName AS status,
                     p.submittedDate,
                     p.reviewedBy,
                     p.remarks,
-                    p.file_name
+                    p.file_name AS fileName
                 FROM 
                     dbo.projects p
                 JOIN 
@@ -51,13 +47,9 @@ router.get('/projects', routeGuard, async (req, res) => {
     }
 });
 
-// GET a specific project file for download/viewing
-router.get('/projects/file/:projectID', routeGuard, async (req, res) => {
+// New route to get a SAS URL for a file
+router.get('/projects/file-url/:projectID', routeGuard, async (req, res) => {
     const { projectID } = req.params;
-
-    if (!projectID) {
-        return res.status(400).json({ success: false, message: 'Project ID is required.' });
-    }
 
     try {
         const pool = await getConnection();
@@ -65,32 +57,19 @@ router.get('/projects/file/:projectID', routeGuard, async (req, res) => {
             .input('projectID', sql.Int, projectID)
             .query('SELECT file_name FROM projects WHERE projectID = @projectID');
 
-        if (result.recordset.length === 0) {
-            return res.status(404).json({ success: false, message: 'Project not found.' });
+        if (result.recordset.length === 0 || !result.recordset[0].file_name) {
+            return res.status(404).json({ success: false, message: 'File not found for this project.' });
         }
 
-        const fileInfo = result.recordset[0];
-        const projectsDir = path.join(__dirname, '..', '..', 'projects');
-        const filePath = path.join(projectsDir, fileInfo.file_name);
+        const blobName = result.recordset[0].file_name;
+        const sasUrl = await getFileSasUrl(blobName);
 
-        if (fs.existsSync(filePath)) {
-            res.download(filePath, fileInfo.file_name, (err) => {
-                if (err) {
-                    console.error('Error sending file:', err);
-                    if (!res.headersSent) {
-                        res.status(500).send({ success: false, message: 'Could not download the file.' });
-                    }
-                }
-            });
-        } else {
-            res.status(404).json({ success: false, message: 'File not found on server.' });
-        }
+        res.json({ success: true, url: sasUrl });
 
     } catch (error) {
-        console.error('Error downloading file:', error);
-        res.status(500).json({ success: false, message: 'Server error while retrieving file.' });
+        console.error('Error generating SAS URL:', error);
+        res.status(500).json({ success: false, message: 'Could not generate file URL.' });
     }
 });
-
 
 module.exports = router;
