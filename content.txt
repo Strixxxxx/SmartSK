@@ -1,53 +1,61 @@
---Users Say:
-so i want you to scan this log from the console.txt because im getting unhealthy pings from the health check as you can see from the screenshot
+Of course. After analyzing all the provided files, I've identified the reason for the "Degraded" health status.
 
-
---Gemini Says:
-Show thinking
-Of course. After analyzing your logs, the health checks are failing because your Node.js application is crashing immediately upon startup due to a TypeError.
+Your backend application is running correctly, but Azure's Health Check system cannot get a successful response from it. This is due to a simple path inconsistency between your application's code and your Azure configuration.
 
 Problem Analysis
-The core issue is an uncaught exception in your application code. The logs from September 26th clearly show the error that's causing the crash:
+Your Application is Running: The latest logs from console.txt confirm that your container is starting successfully without crashing. Entries like 
 
+Container ... initialized successfully and is ready to serve requests show that the previous startup errors have been resolved. Your observation that the frontend can use the backend is correct.
 
-The Crash: Your application throws a TypeError: argument handler must be a function. This is an 
+API Path Inconsistency: In your main.js file, every functional API route that your frontend uses is prefixed with /api.
 
-uncaughtException, which means it's an error that wasn't handled in your code, causing the entire Node.js process to terminate.
+app.use('/api/login', loginRouter);
 
-The Consequence: Because the application crashes, it never gets to the point where it can open and listen on the designated port (3000) for incoming requests.
+app.use('/api/projects', projectSubmissionRouter);
 
-The Health Check Failure: Azure's health check system periodically sends an HTTP request (a "ping") to your application's specified health path (/health) to see if it's running. Since your application has already crashed and isn't listening on port 3000, it cannot respond. This is confirmed by the log entry: 
+app.use('/api/admin', adminRouter);
 
-ERROR - Container smartsk-backend_0_422a076b didn't respond to HTTP pings on port: 3000. Failing site start.
-
-Essentially, the unhealthy status is a symptom of the underlying application crash.
-
-How to Fix It
-To resolve this, you need to find and fix the TypeError in your application code.
-
-Locate the Bug: The error argument handler must be a function typically occurs when you are setting up something like an event listener, a callback, or middleware (e.g., in Express.js) and you pass a value that isn't a function where one is expected.
-
-A critical clue in your logs is the line that appears right before the crash: 
-
-Initializing Azure Storage with primary credentials. This strongly suggests the error is in the code that handles your Azure Storage connection. 
-
-Check how you are initializing the Azure Storage client and its callbacks or handlers.
-
-Implement Robust Error Handling: Wrap your application's startup and initialization code in try...catch blocks. This will help you log more detailed information about errors and can prevent a single uncaught exception from crashing the entire server.
+However, your health check endpoint is defined at the root level:
 
 JavaScript
 
-// Example in your main.js or server file
-try {
-  // Your initialization code, including the Azure Storage connection
-  // ...
+// main.js
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+The Root Cause: Your Azure Health Check is configured to ping the path /health. While your code defines this route, it's possible that Azure's internal networking or some other configuration is preventing access to non-/api prefixed routes. Since all your working routes use the /api prefix, the most reliable solution is to make the health check consistent with the rest of your application's API structure. The "Degraded" status is likely caused by the health checker receiving a 404 Not Found error or a timeout when it tries to access /health.
 
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
+How to Fix It
+To resolve this, you need to make two small changes: one in your code and one in the Azure portal.
 
-} catch (error) {
-  console.error('Failed to start the server:', error);
-  process.exit(1); // Exit with an error code
-}
-Test Locally: Before deploying to Azure, always run your application on your local machine. This will allow you to catch and debug startup errors like this one much more quickly.
+Step 1: Update the Route in main.js
+Modify your health check endpoint in main.js to include the /api prefix, just like your other routes.
+
+Change this:
+
+JavaScript
+
+// Health Check Endpoint
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+To this:
+
+JavaScript
+
+// Health Check Endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).send('OK');
+});
+Step 2: Update the Path in Azure Portal
+Now, tell Azure to ping the new, correct path.
+
+Go to your smartSK-backend App Service in the Azure portal.
+
+In the left-hand menu, scroll down to the Monitoring section and click on Health check.
+
+In the Health probe path field, change the value from /health to /api/health.
+
+Click Save at the top of the page.
+
+After you commit and deploy the code change and save the new path in Azure, the health check status on your app's "Overview" page should change from "Degraded" to "Healthy" within a few minutes.
