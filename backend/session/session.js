@@ -131,7 +131,7 @@ const authMiddleware = async (req, res, next) => {
     const result = await pool.request()
       .input('sessionID', sql.VarChar, decoded.sessionID)
       .query(`
-        SELECT u.userID, u.username, u.fullName, r.roleName as role, u.isDefaultPassword, u.barangay
+        SELECT u.userID, u.username, u.fullName, r.roleName as position, u.isDefaultPassword, u.barangay
         FROM sessions s
         JOIN userInfo u ON s.userID = u.userID
         LEFT JOIN roles r ON u.position = r.roleID
@@ -152,7 +152,7 @@ const authMiddleware = async (req, res, next) => {
       userId: user.userID,
       username: user.username,
       fullName: user.fullName,
-      role: user.role || '',
+      position: user.position || '',
       barangay: user.barangay,
       sessionID: decoded.sessionID
     };
