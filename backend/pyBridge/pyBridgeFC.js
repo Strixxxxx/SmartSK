@@ -273,28 +273,6 @@ class PyBridgeFC {
     });
   }
 
-  /**
-   * Express middleware for handling detailed analysis requests
-   * @param {Object} req - Express request object
-   * @param {Object} res - Express response object
-   */
-  static async handleDetailedAnalysisRequest(req, res) {
-    try {
-      const options = req.query;
-      console.log('Running detailed analysis with options:', options);
-      
-      const result = await PyBridgeFC.runDetailedAnalysis(options);
-      res.json(result);
-    } catch (error) {
-      console.error('Error running detailed analysis:', error);
-      res.status(500).json({ 
-        error: true,
-        message: 'Error running detailed analysis', 
-        details: error.message 
-      });
-    }
-  }
-
   // Note: Project trends functionality moved to PyBridgePA as it now uses paTrends.py
 }
 

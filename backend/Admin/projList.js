@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const { getConnection, sql } = require('../database/database');
-const routeGuard = require('../routeGuard/routeGuard');
 const { getFileSasUrl } = require('../Storage/storage');
 
 // This route fetches projects for the admin's barangay.
-router.get('/projects', routeGuard, async (req, res) => {
+router.get('/projects', async (req, res) => {
     if (!req.user || req.user.barangay === undefined || req.user.barangay === null) {
         return res.status(403).json({ success: false, message: 'Unauthorized: User barangay not specified.' });
     }
@@ -48,7 +47,7 @@ router.get('/projects', routeGuard, async (req, res) => {
 });
 
 // New route to get a SAS URL for a file
-router.get('/projects/file-url/:projectID', routeGuard, async (req, res) => {
+router.get('/projects/file-url/:projectID', async (req, res) => {
     const { projectID } = req.params;
 
     try {

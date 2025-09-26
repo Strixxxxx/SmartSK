@@ -151,8 +151,6 @@ if (sessionLogRouter && typeof sessionLogRouter === 'function') {
 
 if (archiveRouter && typeof archiveRouter === 'function') {
   adminRouter.use('/archive', archiveRouter);
-  adminRouter.use('/archive/accounts', accArchiveRouter);
-  adminRouter.use('/archive/projects', projArchiveRouter);
 } else {
   console.error('archiveRouter is not a valid middleware function');
 }
@@ -284,15 +282,6 @@ app.get('/api/custom-project-trends', (req, res) => {
   }
 });
 
-// Detailed analysis API endpoint
-app.get('/api/detailed-analysis', (req, res) => {
-  if (PyBridgeFC && typeof PyBridgeFC.handleDetailedAnalysisRequest === 'function') {
-    PyBridgeFC.handleDetailedAnalysisRequest(req, res);
-  } else {
-    console.error('PyBridgeFC.handleDetailedAnalysisRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Detailed analysis service unavailable' });
-  }
-});
 
 // Predictive Analysis Routes using PyBridgePA
 app.get('/api/predictive-analysis/trends', (req, res) => {

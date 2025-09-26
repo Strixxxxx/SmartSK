@@ -2,11 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const { addAuditTrail } = require('../audit/auditService');
-const { authMiddleware } = require('../session/session');
-const routeGuard = require('../routeGuard/routeGuard');
-
-// Middleware to ensure only admins can access these routes
-router.use(authMiddleware, routeGuard.isAdmin);
 
 // POST to archive an account
 router.post('/:userId', async (req, res) => {

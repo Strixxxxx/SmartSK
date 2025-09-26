@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { getConnection, sql } = require('../database/database');
-const { authMiddleware } = require('../session/session');
-const routeGuard = require('../routeGuard/routeGuard');
+const accArchiveRouter = require('./accArchive');
+const projArchiveRouter = require('./projArchive');
 
-// Middleware to ensure only admins can access these routes
-router.use(authMiddleware, routeGuard.isAdmin);
+// Mount the specific archive routers
+router.use('/accounts', accArchiveRouter);
+router.use('/projects', projArchiveRouter);
 
 // --- Account Archive Routes ---
 
