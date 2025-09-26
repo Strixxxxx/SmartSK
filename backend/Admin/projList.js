@@ -54,13 +54,13 @@ router.get('/projects/file-url/:projectID', async (req, res) => {
         const pool = await getConnection();
         const result = await pool.request()
             .input('projectID', sql.Int, projectID)
-            .query('SELECT file_name FROM projects WHERE projectID = @projectID');
+            .query('SELECT file_path FROM projects WHERE projectID = @projectID');
 
-        if (result.recordset.length === 0 || !result.recordset[0].file_name) {
+        if (result.recordset.length === 0 || !result.recordset[0].file_path) {
             return res.status(404).json({ success: false, message: 'File not found for this project.' });
         }
 
-        const blobName = result.recordset[0].file_name;
+        const blobName = result.recordset[0].file_path;
         const sasUrl = await getFileSasUrl(blobName);
 
         res.json({ success: true, url: sasUrl });
