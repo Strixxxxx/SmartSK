@@ -103,8 +103,7 @@ const ProjArchive: React.FC = () => {
 
     setFileLoading(project.projectID);
     try {
-        // Use archived projects file URL endpoint (you might need to create this endpoint)
-        const response = await axiosInstance.get(`/api/admin/projects/file-url/${project.projectID}?archived=true`);
+        const response = await axiosInstance.get(`/api/admin/proj-archive/file-url/${project.projectID}`);
         if (response.data.success && response.data.url) {
             openFileViewer(response.data.url, project.file_name);
         } else {
@@ -126,7 +125,7 @@ const ProjArchive: React.FC = () => {
 
     setFileLoading(project.projectID);
     try {
-        const response = await axiosInstance.get(`/api/admin/projects/file-url/${project.projectID}?archived=true`);
+        const response = await axiosInstance.get(`/api/admin/proj-archive/file-url/${project.projectID}`);
         if (response.data.success && response.data.url) {
             const link = document.createElement('a');
             link.href = response.data.url;

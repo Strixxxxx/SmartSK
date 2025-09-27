@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const { addAuditTrail } = require('../audit/auditService');
+const { getFileSasUrl } = require('../Storage/storage');
 
 // GET all archived projects
 router.get('/', async (req, res) => {
@@ -98,6 +99,31 @@ router.post('/restore/:projectId', async (req, res) => {
     } catch (error) {
         console.error(`Error restoring project ${projectId}:`, error);
         res.status(500).json({ success: false, message: 'Failed to restore project.' });
+    }
+});
+
+// New route to get a SAS URL for an archived file
+router.get('/file-url/:projectID', async (req, res) => {
+    const { projectID } = req.params;
+
+    try {
+        const pool = await getConnection();
+        const result = await pool.request()
+            .input('projectID', sql.Int, projectID)
+            .query('SELECT file_path FROM projectsARC WHERE projectID = @projectID');
+
+        if (result.recordset.length === 0 || !result.recordset[0].file_path) {
+            return res.status(404).json({ success: false, message: 'File not found for this project.' });
+        }
+
+        const blobName = result.recordset[0].file_path;
+        const sasUrl = await getFileSasUrl(blobName);
+
+        res.json({ success: true, url: sasUrl });
+
+    } catch (error) {
+        console.error('Error generating SAS URL for archived file:', error);
+        res.status(500).json({ success: false, message: 'Could not generate file URL.' });
     }
 });
 
