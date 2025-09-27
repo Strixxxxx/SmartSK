@@ -172,6 +172,13 @@ router.post('/assignRole', routeGuard.verifyToken, routeGuard.isAdmin, async (re
 
     const oldPositionId = userCheck.recordset[0].position;
 
+    // Get the old role name for audit trail
+    const oldRoleResult = await pool.request()
+      .input('roleId', sql.Int, oldPositionId)
+      .query('SELECT roleName FROM roles WHERE roleID = @roleId');
+    
+    const oldRoleName = oldRoleResult.recordset.length > 0 ? oldRoleResult.recordset[0].roleName : oldPositionId;
+
     // Update the user's position in userInfo table with the roleId
     await pool.request()
       .input('userId', sql.Int, userId)
@@ -188,8 +195,8 @@ router.post('/assignRole', routeGuard.verifyToken, routeGuard.isAdmin, async (re
         module: 'R',
         userID: req.user.userId,
         actions: 'assign-role',
-        oldValue: `position: ${oldPositionId}`,
-        newValue: `position: ${roleId}`,
+        oldValue: `position: ${oldRoleName}`,
+        newValue: `position: ${position}`,
         descriptions: `Admin ${req.user.fullName} assigned role ${position} to user ID ${userId}`
     });
     
