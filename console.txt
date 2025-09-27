@@ -1,32 +1,113 @@
 --Frontend (Browser's Console)
 
-rawdata.tsx:211 
- POST https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/rawdata/upload 500 (Internal Server Error)
-Promise.then		
-fileInput.onchange	@	rawdata.tsx:211
 
-axiosConfig.ts:99 Server error: 500 
-{message: 'Failed to process CSV file.', error: "Validation failed for parameter 'portal'. Invalid string.", processedCount: 53, errorCount: 0}
-error
-: 
-"Validation failed for parameter 'portal'. Invalid string."
-errorCount
-: 
-0
-message
-: 
-"Failed to process CSV file."
-processedCount
-: 
-53
-[[Prototype]]
-: 
-Object
-(anonymous)	@	axiosConfig.ts:99
-Promise.then		
-fileInput.onchange	@	rawdata.tsx:211
+src/components/Client/Forecast/Graph.tsx:20:29 - error TS2307: Cannot find module 'chartjs-plugin-datalabels' or its corresponding type declarations.
 
-﻿
+20 import ChartDataLabels from 'chartjs-plugin-datalabels';
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+src/components/Client/PredictiveAnalysis/pa.tsx:2:30 - error TS6133: 'Row' is declared but its value is never read.
+
+2 import { Card, Button, Form, Row, Col, Spinner, Alert, InputGroup } from 'react-bootstrap';
+                               ~~~
+
+src/components/Client/PredictiveAnalysis/pa.tsx:2:35 - error TS6133: 'Col' is declared but its value is never read.
+
+2 import { Card, Button, Form, Row, Col, Spinner, Alert, InputGroup } from 'react-bootstrap';
+                                    ~~~
+
+src/components/Client/PredictiveAnalysis/pa.tsx:2:56 - error TS6133: 'InputGroup' is declared but its value is never read.
+
+2 import { Card, Button, Form, Row, Col, Spinner, Alert, InputGroup } from 'react-bootstrap';
+                                                         ~~~~~~~~~~
+
+src/components/Client/PredictiveAnalysis/pa.tsx:93:24 - error TS6133: 'setSelectedFile' is declared but its value is never read.
+
+93   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+                          ~~~~~~~~~~~~~~~
+
+src/components/Client/PredictiveAnalysis/pa.tsx:96:10 - error TS6133: 'analysisId' is declared but its value is never read.
+
+96   const [analysisId, setAnalysisId] = useState<string | null>(null);
+            ~~~~~~~~~~
+
+src/components/Client/PredictiveAnalysis/pa.tsx:96:22 - error TS6133: 'setAnalysisId' is declared but its value is never read.
+
+96   const [analysisId, setAnalysisId] = useState<string | null>(null);
+                        ~~~~~~~~~~~~~
+
+src/components/Client/PredictiveAnalysis/pa.tsx:196:9 - error TS6133: 'pollAnalysisProgress' is declared but its value is never read.
+
+196   const pollAnalysisProgress = useCallback((id: string) => {
+            ~~~~~~~~~~~~~~~~~~~~
+
+src/components/Client/PredictiveAnalysis/pa.tsx:217:11 - error TS6133: 'currentYear' is declared but its value is never read.
+
+217     const currentYear = new Date().getFullYear();
+              ~~~~~~~~~~~
+
+src/components/Client/PredictiveAnalysis/paResponse.tsx:2:62 - error TS6133: 'Badge' is declared but its value is never read.
+
+2 import { Container, Row, Col, Card, Alert, Table, ListGroup, Badge } from 'react-bootstrap';
+                                                               ~~~~~
+
+src/components/Client/PredictiveAnalysis/paTrends.tsx:8:3 - error TS6133: 'Divider' is declared but its value is never read.
+
+8   Divider,
+    ~~~~~~~
+
+src/components/Client/PredictiveAnalysis/paTrends.tsx:15:3 - error TS6133: 'ListItem' is declared but its value is never read.
+
+15   ListItem,
+     ~~~~~~~~
+
+src/components/Client/PredictiveAnalysis/paTrends.tsx:16:3 - error TS6133: 'ListItemIcon' is declared but its value is never read.
+
+16   ListItemIcon,
+     ~~~~~~~~~~~~
+
+src/components/Client/PredictiveAnalysis/paTrends.tsx:17:3 - error TS6133: 'ListItemText' is declared but its value is never read.
+
+17   ListItemText,
+     ~~~~~~~~~~~~
+
+src/components/Client/PredictiveAnalysis/paTrends.tsx:44:1 - error TS6133: 'WarningAmberIcon' is declared but its value is never read.
+
+44 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+src/components/ForgotPassword/ForgotPassword.tsx:13:10 - error TS6133: 'newPassword' is declared but its value is never read.
+
+13   const [newPassword, setNewPassword] = useState<string>('');
+            ~~~~~~~~~~~
+
+src/components/Login/Login.tsx:9:11 - error TS6196: 'User' is declared but never used.
+
+9 interface User {
+            ~~~~
+
+src/components/Projects/Projects.tsx:15:10 - error TS6133: 'activeTab' is declared but its value is never read.
+
+15   const [activeTab, setActiveTab] = useState(() => {
+            ~~~~~~~~~
+
+src/components/Projects/Projects.tsx:15:21 - error TS6133: 'setActiveTab' is declared but its value is never read.
+
+15   const [activeTab, setActiveTab] = useState(() => {
+                       ~~~~~~~~~~~~
+
+src/components/Projects/Projects.tsx:46:60 - error TS2551: Property 'fullname' does not exist on type 'UserInfo'. Did you mean 'fullName'?
+
+46         <ProjectReview userId={user.id} userFullName={user.fullname} userRole={user.position} />
+                                                              ~~~~~~~~
+
+  src/context/AuthContext.tsx:14:3
+    14   fullName: string;
+         ~~~~~~~~
+    'fullName' is declared here.
+
+
+Found 20 errors.
 
 --Backend(Azure Portal's Log Stream)
 

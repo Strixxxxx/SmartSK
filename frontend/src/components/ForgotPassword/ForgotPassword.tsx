@@ -10,7 +10,7 @@ const ForgotPassword: React.FC = () => {
   const [step, setStep] = useState<number>(1);
   const [username, setUsername] = useState<string>('');
   const [otp, setOtp] = useState<string>('');
-  const [newPassword, setNewPassword] = useState<string>('');
+  const [, setNewPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
 

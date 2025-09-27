@@ -6,15 +6,7 @@ import { toast } from 'react-toastify';
 import NewAccount from './NewAccount';
 import { Modal, Box } from '@mui/material';
 
-interface User {
-  id: number;
-  username: string;
-  fullname: string;
-  position: string;
-  barangay?: string;
-  isDefaultPassword?: boolean;
-  role?: string;
-}
+
 
 interface NewAccountData {
   userID: number;

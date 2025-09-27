@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './Projects.css';
@@ -11,14 +11,7 @@ const Projects: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Determine the default active tab based on user role
-  const [activeTab, setActiveTab] = useState(() => {
-    if (user?.position === 'MA') {
-      return 'projectReview';
-    } else {
-      return 'projectList';
-    }
-  });
+
 
   useEffect(() => {
     if (!user) {
@@ -43,7 +36,7 @@ const Projects: React.FC = () => {
   if (user.position === 'SKC') {
     return (
       <div className="projects-container">
-        <ProjectReview userId={user.id} userFullName={user.fullname} userRole={user.position} />
+        <ProjectReview userId={user.id} userFullName={user.fullName} userRole={user.position} />
       </div>
     );
   }

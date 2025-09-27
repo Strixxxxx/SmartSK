@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Row, Col, Card, Alert, Table, ListGroup, Badge } from 'react-bootstrap';
+import { Container, Row, Col, Card, Alert, Table, ListGroup } from 'react-bootstrap';
 
 // --- UNIFIED TYPE DEFINITIONS ---
 // These types now represent the single, consistent structure for analysis results.

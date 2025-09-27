@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { Card, Button, Form, Row, Col, Spinner, Alert, InputGroup } from 'react-bootstrap';
+import { Card, Button, Form, Spinner, Alert } from 'react-bootstrap';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import { toast } from 'react-toastify'; // Ensure toast is imported
 import PredictiveAnalysisResponse from './paResponse'; // Existing component for general results
@@ -90,10 +90,10 @@ const PredictiveAnalysis: React.FC = () => {
   const [includeFeedback, setIncludeFeedback] = useState<boolean>(true);
 
   // File upload state
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFile] = useState<File | null>(null);
 
   // Add state for tracking analysis progress
-  const [analysisId, setAnalysisId] = useState<string | null>(null);
+  
   const [analysisProgress, setAnalysisProgress] = useState<{status: string, progress: number} | null>(null);
 
   // Add state for time period sub-category
@@ -192,29 +192,11 @@ const PredictiveAnalysis: React.FC = () => {
     fetchCategories(); // Fetch categories on mount
   }, [runGeneralAnalysis, fetchCategories]); // Use empty dependency array to run only on mount
 
-  // Add a function to poll for progress updates (Keep implementation)
-  const pollAnalysisProgress = useCallback((id: string) => {
-    const interval = setInterval(async () => {
-      try {
-        const response = await axiosInstance.get(`/api/predictive-analysis/progress/${id}`);
-        setAnalysisProgress(response.data);
-
-        // If progress is complete, stop polling
-        if (response.data.status === 'completed' || response.data.progress >= 100) {
-          clearInterval(interval);
-        }
-      } catch (error) {
-        console.error("Error polling for progress:", error);
-      }
-    }, 1000); // Poll every second
-
-    // Clean up interval on component unmount
-    return () => clearInterval(interval);
-  }, []);
+  
 
   // Function to get time sub-category options based on selected time period (Keep implementation)
   const getTimeSubCategoryOptions = () => {
-    const currentYear = new Date().getFullYear();
+    
 
     if (timePeriod === 'Yearly') {
       // Years from 2025 to 2050
