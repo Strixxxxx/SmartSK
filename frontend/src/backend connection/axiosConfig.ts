@@ -2,16 +2,17 @@ import axios from 'axios';
 
 // Get base URL from config
 const getBaseURL = (): string => {
+  // Use the environment variable for the backend server URL, which is set in the .env file.
+  // VITE_ prefix is necessary for Vite to expose the variable to the client-side code.
+  const backendUrl = import.meta.env.VITE_BACKEND_SERVER;
+
   if (import.meta.env.PROD) {
-    return ''; // In production, use relative path
+    // In production, use the environment variable if it's set, otherwise use a relative path.
+    return backendUrl || '';
   }
   
-  const hostname = window.location.hostname;
-  if (hostname === 'localhost') {
-    return 'https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net';
-  }
-  
-  return `https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net`;
+  // In development, prioritize the environment variable, with a fallback to the original hardcoded URL.
+  return backendUrl || 'https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net';
 };
 
 // Create axios instance instead of modifying global defaults
