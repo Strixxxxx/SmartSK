@@ -69,7 +69,7 @@ router.post('/request', async (req, res) => {
         actions: 'request-password-reset',
         oldValue: null,
         newValue: null,
-        descriptions: 'User requested a password reset'
+        descriptions: `User ${username} requested a password reset`
     });
     
     return res.json({

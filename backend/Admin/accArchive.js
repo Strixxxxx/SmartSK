@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const { addAuditTrail } = require('../audit/auditService');
+const { authMiddleware } = require('../session/session');
 
 // GET all archived accounts
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
     const pool = await getConnection();
     const result = await pool.request().query(`
@@ -31,7 +32,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST to archive an account
-router.post('/:userId', async (req, res) => {
+router.post('/:userId', authMiddleware, async (req, res) => {
     const { userId } = req.params;
     try {
         const pool = await getConnection();
@@ -54,7 +55,7 @@ router.post('/:userId', async (req, res) => {
             module: 'D',
             userID: req.user.userId,
             actions: 'archive-account',
-            descriptions: `Admin archived account for user: ${username}`
+            descriptions: `Admin ${req.user.fullName} archived account for user: ${username}`
         });
 
         res.json({ success: true, message: 'Account archived successfully.' });
@@ -65,7 +66,7 @@ router.post('/:userId', async (req, res) => {
 });
 
 // POST to restore an archived account
-router.post('/restore/:userId', async (req, res) => {
+router.post('/restore/:userId', authMiddleware, async (req, res) => {
     const { userId } = req.params;
     try {
         const pool = await getConnection();
@@ -95,7 +96,7 @@ router.post('/restore/:userId', async (req, res) => {
             module: 'D',
             userID: req.user.userId,
             actions: 'restore-account',
-            descriptions: `Admin restored account for user: ${username}`
+            descriptions: `Admin ${req.user.fullName} restored account for user: ${username}`
         });
 
         res.json({ success: true, message: 'Account restored successfully.' });

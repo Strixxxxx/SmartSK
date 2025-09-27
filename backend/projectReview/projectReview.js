@@ -145,7 +145,7 @@ router.put('/status/:id', authMiddleware, async (req, res) => {
         actions: 'update-project-status',
         oldValue: `status: ${oldStatus}`,
         newValue: `status: ${statusId}`,
-        descriptions: 'Project status updated'
+        descriptions: `Project '${projectInfo.recordset[0].title}' status updated to '${status}'`
     });
       
     return res.json({

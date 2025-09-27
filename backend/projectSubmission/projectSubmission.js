@@ -89,7 +89,7 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
         actions: 'submit-project',
         oldValue: null,
         newValue: `Title: ${title}`,
-        descriptions: 'User submitted a new project to Azure Blob Storage'
+        descriptions: `User ${req.user.fullName} submitted a new project: ${title}`
     });
 
     return res.status(201).json({ success: true, message: 'Project submitted successfully', project });
@@ -158,7 +158,7 @@ router.get('/download/:filename', authMiddleware, async (req, res) => {
         actions: 'download-project-file',
         oldValue: null,
         newValue: `filename: ${filename}`,
-        descriptions: 'User requested a project file download link'
+        descriptions: `User ${req.user.fullName} requested a download link for ${filename}`
     });
 
     // Return the SAS URL to the client

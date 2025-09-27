@@ -194,7 +194,7 @@ router.post('/create-account', authMiddleware, async (req, res) => {
         actions: 'create-account',
         oldValue: null,
         newValue: `Username: ${username}`,
-        descriptions: 'Admin created a new account'
+        descriptions: `Admin ${req.user.fullName} created a new account for ${username}`
     });
 
     return res.status(201).json({

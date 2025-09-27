@@ -5,6 +5,7 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const path = require('path');
 const { addAuditTrail } = require('../audit/auditService');
+const { authMiddleware } = require('../session/session');
 
 // Configure email transporter
 const transporter = nodemailer.createTransport({
@@ -15,7 +16,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   try {
     const pool = await getConnection();
     const dbName = 'smartSK';
@@ -50,7 +51,7 @@ router.post('/', async (req, res) => {
         actions: 'backup-database',
         oldValue: null,
         newValue: backupFileName,
-        descriptions: 'Admin created a database backup'
+        descriptions: `Admin ${req.user.fullName} created a database backup`
     });
 
     // Send an email notification after successful backup
@@ -77,7 +78,7 @@ router.post('/', async (req, res) => {
 });
 
 
-router.post('/install', async (req, res) => {
+router.post('/install', authMiddleware, async (req, res) => {
     const { file } = req.body;
     const dbName = 'smartSK';
     const backupFileName = `restore_${Date.now()}.bak`;
@@ -116,7 +117,7 @@ router.post('/install', async (req, res) => {
         actions: 'restore-database',
         oldValue: null,
         newValue: backupFileName,
-        descriptions: 'Admin restored the database'
+        descriptions: `Admin ${req.user.fullName} restored the database`
     });
 
         // Step 3: Bring the database back ONLINE.

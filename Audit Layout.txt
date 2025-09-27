@@ -1,0 +1,75 @@
+--Format for the auditID for the audit trail
+
+First 6 Digit: The current date in the format MMDDYY
+
+Next 6 Digit: The current time, including seconds, in a 24-hour format (HHmmss) based on GMT+8 (Philippine standard time)
+
+First Letter after the digits: The actor who initiated the action. Here are the following actors:
+S for system
+A for Admin 
+C for client
+
+Second Letter after the first letter - The specific module the action took place in. Which means 'which module it came from.' Here are the following modules:
+A- Authentication
+B- Backup
+C- Account Creation
+D- Archive
+E- Email
+F- Forgot Password
+G- Posting
+L- Login
+P- Projects
+Q- Portfolio
+R- Roles
+S- Session log
+X- Predictive Analysis
+Y- Forecast
+Z- Raw Data
+
+Example of auditID with scenario:
+
+Scenario 1- The admin tries to log in his account around 09/20/2025 at 03:15:41pm (GMT+8)
+Expected auditID- 09202025151541AL
+
+Scenario 2- The client proposed a new project from the project module around 09/20/2025 at 10:15:20am (GMT+8)
+Expected auditID- 09202025101520CP
+
+Scenario 3- The system sees that the users credential is wrong when he tries to logged in around 09/20/2025 at 10:46:05pm (GMT+8)
+Expected auditID- 09202025224505SA
+
+--List of moduleName
+Authentication - when it comes to system related logics
+Backup - when the admin creates a database backup
+Account Creation - when the admin creates a new account
+Archive - When the admin archive a project or account
+Email - When the system need to send an email
+Forgot Password - when the client wants to change the password
+Login - when either the admin or client wants to log in
+Projects - when the client wants to create or view the projects
+Portfolio - when the client wants to post a new portfolio
+Roles - when the admin changes the roles of the accounts
+Session log - when the system detects the clearing of the session after the logic deletes it in a certain time
+Predictive Analysis - when the client opens the predictive analysis modules and its content
+Forecast - when the client opens the forecast modules and its content
+Raw Data = when the admin view, update, or view the module
+
+--About Description
+ This field should be a generalized, not specific, description of the event.
+
+Example:
+Scenario: The user changes his password
+Expected Description: password change
+
+--About Old Value & New Value
+Old Value & New Value:  These columns track changes. If only one value is relevant, only one column should display data. If there are multiple columns, exclude the primary key
+
+Example:
+Scenario 1: The client submits a new project Proposal
+Expected New Value: Reference Number: PRJ-571843-371
+
+Scenario 2: When the user first logged in the account, they could change their credentials from the username & password
+Expected Old Value: {old username}
+Expected New Value: {new username}
+
+--About Timestamp
+Always make sure that it was completed date and time without seconds on it. Also it should be in 12 hours format (usage of AM/PM) in GMT+8(PH standard time)

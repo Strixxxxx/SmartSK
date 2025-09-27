@@ -199,12 +199,4 @@ Contains static assets such as images and logos.
 -   **AI-Powered Forecasting**: Provides budget forecasts based on historical data.
 -   **Predictive Analysis**: Offers insights and predictions to aid in decision-making, enhanced with real-time web search data.
 -   **Audit Trail**: Logs user activities for security and accountability.
--   **Database Backup**: Allows administrators to create backups of the database.#   S m a r t S K  
- #   S m a r t S K  
- #   S m a r t S K  
- #   S m a r t S K  
- #   S m a r t S K  
- #   S m a r t S K  
- #   S m a r t S K  
- #   S m a r t S K  
- 
+-   **Database Backup**: Allows administrators to create backups of the database.

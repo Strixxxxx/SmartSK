@@ -190,7 +190,7 @@ router.post('/assignRole', routeGuard.verifyToken, routeGuard.isAdmin, async (re
         actions: 'assign-role',
         oldValue: `position: ${oldPositionId}`,
         newValue: `position: ${roleId}`,
-        descriptions: 'Admin assigned a role to a user'
+        descriptions: `Admin ${req.user.fullName} assigned role ${position} to user ID ${userId}`
     });
     
     return res.json({
@@ -240,16 +240,6 @@ router.post('/create', routeGuard.verifyToken, routeGuard.isAdmin, async (req, r
       
       // Commit transaction
       await transaction.commit();
-      
-      addAuditTrail({
-        actor: 'A',
-        module: 'R',
-        userID: req.user.userId,
-        actions: 'create-role',
-        oldValue: null,
-        newValue: `position: ${position}`,
-        descriptions: 'Admin created a new role'
-    });
       
       return res.status(201).json({
         success: true,
@@ -307,16 +297,6 @@ router.delete('/:roleId', routeGuard.verifyToken, routeGuard.isAdmin, async (req
       
       // Commit transaction
       await transaction.commit();
-      
-      addAuditTrail({
-        actor: 'A',
-        module: 'R',
-        userID: req.user.userId,
-        actions: 'delete-role',
-        oldValue: null,
-        newValue: null,
-        descriptions: 'Admin deleted a role'
-    });
       
       return res.json({
         success: true,

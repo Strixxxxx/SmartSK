@@ -3,9 +3,10 @@ const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const { addAuditTrail } = require('../audit/auditService');
 const { getFileSasUrl } = require('../Storage/storage');
+const { authMiddleware } = require('../session/session');
 
 // GET all archived projects
-router.get('/', async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
     const pool = await getConnection();
     const result = await pool.request().query(`
@@ -35,7 +36,7 @@ router.get('/', async (req, res) => {
 });
 
 // POST to archive a project
-router.post('/:projectId', async (req, res) => {
+router.post('/:projectId', authMiddleware, async (req, res) => {
     const { projectId } = req.params;
     try {
         const pool = await getConnection();
@@ -58,7 +59,7 @@ router.post('/:projectId', async (req, res) => {
             module: 'D',
             userID: req.user.userId,
             actions: 'archive-project',
-            descriptions: `Admin archived project: ${reference_number}`
+            descriptions: `Admin ${req.user.fullName} archived project: ${reference_number}`
         });
 
         res.json({ success: true, message: 'Project archived successfully.' });
@@ -69,7 +70,7 @@ router.post('/:projectId', async (req, res) => {
 });
 
 // POST to restore an archived project
-router.post('/restore/:projectId', async (req, res) => {
+router.post('/restore/:projectId', authMiddleware, async (req, res) => {
     const { projectId } = req.params;
     try {
         const pool = await getConnection();
@@ -92,7 +93,7 @@ router.post('/restore/:projectId', async (req, res) => {
             module: 'D',
             userID: req.user.userId,
             actions: 'restore-project',
-            descriptions: `Admin restored project: ${reference_number}`
+            descriptions: `Admin ${req.user.fullName} restored project: ${reference_number}`
         });
 
         res.json({ success: true, message: 'Project restored successfully.' });
@@ -103,7 +104,7 @@ router.post('/restore/:projectId', async (req, res) => {
 });
 
 // New route to get a SAS URL for an archived file
-router.get('/file-url/:projectID', async (req, res) => {
+router.get('/file-url/:projectID', authMiddleware, async (req, res) => {
     const { projectID } = req.params;
 
     try {

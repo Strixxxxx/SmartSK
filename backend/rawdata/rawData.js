@@ -6,6 +6,7 @@ const multer = require('multer');
 const csv = require('csv-parser');
 const stream = require('stream');
 const jwt = require('jsonwebtoken');
+const { addAuditTrail } = require('../audit/auditService');
 
 // Multer setup for CSV file upload
 const storage = multer.memoryStorage();
@@ -53,13 +54,26 @@ const getUserInfoFromToken = async (authHeader, pool) => {
     
     const userResult = await pool.request()
         .input('userId', sql.Int, decoded.userId)
-        .query('SELECT barangay, fullName FROM userInfo WHERE userID = @userId');
+        .query(`
+            SELECT
+                ui.fullName,
+                b.barangayName as barangay
+            FROM
+                userInfo ui
+            JOIN
+                barangays b ON ui.barangay = b.barangayID
+            WHERE
+                ui.userID = @userId
+        `);
     
     if (userResult.recordset.length === 0) {
-        throw new Error('User not found');
+        throw new Error('User not found or user has no assigned barangay');
     }
     
-    return userResult.recordset[0];
+    const userInfo = userResult.recordset[0];
+    userInfo.userID = decoded.userId; // Add userID to the returned object
+
+    return userInfo;
 };
 
 /**
@@ -222,12 +236,18 @@ router.post('/upload', (req, res) => {
                 const yearStart = Math.min(...detectedYears);
                 const yearEnd = Math.max(...detectedYears);
 
+                let userInfo;
                 try {
                     const pool = await getConnection();
                     
                     // Get user information from token
-                    const userInfo = await getUserInfoFromToken(req.headers.authorization, pool);
+                    userInfo = await getUserInfoFromToken(req.headers.authorization, pool);
                     console.log('User info retrieved');
+
+                    // Validate user's portal/barangay
+                    if (!userInfo || !userInfo.barangay) {
+                        throw new Error('User has no assigned barangay/portal. Cannot process upload.');
+                    }
 
                     const transaction = new sql.Transaction(pool);
                     await transaction.begin();
@@ -357,6 +377,17 @@ router.post('/upload', (req, res) => {
                         console.log('Tracking record created');
 
                         await transaction.commit();
+
+                        // --- Audit Trail --- 
+                        addAuditTrail({
+                            actor: 'A',
+                            module: 'Z',
+                            userID: userInfo.userID,
+                            actions: 'Update',
+                            oldValue: null,
+                            newValue: `File: ${req.file.originalname}`,
+                            descriptions: `Admin ${userInfo.fullName} updated the raw data via CSV upload.`
+                        });
                         
                         const responseMessage = {
                             message: 'CSV file processed successfully.',
