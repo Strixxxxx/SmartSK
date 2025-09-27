@@ -166,7 +166,7 @@ router.post('/', async (req, res) => {
       module: 'L',
       userID: user.userID,
       actions: 'login-success',
-      descriptions: 'User logged in successfully'
+      descriptions: `User: ${user.username} logged in successfully`
     });
 
   } catch (error) {
@@ -202,7 +202,7 @@ router.post('/logout', authMiddleware, async (req, res) => {
         module: 'L',
         userID: userId,
         actions: 'logout',
-        descriptions: 'User logged out'
+        descriptions: `User: ${username} logged out`
     });
   } catch (error) {
      console.error('Error during logout.');

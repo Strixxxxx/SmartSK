@@ -1,0 +1,68 @@
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, 'uploads');
+    // Create directory if it doesn't exist
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    // Use timestamp to ensure unique filenames
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, uniqueSuffix + '-' + file.originalname);
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+  fileFilter: function (req, file, cb) {
+    // Accept only certain file types
+    const filetypes = /pdf|doc|docx|txt/;
+    const mimetype = filetypes.test(file.mimetype);
+    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
+    
+    if (mimetype && extname) {
+      return cb(null, true);
+    }
+    cb(new Error('Only PDF, DOC, DOCX, and TXT files are allowed'));
+  }
+});
+
+// Add a new endpoint to check progress
+app.get('/api/predictive-analysis/progress/:id', async (req, res) => {
+  const progressId = req.params.id;
+  try {
+    const pool = await getConnection();
+    const result = await pool.request()
+      .input('jobID', sql.VarChar, progressId)
+      .query('SELECT * FROM analysisJobs WHERE jobID = @jobID');
+
+    if (result.recordset.length === 0) {
+      return res.json({ status: 'unknown', progress: 0 });
+    }
+
+    const job = result.recordset[0];
+    let responseData = {
+      status: job.status,
+      progress: job.progress,
+    };
+
+    if (job.status === 'completed' && job.result) {
+      try {
+        responseData.result = JSON.parse(job.result);
+      } catch (e) {
+        responseData.error = "Failed to parse analysis result.";
+      }
+    } else if (job.status === 'error' && job.errorMessage) {
+      responseData.error = job.errorMessage;
+    }
+
+    res.json(responseData);
+  } catch (error) {
+    console.error('Error fetching analysis progress:', error);
+    res.status(500).json({ status: 'error', progress: 100, error: 'Failed to fetch progress' });
+  }
+});
