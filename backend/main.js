@@ -65,9 +65,7 @@ dotenv.config();
 const app = express();
 
 const corsOptions = {
-  // For production, set the CORS_ORIGIN environment variable in Azure to your frontend's URL.
-  // e.g., https://your-frontend-app.azurewebsites.net
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: process.env.CORS_ORIGIN,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   credentials: true,
