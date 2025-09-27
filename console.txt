@@ -1,40 +1,6 @@
 --Frontend (Browser's Console)
 
-Access to XMLHttpRequest at 'https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/login' from origin 'https://smartsk.app' has been blocked by CORS policy: Response to preflight request doesn't pass access control check: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
-index-Dxp9f16s.js:81 Network error - no response received: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
-(anonymous) @ index-Dxp9f16s.js:81
-Promise.then
-_request @ index-Dxp9f16s.js:81
-request @ index-Dxp9f16s.js:80
-(anonymous) @ index-Dxp9f16s.js:81
-(anonymous) @ index-Dxp9f16s.js:76
-CM @ index-Dxp9f16s.js:81
-login @ index-Dxp9f16s.js:81
-R @ index-Dxp9f16s.js:292
-n1 @ index-Dxp9f16s.js:48
-(anonymous) @ index-Dxp9f16s.js:48
-ub @ index-Dxp9f16s.js:48
-Em @ index-Dxp9f16s.js:48
-Um @ index-Dxp9f16s.js:49
-wE @ index-Dxp9f16s.js:49Understand this error
-index-Dxp9f16s.js:78  POST https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/login net::ERR_FAILED
-(anonymous) @ index-Dxp9f16s.js:78
-xhr @ index-Dxp9f16s.js:78
-lS @ index-Dxp9f16s.js:80
-Promise.then
-_request @ index-Dxp9f16s.js:81
-request @ index-Dxp9f16s.js:80
-(anonymous) @ index-Dxp9f16s.js:81
-(anonymous) @ index-Dxp9f16s.js:76
-CM @ index-Dxp9f16s.js:81
-login @ index-Dxp9f16s.js:81
-R @ index-Dxp9f16s.js:292
-n1 @ index-Dxp9f16s.js:48
-(anonymous) @ index-Dxp9f16s.js:48
-ub @ index-Dxp9f16s.js:48
-Em @ index-Dxp9f16s.js:48
-Um @ index-Dxp9f16s.js:49
-wE @ index-Dxp9f16s.js:49Understand this error
+
 
 --Backend(Azure Portal's Log Stream)
 

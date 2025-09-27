@@ -158,10 +158,10 @@ router.post('/assignRole', routeGuard.verifyToken, routeGuard.isAdmin, async (re
 
     const roleId = roleResult.recordset[0].roleID;
 
-    // Check if user exists and get current position
+    // Check if user exists and get current position and username
     const userCheck = await pool.request()
       .input('userId', sql.Int, userId)
-      .query('SELECT position FROM userInfo WHERE userID = @userId');
+      .query('SELECT position, userName FROM userInfo WHERE userID = @userId');
 
     if (userCheck.recordset.length === 0) {
       return res.status(404).json({
@@ -171,6 +171,7 @@ router.post('/assignRole', routeGuard.verifyToken, routeGuard.isAdmin, async (re
     }
 
     const oldPositionId = userCheck.recordset[0].position;
+    const userName = userCheck.recordset[0].userName;
 
     // Get the old role name for audit trail
     const oldRoleResult = await pool.request()
@@ -197,7 +198,7 @@ router.post('/assignRole', routeGuard.verifyToken, routeGuard.isAdmin, async (re
         actions: 'assign-role',
         oldValue: `position: ${oldRoleName}`,
         newValue: `position: ${position}`,
-        descriptions: `Admin ${req.user.fullName} assigned role ${position} to user ID ${userId}`
+        descriptions: `Admin ${req.user.fullName} assigned role ${position} to user ${userName}`
     });
     
     return res.json({
