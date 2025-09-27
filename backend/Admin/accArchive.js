@@ -54,8 +54,6 @@ router.post('/:userId', async (req, res) => {
             module: 'D',
             userID: req.user.userId,
             actions: 'archive-account',
-            oldValue: `username: ${username}`,
-            newValue: `userID: ${userId}`,
             descriptions: `Admin archived account for user: ${username}`
         });
 
@@ -97,8 +95,6 @@ router.post('/restore/:userId', async (req, res) => {
             module: 'D',
             userID: req.user.userId,
             actions: 'restore-account',
-            oldValue: `userID: ${userId}`,
-            newValue: `username: ${username}`,
             descriptions: `Admin restored account for user: ${username}`
         });
 

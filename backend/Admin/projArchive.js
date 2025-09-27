@@ -11,11 +11,19 @@ router.get('/', async (req, res) => {
         SELECT 
             p.projectID, 
             p.reference_number, 
-            p.title, 
+            p.title,
+            p.description,
+            p.status,
             p.submittedDate,
-            u.fullName as submittedBy
+            p.file_path,
+            p.file_name,
+            p.remarks,
+            p.reviewedBy,
+            u.fullName as submittedBy,
+            s.StatusName as statusName
         FROM projectsARC p
         LEFT JOIN userInfoARC u ON p.userID = u.userID
+        LEFT JOIN StatusLookup s ON p.status = s.StatusID
         ORDER BY p.submittedDate DESC
     `);
     res.json({ success: true, data: result.recordset });
@@ -49,8 +57,6 @@ router.post('/:projectId', async (req, res) => {
             module: 'D',
             userID: req.user.userId,
             actions: 'archive-project',
-            oldValue: `reference_number: ${reference_number}`,
-            newValue: `projectID: ${projectId}`,
             descriptions: `Admin archived project: ${reference_number}`
         });
 
@@ -85,8 +91,6 @@ router.post('/restore/:projectId', async (req, res) => {
             module: 'D',
             userID: req.user.userId,
             actions: 'restore-project',
-            oldValue: `projectID: ${projectId}`,
-            newValue: `reference_number: ${reference_number}`,
             descriptions: `Admin restored project: ${reference_number}`
         });
 
