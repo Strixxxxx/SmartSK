@@ -2,9 +2,9 @@ name: Build and Deploy Docker app to Azure Web App - smartSK-backend
 
 on:
   push:
-  branches:
-  - main
-workflow_dispatch:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
   build-and-deploy:
