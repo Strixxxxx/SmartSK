@@ -1,17 +1,17 @@
 name: Build and Deploy Docker app to Azure Web App - smartSK-backend
 
 on:
-push:
-branches:
-- main
-workflow_dispatch:
+  push:
+    branches:
+    - main
+  workflow_dispatch:
 
 jobs:
-build-and-deploy:
-runs-on: ubuntu-latest
-permissions:
-contents: read
-id-token: write
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
 
 steps:
   - name: Checkout code
