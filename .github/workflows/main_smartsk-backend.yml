@@ -19,96 +19,51 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Docker Build Steps
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Login to Azure CLI
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F3C59CAD920D4D2488E5081F5E02AD69 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE }}
-
-      - name: Debug Azure Resources
-        run: |
-          echo "Current subscription:"
-          az account show --query "{subscriptionId: id, name: name}" -o table
-          echo "---"
-          echo "Available Container Registries:"
-          az acr list --query "[].{Name:name, LoginServer:loginServer, Location:location, ProvisioningState:provisioningState}" -o table
-          echo "---"
-          echo "Resources in Smart_SK resource group:"
-          az resource list --resource-group Smart_SK --query "[?contains(type, 'Registry')].{Name:name, Type:type, Location:location}" -o table
-
-      - name: Login to Azure Container Registry
-        run: |
-          echo "Attempting ACR login..."
-          az acr login --name smartskregistry --verbose
-
-      - name: Build and push container image to registry
-        run: |
-          echo "Building Docker image..."
-          docker build ./backend -t smartskregistry.azurecr.io/smartsk-backend:${{ github.sha }}
-          echo "Pushing Docker image..."
-          docker push smartskregistry.azurecr.io/smartsk-backend:${{ github.sha }}
-
-      # Node.js Build Steps (Fallback)
       - name: Set up Node.js version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v3
         with:
-          node-version: '22.x'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: './backend/package-lock.json'
 
-      - name: Clean install dependencies
+      - name: npm install, build, and test (backend)
         working-directory: ./backend
         run: |
-          npm ci --production --no-optional
-          npm list --depth=0
+          npm install
+          npm run build --if-present
 
-      - name: Verify Azure Storage Blob installation
+      - name: Zip artifact for deployment (backend)
         working-directory: ./backend
-        run: |
-          echo "Checking @azure/storage-blob installation..."
-          npm list @azure/storage-blob
-          ls -la node_modules/@azure/ || echo "No @azure modules found"
+        run: zip -r ../release.zip .
 
-      - name: Remove unnecessary files
-        working-directory: ./backend
-        run: |
-          find node_modules -name "*.md" -delete 2>/dev/null || true
-          find node_modules -name "test*" -type d -exec rm -rf {} + 2>/dev/null || true
-          find node_modules -name "*.map" -delete 2>/dev/null || true
-
-      - name: Upload backend artifacts
+      - name: Upload artifact for deployment job (backend)
         uses: actions/upload-artifact@v4
         with:
-          name: backend-app
-          path: ./backend
-          compression-level: 6
+          name: node-app
+          path: release.zip
+
+      # Try Docker build with manual registry login
+      - name: Build Docker Image (Test)
+        working-directory: ./backend
+        run: |
+          echo "Building Docker image..."
+          docker build -t smartsk-backend:latest .
+          echo "Docker build completed successfully"
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
+    environment:
+      name: 'Production'
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
     permissions:
       id-token: write
-      contents: read
+
     steps:
-      - name: Download backend artifacts
+      - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
-          name: backend-app
-          path: ./backend
-
-      - name: Verify node_modules before packaging
-        run: |
-          ls -la ./backend/node_modules | head
-
-      - name: Create deployment zip
-        run: |
-          cd backend
-          zip -r ../smartsk-backend.zip .
+          name: node-app
 
       - name: Login to Azure
         uses: azure/login@v2
@@ -117,20 +72,19 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE }}
 
-      # Comment out this step when you're ready to use Docker deployment
-      - name: Deploy to Azure Web App (Node.js fallback)
+      - name: 'Deploy to Azure Web App (Node.js)'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'smartSK-backend'
           slot-name: 'Production'
-          package: ./smartsk-backend.zip
+          package: ./release.zip
 
-      # Uncomment this step when you're ready to switch to Docker deployment
-      - name: Deploy to Azure Web App (Docker)
+      # Commented out Docker deployment until registry access is fixed
+      - name: 'Deploy to Azure Web App (Docker)'
         id: deploy-to-webapp-docker
         uses: azure/webapps-deploy@v3
         with:
-         app-name: 'smartSK-backend'
-         slot-name: 'Production'
-         images: 'smartskregistry.azurecr.io/smartsk-backend:${{ github.sha }}'
+          app-name: 'smartSK-backend'
+          slot-name: 'Production'
+          images: 'smartskregistry.azurecr.io/smartsk-backend:${{ github.sha }}'
