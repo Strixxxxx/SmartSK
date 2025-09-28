@@ -1,4 +1,4 @@
-FROM node:22-lts
+FROM node:22
 
 # Install Python and system dependencies
 RUN apt-get update && apt-get install -y \
