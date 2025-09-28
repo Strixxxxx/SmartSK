@@ -219,10 +219,6 @@ const Portfolio: React.FC = () => {
                 <span>smartsk2025@gmail.com</span>
               </div>
               <div className="contact-item">
-                <span>💼</span>
-                <span>linkedin.com/in/smartsk</span>
-              </div>
-              <div className="contact-item">
                 <span>🏫</span>
                 <span>STI College Novaliches</span>
               </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 
@@ -16,6 +16,7 @@ import Unauthorized from './components/Unauthorized/Unauthorized';
 import NewAccount from './components/Login/NewAccount';
 import Portfolio from './components/Portfolio/Portfolio';
 import ProjectList from './components/Portfolio/ProjectList';
+import ComingSoon from './components/ComingSoon/ComingSoon';
 
 // Client Pages
 import Dashboard from './components/Client/Dashboard/Dashboard';
@@ -36,9 +37,30 @@ import Archive from './components/Admin/Archive/Archive';
 
 const AppRoutes: React.FC = () => {
   const { user, isLoading } = useAuth();
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (isMobile) {
+    return (
+      <Routes>
+        <Route path="*" element={<ComingSoon />} />
+      </Routes>
+    );
   }
 
   return (
