@@ -5,7 +5,7 @@
 --Backend(Azure Portal's Log Stream)
 
 Connected!
-2025-09-28T07:22:06  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/28/2025 07:17:49/home/LogFiles/kudu/trace/01e343fd5c34-8f3fc608-dfb1-41a0-9caa-40dc93ad6e6a.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/01e343fd5c34-8f3fc608-dfb1-41a0-9caa-40dc93ad6e6a.txt)
+2025-09-28T07:37:24  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/28/2025 07:23:40/home/LogFiles/kudu/trace/01e343fd5c34-8f3fc608-dfb1-41a0-9caa-40dc93ad6e6a.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/01e343fd5c34-8f3fc608-dfb1-41a0-9caa-40dc93ad6e6a.txt)
 2025-09-26T16:45:08  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,16, SCM_DO_BUILD_DURING_DEPLOYMENT: false, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, ScmType: GitHubAction/home/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt)
 2025-09-22T03:57:50  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/03a8a751efff-ea9b94d4-5784-44d0-95b8-59e8bdac354e.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03a8a751efff-ea9b94d4-5784-44d0-95b8-59e8bdac354e.txt)
 2025-09-23T06:42:52    Outgoing response, type: response, statusCode: 409, statusText: Conflict/home/LogFiles/kudu/trace/03a8a751efff-f0c217d7-58b3-46fb-98ef-d367d83a9c15.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03a8a751efff-f0c217d7-58b3-46fb-98ef-d367d83a9c15.txt)
@@ -378,15 +378,15 @@ Connected!
 2025-09-27T16:51:29.6741669Z Container spec TerminationMessagePolicy  path
 2025-09-27T16:51:29.6761251Z Container is terminated. Total time elapsed: 7785 ms.
 2025-09-27T16:51:29.6840984Z Site: smartsk-backend stopped./home/LogFiles/2025_09_28_lw1sdlwk0006KG_default_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_28_lw1sdlwk0006KG_default_docker.log)
-2025-09-28T07:19:19.940921950Z
-2025-09-28T07:19:19.940924410Z     If you wish to install a non-Debian packaged Python application,
-2025-09-28T07:19:19.940926979Z     it may be easiest to use pipx install xyz, which will manage a
-2025-09-28T07:19:19.940929542Z     virtual environment for you. Make sure you have pipx installed.
-2025-09-28T07:19:19.940950680Z
-2025-09-28T07:19:19.940953072Z     See /usr/share/doc/python3.11/README.venv for more information.
-2025-09-28T07:19:19.940954927Z
-2025-09-28T07:19:19.940956697Z note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
-2025-09-28T07:19:19.940961112Z hint: See PEP 668 for the detailed specification./home/LogFiles/2025_09_28_lw1sdlwk0006KG_default_scm_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_28_lw1sdlwk0006KG_default_scm_docker.log)
+2025-09-28T07:24:53.993225414Z
+2025-09-28T07:24:53.993227811Z     If you wish to install a non-Debian packaged Python application,
+2025-09-28T07:24:53.993230382Z     it may be easiest to use pipx install xyz, which will manage a
+2025-09-28T07:24:53.993232823Z     virtual environment for you. Make sure you have pipx installed.
+2025-09-28T07:24:53.993254623Z
+2025-09-28T07:24:53.993256742Z     See /usr/share/doc/python3.11/README.venv for more information.
+2025-09-28T07:24:53.993258626Z
+2025-09-28T07:24:53.993260388Z note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
+2025-09-28T07:24:53.993262624Z hint: See PEP 668 for the detailed specification./home/LogFiles/2025_09_28_lw1sdlwk0006KG_default_scm_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_28_lw1sdlwk0006KG_default_scm_docker.log)
 2025-09-28T07:08:33.1738029Z Sun Sep 28 07:08:33 UTC 2025 running .net core
 2025-09-28T07:08:37.1843196Z Startup : 07.08.37.124875
 2025-09-28T07:08:37.3355850Z Configure Services : 07.08.37.335357
@@ -397,106 +397,105 @@ Connected!
 2025-09-28T07:08:44.4107317Z Content root path: /opt/Kudu
 2025-09-28T07:08:44.4277156Z Now listening on: http://0.0.0.0:8181
 2025-09-28T07:08:44.4277453Z Application started. Press Ctrl+C to shut down./home/LogFiles/2025_09_28_lw1sdlwk0006KG_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_28_lw1sdlwk0006KG_docker.log)
-2025-09-28T07:17:59.572Z INFO  - Starting container for site
-2025-09-28T07:17:59.573Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_0ea8c0a2_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173,https://smartsk.app -e WEBSITE_CORS_SUPPORT_C2025-09-28T07:18:07.189Z INFO  - Initiating warmup request to container smartsk-backend_0_0ea8c0a2 for site smartsk-backend
-2025-09-28T07:18:25.872Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_0ea8c0a2. Elapsed time = 18.7342281 sec
-2025-09-28T07:18:43.239Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_0ea8c0a2. Elapsed time = 36.1012727 sec
-2025-09-28T07:19:03.310Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_0ea8c0a2. Elapsed time = 56.1719198 sec
-2025-09-28T07:19:21.433Z ERROR - Container smartsk-backend_0_0ea8c0a2 for site smartsk-backend has exited, failing site start
-2025-09-28T07:19:21.434Z INFO  - Initiating warmup request to container smartsk-backend_0_0ea8c0a2_middleware for site smartsk-backend
-2025-09-28T07:19:23.062Z INFO  - Container smartsk-backend_0_0ea8c0a2_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
-2025-09-28T07:19:23.095Z ERROR - Container smartsk-backend_0_0ea8c0a2 didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
-2025-09-28T07:19:23.246Z INFO  - Stopping site smartsk-backend because it failed during startup./home/LogFiles/2025_09_28_lw1sdlwk0006KG_easyauth_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_28_lw1sdlwk0006KG_easyauth_docker.log)Ending Log Tail of existing logs ---Starting Live Log Stream ---
-2025-09-28T07:23:07  No new trace in the past 1 min(s).
-2025-09-28T07:23:40.987Z INFO  - Starting container for site
-2025-09-28T07:23:40.988Z INFO  - docker run -d --expose=3000 --name smartsk-backend_0_926b3521 -e WEBSITE_USE_DIAGNOSTIC_SERVER=true -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173,https://smartsk.app -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net -e WEBSITE_INSTANCE_ID=abdb3197cd7a02e1a5e6c1091bbdf0012d0d439e81c1d6874df7775d03ebd0a8 -e HTTP_LOGGING_ENABLED=1 -e NODE_OPTIONS=--require /agents/nodejs/build/src/Loader.js appsvc/node:22-lts_20250724.2.tuxprod REDACTEDREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net -e WEBSITE_INSTANCE_ID=abdb3197cd7a02e1a5e6c1091bbdf0012d0d439e81c1d6874df7775d03ebd0a8 -e HTTP_LOGGING_ENABLED=1 mcr.microsoft.com/appsvc/middleware:stage5 REDACTEDElapsed time = 37.5847144 sec
+2025-09-28T07:23:47.820Z INFO  - Starting container for site
+2025-09-28T07:23:47.821Z INFO  - docker run -d --expose=8181 --name smartsk-backend_0_926b3521_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173,https://smartsk.app -e WEBSITE_CORS_SUPPORT_C2025-09-28T07:23:53.564Z INFO  - Initiating warmup request to container smartsk-backend_0_926b3521 for site smartsk-backend
+2025-09-28T07:24:11.438Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_926b3521. Elapsed time = 17.893148 sec
+2025-09-28T07:24:31.130Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_926b3521. Elapsed time = 37.5847144 sec
 2025-09-28T07:24:49.420Z INFO  - Waiting for response to warmup request for container smartsk-backend_0_926b3521. Elapsed time = 55.8748042 sec
-2025-09-28T07:23:43.540357237Z    _____
-2025-09-28T07:23:43.540413403Z   /  _  \ __________ _________   ____
-2025-09-28T07:23:43.540416567Z  /  /_\  \\___   /  |  \_  __ \_/ __ \
-2025-09-28T07:23:43.540418763Z /    |    \/    /|  |  /|  | \/\  ___/
-2025-09-28T07:23:43.540420811Z \____|__  /_____ \____/ |__|    \___  >
-2025-09-28T07:23:43.540422955Z         \/      \/                  \/
-2025-09-28T07:23:43.540424822Z A P P   S E R V I C E   O N   L I N U X
-2025-09-28T07:23:43.540426758Z
-2025-09-28T07:23:43.540428528Z Documentation: http://aka.ms/webapp-linux
-2025-09-28T07:23:43.540430265Z NodeJS quickstart: https://aka.ms/node-qs
-2025-09-28T07:23:43.540432028Z NodeJS Version : v22.17.0
-2025-09-28T07:23:43.540433902Z Note: Any data outside '/home' is not persisted
-2025-09-28T07:23:43.540435861Z
-2025-09-28T07:23:59.527102103Z Starting OpenBSD Secure Shell server: sshd.
-2025-09-28T07:23:59.795797435Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
-2025-09-28T07:23:59.966538830Z Updating certificates in /etc/ssl/certs...
-2025-09-28T07:24:22.296907556Z rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
-2025-09-28T07:24:22.345805211Z 4 added, 0 removed; done.
-2025-09-28T07:24:22.345832013Z Running hooks in /etc/ca-certificates/update.d...
-2025-09-28T07:24:22.362870097Z done.
-2025-09-28T07:24:22.412990937Z CA certificates copied and updated successfully.
-2025-09-28T07:24:22.672717782Z Starting periodic command scheduler: cron.
-2025-09-28T07:24:22.978222912Z Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
-2025-09-28T07:24:22.982678197Z Build Operation ID: 85783dfe72426c20
-2025-09-28T07:24:22.988156458Z Environment Variables for Application Insight's IPA Codeless Configuration exists..
-2025-09-28T07:24:23.522579464Z Writing output script to '/opt/startup/startup.sh'
-2025-09-28T07:24:23.709955605Z Running #!/bin/sh
-2025-09-28T07:24:23.709980003Z
-2025-09-28T07:24:23.709983449Z # Enter the source directory to make sure the script runs where the user expects
-2025-09-28T07:24:23.709986307Z cd "/home/site/wwwroot"
-2025-09-28T07:24:23.709988881Z
-2025-09-28T07:24:23.709991301Z export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
-2025-09-28T07:24:23.709993892Z if [ -z "$PORT" ]; then
-2025-09-28T07:24:23.709996417Z 		export PORT=8080
-2025-09-28T07:24:23.709999330Z fi
-2025-09-28T07:24:23.710001729Z
-2025-09-28T07:24:23.710004171Z echo Found tar.gz based node_modules.
-2025-09-28T07:24:23.710006641Z extractionCommand="tar -xzf node_modules.tar.gz -C /node_modules"
-2025-09-28T07:24:23.710049289Z echo "Removing existing modules directory from root..."
-2025-09-28T07:24:23.710051832Z rm -fr /node_modules
-2025-09-28T07:24:23.710053599Z mkdir -p /node_modules
-2025-09-28T07:24:23.710055404Z echo Extracting modules...
-2025-09-28T07:24:23.710057316Z $extractionCommand
-2025-09-28T07:24:23.710059080Z export NODE_PATH="/node_modules":$NODE_PATH
-2025-09-28T07:24:23.710061008Z export PATH=/node_modules/.bin:$PATH
-2025-09-28T07:24:23.710062909Z if [ -d node_modules ]; then
-2025-09-28T07:24:23.710064662Z     mv -f node_modules _del_node_modules || true
-2025-09-28T07:24:23.710066447Z fi
-2025-09-28T07:24:23.710068117Z
-2025-09-28T07:24:23.710069831Z if [ -d /node_modules ]; then
-2025-09-28T07:24:23.710072389Z     ln -sfn /node_modules ./node_modules
-2025-09-28T07:24:23.710074433Z fi
-2025-09-28T07:24:23.710076156Z
-2025-09-28T07:24:23.710077904Z echo "Done."
-2025-09-28T07:24:23.710079673Z PATH="$PATH:/home/site/wwwroot" bash startup.sh
-2025-09-28T07:24:23.710081522Z Found tar.gz based node_modules.
-2025-09-28T07:24:23.710083367Z Removing existing modules directory from root...
-2025-09-28T07:24:23.774355619Z Extracting modules...
-2025-09-28T07:24:40.872555430Z Done.
-2025-09-28T07:24:40.953316443Z --- Custom Startup Script Started ---
-2025-09-28T07:24:41.106872482Z Python version: Python 3.11.2
-2025-09-28T07:24:41.785275826Z pip not found. Installing pip...
-2025-09-28T07:24:53.993146063Z error: externally-managed-environment
-2025-09-28T07:24:53.993185329Z
-2025-09-28T07:24:53.993188513Z × This environment is externally managed
-2025-09-28T07:24:53.993202535Z ╰─> To install Python packages system-wide, try apt install
-2025-09-28T07:24:53.993206865Z     python3-xyz, where xyz is the package you are trying to
-2025-09-28T07:24:53.993209449Z     install.
-2025-09-28T07:24:53.993211922Z
-2025-09-28T07:24:53.993214742Z     If you wish to install a non-Debian-packaged Python package,
-2025-09-28T07:24:53.993217383Z     create a virtual environment using python3 -m venv path/to/venv.
-2025-09-28T07:24:53.993220396Z     Then use path/to/venv/bin/python and path/to/venv/bin/pip. Make
-2025-09-28T07:24:53.993222932Z     sure you have python3-full installed.
-2025-09-28T07:24:53.993225414Z
-2025-09-28T07:24:53.993227811Z     If you wish to install a non-Debian packaged Python application,
-2025-09-28T07:24:53.993230382Z     it may be easiest to use pipx install xyz, which will manage a
-2025-09-28T07:24:53.993232823Z     virtual environment for you. Make sure you have pipx installed.
-2025-09-28T07:24:53.993254623Z
-2025-09-28T07:24:53.993256742Z     See /usr/share/doc/python3.11/README.venv for more information.
-2025-09-28T07:24:53.993258626Z
-2025-09-28T07:24:53.993260388Z note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
-2025-09-28T07:24:53.993262624Z hint: See PEP 668 for the detailed specification.
 2025-09-28T07:24:55.327Z ERROR - Container smartsk-backend_0_926b3521 for site smartsk-backend has exited, failing site start
 2025-09-28T07:24:55.328Z INFO  - Initiating warmup request to container smartsk-backend_0_926b3521_middleware for site smartsk-backend
 2025-09-28T07:24:56.400Z INFO  - Container smartsk-backend_0_926b3521_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
 2025-09-28T07:24:56.446Z ERROR - Container smartsk-backend_0_926b3521 didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
-2025-09-28T07:24:56.572Z INFO  - Stopping site smartsk-backend because it failed during startup.
+2025-09-28T07:24:56.572Z INFO  - Stopping site smartsk-backend because it failed during startup./home/LogFiles/2025_09_28_lw1sdlwk0006KG_easyauth_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_28_lw1sdlwk0006KG_easyauth_docker.log)Ending Log Tail of existing logs ---Starting Live Log Stream ---
+2025-09-28T07:38:25  No new trace in the past 1 min(s).
+2025-09-28T07:39:25  No new trace in the past 2 min(s).
+2025-09-28T07:40:04.625Z INFO  - Starting container for site
+2025-09-28T07:40:04.700Z INFO  - docker run -d --expose=3000 --name smartsk-backend_0_c9d78d21 -e WEBSITE_USE_DIAGNOSTIC_SERVER=true -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:5173,https://smartsk.app -e WEBSITE_CORS_SUPPORT_CREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net -e WEBSITE_INSTANCE_ID=abdb3197cd7a02e1a5e6c1091bbdf0012d0d439e81c1d6874df7775d03ebd0a8 -e HTTP_LOGGING_ENABLED=1 -e NODE_OPTIONS=--require /agents/nodejs/build/src/Loader.js appsvc/node:22-lts_20250724.2.tuxprod REDACTEDREDENTIALS=True -e PORT=3000 -e WEBSITE_SITE_NAME=smartSK-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net -e WEBSITE_INSTANCE_ID=abdb3197cd7a02e1a5e6c1091bbdf0012d0d439e81c1d6874df7775d03ebd0a8 -e HTTP_LOGGING_ENABLED=1 mcr.microsoft.com/appsvc/middleware:stage5 REDACTED. Elapsed time = 43.2045131 sec
+2025-09-28T07:40:08.482455069Z    _____
+2025-09-28T07:40:08.482529113Z   /  _  \ __________ _________   ____
+2025-09-28T07:40:08.482532399Z  /  /_\  \\___   /  |  \_  __ \_/ __ \
+2025-09-28T07:40:08.482534577Z /    |    \/    /|  |  /|  | \/\  ___/
+2025-09-28T07:40:08.482536818Z \____|__  /_____ \____/ |__|    \___  >
+2025-09-28T07:40:08.482539826Z         \/      \/                  \/
+2025-09-28T07:40:08.482541747Z A P P   S E R V I C E   O N   L I N U X
+2025-09-28T07:40:08.482543622Z
+2025-09-28T07:40:08.482545279Z Documentation: http://aka.ms/webapp-linux
+2025-09-28T07:40:08.482547007Z NodeJS quickstart: https://aka.ms/node-qs
+2025-09-28T07:40:08.482548783Z NodeJS Version : v22.17.0
+2025-09-28T07:40:08.482550572Z Note: Any data outside '/home' is not persisted
+2025-09-28T07:40:08.482552490Z
+2025-09-28T07:40:15.924232792Z Starting OpenBSD Secure Shell server: sshd.
+2025-09-28T07:40:15.952566278Z WEBSITES_INCLUDE_CLOUD_CERTS is not set to true.
+2025-09-28T07:40:16.037210967Z Updating certificates in /etc/ssl/certs...
+2025-09-28T07:40:38.103049831Z rehash: warning: skipping ca-certificates.crt,it does not contain exactly one certificate or CRL
+2025-09-28T07:40:38.158244510Z 4 added, 0 removed; done.
+2025-09-28T07:40:38.160497730Z Running hooks in /etc/ca-certificates/update.d...
+2025-09-28T07:40:38.177905153Z done.
+2025-09-28T07:40:38.227046272Z CA certificates copied and updated successfully.
+2025-09-28T07:40:38.542940325Z Starting periodic command scheduler: cron.
+2025-09-28T07:40:38.803284524Z Found build manifest file at '/home/site/wwwroot/oryx-manifest.toml'. Deserializing it...
+2025-09-28T07:40:38.843832807Z Build Operation ID: da54660bc961af1b
+2025-09-28T07:40:38.861705665Z Environment Variables for Application Insight's IPA Codeless Configuration exists..
+2025-09-28T07:40:39.612098345Z Writing output script to '/opt/startup/startup.sh'
+2025-09-28T07:40:39.773087616Z Running #!/bin/sh
+2025-09-28T07:40:39.773116130Z
+2025-09-28T07:40:39.773124411Z # Enter the source directory to make sure the script runs where the user expects
+2025-09-28T07:40:39.773127634Z cd "/home/site/wwwroot"
+2025-09-28T07:40:39.773130221Z
+2025-09-28T07:40:39.773132389Z export NODE_PATH=/usr/local/lib/node_modules:$NODE_PATH
+2025-09-28T07:40:39.773134720Z if [ -z "$PORT" ]; then
+2025-09-28T07:40:39.773137018Z 		export PORT=8080
+2025-09-28T07:40:39.773139486Z fi
+2025-09-28T07:40:39.773141542Z
+2025-09-28T07:40:39.773143689Z echo Found tar.gz based node_modules.
+2025-09-28T07:40:39.773145920Z extractionCommand="tar -xzf node_modules.tar.gz -C /node_modules"
+2025-09-28T07:40:39.773162494Z echo "Removing existing modules directory from root..."
+2025-09-28T07:40:39.773164644Z rm -fr /node_modules
+2025-09-28T07:40:39.773166334Z mkdir -p /node_modules
+2025-09-28T07:40:39.773167861Z echo Extracting modules...
+2025-09-28T07:40:39.773169396Z $extractionCommand
+2025-09-28T07:40:39.773170902Z export NODE_PATH="/node_modules":$NODE_PATH
+2025-09-28T07:40:39.773172676Z export PATH=/node_modules/.bin:$PATH
+2025-09-28T07:40:39.773174271Z if [ -d node_modules ]; then
+2025-09-28T07:40:39.773175876Z     mv -f node_modules _del_node_modules || true
+2025-09-28T07:40:39.773177488Z fi
+2025-09-28T07:40:39.773179066Z
+2025-09-28T07:40:39.773180493Z if [ -d /node_modules ]; then
+2025-09-28T07:40:39.773182040Z     ln -sfn /node_modules ./node_modules
+2025-09-28T07:40:39.773183648Z fi
+2025-09-28T07:40:39.773185279Z
+2025-09-28T07:40:39.773186781Z echo "Done."
+2025-09-28T07:40:39.804128573Z PATH="$PATH:/home/site/wwwroot" bash startup.sh
+2025-09-28T07:40:39.804157053Z Found tar.gz based node_modules.
+2025-09-28T07:40:39.804159623Z Removing existing modules directory from root...
+2025-09-28T07:40:39.832417915Z Extracting modules...
+2025-09-28T07:40:56.875530889Z Done.
+2025-09-28T07:40:57.161195057Z --- Custom Startup Script Started ---
+2025-09-28T07:40:57.674639707Z Python version: Python 3.11.2
+2025-09-28T07:40:59.169989099Z pip not found. Installing pip...
+2025-09-28T07:41:20.563480471Z error: externally-managed-environment2025-09-28T07:41:20.563581547Z
+2025-09-28T07:41:20.563585083Z × This environment is externally managed
+2025-09-28T07:41:20.563588732Z ╰─> To install Python packages system-wide, try apt install
+2025-09-28T07:41:20.563591852Z     python3-xyz, where xyz is the package you are trying to
+2025-09-28T07:41:20.563594455Z     install.
+2025-09-28T07:41:20.563596901Z
+2025-09-28T07:41:20.563599649Z     If you wish to install a non-Debian-packaged Python package,
+2025-09-28T07:41:20.563602279Z     create a virtual environment using python3 -m venv path/to/venv.
+2025-09-28T07:41:20.563605147Z     Then use path/to/venv/bin/python and path/to/venv/bin/pip. Make
+2025-09-28T07:41:20.563607719Z     sure you have python3-full installed.
+2025-09-28T07:41:20.563692238Z
+2025-09-28T07:41:20.563695829Z     If you wish to install a non-Debian packaged Python application,
+2025-09-28T07:41:20.563698320Z     it may be easiest to use pipx install xyz, which will manage a
+2025-09-28T07:41:20.563700859Z     virtual environment for you. Make sure you have pipx installed.
+2025-09-28T07:41:20.563722262Z
+2025-09-28T07:41:20.563724322Z     See /usr/share/doc/python3.11/README.venv for more information.
+2025-09-28T07:41:20.563726128Z
+2025-09-28T07:41:20.563727976Z note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
+2025-09-28T07:41:20.563731524Z hint: See PEP 668 for the detailed specification.
+2025-09-28T07:41:22.056Z ERROR - Container smartsk-backend_0_c9d78d21 for site smartsk-backend has exited, failing site start
+2025-09-28T07:41:22.057Z INFO  - Initiating warmup request to container smartsk-backend_0_c9d78d21_middleware for site smartsk-backend
+2025-09-28T07:41:23.361Z INFO  - Container smartsk-backend_0_c9d78d21_middleware for site smartsk-backend initialized successfully and is ready to serve requests.
+2025-09-28T07:41:23.407Z ERROR - Container smartsk-backend_0_c9d78d21 didn't respond to HTTP pings on port: 3000. Failing site start. See container logs for debugging.
+2025-09-28T07:41:24.301Z INFO  - Stopping site smartsk-backend because it failed during startup.
 
 --SSH/BASH Console Logs on Advanced Development Tools
