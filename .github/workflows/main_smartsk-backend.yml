@@ -1,45 +1,44 @@
-name: Build and Deploy Docker app to Azure Web App - smartSK-backend
+name: Build and Deploy Backend
 
 on:
   push:
     branches:
       - main
-  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
-      # Checkout code
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Login to Azure using OIDC + secrets
-      - name: Login to Azure
+      - name: Log in to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      # Build & push Docker image to ACR
+      - name: Azure CLI - show account
+        run: az account show
+
       - name: Build and Push Docker image
         run: |
           IMAGE_NAME=smartskregistry.azurecr.io/smartsk-backend
           GIT_SHA=${{ github.sha }}
 
           echo "Building Docker image..."
-          docker build -t $IMAGE_NAME:$GIT_SHA -t $IMAGE_NAME:latest ./backend
+          docker build -f backend/Dockerfile -t $IMAGE_NAME:$GIT_SHA -t $IMAGE_NAME:latest ./backend
 
           echo "Pushing Docker image..."
           docker push $IMAGE_NAME:$GIT_SHA
           docker push $IMAGE_NAME:latest
 
-      # Deploy to Azure Web App (App Service will pull via Managed Identity)
       - name: Deploy to Azure Web App
         run: |
           az webapp config container set \
