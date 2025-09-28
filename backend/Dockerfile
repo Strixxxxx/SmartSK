@@ -8,7 +8,7 @@ WORKDIR /app
 # Debug: show Node version
 RUN node --version && npm --version
 
-COPY backend/package*.json ./
+COPY package*.json ./
 RUN echo "Installing Node.js dependencies..." && npm ci --omit=dev
 
 # ============================
@@ -24,7 +24,7 @@ RUN python3 --version && pip --version
 # Install build tools
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc && rm -rf /var/lib/apt/lists/*
 
-COPY backend/requirements.txt .
+COPY requirements.txt .
 RUN echo "Installing Python dependencies..." && pip install --no-cache-dir -r requirements.txt -t /python-packages
 
 # ============================
@@ -47,7 +47,7 @@ COPY --from=node-builder /app/node_modules ./node_modules
 COPY --from=python-builder /python-packages /usr/local/lib/python3.12/site-packages
 
 # Copy app source
-COPY backend/ .
+COPY . .
 
 # Expose Azure port
 EXPOSE 8080
