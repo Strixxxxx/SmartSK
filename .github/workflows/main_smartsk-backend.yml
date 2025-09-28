@@ -23,12 +23,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Azure CLI
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F3C59CAD920D4D2488E5081F5E02AD69 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE }}
+      - name: Debug Azure Resources
+        run: |
+         echo "Current subscription:"
+         az account show --query "{subscriptionId: id, name: name}" -o table
+         echo "---"
+         echo "Available Container Registries:"
+         az acr list --query "[].{Name:name, LoginServer:loginServer, Location:location, ProvisioningState:provisioningState}" -o table
+         echo "---"
+         echo "Resources in Smart_SK resource group:"
+         az resource list --resource-group Smart_SK --query "[?contains(type, 'Registry')].{Name:name, Type:type, Location:location}" -o table
 
       - name: Login to Azure Container Registry
         run: az acr login --name smartskregistry
