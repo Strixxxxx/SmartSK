@@ -14,9 +14,10 @@ jobs:
       id-token: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # Checkout code
+      - uses: actions/checkout@v4
 
+      # Login to Azure (OIDC)
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -24,6 +25,7 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE }}
 
+      # Build & push Docker image
       - name: Build and Push Docker image
         run: |
           IMAGE_NAME=smartskregistry.azurecr.io/smartsk-backend
@@ -36,6 +38,7 @@ jobs:
           docker push $IMAGE_NAME:$GIT_SHA
           docker push $IMAGE_NAME:latest
 
+      # Deploy to Web App (pulls from ACR with Managed Identity)
       - name: Deploy to Azure Web App
         run: |
           az webapp config container set \
