@@ -7,13 +7,13 @@ RUN apt-get update && \
     apt-get install -y wget build-essential libssl-dev zlib1g-dev \
                        libncurses5-dev libffi-dev libsqlite3-dev \
                        libbz2-dev libreadline-dev liblzma-dev && \
-    wget https://www.python.org/ftp/python/3.12.9/Python-3.12.9.tgz && \
-    tar xvf Python-3.12.9.tgz && \
-    cd Python-3.12.9 && \
+    wget https://www.python.org/ftp/python/3.12.11/Python-3.12.11.tgz && \
+    tar xvf Python-3.12.11.tgz && \
+    cd Python-3.12.11 && \
     ./configure --enable-optimizations && \
     make -j$(nproc) && \
     make altinstall && \
-    cd .. && rm -rf Python-3.12.9*
+    cd .. && rm -rf Python-3.12.11*
 
 # ============================
 # Stage 2: Runtime (Node + Python)
