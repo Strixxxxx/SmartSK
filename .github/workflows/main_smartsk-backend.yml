@@ -1,52 +1,47 @@
 name: Build and Deploy Docker app to Azure Web App - smartSK-backend
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+push:
+branches:
+- main
+workflow_dispatch:
 
 jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
+build-and-deploy:
+runs-on: ubuntu-latest
+permissions:
+contents: read
+id-token: write
 
-    steps:
-      # Checkout code
-      - uses: actions/checkout@v4
+steps:
+  # Checkout code
+  - uses: actions/checkout@v4
 
-      # Login to Azure (OIDC)
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F3C59CAD920D4D2488E5081F5E02AD69 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE }}
+  # Login to Azure using OIDC
+  - name: Login to Azure
+    uses: azure/login@v2
+    with:
+      client-id: 3cf53574-bca2-498b-bef8-302f807b6472
+      tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
+      subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
 
-      # Azure CLI login to ACR (using the OIDC SP above)
-      - name: ACR Login
-        run: az acr login --name smartskregistry
+  # Build & push Docker image to ACR
+  - name: Build and Push Docker image
+    run: |
+      IMAGE_NAME=smartskregistry.azurecr.io/smartsk-backend
+      GIT_SHA=${{ github.sha }}
 
-      # Build & push Docker image
-      - name: Build and Push Docker image
-        run: |
-          IMAGE_NAME=smartskregistry.azurecr.io/smartsk-backend
-          GIT_SHA=${{ github.sha }}
+      echo "Building Docker image..."
+      docker build --no-cache -t $IMAGE_NAME:$GIT_SHA -t $IMAGE_NAME:latest ./backend
 
-          echo "Building Docker image..."
-          docker build --no-cache -t $IMAGE_NAME:$GIT_SHA -t $IMAGE_NAME:latest .
+      echo "Pushing Docker image..."
+      docker push $IMAGE_NAME:$GIT_SHA
+      docker push $IMAGE_NAME:latest
 
-          echo "Pushing Docker image..."
-          docker push $IMAGE_NAME:$GIT_SHA
-          docker push $IMAGE_NAME:latest
-
-      # Deploy to Web App (just points to :latest, App Service pulls with Managed Identity)
-      - name: Deploy to Azure Web App
-        run: |
-          az webapp config container set \
-            --name smartsk-backend-container \
-            --resource-group Smart_SK \
-            --docker-custom-image-name smartskregistry.azurecr.io/smartsk-backend:latest \
-            --enable-app-service-storage false
+  # Deploy to Web App (App Service pulls latest image with Managed Identity)
+  - name: Deploy to Azure Web App
+    run: |
+      az webapp config container set \
+        --name smartsk-backend-container \
+        --resource-group Smart_SK \
+        --docker-custom-image-name smartskregistry.azurecr.io/smartsk-backend:latest
