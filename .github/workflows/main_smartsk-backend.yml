@@ -4,12 +4,6 @@ on:
   push:
     branches:
       - main
-name: Build and Deploy Docker app to Azure Web App - smartSK-backend
-
-on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
@@ -36,7 +30,7 @@ jobs:
           GIT_SHA=${{ github.sha }}
 
           echo "Building Docker image..."
-          docker build -t $IMAGE_NAME:$GIT_SHA -t $IMAGE_NAME:latest ./backend
+          docker build --no-cache -t $IMAGE_NAME:$GIT_SHA -t $IMAGE_NAME:latest ./backend
 
           echo "Pushing Docker image..."
           docker push $IMAGE_NAME:$GIT_SHA
