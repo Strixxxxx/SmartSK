@@ -55,4 +55,3 @@ EXPOSE 8080
 
 # Run Node.js app
 CMD ["npm", "start"]
-```
