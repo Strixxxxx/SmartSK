@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - main
+name: Build and Deploy Docker app to Azure Web App - smartSK-backend
+
+on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -24,16 +30,13 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_86BBADAEAA6540C697C5CF8E2ABC0EE1 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D1E9DCD73D244760B3990633D375E2AE }}
 
-      - name: ACR Login
-        run: az acr login --name smartskregistry
-
       - name: Build and Push Docker image
         run: |
           IMAGE_NAME=smartskregistry.azurecr.io/smartsk-backend
           GIT_SHA=${{ github.sha }}
 
           echo "Building Docker image..."
-          docker build --no-cache -t $IMAGE_NAME:$GIT_SHA -t $IMAGE_NAME:latest ./backend
+          docker build -t $IMAGE_NAME:$GIT_SHA -t $IMAGE_NAME:latest ./backend
 
           echo "Pushing Docker image..."
           docker push $IMAGE_NAME:$GIT_SHA
@@ -46,3 +49,4 @@ jobs:
             --resource-group Smart_SK \
             --docker-custom-image-name smartskregistry.azurecr.io/smartsk-backend:latest \
             --enable-app-service-storage false
+
