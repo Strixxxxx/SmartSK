@@ -9,7 +9,9 @@ DB_SERVER = os.getenv("DB_SERVER")
 DB_DATABASE = os.getenv("DB_DATABASE")
 DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
-DB_DRIVER = '{ODBC Driver 17 for SQL Server}'
+# For Linux, the driver name is often just 'ODBC Driver 17 for SQL Server'
+# but it can vary depending on the installation. Using an env var is more robust.
+DB_DRIVER = os.getenv('DB_DRIVER', '{ODBC Driver 17 for SQL Server}')
 
 def get_raw_data_from_db(category=None):
     """
