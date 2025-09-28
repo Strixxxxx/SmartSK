@@ -17,9 +17,11 @@ fi
 
 echo "Python version: $(python3 --version)"
 
-# Create a virtual environment if it doesn't exist
-if [ ! -d "$VENV_PATH" ]; then
-    echo "Creating Python virtual environment at $VENV_PATH..."
+# Create a virtual environment only if the activate script doesn't exist, making the process idempotent
+if [ ! -f "$VENV_PATH/bin/activate" ]; then
+    echo "Virtual environment not found or incomplete. Creating/recreating at $VENV_PATH..."
+    # Remove the directory if it exists but is incomplete, then recreate
+    rm -rf $VENV_PATH
     python3 -m venv $VENV_PATH
     echo "Virtual environment created."
 fi
