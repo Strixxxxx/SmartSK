@@ -1,42 +1,59 @@
-FROM node:22
+```dockerfile
+# ============================
+# Stage 1: Build Python 3.12.9
+# ============================
+FROM debian:bullseye-slim AS python-builder
 
-# Install Python and system dependencies
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y wget build-essential libssl-dev zlib1g-dev \
+                       libncurses5-dev libffi-dev libsqlite3-dev \
+                       libbz2-dev libreadline-dev liblzma-dev && \
+    wget https://www.python.org/ftp/python/3.12.9/Python-3.12.9.tgz && \
+    tar xvf Python-3.12.9.tgz && \
+    cd Python-3.12.9 && \
+    ./configure --enable-optimizations && \
+    make -j$(nproc) && \
+    make altinstall && \
+    cd .. && rm -rf Python-3.12.9*
 
-# Set up working directory
-WORKDIR /app
+# ============================
+# Stage 2: Runtime (Node + Python)
+# ============================
+FROM node:22-bullseye-slim
 
-# Copy Python requirements first (for better Docker layer caching)
-COPY requirements.txt ./
-COPY runtime.txt ./
+# Install minimal runtime dependencies for Python
+RUN apt-get update && \
+    apt-get install -y libssl1.1 zlib1g libncurses5 libffi7 libsqlite3-0 \
+                       libbz2-1.0 libreadline8 liblzma5 && \
+    rm -rf /var/lib/apt/lists/*
 
-# Create and activate Python virtual environment
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+# Copy Python binaries from builder
+COPY --from=python-builder /usr/local/bin/python3.12 /usr/local/bin/python3.12
+COPY --from=python-builder /usr/local/bin/pip3.12 /usr/local/bin/pip3.12
+COPY --from=python-builder /usr/local/lib/python3.12 /usr/local/lib/python3.12
 
-# Install Python dependencies
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+# Set aliases
+RUN ln -s /usr/local/bin/python3.12 /usr/bin/python && \
+    ln -s /usr/local/bin/pip3.12 /usr/bin/pip && \
+    pip install --upgrade pip
 
-# Copy package.json and package-lock.json (for better Docker layer caching)
+# Set work directory
+WORKDIR /usr/src/app
+
+# Copy Node.js package files and install dependencies
 COPY package*.json ./
+RUN npm install --production
 
-# Install Node.js dependencies
-RUN npm ci --only=production
+# Copy Python requirements and install them
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code
+# Copy application code
 COPY . .
 
-# Set environment variables
-ENV PORT=3000
-ENV PYTHONPATH="/opt/venv/lib/python3.11/site-packages"
+# Expose Azure expected port
+EXPOSE 8080
 
-# Expose the port
-EXPOSE 3000
-
-# Start the application directly with Node.js (no need for startup.sh)
+# Run Node.js app
 CMD ["npm", "start"]
+```
