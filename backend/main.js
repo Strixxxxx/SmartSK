@@ -370,7 +370,7 @@ app.post('/api/predictive-analysis/custom-options', async (req, res) => {
 });
 
 // Define the port
-const PORT = process.env.PORT || process.env.WEBSITES_PORT || 3000;
+const PORT = process.env.PORT || process.env.WEBSITES_PORT;
 
 // Start the server
 app.listen(PORT, '0.0.0.0', () => {
