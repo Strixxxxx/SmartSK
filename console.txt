@@ -1,48 +1,142 @@
 --Frontend (Browser's Console)
 
-Failed to load resource: the server responded with a status of 500 (Internal Server Error)Understand this error
-index-Dxp9f16s.js:81 Server error: 500 {error: 'Failed to generate forecast', message: "Python process failed: Traceback (most recent call…pd\nModuleNotFoundError: No module named 'pandas'\n"}error: "Failed to generate forecast"message: "Python process failed: Traceback (most recent call last):\n  File \"/home/site/wwwroot/AI/forecast.py\", line 7, in <module>\n    import pandas as pd\nModuleNotFoundError: No module named 'pandas'\n"[[Prototype]]: Object
-(anonymous) @ index-Dxp9f16s.js:81Understand this error
-forecast-analysis:1  Failed to load resource: the server responded with a status of 500 (Internal Server Error)Understand this error
-index-Dxp9f16s.js:81 Server error: 500 {error: true, message: 'Error running forecast analysis', details: "Python analysis process failed: Traceback (most re…pd\nModuleNotFoundError: No module named 'pandas'\n"}details: "Python analysis process failed: Traceback (most recent call last):\n  File \"/home/site/wwwroot/AI/forecast.py\", line 7, in <module>\n    import pandas as pd\nModuleNotFoundError: No module named 'pandas'\n"error: truemessage: "Error running forecast analysis"[[Prototype]]: Object
-(anonymous) @ index-Dxp9f16s.js:81Understand this error
-index-Dxp9f16s.js:881 Analysis fetch error: $e {message: 'Request failed with status code 500', name: 'AxiosError', code: 'ERR_BAD_RESPONSE', config: {…}, request: XMLHttpRequest, …}code: "ERR_BAD_RESPONSE"config: {transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 180000, …}message: "Request failed with status code 500"name: "AxiosError"request: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 180000, withCredentials: true, upload: XMLHttpRequestUpload, …}response: {data: {…}, status: 500, statusText: 'Internal Server Error', headers: Wn, config: {…}, …}status: 500stack: "AxiosError: Request failed with status code 500\n    at GC (https://smartsk.app/assets/index-Dxp9f16s.js:78:1088)\n    at XMLHttpRequest._ (https://smartsk.app/assets/index-Dxp9f16s.js:78:5742)\n    at li.request (https://smartsk.app/assets/index-Dxp9f16s.js:80:2068)\n    at async https://smartsk.app/assets/index-Dxp9f16s.js:881:16694"[[Prototype]]: Error
-(anonymous) @ index-Dxp9f16s.js:881Understand this error
+index-B2JIje-p.js:81 Server error: 500 
+{error: 'Failed to generate forecast', message: "Python process failed: Traceback (most recent call…module 'os' has no attribute 'add_dll_directory'\n"}
+error
+: 
+"Failed to generate forecast"
+message
+: 
+"Python process failed: Traceback (most recent call last):\n  File \"/home/site/wwwroot/AI/forecast.py\", line 16, in <module>\n    import pandas as pd\n  File \"/home/site/wwwroot/AI/python_packages/pandas/__init__.py\", line 11, in <module>\n    _delvewheel_patch_1_11_1()\n  File \"/home/site/wwwroot/AI/python_packages/pandas/__init__.py\", line 8, in _delvewheel_patch_1_11_1\n    os.add_dll_directory(libs_dir)\n    ^^^^^^^^^^^^^^^^^^^^\nAttributeError: module 'os' has no attribute 'add_dll_directory'\n"
+[[Prototype]]
+: 
+Object
+(anonymous)	@	index-B2JIje-p.js:81
+Promise.then		
+_request	@	index-B2JIje-p.js:81
+request	@	index-B2JIje-p.js:80
+li.<computed>	@	index-B2JIje-p.js:81
+(anonymous)	@	index-B2JIje-p.js:76
+(anonymous)	@	index-B2JIje-p.js:881
+(anonymous)	@	index-B2JIje-p.js:881
+Ml	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Hs	@	index-B2JIje-p.js:48
+Nx	@	index-B2JIje-p.js:48
+Gx	@	index-B2JIje-p.js:48
+ld	@	index-B2JIje-p.js:48
+Wx	@	index-B2JIje-p.js:48
+Hx	@	index-B2JIje-p.js:48
+Lx	@	index-B2JIje-p.js:48
+Px	@	index-B2JIje-p.js:48
+e1	@	index-B2JIje-p.js:48
+Bl	@	index-B2JIje-p.js:48
+Qx	@	index-B2JIje-p.js:48
+(anonymous)	@	index-B2JIje-p.js:48
+
+﻿
 
 --Backend(Azure Portal's Log Stream)
 
 
 
---Kudu Console Logs
+--SSH/BASH Console Logs on Advanced Development Tools
 
-    __ __          __      __    _ __     
-   / //_/_  _ ____/ /_  __/ /   (_) /____ 
-  / ,< / / / / __  / / / / /   / / __/ _  
- / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
-/_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/ 
-
-                                          
-DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
+   _____                               
+  /  _  \ __________ _________   ____  
+ /  /_\  \\___   /  |  \_  __ \_/ __ \ 
+/    |    \/    /|  |  /|  | \/\  ___/ 
+\____|__  /_____ \____/ |__|    \___  >
+        \/      \/                  \/ 
+A P P   S E R V I C E   O N   L I N U X
 
 Documentation: http://aka.ms/webapp-linux
-Kudu Version : 20250623.5
-Commit       : 353543ec4c45fcbfd4750522d32c94e23b31927a
+NodeJS quickstart: https://aka.ms/node-qs
+NodeJS Version : v22.17.0
+Note: Any data outside '/home' is not persisted
 
-kudu_ssh_user@fc2fcb017701:/$ cd site/wwwroot/AI/python_packages
-kudu_ssh_user@fc2fcb017701:~/site/wwwroot/AI/python_packages$ ls
-__pycache__                         google_ai_generativelanguage-0.6.15.dist-info  idna                            pydantic-2.11.9.dist-info              six-1.17.0.dist-info
-annotated_types                     google_api_core-2.25.1.dist-info               idna-3.10.dist-info             pydantic_core                          six.py
-annotated_types-0.7.0.dist-info     google_api_python_client-2.183.0.dist-info     numpy                           pydantic_core-2.33.2.dist-info         tqdm
-apiclient                           google_auth-2.40.3.dist-info                   numpy-2.3.3.dist-info           pyodbc-5.2.0.dist-info                 tqdm-4.67.1.dist-info
-bin                                 google_auth_httplib2-0.2.0.dist-info           numpy.libs                      pyodbc.cp313-win_amd64.pyd             typing_extensions-4.15.0.dist-info
-cachetools                          google_auth_httplib2.py                        pandas                          pyodbc.pyi                             typing_extensions.py
-cachetools-5.5.2.dist-info          google_generativeai-0.8.5-py3.13-nspkg.pth     pandas-2.3.2.dist-info          pyparsing                              typing_inspection
-certifi                             google_generativeai-0.8.5.dist-info            pandas.libs                     pyparsing-3.2.5.dist-info              typing_inspection-0.4.1.dist-info
-certifi-2025.8.3.dist-info          googleapiclient                                proto                           python_dateutil-2.9.0.post0.dist-info  tzdata
-charset_normalizer                  googleapis_common_protos-1.70.0.dist-info      proto_plus-1.26.1.dist-info     python_dotenv-1.1.1.dist-info          tzdata-2025.2.dist-info
-charset_normalizer-3.4.3.dist-info  grpc                                           protobuf-5.29.5.dist-info       pytz                                   uritemplate
-colorama                            grpc_status                                    pyasn1                          pytz-2025.2.dist-info                  uritemplate-4.2.0.dist-info
-colorama-0.4.6.dist-info            grpcio-1.75.0.dist-info                        pyasn1-0.6.1.dist-info          requests                               urllib3
-dateutil                            grpcio_status-1.71.2.dist-info                 pyasn1_modules                  requests-2.32.5.dist-info              urllib3-2.5.0.dist-info
-dotenv                              httplib2                                       pyasn1_modules-0.4.2.dist-info  rsa
-google                              httplib2-0.31.0.dist-info                      pydantic                        rsa-4.9.1.dist-info
+root@ba0063631f35:/home# cd site/wwwroot
+root@ba0063631f35:/home/site/wwwroot# ls
+AI     Email    Storage            audit   database        login    node_modules         oryx-manifest.toml  package.json   projectSubmission  rawdata     session
+Admin  Posting  _del_node_modules  config  forgotpassword  main.js  node_modules.tar.gz  package-lock.json   projectReview  pyBridge           routeGuard
+root@ba0063631f35:/home/site/wwwroot# cd AI
+root@ba0063631f35:/home/site/wwwroot/AI# ls
+__init__.py  __pycache__  credentials.json  db_utils.py  forecast.py  pa.py  paCstm.py  paCstmTrends.py  paTrends.py  path_setup.py  python_packages  requirements.txt  token.json
+root@ba0063631f35:/home/site/wwwroot/AI# cat path_setup.py
+import os
+import sys
+
+def setup_paths():
+    """
+    Adds the 'python_packages' directory to the Python path.
+    This ensures that modules installed in this custom directory can be imported
+    when scripts are run as standalone processes.
+    """
+    # The directory containing this script (and all other AI scripts)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    packages_dir = os.path.join(current_dir, 'python_packages')
+
+    if packages_dir not in sys.path:
+

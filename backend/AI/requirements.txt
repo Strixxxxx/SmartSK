@@ -1,7 +1,7 @@
-pandas
+pandas==2.2.2
 pyodbc
-numpy
-google-generativeai
-google-api-python-client
-python-dotenv
-requests
+numpy==2.0.0
+google-generativeai==0.7.1
+google-api-python-client==2.136.0
+python-dotenv==1.0.1
+requests==2.32.3
