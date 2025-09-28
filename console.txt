@@ -5,7 +5,7 @@
 --Backend(Azure Portal's Log Stream)
 
 Connected!
-2025-09-28T13:12:54  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/28/2025 12:51:52/home/LogFiles/kudu/trace/01e343fd5c34-8f3fc608-dfb1-41a0-9caa-40dc93ad6e6a.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/01e343fd5c34-8f3fc608-dfb1-41a0-9caa-40dc93ad6e6a.txt)
+2025-09-28T13:36:21  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/28/2025 13:34:33/home/LogFiles/kudu/trace/01e343fd5c34-8f3fc608-dfb1-41a0-9caa-40dc93ad6e6a.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/01e343fd5c34-8f3fc608-dfb1-41a0-9caa-40dc93ad6e6a.txt)
 2025-09-26T16:45:08  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,16, SCM_DO_BUILD_DURING_DEPLOYMENT: false, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, ScmType: GitHubAction/home/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/034c089effda-9928d432-887e-47a4-a977-3ecf8e3b5367.txt)
 2025-09-22T03:57:50  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,16, ScmType: GitHubAction/home/LogFiles/kudu/trace/03a8a751efff-ea9b94d4-5784-44d0-95b8-59e8bdac354e.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03a8a751efff-ea9b94d4-5784-44d0-95b8-59e8bdac354e.txt)
 2025-09-23T06:42:52    Outgoing response, type: response, statusCode: 409, statusText: Conflict/home/LogFiles/kudu/trace/03a8a751efff-f0c217d7-58b3-46fb-98ef-d367d83a9c15.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03a8a751efff-f0c217d7-58b3-46fb-98ef-d367d83a9c15.txt)
@@ -63,7 +63,8 @@ Connected!
 2025-09-23T09:06:37  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/5c6a43b128a8-f987e8d5-4eec-44a2-9d84-1c113e8d2218.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/5c6a43b128a8-f987e8d5-4eec-44a2-9d84-1c113e8d2218.txt)
 2025-09-28T05:27:05  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PcEoRrI&sid=koh2fdu5ww31OnxeAAAA, method: GET, type: request, pid: 826,1,16, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, ScmType: GitHubAction, SCM_DO_BUILD_DURING_DEPLOYMENT: true/home/LogFiles/kudu/trace/5c77d3e52d0a-f619d7dd-1e43-4290-8865-a7e541903450.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/5c77d3e52d0a-f619d7dd-1e43-4290-8865-a7e541903450.txt)
 2025-09-23T11:40:49  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsO5LJ&sid=wSTD9b1x3HhjCQkdAAAA, method: POST, type: request, pid: 820,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/5dee4becb0ab-c2f810c5-b4b8-4654-a127-4a8efa6fbed8.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/5dee4becb0ab-c2f810c5-b4b8-4654-a127-4a8efa6fbed8.txt)
-2025-09-23T11:49:55  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsQAWb&sid=_QdBMB5SIBXeC8VeAAAA, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/63d757d41e17-22adf0c5-c2fe-48cd-9903-c1cb29be5b00.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/63d757d41e17-22adf0c5-c2fe-48cd-9903-c1cb29be5b00.txt)
+2025-09-23T11:49:55  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsQAWb&sid=_QdBMB5SIBXeC8VeAAAA, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction/home/LogFiles/kudu/trace/606ba2143b21-b0d0a6bc-14b9-4b37-919f-8d745b3a50fa.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/606ba2143b21-b0d0a6bc-14b9-4b37-919f-8d745b3a50fa.txt)
+2025-09-28T13:34:27  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PcGY2VM&sid=yTw6UekIO3dUPh97AAAC, method: POST, type: request, pid: 768,1,5, SCM_DO_BUILD_DURING_DEPLOYMENT: true, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, ScmType: GitHubAction/home/LogFiles/kudu/trace/63d757d41e17-22adf0c5-c2fe-48cd-9903-c1cb29be5b00.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/63d757d41e17-22adf0c5-c2fe-48cd-9903-c1cb29be5b00.txt)
 2025-09-26T08:17:27  Startup Request, url: /api/deployments/latest?deployer=OneDeploy&time=2025-09-26_08-12-35Z, method: GET, type: request, pid: 823,1,5, ScmType: GitHubAction, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: false/home/LogFiles/kudu/trace/646aa6e22ee8-4557e930-228e-41aa-b340-0e8b9445fe9a.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/646aa6e22ee8-4557e930-228e-41aa-b340-0e8b9445fe9a.txt)
 2025-09-28T04:09:57  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PcEWoan&sid=MfVlgeL18IkJ_f-VAAAE, method: POST, type: request, pid: 826,1,15, ScmType: GitHubAction, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: true/home/LogFiles/kudu/trace/64d16574b59f-0ffda743-becf-4e6d-a3c1-cbdc8820c308.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/64d16574b59f-0ffda743-becf-4e6d-a3c1-cbdc8820c308.txt)
 2025-09-23T03:39:21  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 825,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/6677560325ff-394daf10-f3d4-4f9b-a36a-e0b175341cc6.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/6677560325ff-394daf10-f3d4-4f9b-a36a-e0b175341cc6.txt)
@@ -137,7 +138,7 @@ Connected!
 2025-09-22T16:14:05  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/dbb6c3ef99ba-69f99403-efac-4c75-8e00-e2d1becced99.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/dbb6c3ef99ba-69f99403-efac-4c75-8e00-e2d1becced99.txt)
 2025-09-22T04:14:17  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/dd02b0a947c3-5f9c3426-b2e8-4317-bb2b-97ffa20e9eb1.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/dd02b0a947c3-5f9c3426-b2e8-4317-bb2b-97ffa20e9eb1.txt)
 2025-09-27T12:45:52  Startup Request, url: /api/settings, method: GET, type: request, pid: 827,1,20, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: false, ScmType: GitHubAction/home/LogFiles/kudu/trace/de2efd88aa5c-004402ed-4af5-4d78-b721-0994792ac0ce.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/de2efd88aa5c-004402ed-4af5-4d78-b721-0994792ac0ce.txt)
-2025-09-23T12:21:29  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsXOuP&sid=DyxDlqtc7d9hIZ7oAAAA, method: GET, type:request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/de3d7590e7c0-59d2f7bf-f868-4cd0-896a-4e82ad8e2ede.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/de3d7590e7c0-59d2f7bf-f868-4cd0-896a-4e82ad8e2ede.txt)
+2025-09-23T12:21:29  Startup Request, url: /webssh/socket.io/?EIO=4&transport=polling&t=PbsXOuP&sid=DyxDlqtc7d9hIZ7oAAAA, method: GET, type: request, pid: 823,1,7, ScmType: GitHubAction/home/LogFiles/kudu/trace/de3d7590e7c0-59d2f7bf-f868-4cd0-896a-4e82ad8e2ede.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/de3d7590e7c0-59d2f7bf-f868-4cd0-896a-4e82ad8e2ede.txt)
 2025-09-28T07:13:36  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 823,1,15, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: true, ScmType: GitHubAction/home/LogFiles/kudu/trace/e239bd2ce51b-3768356d-2783-446d-9dcf-e930ea390767.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/e239bd2ce51b-3768356d-2783-446d-9dcf-e930ea390767.txt)
 2025-09-27T16:36:12  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,7, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, ScmType: GitHubAction, SCM_DO_BUILD_DURING_DEPLOYMENT: false/home/LogFiles/kudu/trace/e32cbc6f25a5-eb2c3efe-76cc-45ad-b3ee-c1268f283a8c.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/e32cbc6f25a5-eb2c3efe-76cc-45ad-b3ee-c1268f283a8c.txt)
 2025-09-22T04:13:18  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 823,1,15, ScmType: GitHubAction/home/LogFiles/kudu/trace/e46a40f74dab-81640283-cbde-4eaa-9c32-0730cc1bd721.txt  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/kudu/trace/e46a40f74dab-81640283-cbde-4eaa-9c32-0730cc1bd721.txt)
@@ -364,7 +365,7 @@ Connected!
 2025-09-27T16:53:46.1440065Z Login successful for user.
 2025-09-27T17:16:30.0223688Z Login attempt received
 2025-09-27T17:16:30.6705774Z Login successful for user.
-2025-09-27T17:25:47.0233780Z Session timed out due to inactivity.
+2025-09-27T17:25:47.0233780Z Session timed out dueto inactivity.
 2025-09-27T17:50:47.1081334Z Session timed out due to inactivity./home/LogFiles/2025_09_27_lw1sdlwk0006KG_default_scm_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_27_lw1sdlwk0006KG_default_scm_docker.log)
 2025-09-27T16:49:33.7048306Z File list size: 0
 2025-09-27T16:49:33.7333241Z File list generation time: 5.739 seconds
@@ -405,413 +406,13 @@ Connected!
 2025-09-28T07:08:44.4107317Z Content root path: /opt/Kudu
 2025-09-28T07:08:44.4277156Z Now listening on: http://0.0.0.0:8181
 2025-09-28T07:08:44.4277453Z Application started. Press Ctrl+C to shut down./home/LogFiles/2025_09_28_lw1sdlwk0006KG_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_28_lw1sdlwk0006KG_docker.log)
-2025-09-28T12:44:39.182Z ERROR - DockerApiException: Docker API responded with status code=InternalServerError, response={"message":"Head \"https://smartskregistry.azurecr.io/v2/smartsk-backend/manifests/ed5fd35a26745c08c820858b1cab2177848f1406\": unauthorized: {\"errors\":[{\"code\":\"UNAUTHORIZED\",\"message\":\"authentication required, visit https://aka.ms/acr/authorization for more information. CorrelationId: 75a6ecf9-64ca-450a-a645-487aa021c312\"}]}"}
-2025-09-28T12:44:39.192Z WARN  - Image pull failed. Defaulting to local copy if present.
-2025-09-28T12:44:39.210Z ERROR - Image pull failed: Verify docker image configuration and credentials (if using private repository)
-2025-09-28T12:44:39.287Z INFO  - Stopping site smartsk-backend because it failed during startup.
-2025-09-28T12:51:53.336Z ERROR - DockerApiException: Docker API responded with status code=InternalServerError, response={"message":"Head \"https://smartskregistry.azurecr.io/v2/smartsk-backend/manifests/ed5fd35a26745c08c820858b1cab2177848f1406\": unauthorized: {\"errors\":[{\"code\":\"UNAUTHORIZED\",\"message\":\"authentication required, visit https://aka.ms/acr/authorization for more information. CorrelationId: 64cfd9d5-bb4f-49df-8175-7be20b9dcd9b\"}]}"}
-2025-09-28T12:51:53.345Z WARN  - Image pull failed. Defaulting to local copy if present.
-2025-09-28T12:51:53.371Z ERROR - Image pull failed: Verify docker image configuration and credentials (if using private repository)
-2025-09-28T12:51:53.402Z INFO  - Stopping site smartsk-backend because it failed during startup./home/LogFiles/2025_09_28_lw1sdlwk0006KG_easyauth_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_28_lw1sdlwk0006KG_easyauth_docker.log)Ending Log Tail of existing logs ---Starting Live Log Stream ---
 2025-09-28T13:12:59.395Z ERROR - DockerApiException: Docker API responded with status code=InternalServerError, response={"message":"Head \"https://smartskregistry.azurecr.io/v2/smartsk-backend/manifests/3d5c0dc43614868d2707dca3af5419cb9aec2ece\": unauthorized: {\"errors\":[{\"code\":\"UNAUTHORIZED\",\"message\":\"authentication required, visit https://aka.ms/acr/authorization for more information. CorrelationId: 835add07-c5ff-4a95-bce1-6eea2ba62023\"}]}"}
 2025-09-28T13:12:59.412Z WARN  - Image pull failed. Defaulting to local copy if present.
 2025-09-28T13:12:59.422Z ERROR - Image pull failed: Verify docker image configuration and credentials (if using private repository)
 2025-09-28T13:12:59.449Z INFO  - Stopping site smartsk-backend because it failed during startup.
+2025-09-28T13:34:35.388Z ERROR - DockerApiException: Docker API responded with status code=InternalServerError, response={"message":"Head \"https://smartskregistry.azurecr.io/v2/smartsk-backend/manifests/72ac05ea96566d2f970bc606dc567d60ef57b126\": unauthorized: {\"errors\":[{\"code\":\"UNAUTHORIZED\",\"message\":\"authentication required, visit https://aka.ms/acr/authorization for more information. CorrelationId: 2c64856e-e92b-4f89-bb34-d24dd347de73\"}]}"}
+2025-09-28T13:34:35.395Z WARN  - Image pull failed. Defaulting to local copy if present.
+2025-09-28T13:34:35.406Z ERROR - Image pull failed: Verify docker image configuration and credentials (if using private repository)
+2025-09-28T13:34:35.435Z INFO  - Stopping site smartsk-backend because it failed during startup./home/LogFiles/2025_09_28_lw1sdlwk0006KG_easyauth_docker.log  (https://smartsk-backend-fsc6fhfphybqacfa.scm.southeastasia-01.azurewebsites.net/api/vfs/LogFiles/2025_09_28_lw1sdlwk0006KG_easyauth_docker.log)Ending Log Tail of existing logs ---Starting Live Log Stream ---
 
---SSH/BASH Console Logs on Advanced Development Tools
-
-    __ __          __      __    _ __     
-   / //_/_  _ ____/ /_  __/ /   (_) /____ 
-  / ,< / / / / __  / / / / /   / / __/ _  
- / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
-/_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/ 
-
-                                          
-DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
-
-Documentation: http://aka.ms/webapp-linux
-Kudu Version : 20250623.5
-Commit       : 353543ec4c45fcbfd4750522d32c94e23b31927a
-
-kudu_ssh_user@6f1b828a7f73:/$ cd site/wwwroot
-kudu_ssh_user@6f1b828a7f73:~/site/wwwroot$ cat main.jswww
-cat: main.jswww: No such file or directory
-kudu_ssh_user@6f1b828a7f73:~/site/wwwroot$ cat main.js
-// Add global error handlers to catch silent crashes
-process.on('uncaughtException', (err, origin) => {
-  console.error(`Caught exception: ${err}\n` + `Exception origin: ${origin}`);
-  process.exit(1);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-  process.exit(1);
-});
-
-// Import the necessary modules
-const express = require('express');
-const cors = require('cors');
-const jwt = require('jsonwebtoken');
-const path = require('path');
-const multer = require('multer');
-const fs = require('fs');
-const pdfParse = require('pdf-parse');
-const { spawn } = require('child_process');
-const os = require('os');
-const dotenv = require('dotenv');
-
-// Import the other js files
-const routeGuard = require('./routeGuard/routeGuard');
-const { getConnection, sql } = require('./database/database');
-const forgotPasswordRoutes = require('./forgotpassword/forgotPassword');
-const accountCreationRouter = require('./Admin/accountCreation');
-const rolesRouter = require('./Admin/roles');
-const backupRouter = require('./Admin/backup');
-const sessionLogRouter = require('./Admin/sessionlog');
-const projectSubmissionRouter = require('./projectSubmission/projectSubmission');
-const emailRouter = require('./Email/email').router;
-const loginRouter = require('./login/login');
-const { authMiddleware, logout, validateToken } = require('./session/session');
-const projectReviewRouter = require('./projectReview/projectReview');
-const auditRouter = require('./audit/auditService').router;
-const rawDataRouter = require('./rawdata/rawData');
-const archiveRouter = require('./Admin/archive');
-const accArchiveRouter = require('./Admin/accArchive');
-const projArchiveRouter = require('./Admin/projArchive');
-const projListRouter = require('./Admin/projList');
-
-// Import the new PyBridge modules with error handling
-let PyBridgeFC, PyBridgePA;
-
-try {
-  PyBridgeFC = require('./pyBridge/pyBridgeFC');
-} catch (error) {
-  console.error('Failed to load PyBridgeFC:', error.message);
-  PyBridgeFC = null;
-}
-
-try {
-  PyBridgePA = require('./pyBridge/pyBridgePA');
-} catch (error) {
-  console.error('Failed to load PyBridgePA:', error.message);
-  PyBridgePA = null;
-}
-
-// Load environment variables
-dotenv.config();
-
-// Create Express app
-const app = express();
-
-const corsOptions = {
-  origin: process.env.CORS_ORIGIN,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
-  credentials: true,
-};
-
-// Middleware
-app.use(cors(corsOptions));
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-
-// Extended timeout middleware for upload endpoints
-app.use((req, res, next) => {
-  // Set longer timeout for upload and processing endpoints
-  if (req.path.includes('/upload') || req.path.includes('/rawdata')) {
-    req.setTimeout(600000); // 10 minutes
-    res.setTimeout(600000); // 10 minutes
-    
-    // Add keep-alive headers to prevent proxy timeouts
-    res.setHeader('Connection', 'keep-alive');
-    res.setHeader('Keep-Alive', 'timeout=600, max=1000');
-  }
-  next();
-});
-
-// --- PUBLIC ROUTES ---
-// Routes that don't need authentication and are publicly accessible.
-
-if (loginRouter && typeof loginRouter === 'function') {
-  app.use('/api/login', loginRouter);
-} else {
-  console.error('loginRouter is not a valid middleware function');
-}
-
-// Forgot password router
-if (forgotPasswordRoutes && typeof forgotPasswordRoutes === 'function') {
-  app.use('/api/forgotpassword', forgotPasswordRoutes);
-} else {
-  console.error('forgotPasswordRoutes is not a valid middleware function');
-}
-
-// Health Check Endpoint
-app.get('/api/health', (req, res) => {
-  res.status(200).send('OK');
-});
-
-// --- AUTHENTICATION MIDDLEWARE ---
-// All routes defined after this point will be protected by the authMiddleware.
-if (authMiddleware && typeof authMiddleware === 'function') {
-  app.use(authMiddleware);
-} else {
-  console.error('authMiddleware is not a valid middleware function');
-}
-
-
-// --- PROTECTED ROUTES ---
-// These routes require a valid token to be accessed.
-
-app.get('/api/validate-token', validateToken);
-
-// Logout route
-app.post('/api/logout', logout);
-
-// --- ADMIN ROUTES ---
-// Create a main router for all admin-related endpoints.
-const adminRouter = express.Router();
-
-// Mount the specific admin routers onto the main admin router.
-if (routeGuard.isAdmin && typeof routeGuard.isAdmin === 'function') {
-  adminRouter.use(routeGuard.isAdmin);
-} else {
-  console.error('routeGuard.isAdmin is not a valid middleware function');
-}
-
-// Mount the specific admin routers onto the main admin router.
-if (accountCreationRouter && typeof accountCreationRouter === 'function') {
-  // Changed from '/accounts' to '/' to match frontend path /api/admin/users
-  adminRouter.use('/', accountCreationRouter);
-} else {
-  console.error('accountCreationRouter is not a valid middleware function');
-}
-
-if(backupRouter && typeof backupRouter === 'function') {
-  adminRouter.use('/backup', backupRouter);
-} else {
-  console.error('backupRouter is not a valid middleware function');
-}
-
-if (sessionLogRouter && typeof sessionLogRouter === 'function') {
-  adminRouter.use('/sessions', sessionLogRouter);
-} else {
-  console.error('sessionLogRouter is not a valid middleware function');
-}
-
-if (archiveRouter && typeof archiveRouter === 'function') {
-  adminRouter.use('/archive', archiveRouter);
-} else {
-  console.error('archiveRouter is not a valid middleware function');
-}
-
-if (projArchiveRouter && typeof projArchiveRouter === 'function') {
-  adminRouter.use('/proj-archive', projArchiveRouter);
-} else {
-  console.error('projArchiveRouter is not a valid middleware function');
-}
-
-if (projListRouter && typeof projListRouter === 'function') {
-  adminRouter.use('/', projListRouter);
-} else {
-  console.error('projListRouter is not a valid middleware function');
-}
-
-// Mount the consolidated admin router to the app.
-app.use('/api/admin', adminRouter);
-
-// Roles router is mounted separately to match frontend's expected path /api/roles/...
-if (rolesRouter && typeof rolesRouter === 'function') {
-  app.use('/api/roles', rolesRouter);
-} else {
-  console.error('rolesRouter is not a valid middleware function');
-}
-
-if (projectSubmissionRouter && typeof projectSubmissionRouter === 'function') {
-  app.use('/api/projects', projectSubmissionRouter);
-} else {
-  console.error('projectSubmissionRouter is not a valid middleware function');
-}
-
-if (emailRouter && typeof emailRouter === 'function') {
-  app.use('/api/email', emailRouter);
-} else {
-  console.error('emailRouter is not a valid middleware function');
-}
-
-if (projectReviewRouter && typeof projectReviewRouter === 'function') {
-  app.use('/api/projectreview', projectReviewRouter);
-} else {
-  console.error('projectReviewRouter is not a valid middleware function');
-}
-
-if (auditRouter && typeof auditRouter === 'function') {
-    app.use('/api/audit', auditRouter);
-} else {
-  console.error('auditRouter is not a valid middleware function');
-}
-
-if (rawDataRouter && typeof rawDataRouter === 'function') {
-  app.use('/api/rawdata', rawDataRouter);
-} else {
-  console.error('rawDataRouter is not a valid middleware function');
-}
-
-// Check PyBridge modules - removed duplicate validation since it's handled in import section above
-
-// Add or update the user-info endpoint
-app.get('/api/user-data', async (req, res) => {
-  try {
-    const pool = await getConnection();
-    const userResult = await pool.request()
-      .input('userId', sql.Int, req.user.userId)
-      .query(`
-        SELECT u.userID, u.username, u.fullName, r.roleName as position, b.barangayName as barangay, u.emailAddress, u.phoneNumber 
-        FROM userInfo u
-        LEFT JOIN roles r ON u.position = r.roleID
-        LEFT JOIN barangays b ON u.barangay = b.barangayID
-        WHERE u.userID = @userId
-      `);
-
-    if (userResult.recordset.length === 0) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-
-    return res.json({
-      success: true,
-      userInfo: userResult.recordset[0]
-    });
-
-  } catch (error) {
-    console.error('Error fetching user data');
-    return res.status(500).json({ success: false, message: 'An error occurred while fetching user data' });
-  }
-});
-
-// Forecast-related API endpoints using PyBridgeFC
-app.get('/api/forecast', async (req, res) => {
-  try {
-    // Get any query parameters
-    const options = req.query;
-    
-    // Run the forecast using PyBridgeFC
-    const forecastData = await PyBridgeFC.runForecast(options);
-    
-    // Return the forecast data
-    res.json(forecastData);
-  } catch (error) {
-    console.error('Error running forecast:', error);
-    res.status(500).json({ 
-      error: 'Failed to generate forecast',
-      message: error.message
-    });
-  }
-});
-
-// Forecast analysis API endpoint
-app.get('/api/forecast-analysis', (req, res) => {
-  if (PyBridgeFC && typeof PyBridgeFC.handleForecastAnalysisRequest === 'function') {
-    PyBridgeFC.handleForecastAnalysisRequest(req, res);
-  } else {
-    console.error('PyBridgeFC.handleForecastAnalysisRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Forecast analysis service unavailable' });
-  }
-});
-
-// Project trends API endpoint (now uses PyBridgePA since fcTrends.py became paTrends.py)
-app.get('/api/project-trends', (req, res) => {
-  if (PyBridgePA && typeof PyBridgePA.handleProjectTrendsRequest === 'function') {
-    PyBridgePA.handleProjectTrendsRequest(req, res);
-  } else {
-    console.error('PyBridgePA.handleProjectTrendsRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Project trends service unavailable' });
-  }
-});
-
-// Custom project trends API endpoint (now uses PyBridgePA since fcCstmTrends.py became paCstmTrends.py)
-app.get('/api/custom-project-trends', (req, res) => {
-  if (PyBridgePA && typeof PyBridgePA.handleCustomProjectTrendsRequest === 'function') {
-    PyBridgePA.handleCustomProjectTrendsRequest(req, res);
-  } else {
-    console.error('PyBridgePA.handleCustomProjectTrendsRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Custom project trends service unavailable' });
-  }
-});
-
-
-// Predictive Analysis Routes using PyBridgePA
-app.get('/api/predictive-analysis/trends', (req, res) => {
-  if (PyBridgePA && typeof PyBridgePA.handlePaTrendsRequest === 'function') {
-    PyBridgePA.handlePaTrendsRequest(req, res);
-  } else {
-    console.error('PyBridgePA.handlePaTrendsRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Predictive analysis trends service unavailable' });
-  }
-});
-
-app.post('/api/predictive-analysis', (req, res) => {
-  if (PyBridgePA && typeof PyBridgePA.handlePredictiveAnalysisRequest === 'function') {
-    PyBridgePA.handlePredictiveAnalysisRequest(req, res);
-  } else {
-    console.error('PyBridgePA.handlePredictiveAnalysisRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Predictive analysis service unavailable' });
-  }
-});
-
-app.post('/api/predictive-analysis/custom', (req, res) => {
-  if (PyBridgePA && typeof PyBridgePA.handleCustomizedAnalysisRequest === 'function') {
-    PyBridgePA.handleCustomizedAnalysisRequest(req, res);
-  } else {
-    console.error('PyBridgePA.handleCustomizedAnalysisRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Customized predictive analysis service unavailable' });
-  }
-});
-
-// Determine the correct Python executable based on the OS
-const getPythonExecutable = () => {
-  const platform = os.platform();
-  // On Windows, typically just 'python' is used
-  if (platform === 'win32') {
-    return 'python';
-  }
-  // On macOS and Linux, try 'python3' first
-  return 'python3';
-};
-
-// Python executable name
-const PYTHON_EXECUTABLE = getPythonExecutable();
-
-// Update your existing predictive analysis endpoint to handle customization options
-app.post('/api/predictive-analysis/custom-options', async (req, res) => {
-  try {
-    // Get analysis options from request body
-    const options = {
-      analysis_type: req.body.analysis_type || 'general',
-      category: req.body.category || 'None',
-      time_period: req.body.time_period || 'None',
-      include_budget: req.body.include_budget,
-      include_duration: req.body.include_duration,
-      include_implement_date: req.body.include_implement_date,
-      include_recommendations: req.body.include_recommendations,
-      include_risks: req.body.include_risks,
-      include_trends: req.body.include_trends,
-      include_success_factors: req.body.include_success_factors,
-      include_feedback: req.body.include_feedback
-    };
-    
-    // Use PyBridgePA for predictive analysis
-    const analysisResult = await PyBridgePA.runPredictiveAnalysis(options);
-    res.json(analysisResult);
-    
-  } catch (error) {
-    console.error('Error in predictive analysis:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Define the port
-const PORT = process.env.WEBSITES_PORT;
-
-// Start the server
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+--SSH/Bash Console from Advanced Development Tools

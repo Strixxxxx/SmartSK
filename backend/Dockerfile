@@ -1,57 +1,56 @@
 # ============================
-# Stage 1: Build Python 3.12.9
+# Stage 1: Build Node.js deps
 # ============================
-FROM debian:bullseye-slim AS python-builder
+FROM node:22-bullseye-slim AS node-builder
 
-RUN apt-get update && \
-    apt-get install -y wget build-essential libssl-dev zlib1g-dev \
-                       libncurses5-dev libffi-dev libsqlite3-dev \
-                       libbz2-dev libreadline-dev liblzma-dev && \
-    wget https://www.python.org/ftp/python/3.12.11/Python-3.12.11.tgz && \
-    tar xvf Python-3.12.11.tgz && \
-    cd Python-3.12.11 && \
-    ./configure --enable-optimizations && \
-    make -j$(nproc) && \
-    make altinstall && \
-    cd .. && rm -rf Python-3.12.11*
+WORKDIR /app
+
+# Debug: show Node version
+RUN node --version && npm --version
+
+COPY backend/package*.json ./
+RUN echo "Installing Node.js dependencies..." && npm ci --omit=dev
 
 # ============================
-# Stage 2: Runtime (Node + Python)
+# Stage 2: Build Python deps
+# ============================
+FROM python:3.12-slim AS python-builder
+
+WORKDIR /app
+
+# Debug: show Python version
+RUN python3 --version && pip --version
+
+# Install build tools
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc && rm -rf /var/lib/apt/lists/*
+
+COPY backend/requirements.txt .
+RUN echo "Installing Python dependencies..." && pip install --no-cache-dir -r requirements.txt -t /python-packages
+
+# ============================
+# Final Stage: Runtime
 # ============================
 FROM node:22-bullseye-slim
 
-# Install minimal runtime dependencies for Python
-RUN apt-get update && \
-    apt-get install -y libssl1.1 zlib1g libncurses5 libffi7 libsqlite3-0 \
-                       libbz2-1.0 libreadline8 liblzma5 && \
-    rm -rf /var/lib/apt/lists/*
+WORKDIR /app
 
-# Copy Python binaries from builder
-COPY --from=python-builder /usr/local/bin/python3.12 /usr/local/bin/python3.12
-COPY --from=python-builder /usr/local/bin/pip3.12 /usr/local/bin/pip3.12
-COPY --from=python-builder /usr/local/lib/python3.12 /usr/local/lib/python3.12
+# Install Python + pip
+RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip && rm -rf /var/lib/apt/lists/*
 
-# Set aliases
-RUN ln -s /usr/local/bin/python3.12 /usr/bin/python && \
-    ln -s /usr/local/bin/pip3.12 /usr/bin/pip && \
-    pip install --upgrade pip
+# Debug: confirm versions
+RUN echo "Final container build:" && node --version && npm --version && python3 --version && pip --version
 
-# Set work directory
-WORKDIR /usr/src/app
+# Copy node modules
+COPY --from=node-builder /app/node_modules ./node_modules
 
-# Copy Node.js package files and install dependencies
-COPY package*.json ./
-RUN npm install --production
+# Copy python deps
+COPY --from=python-builder /python-packages /usr/local/lib/python3.12/site-packages
 
-# Copy Python requirements and install them
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Copy app source
+COPY backend/ .
 
-# Copy application code
-COPY . .
-
-# Expose Azure expected port
+# Expose Azure port
 EXPOSE 8080
 
-# Run Node.js app
-CMD ["npm", "start"]
+# Debug: print environment on container start
+CMD echo "Starting container with PORT=$PORT" && env && node --trace-warnings main.js
