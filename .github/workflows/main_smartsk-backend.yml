@@ -2,16 +2,17 @@ name: Build and Deploy Docker app to Azure Web App - smartSK-backend
 
 on:
   push:
-    branches:
-    - main
-  workflow_dispatch:
+  branches:
+  - main
+workflow_dispatch:
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      id-token: write
+    contents: read
+    id-token: write
+
 
 steps:
   - name: Checkout code
@@ -23,6 +24,9 @@ steps:
       client-id: 3cf53574-bca2-498b-bef8-302f807b6472
       tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID }}
       subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID }}
+
+  - name: Docker login to ACR
+    run: az acr login --name smartskregistry
 
   - name: Build and Push Docker image
     run: |
@@ -41,4 +45,5 @@ steps:
       az webapp config container set \
         --name smartsk-backend-container \
         --resource-group Smart_SK \
-        --docker-custom-image-name smartskregistry.azurecr.io/smartsk-backend:latest
+        --docker-custom-image-name smartskregistry.azurecr.io/smartsk-backend:latest \
+        --enable-app-service-storage false
