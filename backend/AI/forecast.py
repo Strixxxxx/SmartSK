@@ -1,5 +1,14 @@
 import os
 import sys
+# Ensure custom packages are discoverable
+try:
+    from path_setup import setup_paths
+    setup_paths()
+except ImportError:
+    # Handle case where script is run from a different CWD
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from path_setup import setup_paths
+    setup_paths()
 import json
 import argparse
 import logging

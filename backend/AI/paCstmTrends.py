@@ -1,13 +1,22 @@
 
 import os
 import json
+# Ensure custom packages are discoverable
+import sys
+try:
+    from path_setup import setup_paths
+    setup_paths()
+except ImportError:
+    # Handle case where script is run from a different CWD
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from path_setup import setup_paths
+    setup_paths()
 import pandas as pd
 import numpy as np
 import argparse
 from datetime import datetime
 import re
 import requests
-import sys
 import pyodbc
 import logging
 
