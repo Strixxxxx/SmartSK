@@ -3,9 +3,8 @@ import os
 import json
 import sys
 import pandas as pd
-import numpy as np
 import argparse
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import re
 import requests
 import logging
@@ -203,8 +202,9 @@ def main(custom_category, other_category, forecast_year):
 
         result = get_ai_response(prompt)
 
+        ph_tz = timezone(timedelta(hours=8))
         result['metadata'] = {
-            "generated_at": datetime.now().isoformat(),
+            "generated_at": datetime.now(ph_tz).isoformat(),
             "historical_data_points": len(primary_data) if primary_data is not None else 0,
             "internet_sources_used": len(secondary_data),
             "data_weighting": "70% from Primary Data (Database), 30% from Secondary Data (Internet Sources)"

@@ -2,12 +2,10 @@ import os
 import json
 import sys
 import pandas as pd
-import numpy as np
 import argparse
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 import re
 import requests
-from collections import Counter
 import logging
 from db_utils import get_raw_data_from_db
 
@@ -263,8 +261,9 @@ def generate_project_trends(filters=None, forecast_year=None):
         if not trends_data.get('error'):
             categories = get_categories_from_db()
             trends_data['categories'] = categories
+            ph_tz = timezone(timedelta(hours=8))
             trends_data['metadata'] = {
-                "generated_at": datetime.now().isoformat(),
+                "generated_at": datetime.now(ph_tz).isoformat(),
                 "historical_data_available": historical_data is not None,
                 "internet_sources_used": len(search_results),
                 "filters_applied": filters if filters else "none",

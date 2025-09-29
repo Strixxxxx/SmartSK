@@ -5,7 +5,6 @@ import argparse
 import logging
 from datetime import datetime, timezone, timedelta
 import pandas as pd
-import numpy as np
 from db_utils import get_raw_data_from_db
 
 try:

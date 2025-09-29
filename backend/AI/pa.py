@@ -2,7 +2,7 @@ import os
 import sys
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import pandas as pd
 from db_utils import get_raw_data_from_db
 
@@ -254,6 +254,7 @@ def main():
         analysis, sources_consulted = generate_gemini_analysis(df, view_by, custom_category, year)
         
         # Add metadata to the final response
+        ph_tz = timezone(timedelta(hours=8))
         analysis.setdefault('metadata', {})
         analysis['metadata'].update({
             'internet_sources_consulted': sources_consulted,
@@ -261,7 +262,7 @@ def main():
             'total_projects_analyzed': len(df),
             'view_by': view_by,
             'gemini_used': True,
-            'timestamp': datetime.now().isoformat(),
+            'timestamp': datetime.now(ph_tz).isoformat(),
             'filters_applied': {'category': category}
         })
 
@@ -269,10 +270,11 @@ def main():
 
     except Exception as e:
         logger.error(f"Predictive analysis failed: {e}", exc_info=True)
+        ph_tz = timezone(timedelta(hours=8))
         error_response = {
             'error': True,
             'message': str(e),
-            'timestamp': datetime.now().isoformat()
+            'timestamp': datetime.now(ph_tz).isoformat()
         }
         print(json.dumps(error_response, indent=2))
         sys.exit(1)
