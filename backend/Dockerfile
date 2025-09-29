@@ -66,8 +66,8 @@ RUN echo "Final container build:" && node --version && npm --version && python3 
 # Copy node modules
 COPY --from=node-builder /app/node_modules ./node_modules
 
-# Copy python deps to the correct Python 3.9 path
-COPY --from=python-builder /python-packages /usr/local/lib/python3.9/dist-packages
+# Copy Python packages - install them properly in runtime Python environment
+COPY --from=python-builder /python-packages /usr/local/lib/python3.9/site-packages
 
 # Copy app source
 COPY . .
