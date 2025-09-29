@@ -116,7 +116,18 @@ const Login: React.FC<LoginProps> = ({ open, onClose, barangay }) => {
   };
 
   return (
-    <Modal open={open} onClose={onClose}>
+    <Modal 
+      open={open} 
+      onClose={onClose}
+      slotProps={{
+        backdrop: {
+          style: {
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 1100,
+          },
+        },
+      }}
+    >
       <Box sx={style}>
         <div className="login-form-container">
           <div className="login-header">
