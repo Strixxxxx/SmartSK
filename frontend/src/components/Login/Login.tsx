@@ -27,7 +27,7 @@ const style = {
   width: 'auto',
   bgcolor: 'background.paper',
   boxShadow: 24,
-  p: 4,
+  p: 5,
   borderRadius: 2,
   zIndex: 1300,
 };
@@ -83,7 +83,8 @@ const Login: React.FC<LoginProps> = ({ open, onClose, barangay }) => {
         if (result.user.isDefaultPassword) {
           setNewAccountData({ userID: result.user.id, currentUsername: result.user.username });
           setIsNewAccountModalOpen(true);
-        } else {
+        }
+        else {
           const userPosition = result.user.position;
           const userRole = result.user.role;
           const isAdmin = userPosition === 'MA' || 
