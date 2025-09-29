@@ -27,6 +27,13 @@ jobs:
       - name: Azure CLI - show account
         run: az account show
 
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: smartskregistry.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
       - name: Build and Push Docker image
         run: |
           IMAGE_NAME=smartskregistry.azurecr.io/smartsk-backend
@@ -46,4 +53,3 @@ jobs:
             --resource-group Smart_SK \
             --docker-custom-image-name smartskregistry.azurecr.io/smartsk-backend:latest \
             --enable-app-service-storage false
-
