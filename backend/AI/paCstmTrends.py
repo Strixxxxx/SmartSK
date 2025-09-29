@@ -10,6 +10,7 @@ import re
 import requests
 import logging
 from db_utils import get_raw_data_from_db
+from profanity import profanity
 
 # ==============================================================================
 # Configuration
@@ -49,6 +50,22 @@ except ImportError:
     gemini_configured = False
     logger.warning("Google Generative AI module not found. AI features will be disabled.")
 
+# --- Profanity Filter Setup ---
+# You can expand these lists for more comprehensive filtering.
+filipino_bad_words = [
+    "putang ina", "puta", "gago", "tanga", "bobo", "ulol", "pakyu", 
+    "hayop", "bwisit", "lintik", "leche", "animal ka", "ampucha", "ampota",
+    "amputa", "anak ng tokwa", "bilat", "binibrocha", "demonyo", "engot",
+    "hinayupak", "hindot", "inutil", "kupal", "pakingshet", "potangina",
+    "putragis", "pakshet", "tarantado", "ungas"
+]
+spanish_bad_words = [
+    "joder", "mierda", "puta", "puto", "cabron", "gilipollas", "pendejo",
+    "capullo", "hijoputa", "mamón", "marica", "maricón"
+]
+profanity.add_censor_words(filipino_bad_words)
+profanity.add_censor_words(spanish_bad_words)
+
 # ==============================================================================
 # Data Fetching and Processing
 # ==============================================================================
@@ -80,7 +97,6 @@ def search_internet_for_trends(search_query):
 def generate_trends_prompt(primary_data, secondary_data, category, forecast_year):
     """Creates the prompt for the Gemini model."""
     
-    # Dynamically create a focused instruction if a specific category is provided
     category_instruction = ""
     if category and category.lower() != 'general':
         category_instruction = f"""
@@ -138,12 +154,10 @@ def get_ai_response(prompt):
         raise ConnectionError("Gemini AI is not configured. Please set the GEMINI_API_KEY.")
     try:
         response = model.generate_content(prompt)
-        # Clean the response to ensure it is valid JSON
         cleaned_response = re.search(r'```json\n(.*?)\n```', response.text, re.DOTALL)
         if cleaned_response:
             json_text = cleaned_response.group(1)
         else:
-            # Fallback for responses that might not have markdown
             json_text = response.text
         
         return json.loads(json_text)
@@ -159,7 +173,6 @@ def main(custom_category, other_category, forecast_year):
     try:
         target_year = int(forecast_year) if forecast_year else datetime.now().year + 1
         
-        # Determine search query and database filter
         db_category_filter = None
         search_category = "youth development"
         display_category = "General"
@@ -169,24 +182,27 @@ def main(custom_category, other_category, forecast_year):
             db_category_filter = custom_category
             search_category = custom_category
             if custom_category == 'Others' and other_category:
+                if profanity.contains_profanity(other_category):
+                    error_response = {
+                        "error": True,
+                        "message": "The custom category contains inappropriate language. Please use respectful terms. (English, Filipino, and Spanish profanity is checked.)"
+                    }
+                    print(json.dumps(error_response))
+                    sys.exit(1)
+                
                 display_category = other_category
                 search_category = other_category
 
-        # 1. Fetch Primary Data (Database)
         data = get_raw_data_from_db(category=db_category_filter)
         primary_data = pd.DataFrame(data) if data else pd.DataFrame()
 
-        # 2. Fetch Secondary Data (Internet)
         search_query = f"Sangguniang Kabataan {search_category} project trends Philippines {target_year}"
         secondary_data = search_internet_for_trends(search_query)
 
-        # 3. Generate AI Prompt
         prompt = generate_trends_prompt(primary_data, secondary_data, display_category, target_year)
 
-        # 4. Get AI Response
         result = get_ai_response(prompt)
 
-        # 5. Add Metadata and Finalize
         result['metadata'] = {
             "generated_at": datetime.now().isoformat(),
             "historical_data_points": len(primary_data) if primary_data is not None else 0,
