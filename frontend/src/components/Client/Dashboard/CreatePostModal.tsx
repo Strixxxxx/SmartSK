@@ -1,7 +1,8 @@
 
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import axios from '../../../../backend connection/axiosConfig';
+import { AxiosProgressEvent } from 'axios';
+import api from '../../../backend connection/axiosConfig';
 import './CreatePostModal.css';
 
 interface IFormInput {
@@ -46,12 +47,12 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
         }
 
         try {
-            await axios.post('/posts', formData, {
+            await api.post('/posts', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
-                onUploadProgress: (progressEvent) => {
-                    const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                onUploadProgress: (progressEvent: AxiosProgressEvent) => {
+                    const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total ?? 0));
                     setUploadProgress(percentCompleted);
                 }
             });
