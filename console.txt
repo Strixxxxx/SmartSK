@@ -1,8 +1,90 @@
 --Frontend (Browser's Console)
 
-Received general analysis response (data): {error: true, message: 'Insufficient data for analysis. The database query returned no results for the applied filters.', trends: Array(0), metadata: {…}}
-index-Cm8CaO6j.js:885 Creating custom forecast request with params: {selectedCategory: 'Others', selectedYear: '', otherCategory: 'youth pota'}otherCategory: "youth pota"selectedCategory: "Others"selectedYear: ""[[Prototype]]: Object
-index-Cm8CaO6j.js:885 Creating custom forecast request with params: {selectedCategory: 'Others', selectedYear: '', otherCategory: 'youth tangina'}otherCategory: "youth tangina"selectedCategory: "Others"selectedYear: ""[[Prototype]]: Object
+index-Cm8CaO6j.js:78 
+ GET https://smartsk-backend-container.azurewebsites.net/api/custom-project-trends?customCategory=Others&otherCategory=youth+tangina+mo+mj&_t=1759130767919 500 (Internal Server Error)
+(anonymous)	@	index-Cm8CaO6j.js:78
+xhr	@	index-Cm8CaO6j.js:78
+dS	@	index-Cm8CaO6j.js:80
+Promise.then		
+_request	@	index-Cm8CaO6j.js:81
+request	@	index-Cm8CaO6j.js:80
+ci.<computed>	@	index-Cm8CaO6j.js:81
+(anonymous)	@	index-Cm8CaO6j.js:76
+z	@	index-Cm8CaO6j.js:885
+q	@	index-Cm8CaO6j.js:885
+s1	@	index-Cm8CaO6j.js:48
+(anonymous)	@	index-Cm8CaO6j.js:48
+fb	@	index-Cm8CaO6j.js:48
+km	@	index-Cm8CaO6j.js:48
+Hm	@	index-Cm8CaO6j.js:49
+_N	@	index-Cm8CaO6j.js:49
+
+index-Cm8CaO6j.js:81 Server error: 500 
+{error: true, message: 'Failed to generate custom project trends analysis:… INFO - Gemini AI model configured successfully.\n'}
+error
+: 
+true
+message
+: 
+"Failed to generate custom project trends analysis: Python process failed with code 1: 2025-09-29 07:26:19,923 - INFO - Gemini AI model configured successfully.\n"
+[[Prototype]]
+: 
+Object
+(anonymous)	@	index-Cm8CaO6j.js:81
+Promise.then		
+_request	@	index-Cm8CaO6j.js:81
+request	@	index-Cm8CaO6j.js:80
+ci.<computed>	@	index-Cm8CaO6j.js:81
+(anonymous)	@	index-Cm8CaO6j.js:76
+z	@	index-Cm8CaO6j.js:885
+q	@	index-Cm8CaO6j.js:885
+s1	@	index-Cm8CaO6j.js:48
+(anonymous)	@	index-Cm8CaO6j.js:48
+fb	@	index-Cm8CaO6j.js:48
+km	@	index-Cm8CaO6j.js:48
+Hm	@	index-Cm8CaO6j.js:49
+_N	@	index-Cm8CaO6j.js:49
+index-Cm8CaO6j.js:885 API fetch error: 
+Be {message: 'Request failed with status code 500', name: 'AxiosError', code: 'ERR_BAD_RESPONSE', config: {…}, request: XMLHttpRequest, …}
+code
+: 
+"ERR_BAD_RESPONSE"
+config
+: 
+{transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}
+message
+: 
+"Request failed with status code 500"
+name
+: 
+"AxiosError"
+request
+: 
+XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
+response
+: 
+{data: {…}, status: 500, statusText: '', headers: qn, config: {…}, …}
+status
+: 
+500
+stack
+: 
+"AxiosError: Request failed with status code 500\n    at ZC (https://smartsk.app/assets/index-Cm8CaO6j.js:78:1088)\n    at XMLHttpRequest._ (https://smartsk.app/assets/index-Cm8CaO6j.js:78:5742)\n    at ci.request (https://smartsk.app/assets/index-Cm8CaO6j.js:80:2068)\n    at async z (https://smartsk.app/assets/index-Cm8CaO6j.js:885:36855)"
+[[Prototype]]
+: 
+Error
+z	@	index-Cm8CaO6j.js:885
+await in z		
+q	@	index-Cm8CaO6j.js:885
+s1	@	index-Cm8CaO6j.js:48
+(anonymous)	@	index-Cm8CaO6j.js:48
+fb	@	index-Cm8CaO6j.js:48
+km	@	index-Cm8CaO6j.js:48
+Hm	@	index-Cm8CaO6j.js:49
+_N	@	index-Cm8CaO6j.js:49
+﻿
+
+
 
 --Backend(Azure Portal's Log Stream)
 

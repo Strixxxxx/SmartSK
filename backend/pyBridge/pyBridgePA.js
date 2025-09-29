@@ -200,51 +200,47 @@ class PyBridgePA {
       
       // Handle process completion
       pythonProcess.on('close', (code) => {
-        // Clear the timeout
         clearTimeout(timeoutId);
-        
-        if (isTimedOut) return; // Skip processing if timed out
-        
-        if (code !== 0) {
-          console.error(`Python process exited with code ${code}`);
-          console.error(`Error: ${errorString}`);
-          reject(new Error(`Python process failed with code ${code}: ${errorString}`));
-          return;
-        }
-        
-        try {
-          console.log("Processing Python custom trends output...");
-          
-          // Find the JSON object by looking for the structure that looks like JSON
-          const jsonMatches = dataString.match(/\{[\s\S]*\}/g);
-          if (jsonMatches && jsonMatches.length > 0) {
-            // Take the last (and typically largest) JSON object found
-            const lastJsonObject = jsonMatches[jsonMatches.length - 1];
-            console.log("JSON data found in custom trends output");
-            
+        if (isTimedOut) return;
+
+        // Regardless of exit code, first try to find and parse a JSON object from stdout,
+        // as the Python script may provide a structured error message before exiting.
+        if (dataString) {
             try {
-              const result = JSON.parse(lastJsonObject);
-              console.log("Successfully parsed custom trends JSON result");
-              
-              // Validate that the result has a trends array
-              if (!result.trends || !Array.isArray(result.trends)) {
-                console.warn("JSON result contains no trends array or empty trends");
-                throw new Error("Invalid trends data: missing trends array");
-              }
-              
-              resolve(result);
-            } catch (jsonError) {
-              console.error('Error parsing custom trends JSON data:', jsonError);
-              reject(new Error(`Failed to parse JSON from Python output: ${jsonError.message}`));
+                const jsonMatches = dataString.match(/\{[\s\S]*\}/g);
+                if (jsonMatches && jsonMatches.length > 0) {
+                    const lastJsonObject = jsonMatches[jsonMatches.length - 1];
+                    const result = JSON.parse(lastJsonObject);
+                    
+                    // If the parsed object is a structured error (e.g., profanity, no data),
+                    // or even a success response, resolve with it and we're done.
+                    if (result.error || result.trends) {
+                        if(result.error) console.warn('Python script returned a structured error:', result.message);
+                        else console.log("Successfully parsed custom trends JSON result");
+                        
+                        resolve(result);
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.log('Could not parse stdout as a complete JSON response, will proceed to check exit code.');
             }
-          } else {
-            console.log("No valid JSON found in custom trends output");
-            reject(new Error('No valid JSON found in Python script output'));
-          }
-        } catch (error) {
-          console.error('Error processing Python custom trends output:', error);
-          reject(error);
         }
+
+        // If we're here, it means stdout did not contain a definitive JSON response.
+        // Now, we check the exit code.
+        if (code !== 0) {
+            console.error(`Python process exited with code ${code}`);
+            console.error(`Error from stderr: ${errorString}`);
+            const errorMessage = `Python process failed with code ${code}: ${errorString || 'No stderr output'}`;
+            reject(new Error(errorMessage));
+            return;
+        }
+
+        // If code is 0 but we still haven't resolved, it's an issue.
+        const finalErrorMessage = `Python script finished with code 0, but no valid JSON output was found. stdout: ${dataString}`;
+        console.error(finalErrorMessage);
+        reject(new Error(finalErrorMessage));
       });
       
       // Handle process errors
@@ -391,7 +387,13 @@ class PyBridgePA {
       try {
         const trendsData = await PyBridgePA.runCustomProjectTrends(options);
         
-        // Return the trends data
+        // If the Python script returned a structured error, send it with a 400 status
+        if (trendsData && trendsData.error) {
+          console.warn('Returning structured error to client:', trendsData.message);
+          return res.status(400).json(trendsData);
+        }
+
+        // Return the successful trends data
         res.json(trendsData);
       } catch (error) {
         console.error('Error running custom project trends analysis:', error);
