@@ -3,7 +3,7 @@ import sys
 import json
 import argparse
 import logging
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 import pandas as pd
 import numpy as np
 from db_utils import get_raw_data_from_db
@@ -181,12 +181,13 @@ def main():
             analysis = generate_gemini_analysis(df, args.view_by)
             
             logger.info("Step 5/5: Preparing final JSON response...")
+            ph_tz = timezone(timedelta(hours=8))
             analysis['metadata'] = {
                 'data_source': f"Database - {DB_DATABASE}",
                 'total_projects_analyzed': len(df),
                 'view_by': args.view_by,
                 'gemini_used': True,
-                'generated_at': datetime.now().isoformat(),
+                'generated_at': datetime.now(ph_tz).isoformat(),
             }
             final_json = json.dumps(analysis, indent=2)
             logger.info("Step 5/5: Final JSON response prepared. Sending to output.")
@@ -209,7 +210,7 @@ def main():
         error_response = {
             'error': True,
             'message': str(e),
-            'timestamp': datetime.now().isoformat()
+            'timestamp': datetime.now(timezone(timedelta(hours=8))).isoformat(),
         }
         print(json.dumps(error_response, indent=2))
         sys.exit(1)

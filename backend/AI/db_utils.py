@@ -35,31 +35,10 @@ def get_raw_data_from_db(category=None):
             if df.empty:
                 return []
 
-            # Unpivot the data to a more usable format
-            id_vars = [col for col in ['ppa', 'category', 'committee'] if col in df.columns]
-            value_vars = [col for col in df.columns if col not in id_vars]
-            
-            if not value_vars:
-                return df.to_dict('records')
-
-            df_melted = df.melt(id_vars=id_vars, value_vars=value_vars, var_name='year_metric', value_name='value')
-            
-            df_melted[['year', 'metric']] = df_melted['year_metric'].str.split('_', expand=True)
-            
-            df_final = df_melted.pivot_table(
-                index=id_vars + ['year'],
-                columns='metric',
-                values='value',
-                aggfunc='first'
-            ).reset_index()
-            
-            df_final.columns.name = None
-            df_final['year'] = pd.to_numeric(df_final['year'], errors='coerce')
-            if 'budget' in df_final.columns:
-                df_final['budget'] = pd.to_numeric(df_final['budget'], errors='coerce')
-
-            logger.info(f"Processed database data into {len(df_final)} rows.")
-            return df_final.to_dict('records')
+            # The stored procedure already returns data in a wide format, which is what the
+            # downstream scripts expect. No further processing is needed here.
+            logger.info(f"Returning {len(df)} rows of raw data.")
+            return df.to_dict('records')
 
     except Exception as e:
         logger.error("Failed to fetch or process data from database", exc_info=True)
