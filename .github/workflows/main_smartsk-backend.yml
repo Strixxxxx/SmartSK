@@ -42,14 +42,26 @@ jobs:
           echo "Building Docker image..."
           docker build -f backend/Dockerfile -t $IMAGE_NAME:$GIT_SHA -t $IMAGE_NAME:latest ./backend
 
-          echo "Pushing Docker image..."
+          echo "Pushing Docker image with SHA tag..."
           docker push $IMAGE_NAME:$GIT_SHA
+          
+          echo "Pushing Docker image with latest tag..."
           docker push $IMAGE_NAME:latest
 
-      - name: Deploy to Azure Web App
+      - name: Update Azure Web App Configuration
         run: |
+          GIT_SHA=${{ github.sha }}
+          echo "Updating Web App to use image with SHA: $GIT_SHA"
+          
           az webapp config container set \
             --name smartsk-backend-container \
             --resource-group Smart_SK \
-            --docker-custom-image-name smartskregistry.azurecr.io/smartsk-backend:latest \
+            --docker-custom-image-name smartskregistry.azurecr.io/smartsk-backend:$GIT_SHA \
             --enable-app-service-storage false
+
+      - name: Restart Azure Web App
+        run: |
+          echo "Restarting Web App to pull new image..."
+          az webapp restart \
+            --name smartsk-backend-container \
+            --resource-group Smart_SK

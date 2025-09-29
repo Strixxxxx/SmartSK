@@ -443,7 +443,7 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
           onClose={() => setSnackbarOpen(false)}
           message={snackbarMessage}
       />
-      {error && <Alert severity="error" sx={{ mb: 2 }}>No changes to apply. The old_string and new_string are identical in file: D:\Projects\Projects\smartSK\frontend\src\components\Client\PredictiveAnalysis\paTrends.tsx</Alert>}
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       
       {/* Custom Forecast Options Panel */}
       <Paper elevation={3} className="trends-paper" sx={{ p: 3, mb: 3 }}>
