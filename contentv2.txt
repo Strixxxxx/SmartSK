@@ -1,20 +1,29 @@
-Prompt for Gemini CLI:
-I need you to fix a z-index layering issue with the login modal in frontend/src/components/Login/Login.tsx.
-Current Problem:
-Looking at the screenshot, the login modal card is rendering BEHIND the page content (the "Browse the" text and "P" logo are visible through/over the modal). The previous fix added backdrop styling with z-index: 1100, but the modal content box itself doesn't have a sufficient z-index to appear above all page elements.
+There's a critical UI bug in the login modal at frontend/src/components/Login/Login.tsx. Looking at the screenshot, there are TWO white cards rendering instead of one - an outer card that's properly centered, and a slightly offset inner card that contains all the form content (Welcome Back, username field, password field, login button).
+Root Cause:
+The component likely has duplicate container elements - probably both:
+
+A MUI Box component with the sx={style} prop creating one white card
+Another wrapper element inside (possibly a div with class login-form-container) that has its own white background, padding, and border-radius, creating a second card
+
 What needs to be fixed:
 
-The Box component containing the login form (the one using sx={style}) needs a higher z-index to ensure it renders ABOVE all background content including:
+Read frontend/src/components/Login/Login.tsx and frontend/src/components/Login/Login.css
+Identify and remove the duplicate card styling. Either:
 
-The .portfolio section
-The .particles effect
-The page header with "project-list-header"
-Any other custom-styled elements
+Remove the background/styling from .login-form-container in the CSS, OR
+Remove the redundant Box wrapper and keep only one container
 
 
-Update the style object in Login.tsx to include zIndex: 1300 (higher than the backdrop's 1100)
-Ensure the modal content box has position: 'relative' or position: 'absolute' so the z-index takes effect
+Ensure only ONE white card renders with:
+
+White background
+Border radius
+Box shadow
+Proper padding
+
+
+The single card should contain all form elements without any nested card styling
 
 Expected Result:
-The login modal card should appear cleanly on top of the darkened backdrop, with no background content visible through or overlapping the modal card itself.
-Please read frontend/src/components/Login/Login.tsx and modify the style object to fix this z-index stacking issue.
+Only one clean white card should appear on the dark backdrop, with no duplicate shadows or offset inner cards.
+Please scan both files and remove the duplicate card styling to fix this double-card rendering issue.
