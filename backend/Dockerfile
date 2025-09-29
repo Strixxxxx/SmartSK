@@ -66,12 +66,13 @@ RUN echo "Final container build:" && node --version && npm --version && python3 
 # Copy node modules
 COPY --from=node-builder /app/node_modules ./node_modules
 
-# Copy Python packages - install them properly in runtime Python environment
-COPY --from=python-builder /python-packages /usr/local/lib/python3.9/site-packages
+# Copy Python packages to the system's Python path (Bullseye uses dist-packages)
+COPY --from=python-builder /python-packages /usr/lib/python3/dist-packages
 
 # Copy app source
 COPY . .
 
 EXPOSE 8080
 
-CMD echo "Starting container with PORT=$PORT" && python3 -c "import sys; print('Python path:', sys.path)" && python3 -c "import pandas; print('Pandas version:', pandas.__version__)" && node --trace-warnings main.js
+# Simplified CMD - remove debug commands that might be causing crashes
+CMD node --trace-warnings main.js
