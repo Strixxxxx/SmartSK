@@ -1,6 +1,48 @@
 --Frontend (Browser's Console)
 
-
+Creating custom forecast request with params: {selectedCategory: 'Others', selectedYear: '', otherCategory: 'youth tite'}otherCategory: "youth tite"selectedCategory: "Others"selectedYear: ""[[Prototype]]: Object
+index-Dlvr7rj0.js:78  GET https://smartsk-backend-container.azurewebsites.net/api/custom-project-trends?customCategory=Others&otherCategory=youth+tite&_t=1759120879916 500 (Internal Server Error)
+(anonymous) @ index-Dlvr7rj0.js:78
+xhr @ index-Dlvr7rj0.js:78
+uS @ index-Dlvr7rj0.js:80
+Promise.then
+_request @ index-Dlvr7rj0.js:81
+request @ index-Dlvr7rj0.js:80
+li.<computed> @ index-Dlvr7rj0.js:81
+(anonymous) @ index-Dlvr7rj0.js:76
+M @ index-Dlvr7rj0.js:885
+F @ index-Dlvr7rj0.js:885
+s1 @ index-Dlvr7rj0.js:48
+(anonymous) @ index-Dlvr7rj0.js:48
+db @ index-Dlvr7rj0.js:48
+Em @ index-Dlvr7rj0.js:48
+Um @ index-Dlvr7rj0.js:49
+CE @ index-Dlvr7rj0.js:49Understand this error
+index-Dlvr7rj0.js:81 Server error: 500 {error: true, message: "Failed to generate custom project trends analysis:…ModuleNotFoundError: No module named 'profanity'\n"}error: truemessage: "Failed to generate custom project trends analysis: Python process failed with code 1: Traceback (most recent call last):\n  File \"/app/AI/paCstmTrends.py\", line 13, in <module>\n    from profanity import profanity\nModuleNotFoundError: No module named 'profanity'\n"[[Prototype]]: Object
+(anonymous) @ index-Dlvr7rj0.js:81
+Promise.then
+_request @ index-Dlvr7rj0.js:81
+request @ index-Dlvr7rj0.js:80
+li.<computed> @ index-Dlvr7rj0.js:81
+(anonymous) @ index-Dlvr7rj0.js:76
+M @ index-Dlvr7rj0.js:885
+F @ index-Dlvr7rj0.js:885
+s1 @ index-Dlvr7rj0.js:48
+(anonymous) @ index-Dlvr7rj0.js:48
+db @ index-Dlvr7rj0.js:48
+Em @ index-Dlvr7rj0.js:48
+Um @ index-Dlvr7rj0.js:49
+CE @ index-Dlvr7rj0.js:49Understand this error
+index-Dlvr7rj0.js:885 API fetch error: $e {message: 'Request failed with status code 500', name: 'AxiosError', code: 'ERR_BAD_RESPONSE', config: {…}, request: XMLHttpRequest, …}code: "ERR_BAD_RESPONSE"config: {transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}message: "Request failed with status code 500"name: "AxiosError"request: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}response: {data: {…}, status: 500, statusText: '', headers: Wn, config: {…}, …}status: 500stack: "AxiosError: Request failed with status code 500\n    at XC (https://smartsk.app/assets/index-Dlvr7rj0.js:78:1088)\n    at XMLHttpRequest._ (https://smartsk.app/assets/index-Dlvr7rj0.js:78:5742)\n    at li.request (https://smartsk.app/assets/index-Dlvr7rj0.js:80:2068)\n    at async M (https://smartsk.app/assets/index-Dlvr7rj0.js:885:36794)"[[Prototype]]: Error
+M @ index-Dlvr7rj0.js:885
+await in M
+F @ index-Dlvr7rj0.js:885
+s1 @ index-Dlvr7rj0.js:48
+(anonymous) @ index-Dlvr7rj0.js:48
+db @ index-Dlvr7rj0.js:48
+Em @ index-Dlvr7rj0.js:48
+Um @ index-Dlvr7rj0.js:49
+CE @ index-Dlvr7rj0.js:49Understand this error
 
 --Backend(Azure Portal's Log Stream)
 
