@@ -26,6 +26,7 @@ import {
   Button,
   SelectChangeEvent,
   FormHelperText,
+  Snackbar,
 } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
@@ -130,6 +131,8 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
   const [otherCategory, setOtherCategory] = useState<string>("");
   const [customCategoryVisible, setCustomCategoryVisible] = useState<boolean>(false);
   const [otherCategoryError, setOtherCategoryError] = useState<string | null>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   
   // List of inappropriate terms to block
   const inappropriateTerms = [
@@ -314,8 +317,15 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
         
         // Check if the response contains an error flag
         if (data.error) {
-          console.error('API returned error:', data.message);
-          setApiErrorMessage(data.message || 'Failed to generate trend forecast');
+          const errorMessage = data.message || 'Failed to generate trend forecast';
+          console.error('API returned error:', errorMessage);
+          if (errorMessage.includes('inappropriate language')) {
+              setSnackbarMessage('Inappropriate word detected. Cannot be processed.');
+              setSnackbarOpen(true);
+              setApiErrorMessage(null); // Don't show the main error box
+          } else {
+              setApiErrorMessage(errorMessage);
+          }
           setTrendsData([]);
           if (data.forecast_year) {
             setForecastYear(data.forecast_year);
@@ -352,7 +362,13 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
         }
       } catch (fetchError: any) {
         console.error('API fetch error:', fetchError);
-        setError(fetchError.response?.data?.message || 'Failed to connect to trends forecast API. Please try again later.');
+        const errorMessage = fetchError.response?.data?.message || 'Failed to connect to trends forecast API. Please try again later.';
+        if (errorMessage && errorMessage.includes('inappropriate language')) {
+            setSnackbarMessage('Inappropriate word detected. Cannot be processed.');
+            setSnackbarOpen(true);
+        } else {
+            setError(errorMessage);
+        }
       }
       
       setLoading(false);
@@ -421,6 +437,12 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
 
   return (
     <div style={{ width: '100%', marginTop: '24px' }}>
+      <Snackbar
+          open={snackbarOpen}
+          autoHideDuration={6000}
+          onClose={() => setSnackbarOpen(false)}
+          message={snackbarMessage}
+      />
       {error && <Alert severity="error" sx={{ mb: 2 }}>No changes to apply. The old_string and new_string are identical in file: D:\Projects\Projects\smartSK\frontend\src\components\Client\PredictiveAnalysis\paTrends.tsx</Alert>}
       
       {/* Custom Forecast Options Panel */}

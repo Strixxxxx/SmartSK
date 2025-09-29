@@ -1,7 +1,7 @@
 --Frontend (Browser's Console)
 
-Creating custom forecast request with params: {selectedCategory: 'Others', selectedYear: '', otherCategory: 'youth tite'}otherCategory: "youth tite"selectedCategory: "Others"selectedYear: ""[[Prototype]]: Object
-index-Dlvr7rj0.js:78  GET https://smartsk-backend-container.azurewebsites.net/api/custom-project-trends?customCategory=Others&otherCategory=youth+tite&_t=1759120879916 500 (Internal Server Error)
+Creating custom forecast request with params: {selectedCategory: 'Others', selectedYear: '', otherCategory: 'youth pota'}otherCategory: "youth pota"selectedCategory: "Others"selectedYear: ""[[Prototype]]: Object
+index-Dlvr7rj0.js:78  GET https://smartsk-backend-container.azurewebsites.net/api/custom-project-trends?customCategory=Others&otherCategory=youth+pota&_t=1759122620737 500 (Internal Server Error)
 (anonymous) @ index-Dlvr7rj0.js:78
 xhr @ index-Dlvr7rj0.js:78
 uS @ index-Dlvr7rj0.js:80
