@@ -1,171 +1,69 @@
 --Log Stream
 
-Unable to open a connection to your app. This may be due to any network security groups or IP restriction rules that you have placed on your app. To use log streaming, please make sure you are able to access your app directly from your current network.
-2025-09-29T01:32:32  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/appsvctmp/volatile/logs/runtime/container.log
-2025-09-29T01:31:55.2951630Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
-2025-09-29T01:31:55.2951731Z
-2025-09-29T01:31:55.2951751Z Documentation: http://aka.ms/webapp-linux
-2025-09-29T01:31:55.2951773Z Kudu Version : 20250623.5
-2025-09-29T01:31:55.2951797Z Commit       : 353543ec4c45fcbfd4750522d32c94e23b31927a
-2025-09-29T01:31:55.2951816Z
-2025-09-29T01:31:58.1017550Z chown: changing ownership of '/temp': Operation not permitted
-2025-09-29T01:31:58.1397186Z chmod: changing permissions of '/temp': Operation not permitted
-2025-09-29T01:32:12.7816468Z Restarting OpenBSD Secure Shell server: sshd.
-2025-09-29T01:32:14.7104668Z node not running, starting node /opt/webssh/index.jsEnding Log Tail of existing logs ---Starting Live Log Stream ---
-2025-09-29T01:32:53.5470446Z Mon Sep 29 01:32:53 UTC 2025 running .net core
-2025-09-29T01:33:04.9634932Z Startup : 01.33.04.584349
-2025-09-29T01:33:06.5569550Z Configure Services : 01.33.06.449083
-2025-09-29T01:33:09.8238171Z Configure : 01.33.09.806564
-2025-09-29T01:33:13.4976652Z Setting Up Routes : 01.33.13.468827
-2025-09-29T01:33:16.3029533Z Exiting Configure : 01.33.16.283721
-2025-09-29T01:33:17.5016415Z Hosting environment: Production
-2025-09-29T01:33:17.5016884Z Content root path: /opt/Kudu
-2025-09-29T01:33:17.5016912Z Now listening on: http://0.0.0.0:8181
-2025-09-29T01:33:17.5017119Z Application started. Press Ctrl+C to shut down.
-2025-09-29T01:33:52  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/appsvctmp/volatile/logs/runtime/container.log
-2025-09-29T01:32:53.5470446Z Mon Sep 29 01:32:53 UTC 2025 running .net core
-2025-09-29T01:33:04.9634932Z Startup : 01.33.04.584349
-2025-09-29T01:33:06.5569550Z Configure Services : 01.33.06.449083
-2025-09-29T01:33:09.8238171Z Configure : 01.33.09.806564
-2025-09-29T01:33:13.4976652Z Setting Up Routes : 01.33.13.468827
-2025-09-29T01:33:16.3029533Z Exiting Configure : 01.33.16.283721
-2025-09-29T01:33:17.5016415Z Hosting environment: Production
-2025-09-29T01:33:17.5016884Z Content root path: /opt/Kudu
-2025-09-29T01:33:17.5016912Z Now listening on: http://0.0.0.0:8181
-2025-09-29T01:33:17.5017119Z Application started. Press Ctrl+C to shut down.Ending Log Tail of existing logs ---Starting Live Log Stream ---
-2025-09-29T01:34:40.8531546Z Starting container with PORT=8080
-2025-09-29T01:34:40.8915707Z DOTNET_STARTUP_HOOKS=/agents/core/StartupHook/Microsoft.ApplicationInsights.StartupHook.dll
-2025-09-29T01:34:40.8916234Z WEBSITE_DEFAULT_HOSTNAME=smartsk-backend-container.azurewebsites.net
-2025-09-29T01:34:40.8916263Z APPSETTING_BUILD_FLAGS=UseExpressBuild=false
-2025-09-29T01:34:40.8916287Z SEARCH_ENGINE_ID=f689623f137454cf3
-2025-09-29T01:34:40.8916310Z WEBSITES_ENABLE_APP_SERVICE_STORAGE=false
-2025-09-29T01:34:40.8916352Z WEBSITE_WEBDEPLOY_USE_SCM=true
-2025-09-29T01:34:40.8916385Z APPSETTING_DOCKER_CUSTOM_IMAGE_NAME=smartskregistry.azurecr.io/smartsk-backend:latest
-2025-09-29T01:34:40.8916429Z FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED=0
-2025-09-29T01:34:40.8916454Z APPSETTING_WEBSITE_DEFAULT_HOSTNAME=smartsk-backend-container.azurewebsites.net
-2025-09-29T01:34:40.8916480Z REGION_NAME=southeastasia
-2025-09-29T01:34:40.8916504Z JAVA_TOOL_OPTIONS=-javaagent:/agents/java/applicationinsights-agent-codeless.jar
-2025-09-29T01:34:40.8916526Z NODE_VERSION=22.20.0
-2025-09-29T01:34:40.8916549Z PLATFORM_VERSION=105.0.7.128
-2025-09-29T01:34:40.8916587Z WEBSITE_INSTANCE_ID=abdb3197cd7a02e1a5e6c1091bbdf0012d0d439e81c1d6874df7775d03ebd0a8
-2025-09-29T01:34:40.8916609Z YARN_VERSION=1.22.22
-2025-09-29T01:34:40.8916632Z ApplicationInsightsAgent_EXTENSION_VERSION=disabled
-2025-09-29T01:34:40.8917131Z HOSTNAME=576c218e6645
-2025-09-29T01:34:40.8917162Z APPSETTING_WEBSITE_WEBDEPLOY_USE_SCM=true
-2025-09-29T01:34:40.8917185Z APPSETTING_WEBSITES_ENABLE_APP_SERVICE_STORAGE=false
-2025-09-29T01:34:40.8917226Z APPSETTING_PRE_BUILD_COMMAND=python3 -m pip install -r requirements.txt
-2025-09-29T01:34:40.8917251Z APPSETTING_FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED=0
-2025-09-29T01:34:40.8917272Z DB_PORT=1433
-2025-09-29T01:34:40.8917294Z APPSETTING_PORT=8080
-2025-09-29T01:34:40.8917318Z IDENTITY_HEADER=f1c289b7-c901-4c6d-8bac-22010dfa14ca
-2025-09-29T01:34:40.8917407Z JWT_SECRET_KEY=0eb2eca5882ce3a95e549dc160d4a7e4f2fbdebc00bf92c875139e26e0ef9eab6e8016e337711caba29846d9d7e991a9161d76b45526fce2a275640dc10c61541a291d77259f195d1e05cc9efce4760388d2f3185117a5c48e11580c36e90074f943d149f97f96cb392c062e234af04b64499467b3c66c3696911d551c1a3f123e24fa9e523eb651569ccddc12a503c407689c0965149a86802166e336696330fc2c8e20607d80789a291a50c006c21a6ab4902ac7d9688bdf8ce4acd5fd3367436ea5c1fd1b63c92112d50a43826fbd996b73f3d484e5318a2c6bfb284bafec6e1688360d56381f80b6408cead61cd64c83ffcdbd70e0ff2f9dbd8cd2381d86
-2025-09-29T01:34:40.8917432Z APPSETTING_DOCS_CONTAINER=documents
-2025-09-29T01:34:40.8917454Z ENABLE_ORYX_BUILD=false
-2025-09-29T01:34:40.8917476Z APPSETTING_DB_DATABASE=smartSK
-2025-09-29T01:34:40.8917497Z EMAIL_HOST=smtp.gmail.com
-2025-09-29T01:34:40.8917545Z PRE_BUILD_COMMAND=python3 -m pip install -r requirements.txt
-2025-09-29T01:34:40.8917568Z WEBSITE_CONTAINER_START_TIME_LIMIT=600
-2025-09-29T01:34:40.8939585Z WEBSITE_RESOURCE_GROUP=smart_sk
-2025-09-29T01:34:40.9319547Z PORT=8080
-2025-09-29T01:34:40.9319651Z EMAIL_USER=smartSK2025@gmail.com
-2025-09-29T01:34:40.9319688Z HOME=/root
-2025-09-29T01:34:40.9319782Z WEBSITE_HOME_STAMPNAME=waws-prod-sg1-089
-2025-09-29T01:34:40.9319807Z DOCKER_CUSTOM_IMAGE_NAME=smartskregistry.azurecr.io/smartsk-backend:latest
-2025-09-29T01:34:40.9319831Z APPSETTING_ApplicationInsightsAgent_EXTENSION_VERSION=~3
-2025-09-29T01:34:40.9319856Z SPREADSHEET_ID=1Jc_ZVCY5blbNDcNgxiE3le6W37F8u0g9zZTlVmDEpRg
-2025-09-29T01:34:40.9319880Z APPSETTING_WEBSITE_CONTAINER_START_TIME_LIMIT=600
-2025-09-29T01:34:40.9319902Z NODE_OPTIONS=--require /agents/nodejs/build/src/Loader.js
-2025-09-29T01:34:40.9320037Z ScmType=None
-2025-09-29T01:34:40.9320063Z DB_DATABASE=smartSK
-2025-09-29T01:34:40.9320086Z REMOTEDEBUGGINGVERSION=17.12.11017.4296
-2025-09-29T01:34:40.9320109Z APPSETTING_SCM_DISABLE_NODE_MODULES_COMPRESSION=true
-2025-09-29T01:34:40.9320131Z DOCS_CONTAINER=documents
-2025-09-29T01:34:40.9320153Z XDT_MicrosoftApplicationInsights_Mode=default
-2025-09-29T01:34:40.9320175Z SCM_DO_BUILD_DURING_DEPLOYMENT=false
-2025-09-29T01:34:40.9320215Z APPSETTING_STORAGE_NAME=smartskstorage
-2025-09-29T01:34:40.9320239Z APPSETTING_PYTHON_PATH=/home/site/wwwroot
-2025-09-29T01:34:40.9320261Z APPINSIGHTS_ENABLED=false
-2025-09-29T01:34:40.9320284Z WEBSITE_HOSTNAME=smartsk-backend-container.azurewebsites.net
-2025-09-29T01:34:40.9320332Z APPSETTING_GOOGLE_CREDENTIALS_FILE={"installed":{"client_id":"121784492686-gm756o2o6n048f8elmqom470sd13i3ic.apps.googleusercontent.com","project_id":"gen-lang-client-0447049670","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["http://localhost"]}}
-2025-09-29T01:34:40.9320375Z BUILD_FLAGS=UseExpressBuild=false
-2025-09-29T01:34:40.9320396Z EMAIL_PORT=587
-2025-09-29T01:34:40.9320419Z PYTHON_PATH=/home/site/wwwroot
-2025-09-29T01:34:40.9320440Z WEBSITE_STACK=SITECONTAINERS
-2025-09-29T01:34:40.9320461Z NUM_CORES=1
-2025-09-29T01:34:40.9320491Z APPSETTING_STORAGE_CONNECTION_STRING_1=DefaultEndpointsProtocol=https;AccountName=smartskstorage;AccountKey=BLwENgNUR39dxdMEDEH2DoNWMQNvXQtHV6Z547g01nAELq4WVaE2uXt3cfP5d+Ryngk/l1cVUZih+AStpcsKtQ==;EndpointSuffix=core.windows.net
-2025-09-29T01:34:40.9320529Z APPSETTING_REMOTEDEBUGGINGVERSION=17.12.11017.4296
-2025-09-29T01:34:40.9320561Z APPSETTING_STORAGE_CONNECTION_STRING_2=DefaultEndpointsProtocol=https;AccountName=smartskstorage;AccountKey=GYRlhTMQR4hayfibJfIjJI+oI0aNrpj5HSrR1mqZkSOfi+N1bkyovp9mCezsBpQU2VfjllEMr1HG+AStjrZQ1A==;EndpointSuffix=core.windows.net
-2025-09-29T01:34:40.9320583Z WEBSITE_ROLE_INSTANCE_ID=8512
-2025-09-29T01:34:40.9320604Z APPSETTING_EMAIL_PASS=ubum hdkh zdjt vzng
-2025-09-29T01:34:40.9320663Z WEBSITE_AUTH_ENCRYPTION_KEY=4359940B8D0CC2A05D62F5F9532852039B5688B459D81B3C1A07C26521D8C5F6
-2025-09-29T01:34:40.9320704Z WEBSITE_ISOLATION=lxc
-2025-09-29T01:34:40.9320732Z APPLICATIONINSIGHTS_DIAGNOSTICS_OUTPUT_DIRECTORY=/var/log/applicationinsights/
-2025-09-29T01:34:40.9321483Z WEBSITE_HEALTHCHECK_MAXPINGFAILURES=5
-2025-09-29T01:34:40.9321512Z WEBSITE_DEPLOYMENT_ID=smartsk-backend-container
-2025-09-29T01:34:40.9321535Z WEBSITE_SITE_NAME=smartsk-backend-container
-2025-09-29T01:34:40.9321574Z APPSETTING_GEMINI_API_KEY=AIzaSyAOVNZ7qCj2lQ5t2Vzp8J_LBKQyEu5liO4
-2025-09-29T01:34:40.9321597Z WEBSITE_NODE_DEFAULT_VERSION=22-lts
-2025-09-29T01:34:40.9321621Z PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-2025-09-29T01:34:40.9321648Z APPSETTING_STORAGE_KEY_1=BLwENgNUR39dxdMEDEH2DoNWMQNvXQtHV6Z547g01nAELq4WVaE2uXt3cfP5d+Ryngk/l1cVUZih+AStpcsKtQ==
-2025-09-29T01:34:40.9321671Z SCM_DISABLE_NODE_MODULES_COMPRESSION=true
-2025-09-29T01:34:40.9321692Z WEBSITE_RUN_ON_PACKAGE=1
-2025-09-29T01:34:40.9321757Z APPSETTING_JWT_SECRET_KEY=0eb2eca5882ce3a95e549dc160d4a7e4f2fbdebc00bf92c875139e26e0ef9eab6e8016e337711caba29846d9d7e991a9161d76b45526fce2a275640dc10c61541a291d77259f195d1e05cc9efce4760388d2f3185117a5c48e11580c36e90074f943d149f97f96cb392c062e234af04b64499467b3c66c3696911d551c1a3f123e24fa9e523eb651569ccddc12a503c407689c0965149a86802166e336696330fc2c8e20607d80789a291a50c006c21a6ab4902ac7d9688bdf8ce4acd5fd3367436ea5c1fd1b63c92112d50a43826fbd996b73f3d484e5318a2c6bfb284bafec6e1688360d56381f80b6408cead61cd64c83ffcdbd70e0ff2f9dbd8cd2381d86
-2025-09-29T01:34:40.9321783Z APPSETTING_WEBSITE_HEALTHCHECK_MAXPINGFAILURES=5
-2025-09-29T01:34:40.9321808Z APPSETTING_STORAGE_KEY_2=GYRlhTMQR4hayfibJfIjJI+oI0aNrpj5HSrR1mqZkSOfi+N1bkyovp9mCezsBpQU2VfjllEMr1HG+AStjrZQ1A==
-2025-09-29T01:34:40.9321830Z STORAGE_NAME=smartskstorage
-2025-09-29T01:34:40.9321851Z APPSETTING_ENABLE_ORYX_BUILD=false
-2025-09-29T01:34:40.9321890Z APPSETTING_WEBSITE_NODE_DEFAULT_VERSION=22-lts
-2025-09-29T01:34:40.9321912Z APPSETTING_EMAIL_HOST=smtp.gmail.com
-2025-09-29T01:34:40.9321935Z CORS_ORIGIN=https://smartsk.app
-2025-09-29T01:34:40.9321957Z APPSETTING_WEBSITE_SITE_NAME=smartsk-backend-container
-2025-09-29T01:34:40.9321979Z APPSETTING_WEBSITE_RUN_ON_PACKAGE=1
-2025-09-29T01:34:40.9322001Z WEBSITE_AUTH_ENABLED=False
-2025-09-29T01:34:40.9322023Z APPSETTING_EMAIL_USER=smartSK2025@gmail.com
-2025-09-29T01:34:40.9322061Z MSI_ENDPOINT=http://169.254.133.3:8081/msi/token
-2025-09-29T01:34:40.9322092Z STORAGE_CONNECTION_STRING_1=DefaultEndpointsProtocol=https;AccountName=smartskstorage;AccountKey=BLwENgNUR39dxdMEDEH2DoNWMQNvXQtHV6Z547g01nAELq4WVaE2uXt3cfP5d+Ryngk/l1cVUZih+AStpcsKtQ==;EndpointSuffix=core.windows.net
-2025-09-29T01:34:40.9322115Z MSI_SECRET=f1c289b7-c901-4c6d-8bac-22010dfa14ca
-2025-09-29T01:34:40.9322145Z STORAGE_CONNECTION_STRING_2=DefaultEndpointsProtocol=https;AccountName=smartskstorage;AccountKey=GYRlhTMQR4hayfibJfIjJI+oI0aNrpj5HSrR1mqZkSOfi+N1bkyovp9mCezsBpQU2VfjllEMr1HG+AStjrZQ1A==;EndpointSuffix=core.windows.net
-2025-09-29T01:34:40.9322206Z GOOGLE_CREDENTIALS_FILE={"installed":{"client_id":"121784492686-gm756o2o6n048f8elmqom470sd13i3ic.apps.googleusercontent.com","project_id":"gen-lang-client-0447049670","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["http://localhost"]}}
-2025-09-29T01:34:40.9322231Z APPSETTING_SEARCH_ENGINE_API=AIzaSyDZPjQ5fbREHywc33SFQ7wIiGQDgKgSsTw
-2025-09-29T01:34:40.9322253Z APPSETTING_WEBSITE_AUTH_ENABLED=False
-2025-09-29T01:34:40.9322276Z APPSETTING_DB_SERVER=smart-sk.database.windows.net
-2025-09-29T01:34:40.9322297Z APPSETTING_DB_PASSWORD=Smart-SK2025
-2025-09-29T01:34:40.9322319Z APPSETTING_SEARCH_ENGINE_ID=f689623f137454cf3
-2025-09-29T01:34:40.9322362Z WEBSITE_OWNER_NAME=0b42eb46-0f69-4263-86b9-a408ca348b28+Smart_SK-SoutheastAsiawebspace-Linux
-2025-09-29T01:34:40.9322397Z APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=fe860919-abbc-4539-80aa-d3948db36ea2;IngestionEndpoint=https://southeastasia-1.in.applicationinsights.azure.com/;LiveEndpoint=https://southeastasia.livediagnostics.monitor.azure.com/;ApplicationId=374056ef-f86c-42df-a975-34b32f431264
-2025-09-29T01:34:40.9322420Z APPSETTING_EMAIL_PORT=587
-2025-09-29T01:34:40.9322442Z WEBSITE_HTTPLOGGING_RETENTION_DAYS=7
-2025-09-29T01:34:40.9322464Z APPSETTING_DB_USER=smartSK
-2025-09-29T01:34:40.9322500Z WEBSITE_AUTH_INTERNAL_PATHS=/api/health
-2025-09-29T01:34:40.9322525Z STORAGE_KEY_1=BLwENgNUR39dxdMEDEH2DoNWMQNvXQtHV6Z547g01nAELq4WVaE2uXt3cfP5d+Ryngk/l1cVUZih+AStpcsKtQ==
-2025-09-29T01:34:40.9322550Z ASPNETCORE_HOSTINGSTARTUPASSEMBLIES=Microsoft.ApplicationInsights.StartupBootstrapper
-2025-09-29T01:34:40.9322584Z APPSETTING_APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=fe860919-abbc-4539-80aa-d3948db36ea2;IngestionEndpoint=https://southeastasia-1.in.applicationinsights.azure.com/;LiveEndpoint=https://southeastasia.livediagnostics.monitor.azure.com/;ApplicationId=374056ef-f86c-42df-a975-34b32f431264
-2025-09-29T01:34:40.9322608Z IDENTITY_ENDPOINT=http://169.254.133.3:8081/msi/token
-2025-09-29T01:34:40.9322631Z DB_SERVER=smart-sk.database.windows.net
-2025-09-29T01:34:40.9322672Z STORAGE_KEY_2=GYRlhTMQR4hayfibJfIjJI+oI0aNrpj5HSrR1mqZkSOfi+N1bkyovp9mCezsBpQU2VfjllEMr1HG+AStjrZQ1A==
-2025-09-29T01:34:40.9322693Z DB_PASSWORD=Smart-SK2025
-2025-09-29T01:34:40.9322714Z PWD=/app
-2025-09-29T01:34:40.9322735Z WEBSITE_SSH_ENABLED=1
-2025-09-29T01:34:40.9322757Z APPSETTING_WEBSITE_HTTPLOGGING_RETENTION_DAYS=7
-2025-09-29T01:34:40.9322779Z APPSETTING_CORS_ORIGIN=https://smartsk.app
-2025-09-29T01:34:40.9322890Z APPSETTING_PY_PORT=5000
-2025-09-29T01:34:40.9322913Z COMPUTERNAME=lw1sdlwk0006KG
-2025-09-29T01:34:40.9322935Z GEMINI_API_KEY=AIzaSyAOVNZ7qCj2lQ5t2Vzp8J_LBKQyEu5liO4
-2025-09-29T01:34:40.9322959Z APPSETTING_XDT_MicrosoftApplicationInsights_Mode=default
-2025-09-29T01:34:40.9322979Z PY_PORT=5000
-2025-09-29T01:34:40.9323000Z DB_USER=smartSK
-2025-09-29T01:34:40.9323021Z APPSETTING_ScmType=None
-2025-09-29T01:34:40.9323060Z WEBSITE_AUTH_SIGNING_KEY=3776EE238E8D3E310CCB032B9B13156976AFF8ED96FB3362A9E212883B23EAEB
-2025-09-29T01:34:40.9323086Z EMAIL_PASS=ubum hdkh zdjt vzng
-2025-09-29T01:34:40.9323109Z APPSETTING_SPREADSHEET_ID=1Jc_ZVCY5blbNDcNgxiE3le6W37F8u0g9zZTlVmDEpRg
-2025-09-29T01:34:40.9323132Z SEARCH_ENGINE_API=AIzaSyDZPjQ5fbREHywc33SFQ7wIiGQDgKgSsTw
-2025-09-29T01:34:40.9323154Z APPSETTING_SCM_DO_BUILD_DURING_DEPLOYMENT=false
-2025-09-29T01:34:40.9323175Z APPSETTING_DB_PORT=1433
-2025-09-29T01:34:40.9323217Z WEBSITE_SKU=Basic
-2025-09-29T01:34:54.7581348Z Initializing active sessions from database...
-2025-09-29T01:34:56.3364291Z Initializing Azure Storage with primary credentials.
-2025-09-29T01:34:56.6669056Z Server is running on port 8080
-2025-09-29T01:34:58.8704212Z Initialized active sessions.
+2025-09-29T01:49:09  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/appsvctmp/volatile/logs/runtime/container.log
+2025-09-29T01:48:47.2431908Z Mon Sep 29 01:48:47 UTC 2025 running .net core
+2025-09-29T01:48:49.7898258Z Startup : 01.48.49.775968
+2025-09-29T01:48:49.8271459Z Configure Services : 01.48.49.826920
+2025-09-29T01:48:50.3350360Z Configure : 01.48.50.334446
+2025-09-29T01:48:50.7806784Z Setting Up Routes : 01.48.50.780505
+2025-09-29T01:48:51.6395930Z Exiting Configure : 01.48.51.180035
+2025-09-29T01:48:51.6396174Z Hosting environment: Production
+2025-09-29T01:48:51.6396202Z Content root path: /opt/Kudu
+2025-09-29T01:48:51.6396223Z Now listening on: http://0.0.0.0:8181
+2025-09-29T01:48:51.6396244Z Application started. Press Ctrl+C to shut down.Ending Log Tail of existing logs ---Starting Live Log Stream ---
+2025-09-29T01:50:09  No new trace in the past 1 min(s).
+2025-09-29T01:51:09  No new trace in the past 2 min(s).
+2025-09-29T01:51:17.7395201Z Starting container with PORT=8080
+2025-09-29T01:51:18.2821514Z Python path: ['', '/usr/lib/python39.zip', '/usr/lib/python3.9', '/usr/lib/python3.9/lib-dynload', '/usr/local/lib/python3.9/dist-packages', '/usr/lib/python3/dist-packages']
+2025-09-29T01:51:20.9662715Z Pandas version: 2.2.2
+2025-09-29T01:51:29.1898560Z Initializing active sessions from database...
+2025-09-29T01:51:30.2035295Z Initializing Azure Storage with primary credentials.
+2025-09-29T01:51:30.3680787Z Server is running on port 8080
+2025-09-29T01:51:31.6742373Z Initialized active sessions.
+2025-09-29T01:52:52.1524261Z Login attempt received
+2025-09-29T01:52:53.0278907Z Login successful for user.
+2025-09-29T01:52:54.6079991Z Handler: Running forecast analysis with options: { view_by: 'committee' }
+2025-09-29T01:52:54.6095551Z Spawning Python analysis process: python3 /app/AI/forecast.py --analysis --view_by committee
+2025-09-29T01:53:00.3844525Z Python analysis process failed with code 1: Traceback (most recent call last):
+2025-09-29T01:53:00.3845152Z   File "/app/AI/forecast.py", line 9, in <module>
+2025-09-29T01:53:00.3845174Z     from db_utils import get_raw_data_from_db
+2025-09-29T01:53:00.3845190Z   File "/app/AI/db_utils.py", line 3, in <module>
+2025-09-29T01:53:00.3845205Z     import pyodbc
+2025-09-29T01:53:00.3845244Z ImportError: libodbc.so.2: cannot open shared object file: No such file or directory
+2025-09-29T01:53:00.3845259Z
+2025-09-29T01:53:00.3845865Z Handler Error: Error running forecast analysis: Error: Python analysis process failed: Traceback (most recent call last):
+2025-09-29T01:53:00.3845886Z   File "/app/AI/forecast.py", line 9, in <module>
+2025-09-29T01:53:00.3845905Z     from db_utils import get_raw_data_from_db
+2025-09-29T01:53:00.3845943Z   File "/app/AI/db_utils.py", line 3, in <module>
+2025-09-29T01:53:00.3845958Z     import pyodbc
+2025-09-29T01:53:00.3845975Z ImportError: libodbc.so.2: cannot open shared object file: No such file or directory
+2025-09-29T01:53:00.3845988Z
+2025-09-29T01:53:00.3846005Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:123:27)
+2025-09-29T01:53:00.3846021Z     at ChildProcess.emit (node:events:519:28)
+2025-09-29T01:53:00.3846038Z     at maybeClose (node:internal/child_process:1101:16)
+2025-09-29T01:53:00.3846056Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+2025-09-29T01:53:00.3846072Z     at Process.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-09-29T01:53:00.3846089Z Python process failed with code 1: Traceback (most recent call last):
+2025-09-29T01:53:00.3846119Z   File "/app/AI/forecast.py", line 9, in <module>
+2025-09-29T01:53:00.3846135Z     from db_utils import get_raw_data_from_db
+2025-09-29T01:53:00.3846150Z   File "/app/AI/db_utils.py", line 3, in <module>
+2025-09-29T01:53:00.3846164Z     import pyodbc
+2025-09-29T01:53:00.3846181Z ImportError: libodbc.so.2: cannot open shared object file: No such file or directory
+2025-09-29T01:53:00.3846194Z
+2025-09-29T01:53:00.3846211Z Error running forecast: Error: Python process failed: Traceback (most recent call last):
+2025-09-29T01:53:00.3846226Z   File "/app/AI/forecast.py", line 9, in <module>
+2025-09-29T01:53:00.3846242Z     from db_utils import get_raw_data_from_db
+2025-09-29T01:53:00.3846257Z   File "/app/AI/db_utils.py", line 3, in <module>
+2025-09-29T01:53:00.3846270Z     import pyodbc
+2025-09-29T01:53:00.3846302Z ImportError: libodbc.so.2: cannot open shared object file: No such file or directory
+2025-09-29T01:53:00.3846315Z
+2025-09-29T01:53:00.3846334Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:43:25)
+2025-09-29T01:53:00.3846349Z     at ChildProcess.emit (node:events:519:28)
+2025-09-29T01:53:00.3846365Z     at maybeClose (node:internal/child_process:1101:16)
+2025-09-29T01:53:00.3846382Z     at Socket.<anonymous> (node:internal/child_process:456:11)
+2025-09-29T01:53:00.3846397Z     at Socket.emit (node:events:519:28)
+2025-09-29T01:53:00.3846412Z     at Pipe.<anonymous> (node:net:346:12)
+2025-09-29T01:53:00.3846428Z     at Pipe.callbackTrampoline (node:internal/async_hooks:130:17)
 
 --Container Log
 
@@ -244,3 +142,29 @@ Unable to open a connection to your app. This may be due to any network security
 2025-09-29T01:34:40.8016478Z Starting metrics collection.
 2025-09-29T01:34:40.8336211Z Container is running.
 2025-09-29T01:34:43.6186319Z Container start method finished after 145744 ms.
+2025-09-29T01:34:58.3637211Z Site startup probe succeeded after 13.7692054 seconds.
+2025-09-29T01:34:59.8780363Z Site started.
+2025-09-29T01:35:21.3895393Z Container is terminating. Grace period: 5 seconds.
+2025-09-29T01:35:21.6323543Z Stop and delete container. Retry count = 0
+2025-09-29T01:35:21.6425192Z Stopping container: 21f627dd1d37_smartsk-backend-container.
+2025-09-29T01:35:26.8914017Z Deleting container: 21f627dd1d37_smartsk-backend-container. Retry count = 0
+2025-09-29T01:35:29.5458188Z Container spec TerminationMessagePolicy path
+2025-09-29T01:35:29.5955766Z Container is terminated. Total time elapsed: 8158 ms.
+2025-09-29T01:35:29.6050539Z Site: smartsk-backend-container stopped.
+2025-09-29T01:46:39.9901016Z Container start method called.
+2025-09-29T01:46:39.9902656Z Establishing network.
+2025-09-29T01:46:40.0173417Z Pulling image: smartskregistry.azurecr.io/smartsk-backend:latest.
+2025-09-29T01:47:18.4538675Z Container pull image interrupted. Revert by terminate.
+2025-09-29T01:47:18.4642519Z Container is terminating. Grace period: 5 seconds.
+2025-09-29T01:47:18.4726487Z Container spec TerminationMessagePolicy path
+2025-09-29T01:47:18.4737706Z Container is terminated. Total time elapsed: 9 ms.
+2025-09-29T01:47:18.4827118Z Site container: smartsk-backend-container terminated during site startup.
+2025-09-29T01:47:18.7374722Z Site container: smartsk-backend-container terminated. Stopping the entire site.
+2025-09-29T01:47:18.7952934Z Site: smartsk-backend-container stopped.
+2025-09-29T01:47:39.5084800Z Container is terminating. Grace period: 5 seconds.
+2025-09-29T01:47:39.6269604Z Stop and delete container. Retry count = 0
+2025-09-29T01:47:39.6340364Z Stopping container: 9d6a123e5eca_smartsk-backend-container_smartsk-backend-container.
+2025-09-29T01:47:45.0882783Z Deleting container: 9d6a123e5eca_smartsk-backend-container_smartsk-backend-container. Retry count = 0
+2025-09-29T01:47:46.6722687Z Container spec TerminationMessagePolicy path
+2025-09-29T01:47:46.6726349Z Container is terminated. Total time elapsed: 7143 ms.
+2025-09-29T01:47:46.6726678Z Site: smartsk-backend-container stopped.

@@ -21,8 +21,21 @@ WORKDIR /app
 # Debug: show Python version
 RUN python3 --version && pip --version
 
-# Install build tools
-RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc && rm -rf /var/lib/apt/lists/*
+# Install build tools AND ODBC development libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    unixodbc-dev \
+    curl \
+    gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Microsoft ODBC Driver 18 for SQL Server
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
 RUN echo "Installing Python dependencies..." && pip install --no-cache-dir -r requirements.txt -t /python-packages
@@ -34,8 +47,21 @@ FROM node:22-bullseye-slim
 
 WORKDIR /app
 
-# Install Python + pip (this installs Python 3.9 on bullseye)
-RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip && rm -rf /var/lib/apt/lists/*
+# Install Python + pip + ODBC runtime libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 \
+    python3-pip \
+    unixodbc \
+    curl \
+    gnupg \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Microsoft ODBC Driver 18 for SQL Server (runtime)
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
+    && curl https://packages.microsoft.com/config/debian/11/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && apt-get update \
+    && ACCEPT_EULA=Y apt-get install -y msodbcsql18 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Debug: confirm versions
 RUN echo "Final container build:" && node --version && npm --version && python3 --version && pip --version

@@ -1,17 +1,65 @@
 --Frontend (Browser's Console)
 
-index-B2JIje-p.js:78 
- GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/forecast-analysis?view_by=committee 500 (Internal Server Error)
+Failed to load resource: the server responded with a status of 500 ()
+index-Dlvr7rj0.js:81 Server error: 500 
+{error: true, message: 'Error running forecast analysis', details: 'Python analysis process failed: Traceback (most re…en shared object file: No such file or directory\n'}
+details
+: 
+"Python analysis process failed: Traceback (most recent call last):\n  File \"/app/AI/forecast.py\", line 9, in <module>\n    from db_utils import get_raw_data_from_db\n  File \"/app/AI/db_utils.py\", line 3, in <module>\n    import pyodbc\nImportError: libodbc.so.2: cannot open shared object file: No such file or directory\n"
+error
+: 
+true
+message
+: 
+"Error running forecast analysis"
+[[Prototype]]
+: 
+Object
+(anonymous)	@	index-Dlvr7rj0.js:81
 
-index-B2JIje-p.js:81 Server error: 500 
-{error: true, message: 'Error running forecast analysis', details: "Python analysis process failed: Traceback (most re…pd\nModuleNotFoundError: No module named 'pandas'\n"}
-index-B2JIje-p.js:881 Analysis fetch error: 
+index-Dlvr7rj0.js:881 Analysis fetch error: 
 $e {message: 'Request failed with status code 500', name: 'AxiosError', code: 'ERR_BAD_RESPONSE', config: {…}, request: XMLHttpRequest, …}
-index-B2JIje-p.js:78 
- GET https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net/api/forecast 500 (Internal Server Error)
-index-B2JIje-p.js:81 Server error: 500 
-{error: 'Failed to generate forecast', message: "Python process failed: Traceback (most recent call…pd\nModuleNotFoundError: No module named 'pandas'\n"}
-﻿
+code
+: 
+"ERR_BAD_RESPONSE"
+config
+: 
+{transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 180000, …}
+message
+: 
+"Request failed with status code 500"
+name
+: 
+"AxiosError"
+request
+: 
+XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 180000, withCredentials: true, upload: XMLHttpRequestUpload, …}
+response
+: 
+{data: {…}, status: 500, statusText: '', headers: Wn, config: {…}, …}
+status
+: 
+500
+stack
+: 
+"AxiosError: Request failed with status code 500\n    at XC (https://smartsk.app/assets/index-Dlvr7rj0.js:78:1088)\n    at XMLHttpRequest._ (https://smartsk.app/assets/index-Dlvr7rj0.js:78:5742)\n    at li.request (https://smartsk.app/assets/index-Dlvr7rj0.js:80:2068)\n    at async https://smartsk.app/assets/index-Dlvr7rj0.js:881:16694"
+[[Prototype]]
+: 
+Error
+(anonymous)	@	index-Dlvr7rj0.js:881
+forecast:1 
+ Failed to load resource: the server responded with a status of 500 ()
+index-Dlvr7rj0.js:81 Server error: 500 
+{error: 'Failed to generate forecast', message: 'Python process failed: Traceback (most recent call…en shared object file: No such file or directory\n'}
+error
+: 
+"Failed to generate forecast"
+message
+: 
+"Python process failed: Traceback (most recent call last):\n  File \"/app/AI/forecast.py\", line 9, in <module>\n    from db_utils import get_raw_data_from_db\n  File \"/app/AI/db_utils.py\", line 3, in <module>\n    import pyodbc\nImportError: libodbc.so.2: cannot open shared object file: No such file or directory\n"
+[[Prototype]]
+: 
+Object
 
 --Backend(Azure Portal's Log Stream)
 

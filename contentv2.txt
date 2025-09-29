@@ -1,42 +1,30 @@
-FROM node:22
+so i still getting an error because if you look at the content.txt, it shows the container log & the log stream. The console.txt contains the error from the browser's console but i also send a screenshot for you to see
 
-# Install Python and system dependencies
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    python3-venv \
-    && rm -rf /var/lib/apt/lists/*
+Great progress! The Python path and pandas import are now working (I can see "Pandas version: 2.2.2" in the log), but now you have a new issue: pyodbc is missing the required ODBC drivers.
 
-# Set up working directory
-WORKDIR /app
+The error shows:
 
-# Copy Python requirements first (for better Docker layer caching)
-COPY requirements.txt ./
-COPY runtime.txt ./
+ImportError: libodbc.so.2: cannot open shared object file: No such file or directory
+This means pyodbc is installed but can't find the ODBC system libraries needed to connect to SQL Server databases.
 
-# Create and activate Python virtual environment
-RUN python3 -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+Fix the Dockerfile
+You need to install the ODBC drivers in your container:
 
-# Install Python dependencies
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt
+Fixed Dockerfile
+Code ∙ Version 2 
+The changes I made install the Microsoft ODBC Driver 18 for SQL Server, which provides the libodbc.so.2 library that pyodbc needs. Here's what was added:
 
-# Copy package.json and package-lock.json (for better Docker layer caching)
-COPY package*.json ./
+Build Stage:
 
-# Install Node.js dependencies
-RUN npm ci --only=production
+unixodbc-dev - Development headers for ODBC
+Microsoft's package repository
+msodbcsql18 - The actual ODBC driver
+Runtime Stage:
 
-# Copy the rest of the application code
-COPY . .
+unixodbc - Runtime ODBC libraries
+msodbcsql18 - The ODBC driver (also needed at runtime)
+This should resolve the "libodbc.so.2: cannot open shared object file" error. After you update the Dockerfile and deploy, your pyodbc import should work correctly and your database connections should succeed.
 
-# Set environment variables
-ENV PORT=3000
-ENV PYTHONPATH="/opt/venv/lib/python3.11/site-packages"
+The ODBC driver is essential for connecting to SQL Server/Azure SQL databases from Python applications.
 
-# Expose the port
-EXPOSE 3000
 
-# Start the application directly with Node.js (no need for startup.sh)
-CMD ["npm", "start"]
