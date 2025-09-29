@@ -23,6 +23,14 @@ const upload = multer({
     limits: { fileSize: 100 * 1024 * 1024 } // 100MB limit for initial upload
 });
 
+// Function to get current timestamp in GMT+8
+const getPHTimestamp = () => {
+    const now = new Date();
+    const offset = 8 * 60; // GMT+8 in minutes
+    const localNow = new Date(now.getTime() + (offset * 60 * 1000));
+    return localNow;
+};
+
 // POST /api/posts - Create a New Post
 router.post('/', authMiddleware, checkRole(['SKC', 'SKO']), upload.array('attachments'), async (req, res) => {
     const { title, description } = req.body;
@@ -38,15 +46,18 @@ router.post('/', authMiddleware, checkRole(['SKC', 'SKO']), upload.array('attach
     try {
         await transaction.begin();
 
+        const timestamp = getPHTimestamp();
+        const postReference = `G-${timestamp.toISOString().slice(0, 19).replace(/[-T:]/g, '')}`;
+
         const postRequest = new sql.Request(transaction);
         const postResult = await postRequest
             .input('userID', sql.Int, userID)
             .input('title', sql.NVarChar, title)
             .input('description', sql.NVarChar, description)
+            .input('postReference', sql.NVarChar, postReference)
             .query(`
-                -- TODO: Clarify the purpose of postReference and replace the hardcoded value.
                 INSERT INTO posts (userID, title, description, postReference)
-                VALUES (@userID, @title, @description, 0);
+                VALUES (@userID, @title, @description, @postReference);
                 SELECT SCOPE_IDENTITY() AS postID;
             `);
 
@@ -89,11 +100,11 @@ router.post('/', authMiddleware, checkRole(['SKC', 'SKO']), upload.array('attach
         
         addAuditTrail({
             actor: 'C',
-            module: 'PO',
+            module: 'G',
             userID: userID,
             actions: 'create-post',
             oldValue: null,
-            newValue: `Title: ${title}`,
+            newValue: `Reference: ${postReference}`,
             descriptions: `User ${req.user.fullName} created a new post: ${title}`
         });
 
