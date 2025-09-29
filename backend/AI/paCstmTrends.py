@@ -55,7 +55,7 @@ filipino_bad_words = [
     "putang ina", "puta", "gago", "tanga", "bobo", "ulol", "pakyu", 
     "hayop", "bwisit", "lintik", "leche", "animal ka", "ampucha", "ampota",
     "amputa", "anak ng tokwa", "bilat", "binibrocha", "demonyo", "engot",
-    "hinayupak", "hindot", "inutil", "kupal", "pakingshet", "potangina",
+    "hinayupak", "hindot", "inutil", "kupal", "pakingshet", "potangina", "tangina",
     "putragis", "pakshet", "tarantado", "ungas"
 ]
 spanish_bad_words = [
@@ -181,10 +181,20 @@ def main(custom_category, other_category, forecast_year):
             db_category_filter = custom_category
             search_category = custom_category
             if custom_category == 'Others' and other_category:
-                if profanity.contains_profanity(other_category):
+                # Custom profanity check to catch substrings and variations
+                is_profane = False
+                text_to_check = other_category.lower()
+                # Combine all profanity lists for a comprehensive check
+                all_profanities = filipino_bad_words + spanish_bad_words
+                for word in all_profanities:
+                    if word.lower() in text_to_check:
+                        is_profane = True
+                        break
+                
+                if is_profane:
                     error_response = {
                         "error": True,
-                        "message": "The custom category contains inappropriate language. Please use respectful terms. (English, Filipino, and Spanish profanity is checked.)"
+                        "message": "Profanity detected. The custom category contains inappropriate language. Please use respectful terms. (English, Filipino, and Spanish profanity is checked.)"
                     }
                     print(json.dumps(error_response))
                     sys.exit(1)
