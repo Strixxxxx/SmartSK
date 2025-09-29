@@ -1,908 +1,246 @@
-Run IMAGE_NAME=smartskregistry.azurecr.io/smartsk-backend
-Building Docker image...
-#0 building with "default" instance using docker driver
-#1 [internal] load build definition from Dockerfile
-#1 transferring dockerfile: 1.61kB done
-#1 DONE 0.0s
-#2 [auth] library/node:pull token for registry-1.docker.io
-#2 DONE 0.0s
-#3 [auth] library/python:pull token for registry-1.docker.io
-#3 DONE 0.0s
-#4 [internal] load metadata for docker.io/library/python:3.12-slim
-#4 DONE 0.4s
-#5 [internal] load metadata for docker.io/library/node:22-bullseye-slim
-#5 DONE 0.4s
-#6 [internal] load .dockerignore
-#6 transferring context: 152B done
-#6 DONE 0.0s
-#7 [node-builder 1/5] FROM docker.io/library/node:22-bullseye-slim@sha256:39a8664a9388d7637e56e87dded1be09b8d2b6b62cd263571dedc5d76d4aba70
-#7 resolve docker.io/library/node:22-bullseye-slim@sha256:39a8664a9388d7637e56e87dded1be09b8d2b6b62cd263571dedc5d76d4aba70 0.0s done
-#7 ...
-#8 [internal] load build context
-#8 transferring context: 332.08kB 0.0s done
-#8 DONE 0.0s
-#7 [node-builder 1/5] FROM docker.io/library/node:22-bullseye-slim@sha256:39a8664a9388d7637e56e87dded1be09b8d2b6b62cd263571dedc5d76d4aba70
-#7 sha256:16a75a6cfe5aa57945fb4687cd92f9f1348eb1eb3d1df3e821c89ebaa71f9d83 6.79kB / 6.79kB done
-#7 sha256:39a8664a9388d7637e56e87dded1be09b8d2b6b62cd263571dedc5d76d4aba70 3.94kB / 3.94kB done
-#7 sha256:479ead5afbed590fa29eb9368cf1b063d86b8f4cc1d1f6552278a0f712746c33 1.93kB / 1.93kB done
-#7 sha256:456a3213e1b1f193dc759cd05f6f8422428b8c4bd45ef40fbf41ba43bdce8570 10.49MB / 30.26MB 0.3s
-#7 sha256:76168ff42ab799dc2ea9d06a926bd20a21e909137c4080761cf057e6e2702d25 0B / 4.07kB 0.3s
-#7 sha256:302d025cb2edce21744556addd8e8dc781ebd6291aec848b39bc57f0e4eeabb6 0B / 49.43MB 0.3s
-#7 sha256:456a3213e1b1f193dc759cd05f6f8422428b8c4bd45ef40fbf41ba43bdce8570 24.13MB / 30.26MB 0.4s
-#7 sha256:76168ff42ab799dc2ea9d06a926bd20a21e909137c4080761cf057e6e2702d25 4.07kB / 4.07kB 0.3s done
-#7 sha256:302d025cb2edce21744556addd8e8dc781ebd6291aec848b39bc57f0e4eeabb6 11.71MB / 49.43MB 0.4s
-#7 extracting sha256:456a3213e1b1f193dc759cd05f6f8422428b8c4bd45ef40fbf41ba43bdce8570
-#7 sha256:456a3213e1b1f193dc759cd05f6f8422428b8c4bd45ef40fbf41ba43bdce8570 30.26MB / 30.26MB 0.4s done
-#7 sha256:302d025cb2edce21744556addd8e8dc781ebd6291aec848b39bc57f0e4eeabb6 19.92MB / 49.43MB 0.5s
-#7 sha256:592700055349fdf569a03bdb943180c22a2c14e8a5d66b6f1457528b1f396e2a 1.74MB / 1.74MB 0.4s done
-#7 sha256:3daca0b2c495092ae5231041ebfcc6289cb65ea7d751413e942708b668add199 449B / 449B 0.4s done
-#7 sha256:302d025cb2edce21744556addd8e8dc781ebd6291aec848b39bc57f0e4eeabb6 28.31MB / 49.43MB 0.6s
-#7 sha256:302d025cb2edce21744556addd8e8dc781ebd6291aec848b39bc57f0e4eeabb6 43.23MB / 49.43MB 0.7s
-#7 sha256:302d025cb2edce21744556addd8e8dc781ebd6291aec848b39bc57f0e4eeabb6 49.43MB / 49.43MB 0.8s done
-#7 extracting sha256:456a3213e1b1f193dc759cd05f6f8422428b8c4bd45ef40fbf41ba43bdce8570 1.9s done
-#7 extracting sha256:76168ff42ab799dc2ea9d06a926bd20a21e909137c4080761cf057e6e2702d25
-#7 extracting sha256:76168ff42ab799dc2ea9d06a926bd20a21e909137c4080761cf057e6e2702d25 done
-#7 extracting sha256:302d025cb2edce21744556addd8e8dc781ebd6291aec848b39bc57f0e4eeabb6
-#7 ...
-#9 [python-builder 1/6] FROM docker.io/library/python:3.12-slim@sha256:abc799c7ee22b0d66f46c367643088a35e048bbabd81212d73c2323aed38c64f
-#9 resolve docker.io/library/python:3.12-slim@sha256:abc799c7ee22b0d66f46c367643088a35e048bbabd81212d73c2323aed38c64f 0.0s done
-#9 sha256:abc799c7ee22b0d66f46c367643088a35e048bbabd81212d73c2323aed38c64f 10.37kB / 10.37kB done
-#9 sha256:a2dd6679f8a13a533f44782cd31584d4ca4ec7170c84e7e726dc9cc3f862ed42 1.75kB / 1.75kB done
-#9 sha256:f35c889e4f8eec7a5ccec31926201e4a63df72a87cbd59e7af1bfe2689397354 5.58kB / 5.58kB done
-#9 sha256:ce1261c6d567efa8e3b457673eeeb474a0a8066df6bb95ca9a6a94a31e219dd3 29.77MB / 29.77MB 0.2s done
-#9 sha256:ae44614ad59ae7d9347036fab246b3ec97ae8dca5a034c8c0057cd787bceb8fa 1.29MB / 1.29MB 0.1s done
-#9 sha256:48b120ca37b5b627d81d3cb2e63d808078495be97454db590bba47194cb017ee 12.11MB / 12.11MB 0.2s done
-#9 sha256:debe34bebc01f52b9f6e7fc26f1f74708de668b6088d586352067e5d881087d8 249B / 249B 0.2s done
-#9 extracting sha256:ce1261c6d567efa8e3b457673eeeb474a0a8066df6bb95ca9a6a94a31e219dd3 1.5s done
-#9 extracting sha256:ae44614ad59ae7d9347036fab246b3ec97ae8dca5a034c8c0057cd787bceb8fa 0.2s done
-#9 extracting sha256:48b120ca37b5b627d81d3cb2e63d808078495be97454db590bba47194cb017ee 0.9s done
-#9 extracting sha256:debe34bebc01f52b9f6e7fc26f1f74708de668b6088d586352067e5d881087d8 done
-#9 DONE 4.4s
-#10 [python-builder 2/6] WORKDIR /app
-#10 DONE 0.0s
-#11 [python-builder 3/6] RUN python3 --version && pip --version
-#11 0.228 Python 3.12.11
-#11 ...
-#7 [node-builder 1/5] FROM docker.io/library/node:22-bullseye-slim@sha256:39a8664a9388d7637e56e87dded1be09b8d2b6b62cd263571dedc5d76d4aba70
-#7 extracting sha256:302d025cb2edce21744556addd8e8dc781ebd6291aec848b39bc57f0e4eeabb6 2.3s done
-#7 extracting sha256:592700055349fdf569a03bdb943180c22a2c14e8a5d66b6f1457528b1f396e2a 0.1s done
-#7 extracting sha256:3daca0b2c495092ae5231041ebfcc6289cb65ea7d751413e942708b668add199 done
-#7 DONE 5.4s
-#12 [node-builder 2/5] WORKDIR /app
-#12 DONE 0.0s
-#13 [node-builder 3/5] RUN node --version && npm --version
-#13 0.271 v22.20.0
-#13 0.399 10.9.3
-#13 DONE 0.4s
-#14 [node-builder 4/5] COPY package*.json ./
-#14 DONE 0.0s
-#15 [node-builder 5/5] RUN echo "Installing Node.js dependencies..." && npm ci --omit=dev
-#15 0.239 Installing Node.js dependencies...
-#15 ...
-#11 [python-builder 3/6] RUN python3 --version && pip --version
-#11 1.813 pip 25.0.1 from /usr/local/lib/python3.12/site-packages/pip (python 3.12)
-#11 DONE 1.9s
-#16 [python-builder 4/6] RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc && rm -rf /var/lib/apt/lists/*
-#16 0.470 Hit:1 http://deb.debian.org/debian trixie InRelease
-#16 0.471 Get:2 http://deb.debian.org/debian trixie-updates InRelease [47.3 kB]
-#16 0.478 Get:3 http://deb.debian.org/debian-security trixie-security InRelease [43.4 kB]
-#16 0.538 Get:4 http://deb.debian.org/debian trixie/main amd64 Packages [9669 kB]
-#16 0.666 Get:5 http://deb.debian.org/debian trixie-updates/main amd64 Packages [5412 B]
-#16 0.667 Get:6 http://deb.debian.org/debian-security trixie-security/main amd64 Packages [47.7 kB]
-#16 1.825 Fetched 9812 kB in 1s (6915 kB/s)
-#16 1.825 Reading package lists...
-#16 2.835 Reading package lists...
-#16 3.916 Building dependency tree...
-#16 4.145 Reading state information...
-#16 4.414 The following additional packages will be installed:
-#16 4.415   binutils binutils-common binutils-x86-64-linux-gnu bzip2 cpp cpp-14
-#16 4.415   cpp-14-x86-64-linux-gnu cpp-x86-64-linux-gnu dpkg-dev g++ g++-14
-#16 4.415   g++-14-x86-64-linux-gnu g++-x86-64-linux-gnu gcc-14 gcc-14-x86-64-linux-gnu
-#16 4.415   gcc-x86-64-linux-gnu libasan8 libatomic1 libbinutils libc-dev-bin libc6-dev
-#16 4.416   libcc1-0 libcrypt-dev libctf-nobfd0 libctf0 libdpkg-perl libgcc-14-dev
-#16 4.418   libgdbm-compat4t64 libgomp1 libgprofng0 libhwasan0 libisl23 libitm1
-#16 4.418   libjansson4 liblsan0 libmpc3 libmpfr6 libperl5.40 libquadmath0 libsframe1
-#16 4.418   libstdc++-14-dev libtsan2 libubsan1 linux-libc-dev make patch perl
-#16 4.418   perl-modules-5.40 rpcsvc-proto xz-utils
-#16 4.420 Suggested packages:
-#16 4.420   binutils-doc gprofng-gui binutils-gold bzip2-doc cpp-doc gcc-14-locales
-#16 4.420   cpp-14-doc debian-keyring debian-tag2upload-keyring g++-multilib
-#16 4.420   g++-14-multilib gcc-14-doc gcc-multilib manpages-dev autoconf automake
-#16 4.420   libtool flex bison gdb gcc-doc gcc-14-multilib gdb-x86-64-linux-gnu
-#16 4.420   libc-devtools glibc-doc sq | sqop | rsop | gosop | pgpainless-cli | gpg-sq
-#16 4.420   | gnupg sensible-utils git bzr libstdc++-14-doc make-doc ed diffutils-doc
-#16 4.420   perl-doc libterm-readline-gnu-perl | libterm-readline-perl-perl
-#16 4.420   libtap-harness-archive-perl
-#16 4.420 Recommended packages:
-#16 4.420   fakeroot sq | sqop | rsop | gosop | pgpainless-cli | gpg-sq | gnupg
-#16 4.420   libalgorithm-merge-perl manpages manpages-dev libfile-fcntllock-perl
-#16 4.420   liblocale-gettext-perl
-#16 4.693 The following NEW packages will be installed:
-#16 4.693   binutils binutils-common binutils-x86-64-linux-gnu build-essential bzip2 cpp
-#16 4.693   cpp-14 cpp-14-x86-64-linux-gnu cpp-x86-64-linux-gnu dpkg-dev g++ g++-14
-#16 4.693   g++-14-x86-64-linux-gnu g++-x86-64-linux-gnu gcc gcc-14
-#16 4.693   gcc-14-x86-64-linux-gnu gcc-x86-64-linux-gnu libasan8 libatomic1 libbinutils
-#16 4.693   libc-dev-bin libc6-dev libcc1-0 libcrypt-dev libctf-nobfd0 libctf0
-#16 4.693   libdpkg-perl libgcc-14-dev libgdbm-compat4t64 libgomp1 libgprofng0
-#16 4.693   libhwasan0 libisl23 libitm1 libjansson4 liblsan0 libmpc3 libmpfr6
-#16 4.693   libperl5.40 libquadmath0 libsframe1 libstdc++-14-dev libtsan2 libubsan1
-#16 4.693   linux-libc-dev make patch perl perl-modules-5.40 rpcsvc-proto xz-utils
-#16 4.746 0 upgraded, 52 newly installed, 0 to remove and 2 not upgraded.
-#16 4.746 Need to get 82.3 MB of archives.
-#16 4.746 After this operation, 336 MB of additional disk space will be used.
-#16 4.746 Get:1 http://deb.debian.org/debian trixie/main amd64 bzip2 amd64 1.0.8-6 [40.5 kB]
-#16 4.755 Get:2 http://deb.debian.org/debian trixie/main amd64 perl-modules-5.40 all 5.40.1-6 [3019 kB]
-#16 4.804 Get:3 http://deb.debian.org/debian trixie/main amd64 libgdbm-compat4t64 amd64 1.24-2 [50.3 kB]
-#16 4.809 Get:4 http://deb.debian.org/debian trixie/main amd64 libperl5.40 amd64 5.40.1-6 [4341 kB]
-#16 4.840 Get:5 http://deb.debian.org/debian trixie/main amd64 perl amd64 5.40.1-6 [267 kB]
-#16 4.847 Get:6 http://deb.debian.org/debian trixie/main amd64 xz-utils amd64 5.8.1-1 [660 kB]
-#16 4.851 Get:7 http://deb.debian.org/debian trixie/main amd64 libsframe1 amd64 2.44-3 [78.4 kB]
-#16 4.851 Get:8 http://deb.debian.org/debian trixie/main amd64 binutils-common amd64 2.44-3 [2509 kB]
-#16 4.875 Get:9 http://deb.debian.org/debian trixie/main amd64 libbinutils amd64 2.44-3 [534 kB]
-#16 4.877 Get:10 http://deb.debian.org/debian trixie/main amd64 libgprofng0 amd64 2.44-3 [808 kB]
-#16 4.882 Get:11 http://deb.debian.org/debian trixie/main amd64 libctf-nobfd0 amd64 2.44-3 [156 kB]
-#16 4.886 Get:12 http://deb.debian.org/debian trixie/main amd64 libctf0 amd64 2.44-3 [88.6 kB]
-#16 4.886 Get:13 http://deb.debian.org/debian trixie/main amd64 libjansson4 amd64 2.14-2+b3 [39.8 kB]
-#16 4.887 Get:14 http://deb.debian.org/debian trixie/main amd64 binutils-x86-64-linux-gnu amd64 2.44-3 [1014 kB]
-#16 4.894 Get:15 http://deb.debian.org/debian trixie/main amd64 binutils amd64 2.44-3 [265 kB]
-#16 4.897 Get:16 http://deb.debian.org/debian trixie/main amd64 libc-dev-bin amd64 2.41-12 [58.2 kB]
-#16 4.899 Get:17 http://deb.debian.org/debian-security trixie-security/main amd64 linux-libc-dev all 6.12.48-1 [2671 kB]
-#16 4.909 Get:18 http://deb.debian.org/debian trixie/main amd64 libcrypt-dev amd64 1:4.4.38-1 [119 kB]
-#16 4.915 Get:19 http://deb.debian.org/debian trixie/main amd64 rpcsvc-proto amd64 1.4.3-1 [63.3 kB]
-#16 4.919 Get:20 http://deb.debian.org/debian trixie/main amd64 libc6-dev amd64 2.41-12 [1991 kB]
-#16 4.932 Get:21 http://deb.debian.org/debian trixie/main amd64 libisl23 amd64 0.27-1 [659 kB]
-#16 4.939 Get:22 http://deb.debian.org/debian trixie/main amd64 libmpfr6 amd64 4.2.2-1 [729 kB]
-#16 4.948 Get:23 http://deb.debian.org/debian trixie/main amd64 libmpc3 amd64 1.3.1-1+b3 [52.2 kB]
-#16 4.948 Get:24 http://deb.debian.org/debian trixie/main amd64 cpp-14-x86-64-linux-gnu amd64 14.2.0-19 [11.0 MB]
-#16 5.001 Get:25 http://deb.debian.org/debian trixie/main amd64 cpp-14 amd64 14.2.0-19 [1280 B]
-#16 5.002 Get:26 http://deb.debian.org/debian trixie/main amd64 cpp-x86-64-linux-gnu amd64 4:14.2.0-1 [4840 B]
-#16 5.004 Get:27 http://deb.debian.org/debian trixie/main amd64 cpp amd64 4:14.2.0-1 [1568 B]
-#16 5.004 Get:28 http://deb.debian.org/debian trixie/main amd64 libcc1-0 amd64 14.2.0-19 [42.8 kB]
-#16 5.004 Get:29 http://deb.debian.org/debian trixie/main amd64 libgomp1 amd64 14.2.0-19 [137 kB]
-#16 5.005 Get:30 http://deb.debian.org/debian trixie/main amd64 libitm1 amd64 14.2.0-19 [26.0 kB]
-#16 5.009 Get:31 http://deb.debian.org/debian trixie/main amd64 libatomic1 amd64 14.2.0-19 [9308 B]
-#16 5.009 Get:32 http://deb.debian.org/debian trixie/main amd64 libasan8 amd64 14.2.0-19 [2725 kB]
-#16 5.021 Get:33 http://deb.debian.org/debian trixie/main amd64 liblsan0 amd64 14.2.0-19 [1204 kB]
-#16 5.026 Get:34 http://deb.debian.org/debian trixie/main amd64 libtsan2 amd64 14.2.0-19 [2460 kB]
-#16 5.051 Get:35 http://deb.debian.org/debian trixie/main amd64 libubsan1 amd64 14.2.0-19 [1074 kB]
-#16 5.058 Get:36 http://deb.debian.org/debian trixie/main amd64 libhwasan0 amd64 14.2.0-19 [1488 kB]
-#16 5.067 Get:37 http://deb.debian.org/debian trixie/main amd64 libquadmath0 amd64 14.2.0-19 [145 kB]
-#16 5.070 Get:38 http://deb.debian.org/debian trixie/main amd64 libgcc-14-dev amd64 14.2.0-19 [2672 kB]
-#16 5.082 Get:39 http://deb.debian.org/debian trixie/main amd64 gcc-14-x86-64-linux-gnu amd64 14.2.0-19 [21.4 MB]
-#16 5.224 Get:40 http://deb.debian.org/debian trixie/main amd64 gcc-14 amd64 14.2.0-19 [540 kB]
-#16 5.227 Get:41 http://deb.debian.org/debian trixie/main amd64 gcc-x86-64-linux-gnu amd64 4:14.2.0-1 [1436 B]
-#16 5.227 Get:42 http://deb.debian.org/debian trixie/main amd64 gcc amd64 4:14.2.0-1 [5136 B]
-#16 5.227 Get:43 http://deb.debian.org/debian trixie/main amd64 libstdc++-14-dev amd64 14.2.0-19 [2376 kB]
-#16 5.241 Get:44 http://deb.debian.org/debian trixie/main amd64 g++-14-x86-64-linux-gnu amd64 14.2.0-19 [12.1 MB]
-#16 5.314 Get:45 http://deb.debian.org/debian trixie/main amd64 g++-14 amd64 14.2.0-19 [22.5 kB]
-#16 5.328 Get:46 http://deb.debian.org/debian trixie/main amd64 g++-x86-64-linux-gnu amd64 4:14.2.0-1 [1200 B]
-#16 5.328 Get:47 http://deb.debian.org/debian trixie/main amd64 g++ amd64 4:14.2.0-1 [1344 B]
-#16 5.329 Get:48 http://deb.debian.org/debian trixie/main amd64 make amd64 4.4.1-2 [463 kB]
-#16 5.329 Get:49 http://deb.debian.org/debian trixie/main amd64 libdpkg-perl all 1.22.21 [650 kB]
-#16 5.335 Get:50 http://deb.debian.org/debian trixie/main amd64 patch amd64 2.8-2 [134 kB]
-#16 5.336 Get:51 http://deb.debian.org/debian trixie/main amd64 dpkg-dev all 1.22.21 [1338 kB]
-#16 5.343 Get:52 http://deb.debian.org/debian trixie/main amd64 build-essential amd64 12.12 [4624 B]
-#16 5.680 debconf: unable to initialize frontend: Dialog
-#16 5.680 debconf: (TERM is not set, so the dialog frontend is not usable.)
-#16 5.680 debconf: falling back to frontend: Readline
-#16 5.680 debconf: unable to initialize frontend: Readline
-#16 5.680 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC entries checked: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.40.1 /usr/local/share/perl/5.40.1 /usr/lib/x86_64-linux-gnu/perl5/5.40 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.40 /usr/share/perl/5.40 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 8, <STDIN> line 52.)
-#16 5.680 debconf: falling back to frontend: Teletype
-#16 5.695 debconf: unable to initialize frontend: Teletype
-#16 5.696 debconf: (This frontend requires a controlling tty.)
-#16 5.696 debconf: falling back to frontend: Noninteractive
-#16 7.909 Fetched 82.3 MB in 1s (130 MB/s)
-#16 7.958 Selecting previously unselected package bzip2.
-#16 7.958 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 5644 files and directories currently installed.)
-#16 7.974 Preparing to unpack .../00-bzip2_1.0.8-6_amd64.deb ...
-#16 7.979 Unpacking bzip2 (1.0.8-6) ...
-#16 8.047 Selecting previously unselected package perl-modules-5.40.
-#16 8.053 Preparing to unpack .../01-perl-modules-5.40_5.40.1-6_all.deb ...
-#16 8.062 Unpacking perl-modules-5.40 (5.40.1-6) ...
-#16 8.835 Selecting previously unselected package libgdbm-compat4t64:amd64.
-#16 8.838 Preparing to unpack .../02-libgdbm-compat4t64_1.24-2_amd64.deb ...
-#16 8.846 Unpacking libgdbm-compat4t64:amd64 (1.24-2) ...
-#16 8.912 Selecting previously unselected package libperl5.40:amd64.
-#16 8.914 Preparing to unpack .../03-libperl5.40_5.40.1-6_amd64.deb ...
-#16 8.917 Unpacking libperl5.40:amd64 (5.40.1-6) ...
-#16 ...
-#17 [stage-2 3/7] RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip && rm -rf /var/lib/apt/lists/*
-#17 0.458 Get:1 http://deb.debian.org/debian bullseye InRelease [75.1 kB]
-#17 0.498 Get:2 http://deb.debian.org/debian-security bullseye-security InRelease [27.2 kB]
-#17 0.499 Get:3 http://deb.debian.org/debian bullseye-updates InRelease [44.0 kB]
-#17 0.781 Get:4 http://deb.debian.org/debian bullseye/main amd64 Packages [8066 kB]
-#17 1.158 Get:5 http://deb.debian.org/debian-security bullseye-security/main amd64 Packages [410 kB]
-#17 1.480 Get:6 http://deb.debian.org/debian bullseye-updates/main amd64 Packages [18.8 kB]
-#17 3.022 Fetched 8641 kB in 3s (3333 kB/s)
-#17 3.022 Reading package lists...
-#17 3.999 Reading package lists...
-#17 4.805 Building dependency tree...
-#17 5.008 Reading state information...
-#17 5.160 The following additional packages will be installed:
-#17 5.160   ca-certificates libexpat1 libmpdec3 libncursesw6 libpython3-stdlib
-#17 5.160   libpython3.9-minimal libpython3.9-stdlib libreadline8 libsqlite3-0
-#17 5.160   media-types openssl python-pip-whl python3-distutils python3-lib2to3
-#17 5.160   python3-minimal python3-pkg-resources python3-setuptools python3-wheel
-#17 5.161   python3.9 python3.9-minimal readline-common
-#17 5.161 Suggested packages:
-#17 5.161   python3-doc python3-tk python3-venv python-setuptools-doc python3.9-venv
-#17 5.161   python3.9-doc binutils binfmt-support readline-doc
-#17 5.161 Recommended packages:
-#17 5.161   libgpm2 build-essential python3-dev
-#17 5.403 The following NEW packages will be installed:
-#17 5.405   ca-certificates libexpat1 libmpdec3 libncursesw6 libpython3-stdlib
-#17 5.405   libpython3.9-minimal libpython3.9-stdlib libreadline8 libsqlite3-0
-#17 5.405   media-types openssl python-pip-whl python3 python3-distutils python3-lib2to3
-#17 5.405   python3-minimal python3-pip python3-pkg-resources python3-setuptools
-#17 5.405   python3-wheel python3.9 python3.9-minimal readline-common
-#17 5.441 0 upgraded, 23 newly installed, 0 to remove and 4 not upgraded.
-#17 5.441 Need to get 10.5 MB of archives.
-#17 5.441 After this operation, 31.8 MB of additional disk space will be used.
-#17 5.441 Get:1 http://deb.debian.org/debian-security bullseye-security/main amd64 libpython3.9-minimal amd64 3.9.2-1+deb11u3 [805 kB]
-#17 5.471 Get:2 http://deb.debian.org/debian-security bullseye-security/main amd64 libexpat1 amd64 2.2.10-2+deb11u7 [99.2 kB]
-#17 5.478 Get:3 http://deb.debian.org/debian-security bullseye-security/main amd64 python3.9-minimal amd64 3.9.2-1+deb11u3 [1963 kB]
-#17 5.509 Get:4 http://deb.debian.org/debian bullseye/main amd64 python3-minimal amd64 3.9.2-3 [38.2 kB]
-#17 5.509 Get:5 http://deb.debian.org/debian bullseye/main amd64 media-types all 4.0.0 [30.3 kB]
-#17 5.512 Get:6 http://deb.debian.org/debian bullseye/main amd64 libmpdec3 amd64 2.5.1-1 [87.7 kB]
-#17 5.513 Get:7 http://deb.debian.org/debian bullseye/main amd64 libncursesw6 amd64 6.2+20201114-2+deb11u2 [132 kB]
-#17 5.517 Get:8 http://deb.debian.org/debian bullseye/main amd64 readline-common all 8.1-1 [73.7 kB]
-#17 5.518 Get:9 http://deb.debian.org/debian bullseye/main amd64 libreadline8 amd64 8.1-1 [169 kB]
-#17 5.524 Get:10 http://deb.debian.org/debian-security bullseye-security/main amd64 libsqlite3-0 amd64 3.34.1-3+deb11u1 [797 kB]
-#17 5.533 Get:11 http://deb.debian.org/debian-security bullseye-security/main amd64 libpython3.9-stdlib amd64 3.9.2-1+deb11u3 [1684 kB]
-#17 5.549 Get:12 http://deb.debian.org/debian-security bullseye-security/main amd64 python3.9 amd64 3.9.2-1+deb11u3 [467 kB]
-#17 5.556 Get:13 http://deb.debian.org/debian bullseye/main amd64 libpython3-stdlib amd64 3.9.2-3 [21.4 kB]
-#17 5.560 Get:14 http://deb.debian.org/debian bullseye/main amd64 python3 amd64 3.9.2-3 [37.9 kB]
-#17 5.560 Get:15 http://deb.debian.org/debian-security bullseye-security/main amd64 openssl amd64 1.1.1w-0+deb11u3 [859 kB]
-#17 5.568 Get:16 http://deb.debian.org/debian bullseye/main amd64 ca-certificates all 20210119 [158 kB]
-#17 5.571 Get:17 http://deb.debian.org/debian bullseye/main amd64 python-pip-whl all 20.3.4-4+deb11u1 [1948 kB]
-#17 5.592 Get:18 http://deb.debian.org/debian bullseye/main amd64 python3-lib2to3 all 3.9.2-1 [77.8 kB]
-#17 5.594 Get:19 http://deb.debian.org/debian bullseye/main amd64 python3-distutils all 3.9.2-1 [143 kB]
-#17 5.595 Get:20 http://deb.debian.org/debian-security bullseye-security/main amd64 python3-pkg-resources all 52.0.0-4+deb11u2 [190 kB]
-#17 5.597 Get:21 http://deb.debian.org/debian-security bullseye-security/main amd64 python3-setuptools all 52.0.0-4+deb11u2 [367 kB]
-#17 5.600 Get:22 http://deb.debian.org/debian bullseye/main amd64 python3-wheel all 0.34.2-1 [24.0 kB]
-#17 5.603 Get:23 http://deb.debian.org/debian bullseye/main amd64 python3-pip all 20.3.4-4+deb11u1 [337 kB]
-#17 5.857 debconf: delaying package configuration, since apt-utils is not installed
-#17 5.931 Fetched 10.5 MB in 0s (54.8 MB/s)
-#17 5.970 Selecting previously unselected package libpython3.9-minimal:amd64.
-#17 5.970 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 6673 files and directories currently installed.)
-#17 5.991 Preparing to unpack .../libpython3.9-minimal_3.9.2-1+deb11u3_amd64.deb ...
-#17 6.001 Unpacking libpython3.9-minimal:amd64 (3.9.2-1+deb11u3) ...
-#17 6.254 Selecting previously unselected package libexpat1:amd64.
-#17 6.254 Preparing to unpack .../libexpat1_2.2.10-2+deb11u7_amd64.deb ...
-#17 6.262 Unpacking libexpat1:amd64 (2.2.10-2+deb11u7) ...
-#17 6.322 Selecting previously unselected package python3.9-minimal.
-#17 6.324 Preparing to unpack .../python3.9-minimal_3.9.2-1+deb11u3_amd64.deb ...
-#17 6.334 Unpacking python3.9-minimal (3.9.2-1+deb11u3) ...
-#17 6.762 Setting up libpython3.9-minimal:amd64 (3.9.2-1+deb11u3) ...
-#17 6.772 Setting up libexpat1:amd64 (2.2.10-2+deb11u7) ...
-#17 6.784 Setting up python3.9-minimal (3.9.2-1+deb11u3) ...
-#17 7.886 Selecting previously unselected package python3-minimal.
-#17 7.886 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 6967 files and directories currently installed.)
-#17 7.895 Preparing to unpack .../0-python3-minimal_3.9.2-3_amd64.deb ...
-#17 7.901 Unpacking python3-minimal (3.9.2-3) ...
-#17 7.966 Selecting previously unselected package media-types.
-#17 7.970 Preparing to unpack .../1-media-types_4.0.0_all.deb ...
-#17 7.974 Unpacking media-types (4.0.0) ...
-#17 8.021 Selecting previously unselected package libmpdec3:amd64.
-#17 8.025 Preparing to unpack .../2-libmpdec3_2.5.1-1_amd64.deb ...
-#17 8.031 Unpacking libmpdec3:amd64 (2.5.1-1) ...
-#17 8.104 Selecting previously unselected package libncursesw6:amd64.
-#17 8.108 Preparing to unpack .../3-libncursesw6_6.2+20201114-2+deb11u2_amd64.deb ...
-#17 8.114 Unpacking libncursesw6:amd64 (6.2+20201114-2+deb11u2) ...
-#17 8.188 Selecting previously unselected package readline-common.
-#17 8.192 Preparing to unpack .../4-readline-common_8.1-1_all.deb ...
-#17 8.197 Unpacking readline-common (8.1-1) ...
-#17 8.273 Selecting previously unselected package libreadline8:amd64.
-#17 8.277 Preparing to unpack .../5-libreadline8_8.1-1_amd64.deb ...
-#17 8.282 Unpacking libreadline8:amd64 (8.1-1) ...
-#17 8.377 Selecting previously unselected package libsqlite3-0:amd64.
-#17 8.379 Preparing to unpack .../6-libsqlite3-0_3.34.1-3+deb11u1_amd64.deb ...
-#17 8.382 Unpacking libsqlite3-0:amd64 (3.34.1-3+deb11u1) ...
-#17 8.540 Selecting previously unselected package libpython3.9-stdlib:amd64.
-#17 8.542 Preparing to unpack .../7-libpython3.9-stdlib_3.9.2-1+deb11u3_amd64.deb ...
-#17 8.546 Unpacking libpython3.9-stdlib:amd64 (3.9.2-1+deb11u3) ...
-#17 8.992 Selecting previously unselected package python3.9.
-#17 8.994 Preparing to unpack .../8-python3.9_3.9.2-1+deb11u3_amd64.deb ...
-#17 8.997 Unpacking python3.9 (3.9.2-1+deb11u3) ...
-#17 9.067 Selecting previously unselected package libpython3-stdlib:amd64.
-#17 9.071 Preparing to unpack .../9-libpython3-stdlib_3.9.2-3_amd64.deb ...
-#17 9.081 Unpacking libpython3-stdlib:amd64 (3.9.2-3) ...
-#17 9.120 Setting up python3-minimal (3.9.2-3) ...
-#17 9.507 Selecting previously unselected package python3.
-#17 9.509 (Reading database ... 
-(Reading database ... 5%
-(Reading database ... 10%
-(Reading database ... 15%
-(Reading database ... 20%
-(Reading database ... 25%
-(Reading database ... 30%
-(Reading database ... 35%
-(Reading database ... 40%
-(Reading database ... 45%
-(Reading database ... 50%
-(Reading database ... 55%
-(Reading database ... 60%
-(Reading database ... 65%
-(Reading database ... 70%
-(Reading database ... 75%
-(Reading database ... 80%
-(Reading database ... 85%
-(Reading database ... 90%
-(Reading database ... 95%
-(Reading database ... 100%
-(Reading database ... 7405 files and directories currently installed.)
-#17 9.524 Preparing to unpack .../0-python3_3.9.2-3_amd64.deb ...
-#17 9.543 Unpacking python3 (3.9.2-3) ...
-#17 9.577 Selecting previously unselected package openssl.
-#17 9.579 Preparing to unpack .../1-openssl_1.1.1w-0+deb11u3_amd64.deb ...
-#17 9.583 Unpacking openssl (1.1.1w-0+deb11u3) ...
-#17 9.721 Selecting previously unselected package ca-certificates.
-#17 9.723 Preparing to unpack .../2-ca-certificates_20210119_all.deb ...
-#17 9.727 Unpacking ca-certificates (20210119) ...
-#17 9.832 Selecting previously unselected package python-pip-whl.
-#17 9.835 Preparing to unpack .../3-python-pip-whl_20.3.4-4+deb11u1_all.deb ...
-#17 9.839 Unpacking python-pip-whl (20.3.4-4+deb11u1) ...
-#17 10.13 Selecting previously unselected package python3-lib2to3.
-#17 10.14 Preparing to unpack .../4-python3-lib2to3_3.9.2-1_all.deb ...
-#17 10.15 Unpacking python3-lib2to3 (3.9.2-1) ...
-#17 10.24 Selecting previously unselected package python3-distutils.
-#17 10.24 Preparing to unpack .../5-python3-distutils_3.9.2-1_all.deb ...
-#17 10.25 Unpacking python3-distutils (3.9.2-1) ...
-#17 10.31 Selecting previously unselected package python3-pkg-resources.
-#17 10.31 Preparing to unpack .../6-python3-pkg-resources_52.0.0-4+deb11u2_all.deb ...
-#17 10.32 Unpacking python3-pkg-resources (52.0.0-4+deb11u2) ...
-#17 10.41 Selecting previously unselected package python3-setuptools.
-#17 10.41 Preparing to unpack .../7-python3-setuptools_52.0.0-4+deb11u2_all.deb ...
-#17 10.42 Unpacking python3-setuptools (52.0.0-4+deb11u2) ...
-#17 ...
-#16 [python-builder 4/6] RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc && rm -rf /var/lib/apt/lists/*
-#16 9.572 Selecting previously unselected package perl.
-#16 9.574 Preparing to unpack .../04-perl_5.40.1-6_amd64.deb ...
-#16 9.577 Unpacking perl (5.40.1-6) ...
-#16 9.649 Selecting previously unselected package xz-utils.
-#16 9.652 Preparing to unpack .../05-xz-utils_5.8.1-1_amd64.deb ...
-#16 9.655 Unpacking xz-utils (5.8.1-1) ...
-#16 9.731 Selecting previously unselected package libsframe1:amd64.
-#16 9.733 Preparing to unpack .../06-libsframe1_2.44-3_amd64.deb ...
-#16 9.735 Unpacking libsframe1:amd64 (2.44-3) ...
-#16 9.786 Selecting previously unselected package binutils-common:amd64.
-#16 9.786 Preparing to unpack .../07-binutils-common_2.44-3_amd64.deb ...
-#16 9.788 Unpacking binutils-common:amd64 (2.44-3) ...
-#16 9.998 Selecting previously unselected package libbinutils:amd64.
-#16 9.999 Preparing to unpack .../08-libbinutils_2.44-3_amd64.deb ...
-#16 10.00 Unpacking libbinutils:amd64 (2.44-3) ...
-#16 10.12 Selecting previously unselected package libgprofng0:amd64.
-#16 10.12 Preparing to unpack .../09-libgprofng0_2.44-3_amd64.deb ...
-#16 10.13 Unpacking libgprofng0:amd64 (2.44-3) ...
-#16 10.27 Selecting previously unselected package libctf-nobfd0:amd64.
-#16 10.27 Preparing to unpack .../10-libctf-nobfd0_2.44-3_amd64.deb ...
-#16 10.28 Unpacking libctf-nobfd0:amd64 (2.44-3) ...
-#16 10.33 Selecting previously unselected package libctf0:amd64.
-#16 10.33 Preparing to unpack .../11-libctf0_2.44-3_amd64.deb ...
-#16 10.33 Unpacking libctf0:amd64 (2.44-3) ...
-#16 10.39 Selecting previously unselected package libjansson4:amd64.
-#16 10.39 Preparing to unpack .../12-libjansson4_2.14-2+b3_amd64.deb ...
-#16 10.40 Unpacking libjansson4:amd64 (2.14-2+b3) ...
-#16 10.44 Selecting previously unselected package binutils-x86-64-linux-gnu.
-#16 10.44 Preparing to unpack .../13-binutils-x86-64-linux-gnu_2.44-3_amd64.deb ...
-#16 10.44 Unpacking binutils-x86-64-linux-gnu (2.44-3) ...
-#16 10.65 Selecting previously unselected package binutils.
-#16 10.65 Preparing to unpack .../14-binutils_2.44-3_amd64.deb ...
-#16 10.65 Unpacking binutils (2.44-3) ...
-#16 10.73 Selecting previously unselected package libc-dev-bin.
-#16 10.74 Preparing to unpack .../15-libc-dev-bin_2.41-12_amd64.deb ...
-#16 10.74 Unpacking libc-dev-bin (2.41-12) ...
-#16 10.78 Selecting previously unselected package linux-libc-dev.
-#16 10.78 Preparing to unpack .../16-linux-libc-dev_6.12.48-1_all.deb ...
-#16 10.78 Unpacking linux-libc-dev (6.12.48-1) ...
-#16 11.54 Selecting previously unselected package libcrypt-dev:amd64.
-#16 11.54 Preparing to unpack .../17-libcrypt-dev_1%3a4.4.38-1_amd64.deb ...
-#16 11.56 Unpacking libcrypt-dev:amd64 (1:4.4.38-1) ...
-#16 11.61 Selecting previously unselected package rpcsvc-proto.
-#16 11.61 Preparing to unpack .../18-rpcsvc-proto_1.4.3-1_amd64.deb ...
-#16 11.61 Unpacking rpcsvc-proto (1.4.3-1) ...
-#16 11.67 Selecting previously unselected package libc6-dev:amd64.
-#16 11.67 Preparing to unpack .../19-libc6-dev_2.41-12_amd64.deb ...
-#16 11.67 Unpacking libc6-dev:amd64 (2.41-12) ...
-#16 12.03 Selecting previously unselected package libisl23:amd64.
-#16 12.03 Preparing to unpack .../20-libisl23_0.27-1_amd64.deb ...
-#16 12.04 Unpacking libisl23:amd64 (0.27-1) ...
-#16 12.16 Selecting previously unselected package libmpfr6:amd64.
-#16 12.16 Preparing to unpack .../21-libmpfr6_4.2.2-1_amd64.deb ...
-#16 12.17 Unpacking libmpfr6:amd64 (4.2.2-1) ...
-#16 12.23 Selecting previously unselected package libmpc3:amd64.
-#16 12.24 Preparing to unpack .../22-libmpc3_1.3.1-1+b3_amd64.deb ...
-#16 12.24 Unpacking libmpc3:amd64 (1.3.1-1+b3) ...
-#16 12.31 Selecting previously unselected package cpp-14-x86-64-linux-gnu.
-#16 12.32 Preparing to unpack .../23-cpp-14-x86-64-linux-gnu_14.2.0-19_amd64.deb ...
-#16 12.32 Unpacking cpp-14-x86-64-linux-gnu (14.2.0-19) ...
-#16 13.00 Selecting previously unselected package cpp-14.
-#16 13.00 Preparing to unpack .../24-cpp-14_14.2.0-19_amd64.deb ...
-#16 13.03 Unpacking cpp-14 (14.2.0-19) ...
-#16 13.30 Selecting previously unselected package cpp-x86-64-linux-gnu.
-#16 13.30 Preparing to unpack .../25-cpp-x86-64-linux-gnu_4%3a14.2.0-1_amd64.deb ...
-#16 13.31 Unpacking cpp-x86-64-linux-gnu (4:14.2.0-1) ...
-#16 ...
-#15 [node-builder 5/5] RUN echo "Installing Node.js dependencies..." && npm ci --omit=dev
-#15 11.39 
-#15 11.39 > postinstall
-#15 11.39 > echo 'Verifying Azure Storage Blob...' && npm list @azure/storage-blob
-#15 11.39 
-#15 11.40 Verifying Azure Storage Blob...
-#15 12.34 app@ /app
-#15 12.34 `-- @azure/storage-blob@12.28.0
-#15 12.34 
-#15 12.46 
-#15 12.46 added 179 packages, and audited 180 packages in 12s
-#15 12.47 
-#15 12.47 32 packages are looking for funding
-#15 12.47   run `npm fund` for details
-#15 12.47 
-#15 12.47 found 0 vulnerabilities
-#15 12.47 npm notice
-#15 12.47 npm notice New major version of npm available! 10.9.3 -> 11.6.1
-#15 12.47 npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.6.1
-#15 12.47 npm notice To update run: npm install -g npm@11.6.1
-#15 12.47 npm notice
-#15 DONE 14.0s
-#16 [python-builder 4/6] RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc && rm -rf /var/lib/apt/lists/*
-#16 13.64 Selecting previously unselected package cpp.
-#16 13.64 Preparing to unpack .../26-cpp_4%3a14.2.0-1_amd64.deb ...
-#16 13.65 Unpacking cpp (4:14.2.0-1) ...
-#16 13.69 Selecting previously unselected package libcc1-0:amd64.
-#16 13.70 Preparing to unpack .../27-libcc1-0_14.2.0-19_amd64.deb ...
-#16 13.70 Unpacking libcc1-0:amd64 (14.2.0-19) ...
-#16 13.76 Selecting previously unselected package libgomp1:amd64.
-#16 13.76 Preparing to unpack .../28-libgomp1_14.2.0-19_amd64.deb ...
-#16 13.76 Unpacking libgomp1:amd64 (14.2.0-19) ...
-#16 13.84 Selecting previously unselected package libitm1:amd64.
-#16 13.84 Preparing to unpack .../29-libitm1_14.2.0-19_amd64.deb ...
-#16 13.84 Unpacking libitm1:amd64 (14.2.0-19) ...
-#16 13.89 Selecting previously unselected package libatomic1:amd64.
-#16 13.90 Preparing to unpack .../30-libatomic1_14.2.0-19_amd64.deb ...
-#16 13.90 Unpacking libatomic1:amd64 (14.2.0-19) ...
-#16 13.97 Selecting previously unselected package libasan8:amd64.
-#16 13.97 Preparing to unpack .../31-libasan8_14.2.0-19_amd64.deb ...
-#16 13.98 Unpacking libasan8:amd64 (14.2.0-19) ...
-#16 14.33 Selecting previously unselected package liblsan0:amd64.
-#16 14.33 Preparing to unpack .../32-liblsan0_14.2.0-19_amd64.deb ...
-#16 14.33 Unpacking liblsan0:amd64 (14.2.0-19) ...
-#16 14.47 Selecting previously unselected package libtsan2:amd64.
-#16 14.48 Preparing to unpack .../33-libtsan2_14.2.0-19_amd64.deb ...
-#16 14.48 Unpacking libtsan2:amd64 (14.2.0-19) ...
-#16 14.78 Selecting previously unselected package libubsan1:amd64.
-#16 14.79 Preparing to unpack .../34-libubsan1_14.2.0-19_amd64.deb ...
-#16 14.79 Unpacking libubsan1:amd64 (14.2.0-19) ...
-#16 14.91 Selecting previously unselected package libhwasan0:amd64.
-#16 14.91 Preparing to unpack .../35-libhwasan0_14.2.0-19_amd64.deb ...
-#16 14.92 Unpacking libhwasan0:amd64 (14.2.0-19) ...
-#16 15.08 Selecting previously unselected package libquadmath0:amd64.
-#16 15.08 Preparing to unpack .../36-libquadmath0_14.2.0-19_amd64.deb ...
-#16 15.09 Unpacking libquadmath0:amd64 (14.2.0-19) ...
-#16 15.16 Selecting previously unselected package libgcc-14-dev:amd64.
-#16 15.16 Preparing to unpack .../37-libgcc-14-dev_14.2.0-19_amd64.deb ...
-#16 15.16 Unpacking libgcc-14-dev:amd64 (14.2.0-19) ...
-#16 15.54 Selecting previously unselected package gcc-14-x86-64-linux-gnu.
-#16 15.54 Preparing to unpack .../38-gcc-14-x86-64-linux-gnu_14.2.0-19_amd64.deb ...
-#16 15.54 Unpacking gcc-14-x86-64-linux-gnu (14.2.0-19) ...
-#16 16.63 Selecting previously unselected package gcc-14.
-#16 16.63 Preparing to unpack .../39-gcc-14_14.2.0-19_amd64.deb ...
-#16 16.63 Unpacking gcc-14 (14.2.0-19) ...
-#16 16.67 Selecting previously unselected package gcc-x86-64-linux-gnu.
-#16 16.67 Preparing to unpack .../40-gcc-x86-64-linux-gnu_4%3a14.2.0-1_amd64.deb ...
-#16 16.67 Unpacking gcc-x86-64-linux-gnu (4:14.2.0-1) ...
-#16 16.70 Selecting previously unselected package gcc.
-#16 16.70 Preparing to unpack .../41-gcc_4%3a14.2.0-1_amd64.deb ...
-#16 16.71 Unpacking gcc (4:14.2.0-1) ...
-#16 16.73 Selecting previously unselected package libstdc++-14-dev:amd64.
-#16 16.73 Preparing to unpack .../42-libstdc++-14-dev_14.2.0-19_amd64.deb ...
-#16 16.74 Unpacking libstdc++-14-dev:amd64 (14.2.0-19) ...
-#16 ...
-#17 [stage-2 3/7] RUN apt-get update && apt-get install -y --no-install-recommends python3 python3-pip && rm -rf /var/lib/apt/lists/*
-#17 10.57 Selecting previously unselected package python3-wheel.
-#17 10.57 Preparing to unpack .../8-python3-wheel_0.34.2-1_all.deb ...
-#17 10.58 Unpacking python3-wheel (0.34.2-1) ...
-#17 10.61 Selecting previously unselected package python3-pip.
-#17 10.61 Preparing to unpack .../9-python3-pip_20.3.4-4+deb11u1_all.deb ...
-#17 10.62 Unpacking python3-pip (20.3.4-4+deb11u1) ...
-#17 10.77 Setting up media-types (4.0.0) ...
-#17 10.78 Setting up libsqlite3-0:amd64 (3.34.1-3+deb11u1) ...
-#17 10.78 Setting up libncursesw6:amd64 (6.2+20201114-2+deb11u2) ...
-#17 10.79 Setting up libmpdec3:amd64 (2.5.1-1) ...
-#17 10.80 Setting up openssl (1.1.1w-0+deb11u3) ...
-#17 10.81 Setting up readline-common (8.1-1) ...
-#17 10.82 Setting up libreadline8:amd64 (8.1-1) ...
-#17 10.83 Setting up ca-certificates (20210119) ...
-#17 11.00 debconf: unable to initialize frontend: Dialog
-#17 11.00 debconf: (TERM is not set, so the dialog frontend is not usable.)
-#17 11.00 debconf: falling back to frontend: Readline
-#17 11.00 debconf: unable to initialize frontend: Readline
-#17 11.00 debconf: (Can't locate Term/ReadLine.pm in @INC (you may need to install the Term::ReadLine module) (@INC contains: /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.32.1 /usr/local/share/perl/5.32.1 /usr/lib/x86_64-linux-gnu/perl5/5.32 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl-base /usr/lib/x86_64-linux-gnu/perl/5.32 /usr/share/perl/5.32 /usr/local/lib/site_perl) at /usr/share/perl5/Debconf/FrontEnd/Readline.pm line 7.)
-#17 11.00 debconf: falling back to frontend: Teletype
-#17 11.83 Updating certificates in /etc/ssl/certs...
-#17 13.34 129 added, 0 removed; done.
-#17 13.63 Setting up python-pip-whl (20.3.4-4+deb11u1) ...
-#17 13.83 Setting up libpython3.9-stdlib:amd64 (3.9.2-1+deb11u3) ...
-#17 13.88 Setting up libpython3-stdlib:amd64 (3.9.2-3) ...
-#17 13.89 Setting up python3.9 (3.9.2-1+deb11u3) ...
-#17 14.91 Setting up python3 (3.9.2-3) ...
-#17 14.93 running python rtupdate hooks for python3.9...
-#17 14.93 running python post-rtupdate hooks for python3.9...
-#17 15.06 Setting up python3-wheel (0.34.2-1) ...
-#17 15.36 Setting up python3-lib2to3 (3.9.2-1) ...
-#17 15.50 Setting up python3-pkg-resources (52.0.0-4+deb11u2) ...
-#17 15.85 Setting up python3-distutils (3.9.2-1) ...
-#17 16.07 Setting up python3-setuptools (52.0.0-4+deb11u2) ...
-#17 16.68 Setting up python3-pip (20.3.4-4+deb11u1) ...
-#17 17.05 Processing triggers for libc-bin (2.31-13+deb11u13) ...
-#17 17.07 Processing triggers for ca-certificates (20210119) ...
-#17 17.08 Updating certificates in /etc/ssl/certs...
-#17 17.83 0 added, 0 removed; done.
-#17 17.83 Running hooks in /etc/ca-certificates/update.d...
-#17 17.83 done.
-#17 DONE 18.1s
-#16 [python-builder 4/6] RUN apt-get update && apt-get install -y --no-install-recommends build-essential gcc && rm -rf /var/lib/apt/lists/*
-#16 17.25 Selecting previously unselected package g++-14-x86-64-linux-gnu.
-#16 17.25 Preparing to unpack .../43-g++-14-x86-64-linux-gnu_14.2.0-19_amd64.deb ...
-#16 17.26 Unpacking g++-14-x86-64-linux-gnu (14.2.0-19) ...
-#16 17.90 Selecting previously unselected package g++-14.
-#16 17.90 Preparing to unpack .../44-g++-14_14.2.0-19_amd64.deb ...
-#16 17.90 Unpacking g++-14 (14.2.0-19) ...
-#16 17.93 Selecting previously unselected package g++-x86-64-linux-gnu.
-#16 17.93 Preparing to unpack .../45-g++-x86-64-linux-gnu_4%3a14.2.0-1_amd64.deb ...
-#16 17.93 Unpacking g++-x86-64-linux-gnu (4:14.2.0-1) ...
-#16 17.95 Selecting previously unselected package g++.
-#16 17.96 Preparing to unpack .../46-g++_4%3a14.2.0-1_amd64.deb ...
-#16 17.96 Unpacking g++ (4:14.2.0-1) ...
-#16 17.98 Selecting previously unselected package make.
-#16 17.98 Preparing to unpack .../47-make_4.4.1-2_amd64.deb ...
-#16 17.99 Unpacking make (4.4.1-2) ...
-#16 18.04 Selecting previously unselected package libdpkg-perl.
-#16 18.04 Preparing to unpack .../48-libdpkg-perl_1.22.21_all.deb ...
-#16 18.04 Unpacking libdpkg-perl (1.22.21) ...
-#16 18.11 Selecting previously unselected package patch.
-#16 18.11 Preparing to unpack .../49-patch_2.8-2_amd64.deb ...
-#16 18.11 Unpacking patch (2.8-2) ...
-#16 18.15 Selecting previously unselected package dpkg-dev.
-#16 18.15 Preparing to unpack .../50-dpkg-dev_1.22.21_all.deb ...
-#16 18.15 Unpacking dpkg-dev (1.22.21) ...
-#16 18.22 Selecting previously unselected package build-essential.
-#16 18.22 Preparing to unpack .../51-build-essential_12.12_amd64.deb ...
-#16 18.22 Unpacking build-essential (12.12) ...
-#16 18.26 Setting up libgdbm-compat4t64:amd64 (1.24-2) ...
-#16 18.26 Setting up binutils-common:amd64 (2.44-3) ...
-#16 18.27 Setting up linux-libc-dev (6.12.48-1) ...
-#16 18.27 Setting up libctf-nobfd0:amd64 (2.44-3) ...
-#16 18.28 Setting up libgomp1:amd64 (14.2.0-19) ...
-#16 18.28 Setting up bzip2 (1.0.8-6) ...
-#16 18.29 Setting up libsframe1:amd64 (2.44-3) ...
-#16 18.29 Setting up libjansson4:amd64 (2.14-2+b3) ...
-#16 18.30 Setting up rpcsvc-proto (1.4.3-1) ...
-#16 18.30 Setting up make (4.4.1-2) ...
-#16 18.31 Setting up libmpfr6:amd64 (4.2.2-1) ...
-#16 18.31 Setting up xz-utils (5.8.1-1) ...
-#16 18.32 update-alternatives: using /usr/bin/xz to provide /usr/bin/lzma (lzma) in auto mode
-#16 18.32 update-alternatives: warning: skip creation of /usr/share/man/man1/lzma.1.gz because associated file /usr/share/man/man1/xz.1.gz (of link group lzma) doesn't exist
-#16 18.32 update-alternatives: warning: skip creation of /usr/share/man/man1/unlzma.1.gz because associated file /usr/share/man/man1/unxz.1.gz (of link group lzma) doesn't exist
-#16 18.32 update-alternatives: warning: skip creation of /usr/share/man/man1/lzcat.1.gz because associated file /usr/share/man/man1/xzcat.1.gz (of link group lzma) doesn't exist
-#16 18.32 update-alternatives: warning: skip creation of /usr/share/man/man1/lzmore.1.gz because associated file /usr/share/man/man1/xzmore.1.gz (of link group lzma) doesn't exist
-#16 18.32 update-alternatives: warning: skip creation of /usr/share/man/man1/lzless.1.gz because associated file /usr/share/man/man1/xzless.1.gz (of link group lzma) doesn't exist
-#16 18.32 update-alternatives: warning: skip creation of /usr/share/man/man1/lzdiff.1.gz because associated file /usr/share/man/man1/xzdiff.1.gz (of link group lzma) doesn't exist
-#16 18.32 update-alternatives: warning: skip creation of /usr/share/man/man1/lzcmp.1.gz because associated file /usr/share/man/man1/xzcmp.1.gz (of link group lzma) doesn't exist
-#16 18.32 update-alternatives: warning: skip creation of /usr/share/man/man1/lzgrep.1.gz because associated file /usr/share/man/man1/xzgrep.1.gz (of link group lzma) doesn't exist
-#16 18.32 update-alternatives: warning: skip creation of /usr/share/man/man1/lzegrep.1.gz because associated file /usr/share/man/man1/xzegrep.1.gz (of link group lzma) doesn't exist
-#16 18.32 update-alternatives: warning: skip creation of /usr/share/man/man1/lzfgrep.1.gz because associated file /usr/share/man/man1/xzfgrep.1.gz (of link group lzma) doesn't exist
-#16 18.33 Setting up libquadmath0:amd64 (14.2.0-19) ...
-#16 18.33 Setting up libmpc3:amd64 (1.3.1-1+b3) ...
-#16 18.34 Setting up libatomic1:amd64 (14.2.0-19) ...
-#16 18.34 Setting up patch (2.8-2) ...
-#16 18.35 Setting up libubsan1:amd64 (14.2.0-19) ...
-#16 18.35 Setting up perl-modules-5.40 (5.40.1-6) ...
-#16 18.35 Setting up libhwasan0:amd64 (14.2.0-19) ...
-#16 18.36 Setting up libcrypt-dev:amd64 (1:4.4.38-1) ...
-#16 18.37 Setting up libasan8:amd64 (14.2.0-19) ...
-#16 18.38 Setting up libtsan2:amd64 (14.2.0-19) ...
-#16 18.38 Setting up libbinutils:amd64 (2.44-3) ...
-#16 18.39 Setting up libisl23:amd64 (0.27-1) ...
-#16 18.39 Setting up libc-dev-bin (2.41-12) ...
-#16 18.40 Setting up libcc1-0:amd64 (14.2.0-19) ...
-#16 18.40 Setting up liblsan0:amd64 (14.2.0-19) ...
-#16 18.41 Setting up libitm1:amd64 (14.2.0-19) ...
-#16 18.41 Setting up libctf0:amd64 (2.44-3) ...
-#16 18.42 Setting up libperl5.40:amd64 (5.40.1-6) ...
-#16 18.42 Setting up perl (5.40.1-6) ...
-#16 18.43 Setting up libgprofng0:amd64 (2.44-3) ...
-#16 18.43 Setting up cpp-14-x86-64-linux-gnu (14.2.0-19) ...
-#16 18.44 Setting up libdpkg-perl (1.22.21) ...
-#16 18.45 Setting up cpp-14 (14.2.0-19) ...
-#16 18.45 Setting up libc6-dev:amd64 (2.41-12) ...
-#16 18.45 Setting up libgcc-14-dev:amd64 (14.2.0-19) ...
-#16 18.46 Setting up libstdc++-14-dev:amd64 (14.2.0-19) ...
-#16 18.46 Setting up binutils-x86-64-linux-gnu (2.44-3) ...
-#16 18.47 Setting up cpp-x86-64-linux-gnu (4:14.2.0-1) ...
-#16 18.47 Setting up binutils (2.44-3) ...
-#16 18.48 Setting up dpkg-dev (1.22.21) ...
-#16 18.49 Setting up cpp (4:14.2.0-1) ...
-#16 18.50 Setting up gcc-14-x86-64-linux-gnu (14.2.0-19) ...
-#16 18.51 Setting up gcc-x86-64-linux-gnu (4:14.2.0-1) ...
-#16 18.51 Setting up gcc-14 (14.2.0-19) ...
-#16 18.52 Setting up g++-14-x86-64-linux-gnu (14.2.0-19) ...
-#16 18.52 Setting up g++-x86-64-linux-gnu (4:14.2.0-1) ...
-#16 18.52 Setting up g++-14 (14.2.0-19) ...
-#16 18.53 Setting up gcc (4:14.2.0-1) ...
-#16 18.54 Setting up g++ (4:14.2.0-1) ...
-#16 18.55 update-alternatives: using /usr/bin/g++ to provide /usr/bin/c++ (c++) in auto mode
-#16 18.55 Setting up build-essential (12.12) ...
-#16 18.56 Processing triggers for libc-bin (2.41-12) ...
-#16 DONE 18.7s
-#18 [stage-2 4/7] RUN echo "Final container build:" && node --version && npm --version && python3 --version && pip --version
-#18 0.220 Final container build:
-#18 0.226 v22.20.0
-#18 0.401 10.9.3
-#18 0.417 Python 3.9.2
-#18 1.371 pip 20.3.4 from /usr/lib/python3/dist-packages/pip (python 3.9)
-#18 DONE 1.4s
-#19 [stage-2 5/7] COPY --from=node-builder /app/node_modules ./node_modules
-#19 ...
-#20 [python-builder 5/6] COPY requirements.txt .
-#20 DONE 0.0s
-#21 [python-builder 6/6] RUN echo "Installing Python dependencies..." && pip install --no-cache-dir -r requirements.txt -t /python-packages
-#21 0.201 Installing Python dependencies...
-#21 1.586 Collecting pandas==2.2.2 (from -r requirements.txt (line 1))
-#21 1.645   Downloading pandas-2.2.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (19 kB)
-#21 1.766 Collecting pyodbc (from -r requirements.txt (line 2))
-#21 1.778   Downloading pyodbc-5.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (2.7 kB)
-#21 2.038 Collecting numpy==2.0.0 (from -r requirements.txt (line 3))
-#21 2.046   Downloading numpy-2.0.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (60 kB)
-#21 2.106 Collecting google-generativeai==0.7.1 (from -r requirements.txt (line 4))
-#21 2.129   Downloading google_generativeai-0.7.1-py3-none-any.whl.metadata (3.9 kB)
-#21 2.182 Collecting google-api-python-client==2.136.0 (from -r requirements.txt (line 5))
-#21 2.223   Downloading google_api_python_client-2.136.0-py2.py3-none-any.whl.metadata (6.7 kB)
-#21 2.241 Collecting python-dotenv==1.0.1 (from -r requirements.txt (line 6))
-#21 2.254   Downloading python_dotenv-1.0.1-py3-none-any.whl.metadata (23 kB)
-#21 2.285 Collecting requests==2.32.3 (from -r requirements.txt (line 7))
-#21 ...
-#19 [stage-2 5/7] COPY --from=node-builder /app/node_modules ./node_modules
-#19 DONE 2.5s
-#21 [python-builder 6/6] RUN echo "Installing Python dependencies..." && pip install --no-cache-dir -r requirements.txt -t /python-packages
-#21 2.295   Downloading requests-2.32.3-py3-none-any.whl.metadata (4.6 kB)
-#21 2.321 Collecting python-dateutil>=2.8.2 (from pandas==2.2.2->-r requirements.txt (line 1))
-#21 2.349   Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl.metadata (8.4 kB)
-#21 2.384 Collecting pytz>=2020.1 (from pandas==2.2.2->-r requirements.txt (line 1))
-#21 2.392   Downloading pytz-2025.2-py2.py3-none-any.whl.metadata (22 kB)
-#21 2.408 Collecting tzdata>=2022.7 (from pandas==2.2.2->-r requirements.txt (line 1))
-#21 2.415   Downloading tzdata-2025.2-py2.py3-none-any.whl.metadata (1.4 kB)
-#21 2.432 Collecting google-ai-generativelanguage==0.6.6 (from google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 2.442   Downloading google_ai_generativelanguage-0.6.6-py3-none-any.whl.metadata (5.6 kB)
-#21 2.472 Collecting google-api-core (from google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 2.482   Downloading google_api_core-2.25.1-py3-none-any.whl.metadata (3.0 kB)
-#21 2.525 Collecting google-auth>=2.15.0 (from google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 2.534   Downloading google_auth-2.40.3-py2.py3-none-any.whl.metadata (6.2 kB)
-#21 2.668 Collecting protobuf (from google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 2.752   Downloading protobuf-6.32.1-cp39-abi3-manylinux2014_x86_64.whl.metadata (593 bytes)
-#21 2.843 Collecting pydantic (from google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 2.856   Downloading pydantic-2.11.9-py3-none-any.whl.metadata (68 kB)
-#21 2.891 Collecting tqdm (from google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 2.898   Downloading tqdm-4.67.1-py3-none-any.whl.metadata (57 kB)
-#21 2.920 Collecting typing-extensions (from google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 2.927   Downloading typing_extensions-4.15.0-py3-none-any.whl.metadata (3.3 kB)
-#21 2.943 Collecting httplib2<1.dev0,>=0.19.0 (from google-api-python-client==2.136.0->-r requirements.txt (line 5))
-#21 2.965   Downloading httplib2-0.31.0-py3-none-any.whl.metadata (2.2 kB)
-#21 3.003 Collecting google-auth-httplib2<1.0.0,>=0.2.0 (from google-api-python-client==2.136.0->-r requirements.txt (line 5))
-#21 3.017   Downloading google_auth_httplib2-0.2.0-py2.py3-none-any.whl.metadata (2.2 kB)
-#21 3.063 Collecting uritemplate<5,>=3.0.1 (from google-api-python-client==2.136.0->-r requirements.txt (line 5))
-#21 3.074   Downloading uritemplate-4.2.0-py3-none-any.whl.metadata (2.6 kB)
-#21 3.158 Collecting charset-normalizer<4,>=2 (from requests==2.32.3->-r requirements.txt (line 7))
-#21 3.165   Downloading charset_normalizer-3.4.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl.metadata (36 kB)
-#21 3.182 Collecting idna<4,>=2.5 (from requests==2.32.3->-r requirements.txt (line 7))
-#21 3.190   Downloading idna-3.10-py3-none-any.whl.metadata (10 kB)
-#21 3.216 Collecting urllib3<3,>=1.21.1 (from requests==2.32.3->-r requirements.txt (line 7))
-#21 3.223   Downloading urllib3-2.5.0-py3-none-any.whl.metadata (6.5 kB)
-#21 3.250 Collecting certifi>=2017.4.17 (from requests==2.32.3->-r requirements.txt (line 7))
-#21 3.257   Downloading certifi-2025.8.3-py3-none-any.whl.metadata (2.4 kB)
-#21 3.396 Collecting proto-plus<2.0.0dev,>=1.22.3 (from google-ai-generativelanguage==0.6.6->google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 3.404   Downloading proto_plus-1.26.1-py3-none-any.whl.metadata (2.2 kB)
-#21 3.478 Collecting protobuf (from google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 3.485   Downloading protobuf-4.25.8-cp37-abi3-manylinux2014_x86_64.whl.metadata (541 bytes)
-#21 3.507 Collecting googleapis-common-protos<2.0.0,>=1.56.2 (from google-api-core->google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 3.514   Downloading googleapis_common_protos-1.70.0-py3-none-any.whl.metadata (9.3 kB)
-#21 3.667 Collecting cachetools<6.0,>=2.0.0 (from google-auth>=2.15.0->google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 3.675   Downloading cachetools-5.5.2-py3-none-any.whl.metadata (5.4 kB)
-#21 3.693 Collecting pyasn1-modules>=0.2.1 (from google-auth>=2.15.0->google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 3.700   Downloading pyasn1_modules-0.4.2-py3-none-any.whl.metadata (3.5 kB)
-#21 3.716 Collecting rsa<5,>=3.1.4 (from google-auth>=2.15.0->google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 3.723   Downloading rsa-4.9.1-py3-none-any.whl.metadata (5.6 kB)
-#21 3.750 Collecting pyparsing<4,>=3.0.4 (from httplib2<1.dev0,>=0.19.0->google-api-python-client==2.136.0->-r requirements.txt (line 5))
-#21 3.757   Downloading pyparsing-3.2.5-py3-none-any.whl.metadata (5.0 kB)
-#21 3.773 Collecting six>=1.5 (from python-dateutil>=2.8.2->pandas==2.2.2->-r requirements.txt (line 1))
-#21 3.780   Downloading six-1.17.0-py2.py3-none-any.whl.metadata (1.7 kB)
-#21 3.795 Collecting annotated-types>=0.6.0 (from pydantic->google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 3.802   Downloading annotated_types-0.7.0-py3-none-any.whl.metadata (15 kB)
-#21 4.321 Collecting pydantic-core==2.33.2 (from pydantic->google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 4.331   Downloading pydantic_core-2.33.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl.metadata (6.8 kB)
-#21 4.345 Collecting typing-inspection>=0.4.0 (from pydantic->google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 4.352   Downloading typing_inspection-0.4.1-py3-none-any.whl.metadata (2.6 kB)
-#21 4.724 Collecting grpcio<2.0.0,>=1.33.2 (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-ai-generativelanguage==0.6.6->google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 4.732   Downloading grpcio-1.75.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl.metadata (3.7 kB)
-#21 4.782 Collecting grpcio-status<2.0.0,>=1.33.2 (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-ai-generativelanguage==0.6.6->google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 4.791   Downloading grpcio_status-1.75.1-py3-none-any.whl.metadata (1.1 kB)
-#21 4.979 Collecting pyasn1<0.7.0,>=0.6.1 (from pyasn1-modules>=0.2.1->google-auth>=2.15.0->google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 4.986   Downloading pyasn1-0.6.1-py3-none-any.whl.metadata (8.4 kB)
-#21 5.051 INFO: pip is looking at multiple versions of grpcio-status to determine which version is compatible with other requirements. This could take a while.
-#21 5.052 Collecting grpcio-status<2.0.0,>=1.33.2 (from google-api-core[grpc]!=2.0.*,!=2.1.*,!=2.10.*,!=2.2.*,!=2.3.*,!=2.4.*,!=2.5.*,!=2.6.*,!=2.7.*,!=2.8.*,!=2.9.*,<3.0.0dev,>=1.34.1->google-ai-generativelanguage==0.6.6->google-generativeai==0.7.1->-r requirements.txt (line 4))
-#21 5.059   Downloading grpcio_status-1.75.0-py3-none-any.whl.metadata (1.1 kB)
-#21 5.069   Downloading grpcio_status-1.74.0-py3-none-any.whl.metadata (1.1 kB)
-#21 5.080   Downloading grpcio_status-1.73.1-py3-none-any.whl.metadata (1.1 kB)
-#21 5.168   Downloading grpcio_status-1.73.0-py3-none-any.whl.metadata (1.1 kB)
-#21 5.178   Downloading grpcio_status-1.72.2-py3-none-any.whl.metadata (1.1 kB)
-#21 5.188   Downloading grpcio_status-1.72.1-py3-none-any.whl.metadata (1.1 kB)
-#21 5.198   Downloading grpcio_status-1.71.2-py3-none-any.whl.metadata (1.1 kB)
-#21 5.277 INFO: pip is still looking at multiple versions of grpcio-status to determine which version is compatible with other requirements. This could take a while.
-#21 5.286   Downloading grpcio_status-1.71.0-py3-none-any.whl.metadata (1.1 kB)
-#21 5.296   Downloading grpcio_status-1.70.0-py3-none-any.whl.metadata (1.1 kB)
-#21 5.308   Downloading grpcio_status-1.69.0-py3-none-any.whl.metadata (1.1 kB)
-#21 5.319   Downloading grpcio_status-1.68.1-py3-none-any.whl.metadata (1.1 kB)
-#21 5.330   Downloading grpcio_status-1.68.0-py3-none-any.whl.metadata (1.1 kB)
-#21 5.333 INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. See https://pip.pypa.io/warnings/backtracking for guidance. If you want to abort this run, press Ctrl + C.
-#21 5.341   Downloading grpcio_status-1.67.1-py3-none-any.whl.metadata (1.1 kB)
-#21 5.352   Downloading grpcio_status-1.67.0-py3-none-any.whl.metadata (1.1 kB)
-#21 5.362   Downloading grpcio_status-1.66.2-py3-none-any.whl.metadata (1.1 kB)
-#21 5.372   Downloading grpcio_status-1.66.1-py3-none-any.whl.metadata (1.1 kB)
-#21 5.383   Downloading grpcio_status-1.66.0-py3-none-any.whl.metadata (1.1 kB)
-#21 5.393   Downloading grpcio_status-1.65.5-py3-none-any.whl.metadata (1.1 kB)
-#21 5.403   Downloading grpcio_status-1.65.4-py3-none-any.whl.metadata (1.1 kB)
-#21 5.414   Downloading grpcio_status-1.65.2-py3-none-any.whl.metadata (1.1 kB)
-#21 5.424   Downloading grpcio_status-1.65.1-py3-none-any.whl.metadata (1.1 kB)
-#21 5.434   Downloading grpcio_status-1.64.3-py3-none-any.whl.metadata (1.1 kB)
-#21 5.444   Downloading grpcio_status-1.64.1-py3-none-any.whl.metadata (1.1 kB)
-#21 5.455   Downloading grpcio_status-1.64.0-py3-none-any.whl.metadata (1.1 kB)
-#21 5.464   Downloading grpcio_status-1.63.2-py3-none-any.whl.metadata (1.1 kB)
-#21 5.474   Downloading grpcio_status-1.63.0-py3-none-any.whl.metadata (1.1 kB)
-#21 5.484   Downloading grpcio_status-1.62.3-py3-none-any.whl.metadata (1.3 kB)
-#21 5.605 Downloading pandas-2.2.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (12.7 MB)
-#21 5.718    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 12.7/12.7 MB 118.0 MB/s eta 0:00:00
-#21 5.733 Downloading numpy-2.0.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (19.0 MB)
-#21 5.889    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 19.0/19.0 MB 123.0 MB/s eta 0:00:00
-#21 5.902 Downloading google_generativeai-0.7.1-py3-none-any.whl (163 kB)
-#21 5.915 Downloading google_api_python_client-2.136.0-py2.py3-none-any.whl (11.9 MB)
-#21 5.982    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 11.9/11.9 MB 184.1 MB/s eta 0:00:00
-#21 5.990 Downloading python_dotenv-1.0.1-py3-none-any.whl (19 kB)
-#21 5.999 Downloading requests-2.32.3-py3-none-any.whl (64 kB)
-#21 6.012 Downloading google_ai_generativelanguage-0.6.6-py3-none-any.whl (718 kB)
-#21 6.037    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 718.3/718.3 kB 24.7 MB/s eta 0:00:00
-#21 6.046 Downloading pyodbc-5.2.0-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (353 kB)
-#21 6.059 Downloading certifi-2025.8.3-py3-none-any.whl (161 kB)
-#21 6.067 Downloading charset_normalizer-3.4.3-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl (151 kB)
-#21 6.074 Downloading google_api_core-2.25.1-py3-none-any.whl (160 kB)
-#21 6.086 Downloading google_auth-2.40.3-py2.py3-none-any.whl (216 kB)
-#21 6.093 Downloading google_auth_httplib2-0.2.0-py2.py3-none-any.whl (9.3 kB)
-#21 6.100 Downloading httplib2-0.31.0-py3-none-any.whl (91 kB)
-#21 6.107 Downloading idna-3.10-py3-none-any.whl (70 kB)
-#21 6.115 Downloading protobuf-4.25.8-cp37-abi3-manylinux2014_x86_64.whl (294 kB)
-#21 6.122 Downloading python_dateutil-2.9.0.post0-py2.py3-none-any.whl (229 kB)
-#21 6.131 Downloading pytz-2025.2-py2.py3-none-any.whl (509 kB)
-#21 6.139 Downloading tzdata-2025.2-py2.py3-none-any.whl (347 kB)
-#21 6.146 Downloading uritemplate-4.2.0-py3-none-any.whl (11 kB)
-#21 6.155 Downloading urllib3-2.5.0-py3-none-any.whl (129 kB)
-#21 6.162 Downloading pydantic-2.11.9-py3-none-any.whl (444 kB)
-#21 6.171 Downloading pydantic_core-2.33.2-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl (2.0 MB)
-#21 6.178    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 2.0/2.0 MB 377.1 MB/s eta 0:00:00
-#21 6.185 Downloading typing_extensions-4.15.0-py3-none-any.whl (44 kB)
-#21 6.193 Downloading tqdm-4.67.1-py3-none-any.whl (78 kB)
-#21 6.202 Downloading annotated_types-0.7.0-py3-none-any.whl (13 kB)
-#21 6.210 Downloading cachetools-5.5.2-py3-none-any.whl (10 kB)
-#21 6.217 Downloading googleapis_common_protos-1.70.0-py3-none-any.whl (294 kB)
-#21 6.225 Downloading proto_plus-1.26.1-py3-none-any.whl (50 kB)
-#21 6.233 Downloading pyasn1_modules-0.4.2-py3-none-any.whl (181 kB)
-#21 6.240 Downloading pyparsing-3.2.5-py3-none-any.whl (113 kB)
-#21 6.247 Downloading rsa-4.9.1-py3-none-any.whl (34 kB)
-#21 6.255 Downloading six-1.17.0-py2.py3-none-any.whl (11 kB)
-#21 6.262 Downloading typing_inspection-0.4.1-py3-none-any.whl (14 kB)
-#21 6.270 Downloading grpcio-1.75.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl (6.4 MB)
-#21 6.311    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 6.4/6.4 MB 162.6 MB/s eta 0:00:00
-#21 6.318 Downloading grpcio_status-1.62.3-py3-none-any.whl (14 kB)
-#21 6.325 Downloading pyasn1-0.6.1-py3-none-any.whl (83 kB)
-#21 6.499 Installing collected packages: pytz, urllib3, uritemplate, tzdata, typing-extensions, tqdm, six, python-dotenv, pyparsing, pyodbc, pyasn1, protobuf, numpy, idna, charset-normalizer, certifi, cachetools, annotated-types, typing-inspection, rsa, requests, python-dateutil, pydantic-core, pyasn1-modules, proto-plus, httplib2, grpcio, googleapis-common-protos, pydantic, pandas, grpcio-status, google-auth, google-auth-httplib2, google-api-core, google-api-python-client, google-ai-generativelanguage, google-generativeai
-#21 14.88 Successfully installed annotated-types-0.7.0 cachetools-5.5.2 certifi-2025.8.3 charset-normalizer-3.4.3 google-ai-generativelanguage-0.6.6 google-api-core-2.25.1 google-api-python-client-2.136.0 google-auth-2.40.3 google-auth-httplib2-0.2.0 google-generativeai-0.7.1 googleapis-common-protos-1.70.0 grpcio-1.75.1 grpcio-status-1.62.3 httplib2-0.31.0 idna-3.10 numpy-2.0.0 pandas-2.2.2 proto-plus-1.26.1 protobuf-4.25.8 pyasn1-0.6.1 pyasn1-modules-0.4.2 pydantic-2.11.9 pydantic-core-2.33.2 pyodbc-5.2.0 pyparsing-3.2.5 python-dateutil-2.9.0.post0 python-dotenv-1.0.1 pytz-2025.2 requests-2.32.3 rsa-4.9.1 six-1.17.0 tqdm-4.67.1 typing-extensions-4.15.0 typing-inspection-0.4.1 tzdata-2025.2 uritemplate-4.2.0 urllib3-2.5.0
-#21 14.88 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
-#21 14.95 
-#21 14.95 [notice] A new release of pip is available: 25.0.1 -> 25.2
-#21 14.95 [notice] To update, run: pip install --upgrade pip
-#21 DONE 15.9s
-#22 [stage-2 6/7] COPY --from=python-builder /python-packages /usr/local/lib/python3.12/site-packages
-#22 DONE 2.4s
-#23 [stage-2 7/7] COPY . .
-#23 DONE 0.0s
-#24 exporting to image
-#24 exporting layers
-#24 exporting layers 4.3s done
-#24 writing image sha256:04fe173894055a951f16c19859560f1e1d8e4e3172015334df083db67b4d0127 done
-#24 naming to smartskregistry.azurecr.io/smartsk-backend:89bf4d1bb7ce2f3189045d4133c44cad4873ddf4 done
-#24 naming to smartskregistry.azurecr.io/smartsk-backend:latest done
-#24 DONE 4.4s
- 1 warning found (use docker --debug to expand):
- - JSONArgsRecommended: JSON arguments recommended for CMD to prevent unintended behavior related to OS signals (line 56)
-Pushing Docker image...
-The push refers to repository [smartskregistry.azurecr.io/smartsk-backend]
-c60f685af837: Preparing
-14c24f28c57a: Preparing
-094702e4301f: Preparing
-9b864dc82677: Preparing
-495015f19530: Preparing
-f4d622d56660: Preparing
-41c1d4d5a796: Preparing
-e283093fe68b: Preparing
-23f472fd93d7: Preparing
-3083aeb70450: Preparing
-6e12a734996b: Preparing
-f4d622d56660: Waiting
-41c1d4d5a796: Waiting
-e283093fe68b: Waiting
-23f472fd93d7: Waiting
-3083aeb70450: Waiting
-6e12a734996b: Waiting
-unauthorized: {"errors":[{"code":"UNAUTHORIZED","message":"authentication required, visit https://aka.ms/acr/authorization for more information. CorrelationId: 2cac0a61-d7c5-4561-badc-a1174d8f017a"}]}
-Error: Process completed with exit code 1.
+--Log Stream
+
+Unable to open a connection to your app. This may be due to any network security groups or IP restriction rules that you have placed on your app. To use log streaming, please make sure you are able to access your app directly from your current network.
+2025-09-29T01:32:32  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/appsvctmp/volatile/logs/runtime/container.log
+2025-09-29T01:31:55.2951630Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
+2025-09-29T01:31:55.2951731Z
+2025-09-29T01:31:55.2951751Z Documentation: http://aka.ms/webapp-linux
+2025-09-29T01:31:55.2951773Z Kudu Version : 20250623.5
+2025-09-29T01:31:55.2951797Z Commit       : 353543ec4c45fcbfd4750522d32c94e23b31927a
+2025-09-29T01:31:55.2951816Z
+2025-09-29T01:31:58.1017550Z chown: changing ownership of '/temp': Operation not permitted
+2025-09-29T01:31:58.1397186Z chmod: changing permissions of '/temp': Operation not permitted
+2025-09-29T01:32:12.7816468Z Restarting OpenBSD Secure Shell server: sshd.
+2025-09-29T01:32:14.7104668Z node not running, starting node /opt/webssh/index.jsEnding Log Tail of existing logs ---Starting Live Log Stream ---
+2025-09-29T01:32:53.5470446Z Mon Sep 29 01:32:53 UTC 2025 running .net core
+2025-09-29T01:33:04.9634932Z Startup : 01.33.04.584349
+2025-09-29T01:33:06.5569550Z Configure Services : 01.33.06.449083
+2025-09-29T01:33:09.8238171Z Configure : 01.33.09.806564
+2025-09-29T01:33:13.4976652Z Setting Up Routes : 01.33.13.468827
+2025-09-29T01:33:16.3029533Z Exiting Configure : 01.33.16.283721
+2025-09-29T01:33:17.5016415Z Hosting environment: Production
+2025-09-29T01:33:17.5016884Z Content root path: /opt/Kudu
+2025-09-29T01:33:17.5016912Z Now listening on: http://0.0.0.0:8181
+2025-09-29T01:33:17.5017119Z Application started. Press Ctrl+C to shut down.
+2025-09-29T01:33:52  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/appsvctmp/volatile/logs/runtime/container.log
+2025-09-29T01:32:53.5470446Z Mon Sep 29 01:32:53 UTC 2025 running .net core
+2025-09-29T01:33:04.9634932Z Startup : 01.33.04.584349
+2025-09-29T01:33:06.5569550Z Configure Services : 01.33.06.449083
+2025-09-29T01:33:09.8238171Z Configure : 01.33.09.806564
+2025-09-29T01:33:13.4976652Z Setting Up Routes : 01.33.13.468827
+2025-09-29T01:33:16.3029533Z Exiting Configure : 01.33.16.283721
+2025-09-29T01:33:17.5016415Z Hosting environment: Production
+2025-09-29T01:33:17.5016884Z Content root path: /opt/Kudu
+2025-09-29T01:33:17.5016912Z Now listening on: http://0.0.0.0:8181
+2025-09-29T01:33:17.5017119Z Application started. Press Ctrl+C to shut down.Ending Log Tail of existing logs ---Starting Live Log Stream ---
+2025-09-29T01:34:40.8531546Z Starting container with PORT=8080
+2025-09-29T01:34:40.8915707Z DOTNET_STARTUP_HOOKS=/agents/core/StartupHook/Microsoft.ApplicationInsights.StartupHook.dll
+2025-09-29T01:34:40.8916234Z WEBSITE_DEFAULT_HOSTNAME=smartsk-backend-container.azurewebsites.net
+2025-09-29T01:34:40.8916263Z APPSETTING_BUILD_FLAGS=UseExpressBuild=false
+2025-09-29T01:34:40.8916287Z SEARCH_ENGINE_ID=f689623f137454cf3
+2025-09-29T01:34:40.8916310Z WEBSITES_ENABLE_APP_SERVICE_STORAGE=false
+2025-09-29T01:34:40.8916352Z WEBSITE_WEBDEPLOY_USE_SCM=true
+2025-09-29T01:34:40.8916385Z APPSETTING_DOCKER_CUSTOM_IMAGE_NAME=smartskregistry.azurecr.io/smartsk-backend:latest
+2025-09-29T01:34:40.8916429Z FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED=0
+2025-09-29T01:34:40.8916454Z APPSETTING_WEBSITE_DEFAULT_HOSTNAME=smartsk-backend-container.azurewebsites.net
+2025-09-29T01:34:40.8916480Z REGION_NAME=southeastasia
+2025-09-29T01:34:40.8916504Z JAVA_TOOL_OPTIONS=-javaagent:/agents/java/applicationinsights-agent-codeless.jar
+2025-09-29T01:34:40.8916526Z NODE_VERSION=22.20.0
+2025-09-29T01:34:40.8916549Z PLATFORM_VERSION=105.0.7.128
+2025-09-29T01:34:40.8916587Z WEBSITE_INSTANCE_ID=abdb3197cd7a02e1a5e6c1091bbdf0012d0d439e81c1d6874df7775d03ebd0a8
+2025-09-29T01:34:40.8916609Z YARN_VERSION=1.22.22
+2025-09-29T01:34:40.8916632Z ApplicationInsightsAgent_EXTENSION_VERSION=disabled
+2025-09-29T01:34:40.8917131Z HOSTNAME=576c218e6645
+2025-09-29T01:34:40.8917162Z APPSETTING_WEBSITE_WEBDEPLOY_USE_SCM=true
+2025-09-29T01:34:40.8917185Z APPSETTING_WEBSITES_ENABLE_APP_SERVICE_STORAGE=false
+2025-09-29T01:34:40.8917226Z APPSETTING_PRE_BUILD_COMMAND=python3 -m pip install -r requirements.txt
+2025-09-29T01:34:40.8917251Z APPSETTING_FUNCTIONS_RUNTIME_SCALE_MONITORING_ENABLED=0
+2025-09-29T01:34:40.8917272Z DB_PORT=1433
+2025-09-29T01:34:40.8917294Z APPSETTING_PORT=8080
+2025-09-29T01:34:40.8917318Z IDENTITY_HEADER=f1c289b7-c901-4c6d-8bac-22010dfa14ca
+2025-09-29T01:34:40.8917407Z JWT_SECRET_KEY=0eb2eca5882ce3a95e549dc160d4a7e4f2fbdebc00bf92c875139e26e0ef9eab6e8016e337711caba29846d9d7e991a9161d76b45526fce2a275640dc10c61541a291d77259f195d1e05cc9efce4760388d2f3185117a5c48e11580c36e90074f943d149f97f96cb392c062e234af04b64499467b3c66c3696911d551c1a3f123e24fa9e523eb651569ccddc12a503c407689c0965149a86802166e336696330fc2c8e20607d80789a291a50c006c21a6ab4902ac7d9688bdf8ce4acd5fd3367436ea5c1fd1b63c92112d50a43826fbd996b73f3d484e5318a2c6bfb284bafec6e1688360d56381f80b6408cead61cd64c83ffcdbd70e0ff2f9dbd8cd2381d86
+2025-09-29T01:34:40.8917432Z APPSETTING_DOCS_CONTAINER=documents
+2025-09-29T01:34:40.8917454Z ENABLE_ORYX_BUILD=false
+2025-09-29T01:34:40.8917476Z APPSETTING_DB_DATABASE=smartSK
+2025-09-29T01:34:40.8917497Z EMAIL_HOST=smtp.gmail.com
+2025-09-29T01:34:40.8917545Z PRE_BUILD_COMMAND=python3 -m pip install -r requirements.txt
+2025-09-29T01:34:40.8917568Z WEBSITE_CONTAINER_START_TIME_LIMIT=600
+2025-09-29T01:34:40.8939585Z WEBSITE_RESOURCE_GROUP=smart_sk
+2025-09-29T01:34:40.9319547Z PORT=8080
+2025-09-29T01:34:40.9319651Z EMAIL_USER=smartSK2025@gmail.com
+2025-09-29T01:34:40.9319688Z HOME=/root
+2025-09-29T01:34:40.9319782Z WEBSITE_HOME_STAMPNAME=waws-prod-sg1-089
+2025-09-29T01:34:40.9319807Z DOCKER_CUSTOM_IMAGE_NAME=smartskregistry.azurecr.io/smartsk-backend:latest
+2025-09-29T01:34:40.9319831Z APPSETTING_ApplicationInsightsAgent_EXTENSION_VERSION=~3
+2025-09-29T01:34:40.9319856Z SPREADSHEET_ID=1Jc_ZVCY5blbNDcNgxiE3le6W37F8u0g9zZTlVmDEpRg
+2025-09-29T01:34:40.9319880Z APPSETTING_WEBSITE_CONTAINER_START_TIME_LIMIT=600
+2025-09-29T01:34:40.9319902Z NODE_OPTIONS=--require /agents/nodejs/build/src/Loader.js
+2025-09-29T01:34:40.9320037Z ScmType=None
+2025-09-29T01:34:40.9320063Z DB_DATABASE=smartSK
+2025-09-29T01:34:40.9320086Z REMOTEDEBUGGINGVERSION=17.12.11017.4296
+2025-09-29T01:34:40.9320109Z APPSETTING_SCM_DISABLE_NODE_MODULES_COMPRESSION=true
+2025-09-29T01:34:40.9320131Z DOCS_CONTAINER=documents
+2025-09-29T01:34:40.9320153Z XDT_MicrosoftApplicationInsights_Mode=default
+2025-09-29T01:34:40.9320175Z SCM_DO_BUILD_DURING_DEPLOYMENT=false
+2025-09-29T01:34:40.9320215Z APPSETTING_STORAGE_NAME=smartskstorage
+2025-09-29T01:34:40.9320239Z APPSETTING_PYTHON_PATH=/home/site/wwwroot
+2025-09-29T01:34:40.9320261Z APPINSIGHTS_ENABLED=false
+2025-09-29T01:34:40.9320284Z WEBSITE_HOSTNAME=smartsk-backend-container.azurewebsites.net
+2025-09-29T01:34:40.9320332Z APPSETTING_GOOGLE_CREDENTIALS_FILE={"installed":{"client_id":"121784492686-gm756o2o6n048f8elmqom470sd13i3ic.apps.googleusercontent.com","project_id":"gen-lang-client-0447049670","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["http://localhost"]}}
+2025-09-29T01:34:40.9320375Z BUILD_FLAGS=UseExpressBuild=false
+2025-09-29T01:34:40.9320396Z EMAIL_PORT=587
+2025-09-29T01:34:40.9320419Z PYTHON_PATH=/home/site/wwwroot
+2025-09-29T01:34:40.9320440Z WEBSITE_STACK=SITECONTAINERS
+2025-09-29T01:34:40.9320461Z NUM_CORES=1
+2025-09-29T01:34:40.9320491Z APPSETTING_STORAGE_CONNECTION_STRING_1=DefaultEndpointsProtocol=https;AccountName=smartskstorage;AccountKey=BLwENgNUR39dxdMEDEH2DoNWMQNvXQtHV6Z547g01nAELq4WVaE2uXt3cfP5d+Ryngk/l1cVUZih+AStpcsKtQ==;EndpointSuffix=core.windows.net
+2025-09-29T01:34:40.9320529Z APPSETTING_REMOTEDEBUGGINGVERSION=17.12.11017.4296
+2025-09-29T01:34:40.9320561Z APPSETTING_STORAGE_CONNECTION_STRING_2=DefaultEndpointsProtocol=https;AccountName=smartskstorage;AccountKey=GYRlhTMQR4hayfibJfIjJI+oI0aNrpj5HSrR1mqZkSOfi+N1bkyovp9mCezsBpQU2VfjllEMr1HG+AStjrZQ1A==;EndpointSuffix=core.windows.net
+2025-09-29T01:34:40.9320583Z WEBSITE_ROLE_INSTANCE_ID=8512
+2025-09-29T01:34:40.9320604Z APPSETTING_EMAIL_PASS=ubum hdkh zdjt vzng
+2025-09-29T01:34:40.9320663Z WEBSITE_AUTH_ENCRYPTION_KEY=4359940B8D0CC2A05D62F5F9532852039B5688B459D81B3C1A07C26521D8C5F6
+2025-09-29T01:34:40.9320704Z WEBSITE_ISOLATION=lxc
+2025-09-29T01:34:40.9320732Z APPLICATIONINSIGHTS_DIAGNOSTICS_OUTPUT_DIRECTORY=/var/log/applicationinsights/
+2025-09-29T01:34:40.9321483Z WEBSITE_HEALTHCHECK_MAXPINGFAILURES=5
+2025-09-29T01:34:40.9321512Z WEBSITE_DEPLOYMENT_ID=smartsk-backend-container
+2025-09-29T01:34:40.9321535Z WEBSITE_SITE_NAME=smartsk-backend-container
+2025-09-29T01:34:40.9321574Z APPSETTING_GEMINI_API_KEY=AIzaSyAOVNZ7qCj2lQ5t2Vzp8J_LBKQyEu5liO4
+2025-09-29T01:34:40.9321597Z WEBSITE_NODE_DEFAULT_VERSION=22-lts
+2025-09-29T01:34:40.9321621Z PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+2025-09-29T01:34:40.9321648Z APPSETTING_STORAGE_KEY_1=BLwENgNUR39dxdMEDEH2DoNWMQNvXQtHV6Z547g01nAELq4WVaE2uXt3cfP5d+Ryngk/l1cVUZih+AStpcsKtQ==
+2025-09-29T01:34:40.9321671Z SCM_DISABLE_NODE_MODULES_COMPRESSION=true
+2025-09-29T01:34:40.9321692Z WEBSITE_RUN_ON_PACKAGE=1
+2025-09-29T01:34:40.9321757Z APPSETTING_JWT_SECRET_KEY=0eb2eca5882ce3a95e549dc160d4a7e4f2fbdebc00bf92c875139e26e0ef9eab6e8016e337711caba29846d9d7e991a9161d76b45526fce2a275640dc10c61541a291d77259f195d1e05cc9efce4760388d2f3185117a5c48e11580c36e90074f943d149f97f96cb392c062e234af04b64499467b3c66c3696911d551c1a3f123e24fa9e523eb651569ccddc12a503c407689c0965149a86802166e336696330fc2c8e20607d80789a291a50c006c21a6ab4902ac7d9688bdf8ce4acd5fd3367436ea5c1fd1b63c92112d50a43826fbd996b73f3d484e5318a2c6bfb284bafec6e1688360d56381f80b6408cead61cd64c83ffcdbd70e0ff2f9dbd8cd2381d86
+2025-09-29T01:34:40.9321783Z APPSETTING_WEBSITE_HEALTHCHECK_MAXPINGFAILURES=5
+2025-09-29T01:34:40.9321808Z APPSETTING_STORAGE_KEY_2=GYRlhTMQR4hayfibJfIjJI+oI0aNrpj5HSrR1mqZkSOfi+N1bkyovp9mCezsBpQU2VfjllEMr1HG+AStjrZQ1A==
+2025-09-29T01:34:40.9321830Z STORAGE_NAME=smartskstorage
+2025-09-29T01:34:40.9321851Z APPSETTING_ENABLE_ORYX_BUILD=false
+2025-09-29T01:34:40.9321890Z APPSETTING_WEBSITE_NODE_DEFAULT_VERSION=22-lts
+2025-09-29T01:34:40.9321912Z APPSETTING_EMAIL_HOST=smtp.gmail.com
+2025-09-29T01:34:40.9321935Z CORS_ORIGIN=https://smartsk.app
+2025-09-29T01:34:40.9321957Z APPSETTING_WEBSITE_SITE_NAME=smartsk-backend-container
+2025-09-29T01:34:40.9321979Z APPSETTING_WEBSITE_RUN_ON_PACKAGE=1
+2025-09-29T01:34:40.9322001Z WEBSITE_AUTH_ENABLED=False
+2025-09-29T01:34:40.9322023Z APPSETTING_EMAIL_USER=smartSK2025@gmail.com
+2025-09-29T01:34:40.9322061Z MSI_ENDPOINT=http://169.254.133.3:8081/msi/token
+2025-09-29T01:34:40.9322092Z STORAGE_CONNECTION_STRING_1=DefaultEndpointsProtocol=https;AccountName=smartskstorage;AccountKey=BLwENgNUR39dxdMEDEH2DoNWMQNvXQtHV6Z547g01nAELq4WVaE2uXt3cfP5d+Ryngk/l1cVUZih+AStpcsKtQ==;EndpointSuffix=core.windows.net
+2025-09-29T01:34:40.9322115Z MSI_SECRET=f1c289b7-c901-4c6d-8bac-22010dfa14ca
+2025-09-29T01:34:40.9322145Z STORAGE_CONNECTION_STRING_2=DefaultEndpointsProtocol=https;AccountName=smartskstorage;AccountKey=GYRlhTMQR4hayfibJfIjJI+oI0aNrpj5HSrR1mqZkSOfi+N1bkyovp9mCezsBpQU2VfjllEMr1HG+AStjrZQ1A==;EndpointSuffix=core.windows.net
+2025-09-29T01:34:40.9322206Z GOOGLE_CREDENTIALS_FILE={"installed":{"client_id":"121784492686-gm756o2o6n048f8elmqom470sd13i3ic.apps.googleusercontent.com","project_id":"gen-lang-client-0447049670","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["http://localhost"]}}
+2025-09-29T01:34:40.9322231Z APPSETTING_SEARCH_ENGINE_API=AIzaSyDZPjQ5fbREHywc33SFQ7wIiGQDgKgSsTw
+2025-09-29T01:34:40.9322253Z APPSETTING_WEBSITE_AUTH_ENABLED=False
+2025-09-29T01:34:40.9322276Z APPSETTING_DB_SERVER=smart-sk.database.windows.net
+2025-09-29T01:34:40.9322297Z APPSETTING_DB_PASSWORD=Smart-SK2025
+2025-09-29T01:34:40.9322319Z APPSETTING_SEARCH_ENGINE_ID=f689623f137454cf3
+2025-09-29T01:34:40.9322362Z WEBSITE_OWNER_NAME=0b42eb46-0f69-4263-86b9-a408ca348b28+Smart_SK-SoutheastAsiawebspace-Linux
+2025-09-29T01:34:40.9322397Z APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=fe860919-abbc-4539-80aa-d3948db36ea2;IngestionEndpoint=https://southeastasia-1.in.applicationinsights.azure.com/;LiveEndpoint=https://southeastasia.livediagnostics.monitor.azure.com/;ApplicationId=374056ef-f86c-42df-a975-34b32f431264
+2025-09-29T01:34:40.9322420Z APPSETTING_EMAIL_PORT=587
+2025-09-29T01:34:40.9322442Z WEBSITE_HTTPLOGGING_RETENTION_DAYS=7
+2025-09-29T01:34:40.9322464Z APPSETTING_DB_USER=smartSK
+2025-09-29T01:34:40.9322500Z WEBSITE_AUTH_INTERNAL_PATHS=/api/health
+2025-09-29T01:34:40.9322525Z STORAGE_KEY_1=BLwENgNUR39dxdMEDEH2DoNWMQNvXQtHV6Z547g01nAELq4WVaE2uXt3cfP5d+Ryngk/l1cVUZih+AStpcsKtQ==
+2025-09-29T01:34:40.9322550Z ASPNETCORE_HOSTINGSTARTUPASSEMBLIES=Microsoft.ApplicationInsights.StartupBootstrapper
+2025-09-29T01:34:40.9322584Z APPSETTING_APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=fe860919-abbc-4539-80aa-d3948db36ea2;IngestionEndpoint=https://southeastasia-1.in.applicationinsights.azure.com/;LiveEndpoint=https://southeastasia.livediagnostics.monitor.azure.com/;ApplicationId=374056ef-f86c-42df-a975-34b32f431264
+2025-09-29T01:34:40.9322608Z IDENTITY_ENDPOINT=http://169.254.133.3:8081/msi/token
+2025-09-29T01:34:40.9322631Z DB_SERVER=smart-sk.database.windows.net
+2025-09-29T01:34:40.9322672Z STORAGE_KEY_2=GYRlhTMQR4hayfibJfIjJI+oI0aNrpj5HSrR1mqZkSOfi+N1bkyovp9mCezsBpQU2VfjllEMr1HG+AStjrZQ1A==
+2025-09-29T01:34:40.9322693Z DB_PASSWORD=Smart-SK2025
+2025-09-29T01:34:40.9322714Z PWD=/app
+2025-09-29T01:34:40.9322735Z WEBSITE_SSH_ENABLED=1
+2025-09-29T01:34:40.9322757Z APPSETTING_WEBSITE_HTTPLOGGING_RETENTION_DAYS=7
+2025-09-29T01:34:40.9322779Z APPSETTING_CORS_ORIGIN=https://smartsk.app
+2025-09-29T01:34:40.9322890Z APPSETTING_PY_PORT=5000
+2025-09-29T01:34:40.9322913Z COMPUTERNAME=lw1sdlwk0006KG
+2025-09-29T01:34:40.9322935Z GEMINI_API_KEY=AIzaSyAOVNZ7qCj2lQ5t2Vzp8J_LBKQyEu5liO4
+2025-09-29T01:34:40.9322959Z APPSETTING_XDT_MicrosoftApplicationInsights_Mode=default
+2025-09-29T01:34:40.9322979Z PY_PORT=5000
+2025-09-29T01:34:40.9323000Z DB_USER=smartSK
+2025-09-29T01:34:40.9323021Z APPSETTING_ScmType=None
+2025-09-29T01:34:40.9323060Z WEBSITE_AUTH_SIGNING_KEY=3776EE238E8D3E310CCB032B9B13156976AFF8ED96FB3362A9E212883B23EAEB
+2025-09-29T01:34:40.9323086Z EMAIL_PASS=ubum hdkh zdjt vzng
+2025-09-29T01:34:40.9323109Z APPSETTING_SPREADSHEET_ID=1Jc_ZVCY5blbNDcNgxiE3le6W37F8u0g9zZTlVmDEpRg
+2025-09-29T01:34:40.9323132Z SEARCH_ENGINE_API=AIzaSyDZPjQ5fbREHywc33SFQ7wIiGQDgKgSsTw
+2025-09-29T01:34:40.9323154Z APPSETTING_SCM_DO_BUILD_DURING_DEPLOYMENT=false
+2025-09-29T01:34:40.9323175Z APPSETTING_DB_PORT=1433
+2025-09-29T01:34:40.9323217Z WEBSITE_SKU=Basic
+2025-09-29T01:34:54.7581348Z Initializing active sessions from database...
+2025-09-29T01:34:56.3364291Z Initializing Azure Storage with primary credentials.
+2025-09-29T01:34:56.6669056Z Server is running on port 8080
+2025-09-29T01:34:58.8704212Z Initialized active sessions.
+
+--Container Log
+
+2025_09_29_lw1sdlwk0006KG_docker.log:
+2025-09-29T00:51:38.3225290Z Container start method called.
+2025-09-29T00:51:38.3433424Z Establishing network.
+2025-09-29T00:51:38.3436332Z Pulling image: smartskregistry.azurecr.io/smartsk-backend:latest.
+2025-09-29T00:53:39.4213788Z Image smartskregistry.azurecr.io/smartsk-backend:latest is pulled from registry smartskregistry.azurecr.io
+2025-09-29T00:53:39.4306357Z Container is starting.
+2025-09-29T00:53:39.4309052Z Establishing user namespace if not established already.
+2025-09-29T00:53:39.4326277Z Establishing network if not established already.
+2025-09-29T00:53:39.4507877Z Mounting volumes.
+2025-09-29T00:53:39.5853265Z Nested mountpoint volatile/logs
+2025-09-29T00:53:39.6655116Z Nested mountpoint
+2025-09-29T00:53:39.8774023Z Nested mountpoint
+2025-09-29T00:53:39.9753763Z Nested mountpoint
+2025-09-29T00:53:40.0339274Z Nested mountpoint
+2025-09-29T00:53:40.0814501Z Nested mountpoint
+2025-09-29T00:53:42.1307024Z Creating container.
+2025-09-29T00:53:42.1308418Z Creating pipes for streaming container io.
+2025-09-29T00:53:42.1323243Z Creating stdout named pipe at /podr/container/pipe/21f627dd1d37_smartsk-backend-container/stdout_a5027eaef8894270bef9b8fc3b205b76.
+2025-09-29T00:53:42.1401092Z Successfully created stdout named pipe at: /podr/container/pipe/21f627dd1d37_smartsk-backend-container/stdout_a5027eaef8894270bef9b8fc3b205b76.
+2025-09-29T00:53:42.1409175Z Opening named pipe /podr/container/pipe/21f627dd1d37_smartsk-backend-container/stdout_a5027eaef8894270bef9b8fc3b205b76 for reading in non-blocking mode.
+2025-09-29T00:53:42.1413907Z Successfully opened named pipe: /podr/container/pipe/21f627dd1d37_smartsk-backend-container/stdout_a5027eaef8894270bef9b8fc3b205b76.
+2025-09-29T00:53:42.1424410Z Successfully removed non-blocking flag from /podr/container/pipe/21f627dd1d37_smartsk-backend-container/stdout_a5027eaef8894270bef9b8fc3b205b76.
+2025-09-29T00:53:42.1798156Z Creating stderr named pipe at /podr/container/pipe/21f627dd1d37_smartsk-backend-container/stderr_356cf2a93774413fb44b72e1d14b4b41.
+2025-09-29T00:53:42.1804480Z Successfully created stderr named pipe at: /podr/container/pipe/21f627dd1d37_smartsk-backend-container/stderr_356cf2a93774413fb44b72e1d14b4b41.
+2025-09-29T00:53:42.1812745Z Opening named pipe /podr/container/pipe/21f627dd1d37_smartsk-backend-container/stderr_356cf2a93774413fb44b72e1d14b4b41 for reading in non-blocking mode.
+2025-09-29T00:53:42.2022624Z Successfully opened named pipe: /podr/container/pipe/21f627dd1d37_smartsk-backend-container/stderr_356cf2a93774413fb44b72e1d14b4b41.
+2025-09-29T00:53:42.2107739Z Successfully removed non-blocking flag from /podr/container/pipe/21f627dd1d37_smartsk-backend-container/stderr_356cf2a93774413fb44b72e1d14b4b41.
+2025-09-29T00:53:42.2119355Z Creating container with image: smartskregistry.azurecr.io/smartsk-backend:latest from registry: smartskregistry.azurecr.io and fully qualified image name: smartskregistry.azurecr.io/smartsk-backend:latest
+2025-09-29T00:53:42.9935378Z Starting container: 21f627dd1d37_smartsk-backend-container.
+2025-09-29T00:53:43.0923880Z Starting watchers and probes.
+2025-09-29T00:53:43.1022727Z Starting metrics collection.
+2025-09-29T00:53:43.1040059Z Container is running.
+2025-09-29T00:53:43.5817497Z Container start method finished after 125258 ms.
+2025-09-29T00:53:53.0707338Z Site startup probe succeeded after 9.3429741 seconds.
+2025-09-29T00:53:53.3875340Z Site started.
+2025-09-29T00:54:13.7326645Z Container is terminating. Grace period: 5 seconds.
+2025-09-29T00:54:13.7882215Z Stop and delete container. Retry count = 0
+2025-09-29T00:54:13.7885973Z Stopping container: 29ea06e0537c_smartsk-backend-container.
+2025-09-29T00:54:18.9699961Z Deleting container: 29ea06e0537c_smartsk-backend-container. Retry count = 0
+2025-09-29T00:54:19.5717759Z Container spec TerminationMessagePolicy path
+2025-09-29T00:54:19.5725902Z Container is terminated. Total time elapsed: 5839 ms.
+2025-09-29T00:54:19.5794051Z Site: smartsk-backend-container stopped.
+2025-09-29T01:32:17.8734760Z Container start method called.
+2025-09-29T01:32:17.8742876Z Establishing network.
+2025-09-29T01:32:17.8953855Z Pulling image: smartskregistry.azurecr.io/smartsk-backend:latest.
+2025-09-29T01:34:30.2323522Z Image smartskregistry.azurecr.io/smartsk-backend:latest is pulled from registry smartskregistry.azurecr.io
+2025-09-29T01:34:30.2507390Z Container is starting.
+2025-09-29T01:34:30.2579132Z Establishing user namespace if not established already.
+2025-09-29T01:34:30.2697639Z Establishing network if not established already.
+2025-09-29T01:34:30.2787669Z Mounting volumes.
+2025-09-29T01:34:30.3440161Z Nested mountpoint volatile/logs
+2025-09-29T01:34:30.4993657Z Nested mountpoint
+2025-09-29T01:34:30.5915086Z Nested mountpoint
+2025-09-29T01:34:30.6009067Z Nested mountpoint
+2025-09-29T01:34:30.6195925Z Nested mountpoint
+2025-09-29T01:34:30.6412232Z Nested mountpoint
+2025-09-29T01:34:30.7405475Z Nested mountpoint
+2025-09-29T01:34:36.5891514Z Creating container.
+2025-09-29T01:34:36.5997850Z Creating pipes for streaming container io.
+2025-09-29T01:34:36.6677363Z Creating stdout named pipe at /podr/container/pipe/9d6a123e5eca_smartsk-backend-container_smartsk-backend-container/stdout_282f313de4624ec2b39f86ab432ee051.
+2025-09-29T01:34:36.6761183Z Successfully created stdout named pipe at: /podr/container/pipe/9d6a123e5eca_smartsk-backend-container_smartsk-backend-container/stdout_282f313de4624ec2b39f86ab432ee051.
+2025-09-29T01:34:36.6781437Z Opening named pipe /podr/container/pipe/9d6a123e5eca_smartsk-backend-container_smartsk-backend-container/stdout_282f313de4624ec2b39f86ab432ee051 for reading in non-blocking mode.
+2025-09-29T01:34:36.6784936Z Successfully opened named pipe: /podr/container/pipe/9d6a123e5eca_smartsk-backend-container_smartsk-backend-container/stdout_282f313de4624ec2b39f86ab432ee051.
+2025-09-29T01:34:36.7374331Z Successfully removed non-blocking flag from /podr/container/pipe/9d6a123e5eca_smartsk-backend-container_smartsk-backend-container/stdout_282f313de4624ec2b39f86ab432ee051.
+2025-09-29T01:34:36.7483254Z Creating stderr named pipe at /podr/container/pipe/9d6a123e5eca_smartsk-backend-container_smartsk-backend-container/stderr_dcae9f4f554a4508a32649fe8d96e6f9.
+2025-09-29T01:34:36.7767502Z Successfully created stderr named pipe at: /podr/container/pipe/9d6a123e5eca_smartsk-backend-container_smartsk-backend-container/stderr_dcae9f4f554a4508a32649fe8d96e6f9.
+2025-09-29T01:34:36.7771284Z Opening named pipe /podr/container/pipe/9d6a123e5eca_smartsk-backend-container_smartsk-backend-container/stderr_dcae9f4f554a4508a32649fe8d96e6f9 for reading in non-blocking mode.
+2025-09-29T01:34:36.7776805Z Successfully opened named pipe: /podr/container/pipe/9d6a123e5eca_smartsk-backend-container_smartsk-backend-container/stderr_dcae9f4f554a4508a32649fe8d96e6f9.
+2025-09-29T01:34:36.7972916Z Successfully removed non-blocking flag from /podr/container/pipe/9d6a123e5eca_smartsk-backend-container_smartsk-backend-container/stderr_dcae9f4f554a4508a32649fe8d96e6f9.
+2025-09-29T01:34:36.9148811Z Creating container with image: smartskregistry.azurecr.io/smartsk-backend:latest from registry: smartskregistry.azurecr.io and fully qualified image name: smartskregistry.azurecr.io/smartsk-backend:latest
+2025-09-29T01:34:40.4087886Z Starting container: 9d6a123e5eca_smartsk-backend-container_smartsk-backend-container.
+2025-09-29T01:34:40.7717778Z Starting watchers and probes.
+2025-09-29T01:34:40.8016478Z Starting metrics collection.
+2025-09-29T01:34:40.8336211Z Container is running.
+2025-09-29T01:34:43.6186319Z Container start method finished after 145744 ms.
