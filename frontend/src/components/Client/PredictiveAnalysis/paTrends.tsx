@@ -438,11 +438,15 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
   return (
     <div style={{ width: '100%', marginTop: '24px' }}>
       <Snackbar
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
           open={snackbarOpen}
           autoHideDuration={6000}
           onClose={() => setSnackbarOpen(false)}
-          message={snackbarMessage}
-      />
+      >
+        <Alert onClose={() => setSnackbarOpen(false)} severity="error" sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       
       {/* Custom Forecast Options Panel */}
