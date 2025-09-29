@@ -1,27 +1,20 @@
-I'm experiencing a UI rendering issue with my login modal component. Here's what's happening:
+Prompt for Gemini CLI:
+I need you to fix a z-index layering issue with the login modal in frontend/src/components/Login/Login.tsx.
+Current Problem:
+Looking at the screenshot, the login modal card is rendering BEHIND the page content (the "Browse the" text and "P" logo are visible through/over the modal). The previous fix added backdrop styling with z-index: 1100, but the modal content box itself doesn't have a sufficient z-index to appear above all page elements.
+What needs to be fixed:
 
-**Current Behavior:**
-- The login modal dialog appears on the page with a "Welcome Back" heading
-- The modal contains username and password input fields, a "Forgot Password?" link, and a blue "Login" button
-- The modal is displaying for user "San Bartolome"
-- Looking at the browser's DevTools, I can see the HTML structure is rendering correctly with proper class names like "portfolio", "particles", "project-list-header", etc.
-- The page background shows "Browse the" text and a "P" logo/icon
+The Box component containing the login form (the one using sx={style}) needs a higher z-index to ensure it renders ABOVE all background content including:
 
-**Suspected Issue:**
-The modal appears to be functional but there may be:
-1. Layout or positioning issues (the modal seems properly centered but the underlying page content is visible)
-2. Possible z-index or overlay backdrop problems
-3. The modal might need better backdrop/overlay styling to prevent interaction with background content
+The .portfolio section
+The .particles effect
+The page header with "project-list-header"
+Any other custom-styled elements
 
-**Technical Details:**
-- Framework/Stack: Appears to be a custom implementation with vanilla HTML/CSS/JS
-- The HTML structure includes sections for "Toastify" notifications, particles effect, and a MuiModal root
-- Login form elements are standard input fields with a submit button
 
-**What I Need:**
-Please help me analyze if there are any:
-1. CSS positioning or z-index conflicts
-2. Modal backdrop/overlay implementation issues
-3. Accessibility concerns with the modal structure
-4. Best practices I should follow for modal dialog implementation
-5. Any JavaScript event handling issues that might affect form submission or modal dismissal
+Update the style object in Login.tsx to include zIndex: 1300 (higher than the backdrop's 1100)
+Ensure the modal content box has position: 'relative' or position: 'absolute' so the z-index takes effect
+
+Expected Result:
+The login modal card should appear cleanly on top of the darkened backdrop, with no background content visible through or overlapping the modal card itself.
+Please read frontend/src/components/Login/Login.tsx and modify the style object to fix this z-index stacking issue.

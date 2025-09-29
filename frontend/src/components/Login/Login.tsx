@@ -29,6 +29,7 @@ const style = {
   boxShadow: 24,
   p: 4,
   borderRadius: 2,
+  zIndex: 1300,
 };
 
 const Login: React.FC<LoginProps> = ({ open, onClose, barangay }) => {
