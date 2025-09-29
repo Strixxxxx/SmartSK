@@ -151,7 +151,7 @@ def main():
     category = options.get('category')
 
     try:
-        data = get_raw_data_from_db(category_filter=category)
+        data = get_raw_data_from_db(category=category)
         if not data:
             print(json.dumps({
                 "error": True,

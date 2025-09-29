@@ -242,7 +242,7 @@ def generate_project_trends(filters=None, forecast_year=None):
             
         historical_data = None
         try:
-            data = get_raw_data_from_db(category_filter=filters.get('category') if filters else None)
+            data = get_raw_data_from_db(category=filters.get('category') if filters else None)
             if data:
                 raw_df = pd.DataFrame(data)
                 if not raw_df.empty:

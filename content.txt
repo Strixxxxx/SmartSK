@@ -1,84 +1,7 @@
 --Log Stream
 
-2025-09-29T02:25:14  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/appsvctmp/volatile/logs/runtime/container.log
-2025-09-29T01:58:57.0292556Z     import pyodbc
-2025-09-29T01:58:57.0292577Z ImportError: libodbc.so.2: cannot open shared object file: No such file or directory
-2025-09-29T01:58:57.0292590Z
-2025-09-29T01:58:57.0292608Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:43:25)
-2025-09-29T01:58:57.0292624Z     at ChildProcess.emit (node:events:519:28)
-2025-09-29T01:58:57.0292641Z     at maybeClose (node:internal/child_process:1101:16)
-2025-09-29T01:58:57.0292658Z     at Socket.<anonymous> (node:internal/child_process:456:11)
-2025-09-29T01:58:57.0292674Z     at Socket.emit (node:events:519:28)
-2025-09-29T01:58:57.0292690Z     at Pipe.<anonymous> (node:net:346:12)
-2025-09-29T01:58:57.0292707Z     at Pipe.callbackTrampoline (node:internal/async_hooks:130:17)Ending Log Tail of existing logs ---Starting Live Log Stream ---
-2025-09-29T02:25:19.0993501Z     __ __          __      __    _ __
-2025-09-29T02:25:19.1019737Z    / //_/_  _ ____/ /_  __/ /   (_) /____
-2025-09-29T02:25:19.1019965Z   / ,< / / / / __  / / / / /   / / __/ _
-2025-09-29T02:25:19.1019988Z  / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
-2025-09-29T02:25:19.1020008Z /_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/
-2025-09-29T02:25:19.1020051Z
-2025-09-29T02:25:19.1092638Z
-2025-09-29T02:25:19.1092823Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
-2025-09-29T02:25:19.1092843Z
-2025-09-29T02:25:19.1092889Z Documentation: http://aka.ms/webapp-linux
-2025-09-29T02:25:19.1092910Z Kudu Version : 20250623.5
-2025-09-29T02:25:19.1092932Z Commit       : 353543ec4c45fcbfd4750522d32c94e23b31927a
-2025-09-29T02:25:19.1092950Z
-2025-09-29T02:25:19.9226390Z chown: changing ownership of '/temp': Operation not permitted
-2025-09-29T02:25:19.9344832Z chmod: changing permissions of '/temp': Operation not permitted
-2025-09-29T02:25:22.5389088Z Restarting OpenBSD Secure Shell server: sshd.
-2025-09-29T02:25:22.6483931Z node not running, starting node /opt/webssh/index.js
-2025-09-29T02:25:35.4507293Z Mon Sep 29 02:25:35 UTC 2025 running .net core
-2025-09-29T02:25:37.4776505Z Startup : 02.25.37.454428
-2025-09-29T02:25:37.5164709Z Configure Services : 02.25.37.516145
-2025-09-29T02:25:37.9618119Z Configure : 02.25.37.961629
-2025-09-29T02:25:38.4395201Z Setting Up Routes : 02.25.38.439215
-2025-09-29T02:25:38.8483978Z Exiting Configure : 02.25.38.848231
-2025-09-29T02:25:39.4306914Z Hosting environment: Production
-2025-09-29T02:25:39.4478148Z Content root path: /opt/Kudu
-2025-09-29T02:25:39.4478428Z Now listening on: http://0.0.0.0:8181
-2025-09-29T02:25:39.4478455Z Application started. Press Ctrl+C to shut down.
-2025-09-29T02:26:00  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/28/2025 16:25:25/home/LogFiles/kudu/trace/0e52acce53b3-7d6a1366-f062-4b56-833c-a87d6608c7fe.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0e52acce53b3-7d6a1366-f062-4b56-833c-a87d6608c7fe.txt)
-2025-09-28T16:29:18  Startup Request, url: /, method: GET, type: request, pid: 778,1,15, SCM_DO_BUILD_DURING_DEPLOYMENT: false, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, ScmType: None/home/LogFiles/kudu/trace/15946ce7568e-5ddefc41-a1e0-4fd6-a582-4e611bba343f.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/15946ce7568e-5ddefc41-a1e0-4fd6-a582-4e611bba343f.txt)
-2025-09-29T01:20:25  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 773,1,60, ScmType: None, SCM_DO_BUILD_DURING_DEPLOYMENT: false, SCM_DISABLE_NODE_MODULES_COMPRESSION: true/home/LogFiles/kudu/trace/276b5fcc073e-be78965b-f70d-435a-88e8-ca382d182167.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/276b5fcc073e-be78965b-f70d-435a-88e8-ca382d182167.txt)
-2025-09-28T16:09:58  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 770,1,5, ScmType: None, SCM_DO_BUILD_DURING_DEPLOYMENT: false, SCM_DISABLE_NODE_MODULES_COMPRESSION: true/home/LogFiles/kudu/trace/a4773b305d14-2c8befdc-960b-4566-bfb2-735a1dd4c62b.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a4773b305d14-2c8befdc-960b-4566-bfb2-735a1dd4c62b.txt)
-2025-09-29T01:48:52  Startup Request, url: /api/logs/docker, method: POST, type: request, pid: 770,1,5, ScmType: None, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: false/home/LogFiles/kudu/trace/abdd1d9b7164-f91ce545-8d97-42ec-bf01-719e2ac9b83f.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/abdd1d9b7164-f91ce545-8d97-42ec-bf01-719e2ac9b83f.txt)
-2025-09-29T02:25:42  Startup Request, url: /api/vfs/LogFiles/2025_09_29_lw1sdlwk0006KG_docker.log, method: POST, type: request, pid: 769,1,5, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, ScmType: None, SCM_DO_BUILD_DURING_DEPLOYMENT: false/home/LogFiles/kudu/trace/cd6afb915a49-1adad8e3-cd55-44c8-b7a2-927210369cc3.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/cd6afb915a49-1adad8e3-cd55-44c8-b7a2-927210369cc3.txt)
-2025-09-28T15:55:18  Startup Request, url: /logstream, method: GET, type: request, pid: 772,1,5, ScmType: None
-2025-09-28T15:57:19    Error occurred, type: error, text: LogStreamManager: ProcessRequest end
-2025-09-28T15:57:22  Error occurred, type: error, text: LogStreamManager: Inside Reset/home/LogFiles/kudu/trace/e5bfd5da9937-9186ff98-f6a4-4176-b3b5-975226f6562d.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/e5bfd5da9937-9186ff98-f6a4-4176-b3b5-975226f6562d.txt)
-2025-09-29T01:33:51  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 774,1,15, SCM_DO_BUILD_DURING_DEPLOYMENT: false, ScmType: None, SCM_DISABLE_NODE_MODULES_COMPRESSION: true/home/LogFiles/2025_09_28_lw1sdlwk0006KG_default_docker.log  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/2025_09_28_lw1sdlwk0006KG_default_docker.log)
-2025-09-28T16:00:43.104496473Z IDENTITY_ENDPOINT=http://169.254.132.3:8081/msi/token
-2025-09-28T16:00:43.104498336Z PWD=/app
-2025-09-28T16:00:43.104500053Z COMPUTERNAME=lw1sdlwk0006KG
-2025-09-28T16:00:43.104501902Z APPSVC_RUN_ZIP=FALSE
-2025-09-28T16:00:43.104503711Z WEBSITE_SSH_ENABLED=1
-2025-09-28T16:00:43.104505449Z APPSETTING_ScmType=None
-2025-09-28T16:00:43.104507268Z WEBSITE_AUTH_SIGNING_KEY=3776EE238E8D3E310CCB032B9B13156976AFF8ED96FB3362A9E212883B23EAEB
-2025-09-28T16:00:43.104509285Z WEBSITE_SKU=Basic
-2025-09-28T16:00:51.622967749Z FATAL ERROR: DB_SERVER environment variable is not set./home/LogFiles/2025_09_28_lw1sdlwk0006KG_docker.log  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/2025_09_28_lw1sdlwk0006KG_docker.log)
-2025-09-28T16:30:42.3953780Z Successfully opened named pipe: /podr/container/pipe/29ea06e0537c_smartsk-backend-container/stderr_a3a5d6c7dc254e98b5702663926de754.
-2025-09-28T16:30:42.3954463Z Successfully removed non-blocking flag from /podr/container/pipe/29ea06e0537c_smartsk-backend-container/stderr_a3a5d6c7dc254e98b5702663926de754.
-2025-09-28T16:30:42.3955179Z Creating container with image: smartskregistry.azurecr.io/smartsk-backend:latest from registry: smartskregistry.azurecr.io and fully qualified image name: smartskregistry.azurecr.io/smartsk-backend:latest
-2025-09-28T16:30:44.5831123Z Starting container: 29ea06e0537c_smartsk-backend-container.
-2025-09-28T16:30:44.8295114Z Starting watchers and probes.
-2025-09-28T16:30:44.8760518Z Starting metrics collection.
-2025-09-28T16:30:44.8764221Z Container is running.
-2025-09-28T16:30:45.4575499Z Container start method finished after 13877 ms.
-2025-09-28T16:31:17.6866483Z Site startup probe succeeded after 31.845833 seconds.
-2025-09-28T16:31:18.5792766Z Site started./home/LogFiles/2025_09_29_lw1sdlwk0006KG_docker.log  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/2025_09_29_lw1sdlwk0006KG_docker.log)
-2025-09-29T01:51:17.8613597Z Container start method finished after 48523 ms.
-2025-09-29T01:51:32.1951064Z Site startup probe succeeded after 14.1286863 seconds.
-2025-09-29T01:51:32.6453378Z Site started.
-2025-09-29T02:16:42.8565402Z Container is terminating. Grace period: 5 seconds.
-2025-09-29T02:16:43.0032052Z Stop and delete container. Retry count = 0
-2025-09-29T02:16:43.0035905Z Stopping container: 7db1f5b6bbd8_smartsk-backend-container.
-2025-09-29T02:16:48.1040218Z Deleting container: 7db1f5b6bbd8_smartsk-backend-container. Retry count = 0
-2025-09-29T02:16:48.9698270Z Container spec TerminationMessagePolicy  path
-2025-09-29T02:16:48.9721488Z Container is terminated. Total time elapsed: 6112 ms.
-2025-09-29T02:16:48.9755215Z Site: smartsk-backend-container stopped.Ending Log Tail of existing logs ---Starting Live Log Stream ---
 Connected!
-2025-09-29T02:26:36  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/28/2025 16:25:25/home/LogFiles/kudu/trace/0e52acce53b3-7d6a1366-f062-4b56-833c-a87d6608c7fe.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0e52acce53b3-7d6a1366-f062-4b56-833c-a87d6608c7fe.txt)
+2025-09-29T02:38:46  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/28/2025 16:25:25/home/LogFiles/kudu/trace/0e52acce53b3-7d6a1366-f062-4b56-833c-a87d6608c7fe.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0e52acce53b3-7d6a1366-f062-4b56-833c-a87d6608c7fe.txt)
 2025-09-28T16:29:18  Startup Request, url: /, method: GET, type: request, pid: 778,1,15, SCM_DO_BUILD_DURING_DEPLOYMENT: false, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, ScmType: None/home/LogFiles/kudu/trace/15946ce7568e-5ddefc41-a1e0-4fd6-a582-4e611bba343f.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/15946ce7568e-5ddefc41-a1e0-4fd6-a582-4e611bba343f.txt)
 2025-09-29T01:20:25  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 773,1,60, ScmType: None, SCM_DO_BUILD_DURING_DEPLOYMENT: false, SCM_DISABLE_NODE_MODULES_COMPRESSION: true/home/LogFiles/kudu/trace/276b5fcc073e-be78965b-f70d-435a-88e8-ca382d182167.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/276b5fcc073e-be78965b-f70d-435a-88e8-ca382d182167.txt)
 2025-09-28T16:09:58  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 770,1,5, ScmType: None, SCM_DO_BUILD_DURING_DEPLOYMENT: false, SCM_DISABLE_NODE_MODULES_COMPRESSION: true/home/LogFiles/kudu/trace/a4773b305d14-2c8befdc-960b-4566-bfb2-735a1dd4c62b.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a4773b305d14-2c8befdc-960b-4566-bfb2-735a1dd4c62b.txt)
@@ -107,60 +30,59 @@ Connected!
 2025-09-28T16:30:45.4575499Z Container start method finished after 13877 ms.
 2025-09-28T16:31:17.6866483Z Site startup probe succeeded after 31.845833 seconds.
 2025-09-28T16:31:18.5792766Z Site started./home/LogFiles/2025_09_29_lw1sdlwk0006KG_docker.log  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/2025_09_29_lw1sdlwk0006KG_docker.log)
-2025-09-29T01:51:17.8613597Z Container start method finished after 48523 ms.
-2025-09-29T01:51:32.1951064Z Site startup probe succeeded after 14.1286863 seconds.
-2025-09-29T01:51:32.6453378Z Site started.
-2025-09-29T02:16:42.8565402Z Container is terminating. Grace period: 5 seconds.
-2025-09-29T02:16:43.0032052Z Stop and delete container. Retry count = 0
-2025-09-29T02:16:43.0035905Z Stopping container: 7db1f5b6bbd8_smartsk-backend-container.
-2025-09-29T02:16:48.1040218Z Deleting container: 7db1f5b6bbd8_smartsk-backend-container. Retry count = 0
-2025-09-29T02:16:48.9698270Z Container spec TerminationMessagePolicy  path
-2025-09-29T02:16:48.9721488Z Container is terminated. Total time elapsed: 6112 ms.
-2025-09-29T02:16:48.9755215Z Site: smartsk-backend-container stopped.Ending Log Tail of existing logs ---Starting Live Log Stream ---
-2025-09-29T02:26:43.5389621Z Container start method called.
-2025-09-29T02:26:43.5485041Z Establishing network.
-2025-09-29T02:26:43.5494603Z Pulling image: smartskregistry.azurecr.io/smartsk-backend:latest.
-2025-09-29T02:27:28.0906886Z Image smartskregistry.azurecr.io/smartsk-backend:latest is pulled from registry smartskregistry.azurecr.io
-2025-09-29T02:27:28.0910912Z Container is starting.
-2025-09-29T02:27:28.0912153Z Establishing user namespace if not established already.
-2025-09-29T02:27:28.0913212Z Establishing network if not established already.
-2025-09-29T02:27:28.0914312Z Mounting volumes.
-2025-09-29T02:27:28.0916053Z Nested mountpoint volatile/logs
-2025-09-29T02:27:28.1224902Z Nested mountpoint
-2025-09-29T02:27:28.2107261Z Nested mountpoint
-2025-09-29T02:27:28.2195422Z Nested mountpoint
-2025-09-29T02:27:28.2200124Z Nested mountpoint
-2025-09-29T02:27:28.2783570Z Nested mountpoint
-2025-09-29T02:27:28.3291215Z Nested mountpoint
-2025-09-29T02:27:35.3552016Z Creating container.
-2025-09-29T02:27:35.3717735Z Creating pipes for streaming container io.
-2025-09-29T02:27:35.4836146Z Creating stdout named pipe at /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stdout_dd1f4ada361c45c38552ad32224dcb42.
-2025-09-29T02:27:35.4851742Z Successfully created stdout named pipe at: /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stdout_dd1f4ada361c45c38552ad32224dcb42.
-2025-09-29T02:27:35.5032626Z Opening named pipe /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stdout_dd1f4ada361c45c38552ad32224dcb42 for reading in non-blocking mode.
-2025-09-29T02:27:35.5050524Z Successfully opened named pipe: /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stdout_dd1f4ada361c45c38552ad32224dcb42.
-2025-09-29T02:27:35.5137168Z Successfully removed non-blocking flag from /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stdout_dd1f4ada361c45c38552ad32224dcb42.
-2025-09-29T02:27:35.5143127Z Creating stderr named pipe at /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stderr_a1587c94872445f8854a97631dbb9db0.
-2025-09-29T02:27:35.5150187Z Successfully created stderr named pipe at: /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stderr_a1587c94872445f8854a97631dbb9db0.
-2025-09-29T02:27:35.5223417Z Opening named pipe /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stderr_a1587c94872445f8854a97631dbb9db0 for reading in non-blocking mode.
-2025-09-29T02:27:35.5233773Z Successfully opened named pipe: /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stderr_a1587c94872445f8854a97631dbb9db0.
-2025-09-29T02:27:35.5524977Z Successfully removed non-blocking flag from /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stderr_a1587c94872445f8854a97631dbb9db0.
-2025-09-29T02:27:35.5529130Z Creating container with image: smartskregistry.azurecr.io/smartsk-backend:latest from registry: smartskregistry.azurecr.io and fully qualified image name: smartskregistry.azurecr.io/smartsk-backend:latest
-2025-09-29T02:27:37.9759480Z Starting container: 90be4a2616ac_smartsk-backend-container.
-2025-09-29T02:27:38.3891612Z Starting watchers and probes.
-2025-09-29T02:27:38.4284159Z Starting metrics collection.
-2025-09-29T02:27:38.4304218Z Container is running.
-2025-09-29T02:27:38.8061672Z Container start method finished after 55266 ms.
-2025-09-29T02:27:40.1515830Z Container has finished running with exit code: 1.
-2025-09-29T02:27:40.1517475Z Container is terminating. Grace period: 5 seconds.
-2025-09-29T02:27:40.1520338Z Stop and delete container. Retry count = 0
-2025-09-29T02:27:40.2057260Z Stopping container: 90be4a2616ac_smartsk-backend-container.
-2025-09-29T02:27:41.0161038Z Deleting container: 90be4a2616ac_smartsk-backend-container. Retry count = 0
-2025-09-29T02:27:42.4342068Z Container spec TerminationMessagePolicy  path
-2025-09-29T02:27:42.4542653Z Container is terminated. Total time elapsed: 2302 ms.
-2025-09-29T02:27:42.4932681Z Site container: smartsk-backend-container terminated during site startup.
-2025-09-29T02:27:42.5426496Z Site startup probe failed after 3.4781217 seconds.
-2025-09-29T02:27:43.1193781Z Failed to start site. Revert by stopping site.
-2025-09-29T02:27:43.3265906Z Site: smartsk-backend-container stopped.
+2025-09-29T02:28:32.2655441Z Container is terminating. Grace period: 5 seconds.
+2025-09-29T02:28:32.2748665Z Stop and delete container. Retry count = 0
+2025-09-29T02:28:32.2750285Z Stopping container: 4bcb1bc1400d_smartsk-backend-container.
+2025-09-29T02:28:32.4165440Z Deleting container: 4bcb1bc1400d_smartsk-backend-container. Retry count = 0
+2025-09-29T02:28:33.6065038Z Container spec TerminationMessagePolicy  path
+2025-09-29T02:28:33.6094560Z Container is terminated. Total time elapsed: 1343 ms.
+2025-09-29T02:28:33.6161560Z Site container: smartsk-backend-container terminated during site startup.
+2025-09-29T02:28:33.6164054Z Site startup probe failed after 1.508122 seconds.
+2025-09-29T02:28:33.6190983Z Failed to start site. Revert by stopping site.
+2025-09-29T02:28:33.6367655Z Site: smartsk-backend-container stopped.Ending Log Tail of existing logs ---Starting Live Log Stream ---
+2025-09-29T02:28:36.4636726Z Site container: smartsk-backend-container_managedIdentity terminated during site startup.
+2025-09-29T02:28:36.4844659Z ManagedIdentity container failed to startup
+2025-09-29T02:28:37.4072282Z Site: smartsk-backend-container will be blocked for 1 minutes till 09/29/2025 02:29:37
+2025-09-29T02:29:18.5898284Z Start site prohibitted because the site is being blocked.
+2025-09-29T02:29:19.1121904Z Start site prohibitted because the site is being blocked.
+2025-09-29T02:29:37.3981713Z Site: smartsk-backend-container is unblocked.
+025-09-29T02:39:19.7334956Z Container start method called.
+2025-09-29T02:39:19.7507395Z Establishing network.
+2025-09-29T02:39:19.7513429Z Pulling image: smartskregistry.azurecr.io/smartsk-backend:latest.
+2025-09-29T02:40:04.1449199Z Image smartskregistry.azurecr.io/smartsk-backend:latest is pulled from registry smartskregistry.azurecr.io
+2025-09-29T02:40:04.1531562Z Container is starting.
+2025-09-29T02:40:04.1533936Z Establishing user namespace if not established already.
+2025-09-29T02:40:04.1535196Z Establishing network if not established already.
+2025-09-29T02:40:04.1540735Z Mounting volumes.
+2025-09-29T02:40:04.1547174Z Nested mountpoint volatile/logs
+2025-09-29T02:40:04.2140972Z Nested mountpoint
+2025-09-29T02:40:04.3431950Z Nested mountpoint
+2025-09-29T02:40:04.3520919Z Nested mountpoint
+2025-09-29T02:40:04.3527833Z Nested mountpoint
+2025-09-29T02:40:04.5354332Z Nested mountpoint
+2025-09-29T02:40:04.8017740Z Nested mountpoint
+2025-09-29T02:40:07.1376778Z Creating container.
+2025-09-29T02:40:07.1384683Z Creating pipes for streaming container io.
+2025-09-29T02:40:07.1681785Z Creating stdout named pipe at /podr/container/pipe/2d49a5127c41_smartsk-backend-container/stdout_5fbefb17cbb84fda8340dbfcb5f47f05.
+2025-09-29T02:40:07.1980689Z Successfully created stdout named pipe at: /podr/container/pipe/2d49a5127c41_smartsk-backend-container/stdout_5fbefb17cbb84fda8340dbfcb5f47f05.
+2025-09-29T02:40:07.2088492Z Opening named pipe /podr/container/pipe/2d49a5127c41_smartsk-backend-container/stdout_5fbefb17cbb84fda8340dbfcb5f47f05 for reading in non-blocking mode.
+2025-09-29T02:40:07.2369267Z Successfully opened named pipe: /podr/container/pipe/2d49a5127c41_smartsk-backend-container/stdout_5fbefb17cbb84fda8340dbfcb5f47f05.
+2025-09-29T02:40:07.2377155Z Successfully removed non-blocking flag from /podr/container/pipe/2d49a5127c41_smartsk-backend-container/stdout_5fbefb17cbb84fda8340dbfcb5f47f05.
+2025-09-29T02:40:07.2387227Z Creating stderr named pipe at /podr/container/pipe/2d49a5127c41_smartsk-backend-container/stderr_fd2532ada83d45929e0a1851611fab1f.
+2025-09-29T02:40:07.2473675Z Successfully created stderr named pipe at: /podr/container/pipe/2d49a5127c41_smartsk-backend-container/stderr_fd2532ada83d45929e0a1851611fab1f.
+2025-09-29T02:40:07.2476021Z Opening named pipe /podr/container/pipe/2d49a5127c41_smartsk-backend-container/stderr_fd2532ada83d45929e0a1851611fab1f for reading in non-blocking mode.
+2025-09-29T02:40:07.2477787Z Successfully opened named pipe: /podr/container/pipe/2d49a5127c41_smartsk-backend-container/stderr_fd2532ada83d45929e0a1851611fab1f.
+2025-09-29T02:40:07.2478857Z Successfully removed non-blocking flag from /podr/container/pipe/2d49a5127c41_smartsk-backend-container/stderr_fd2532ada83d45929e0a1851611fab1f.
+2025-09-29T02:40:07.2479930Z Creating container with image: smartskregistry.azurecr.io/smartsk-backend:latest from registry: smartskregistry.azurecr.io and fully qualified image name: smartskregistry.azurecr.io/smartsk-backend:latest
+2025-09-29T02:40:09.6763314Z Starting container: 2d49a5127c41_smartsk-backend-container.
+2025-09-29T02:40:09.7983952Z Starting watchers and probes.
+2025-09-29T02:40:09.8165870Z Starting metrics collection.
+2025-09-29T02:40:09.8171322Z Container is running.
+2025-09-29T02:40:11.1015694Z Container start method finished after 51358 ms.
+2025-09-29T02:40:18.6105683Z Site startup probe succeeded after 7.3119749 seconds.
+2025-09-29T02:40:18.9502656Z Site started.
+
+
 
 --Container Log
 
@@ -307,3 +229,92 @@ Connected!
 2025-09-29T02:16:48.9698270Z Container spec TerminationMessagePolicy path
 2025-09-29T02:16:48.9721488Z Container is terminated. Total time elapsed: 6112 ms.
 2025-09-29T02:16:48.9755215Z Site: smartsk-backend-container stopped.
+2025-09-29T02:26:43.5389621Z Container start method called.
+2025-09-29T02:26:43.5485041Z Establishing network.
+2025-09-29T02:26:43.5494603Z Pulling image: smartskregistry.azurecr.io/smartsk-backend:latest.
+2025-09-29T02:27:28.0906886Z Image smartskregistry.azurecr.io/smartsk-backend:latest is pulled from registry smartskregistry.azurecr.io
+2025-09-29T02:27:28.0910912Z Container is starting.
+2025-09-29T02:27:28.0912153Z Establishing user namespace if not established already.
+2025-09-29T02:27:28.0913212Z Establishing network if not established already.
+2025-09-29T02:27:28.0914312Z Mounting volumes.
+2025-09-29T02:27:28.0916053Z Nested mountpoint volatile/logs
+2025-09-29T02:27:28.1224902Z Nested mountpoint
+2025-09-29T02:27:28.2107261Z Nested mountpoint
+2025-09-29T02:27:28.2195422Z Nested mountpoint
+2025-09-29T02:27:28.2200124Z Nested mountpoint
+2025-09-29T02:27:28.2783570Z Nested mountpoint
+2025-09-29T02:27:28.3291215Z Nested mountpoint
+2025-09-29T02:27:35.3552016Z Creating container.
+2025-09-29T02:27:35.3717735Z Creating pipes for streaming container io.
+2025-09-29T02:27:35.4836146Z Creating stdout named pipe at /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stdout_dd1f4ada361c45c38552ad32224dcb42.
+2025-09-29T02:27:35.4851742Z Successfully created stdout named pipe at: /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stdout_dd1f4ada361c45c38552ad32224dcb42.
+2025-09-29T02:27:35.5032626Z Opening named pipe /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stdout_dd1f4ada361c45c38552ad32224dcb42 for reading in non-blocking mode.
+2025-09-29T02:27:35.5050524Z Successfully opened named pipe: /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stdout_dd1f4ada361c45c38552ad32224dcb42.
+2025-09-29T02:27:35.5137168Z Successfully removed non-blocking flag from /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stdout_dd1f4ada361c45c38552ad32224dcb42.
+2025-09-29T02:27:35.5143127Z Creating stderr named pipe at /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stderr_a1587c94872445f8854a97631dbb9db0.
+2025-09-29T02:27:35.5150187Z Successfully created stderr named pipe at: /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stderr_a1587c94872445f8854a97631dbb9db0.
+2025-09-29T02:27:35.5223417Z Opening named pipe /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stderr_a1587c94872445f8854a97631dbb9db0 for reading in non-blocking mode.
+2025-09-29T02:27:35.5233773Z Successfully opened named pipe: /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stderr_a1587c94872445f8854a97631dbb9db0.
+2025-09-29T02:27:35.5524977Z Successfully removed non-blocking flag from /podr/container/pipe/90be4a2616ac_smartsk-backend-container/stderr_a1587c94872445f8854a97631dbb9db0.
+2025-09-29T02:27:35.5529130Z Creating container with image: smartskregistry.azurecr.io/smartsk-backend:latest from registry: smartskregistry.azurecr.io and fully qualified image name: smartskregistry.azurecr.io/smartsk-backend:latest
+2025-09-29T02:27:37.9759480Z Starting container: 90be4a2616ac_smartsk-backend-container.
+2025-09-29T02:27:38.3891612Z Starting watchers and probes.
+2025-09-29T02:27:38.4284159Z Starting metrics collection.
+2025-09-29T02:27:38.4304218Z Container is running.
+2025-09-29T02:27:38.8061672Z Container start method finished after 55266 ms.
+2025-09-29T02:27:40.1515830Z Container has finished running with exit code: 1.
+2025-09-29T02:27:40.1517475Z Container is terminating. Grace period: 5 seconds.
+2025-09-29T02:27:40.1520338Z Stop and delete container. Retry count = 0
+2025-09-29T02:27:40.2057260Z Stopping container: 90be4a2616ac_smartsk-backend-container.
+2025-09-29T02:27:41.0161038Z Deleting container: 90be4a2616ac_smartsk-backend-container. Retry count = 0
+2025-09-29T02:27:42.4342068Z Container spec TerminationMessagePolicy path
+2025-09-29T02:27:42.4542653Z Container is terminated. Total time elapsed: 2302 ms.
+2025-09-29T02:27:42.4932681Z Site container: smartsk-backend-container terminated during site startup.
+2025-09-29T02:27:42.5426496Z Site startup probe failed after 3.4781217 seconds.
+2025-09-29T02:27:43.1193781Z Failed to start site. Revert by stopping site.
+2025-09-29T02:27:43.3265906Z Site: smartsk-backend-container stopped.
+2025-09-29T02:27:54.0068586Z Site container: smartsk-backend-container_managedIdentity terminated during site startup.
+2025-09-29T02:27:54.0173848Z ManagedIdentity container failed to startup
+2025-09-29T02:28:25.5642659Z Container start method called.
+2025-09-29T02:28:25.5647058Z Establishing network.
+2025-09-29T02:28:25.5671421Z Pulling image: smartskregistry.azurecr.io/smartsk-backend:latest.
+2025-09-29T02:28:26.8163194Z Container is starting.
+2025-09-29T02:28:26.8356853Z Establishing user namespace if not established already.
+2025-09-29T02:28:26.8366568Z Establishing network if not established already.
+2025-09-29T02:28:26.8373494Z Mounting volumes.
+2025-09-29T02:28:26.8658294Z Nested mountpoint volatile/logs
+2025-09-29T02:28:26.9070982Z Nested mountpoint
+2025-09-29T02:28:26.9078203Z Nested mountpoint
+2025-09-29T02:28:26.9081922Z Nested mountpoint
+2025-09-29T02:28:27.0878222Z Nested mountpoint
+2025-09-29T02:28:27.1562951Z Nested mountpoint
+2025-09-29T02:28:27.4158915Z Nested mountpoint
+2025-09-29T02:28:30.7182561Z Creating container.
+2025-09-29T02:28:30.7263563Z Creating pipes for streaming container io.
+2025-09-29T02:28:30.7273202Z Creating stdout named pipe at /podr/container/pipe/4bcb1bc1400d_smartsk-backend-container/stdout_eee4a4ac0e8040a085cb2e70bc0c4ad4.
+2025-09-29T02:28:30.7285808Z Successfully created stdout named pipe at: /podr/container/pipe/4bcb1bc1400d_smartsk-backend-container/stdout_eee4a4ac0e8040a085cb2e70bc0c4ad4.
+2025-09-29T02:28:30.7363079Z Opening named pipe /podr/container/pipe/4bcb1bc1400d_smartsk-backend-container/stdout_eee4a4ac0e8040a085cb2e70bc0c4ad4 for reading in non-blocking mode.
+2025-09-29T02:28:30.7364683Z Successfully opened named pipe: /podr/container/pipe/4bcb1bc1400d_smartsk-backend-container/stdout_eee4a4ac0e8040a085cb2e70bc0c4ad4.
+2025-09-29T02:28:30.7373788Z Successfully removed non-blocking flag from /podr/container/pipe/4bcb1bc1400d_smartsk-backend-container/stdout_eee4a4ac0e8040a085cb2e70bc0c4ad4.
+2025-09-29T02:28:30.7375121Z Creating stderr named pipe at /podr/container/pipe/4bcb1bc1400d_smartsk-backend-container/stderr_b3209c3c7eaa4ea1ae9ae63c02cc83ee.
+2025-09-29T02:28:30.7376481Z Successfully created stderr named pipe at: /podr/container/pipe/4bcb1bc1400d_smartsk-backend-container/stderr_b3209c3c7eaa4ea1ae9ae63c02cc83ee.
+2025-09-29T02:28:30.7377176Z Opening named pipe /podr/container/pipe/4bcb1bc1400d_smartsk-backend-container/stderr_b3209c3c7eaa4ea1ae9ae63c02cc83ee for reading in non-blocking mode.
+2025-09-29T02:28:30.7378052Z Successfully opened named pipe: /podr/container/pipe/4bcb1bc1400d_smartsk-backend-container/stderr_b3209c3c7eaa4ea1ae9ae63c02cc83ee.
+2025-09-29T02:28:30.7378722Z Successfully removed non-blocking flag from /podr/container/pipe/4bcb1bc1400d_smartsk-backend-container/stderr_b3209c3c7eaa4ea1ae9ae63c02cc83ee.
+2025-09-29T02:28:30.7379438Z Creating container with image: smartskregistry.azurecr.io/smartsk-backend:latest from registry: smartskregistry.azurecr.io and fully qualified image name: smartskregistry.azurecr.io/smartsk-backend:latest
+2025-09-29T02:28:31.2460905Z Starting container: 4bcb1bc1400d_smartsk-backend-container.
+2025-09-29T02:28:31.4171152Z Starting watchers and probes.
+2025-09-29T02:28:31.4466880Z Starting metrics collection.
+2025-09-29T02:28:31.4657416Z Container is running.
+2025-09-29T02:28:32.0805819Z Container start method finished after 6516 ms.
+2025-09-29T02:28:32.2653185Z Container has finished running with exit code: 1.
+2025-09-29T02:28:32.2655441Z Container is terminating. Grace period: 5 seconds.
+2025-09-29T02:28:32.2748665Z Stop and delete container. Retry count = 0
+2025-09-29T02:28:32.2750285Z Stopping container: 4bcb1bc1400d_smartsk-backend-container.
+2025-09-29T02:28:32.4165440Z Deleting container: 4bcb1bc1400d_smartsk-backend-container. Retry count = 0
+2025-09-29T02:28:33.6065038Z Container spec TerminationMessagePolicy path
+2025-09-29T02:28:33.6094560Z Container is terminated. Total time elapsed: 1343 ms.
+2025-09-29T02:28:33.6161560Z Site container: smartsk-backend-container terminated during site startup.
+2025-09-29T02:28:33.6164054Z Site startup probe failed after 1.508122 seconds.
+2025-09-29T02:28:33.6190983Z Failed to start site. Revert by stopping site.
+2025-09-29T02:28:33.6367655Z Site: smartsk-backend-container stopped.

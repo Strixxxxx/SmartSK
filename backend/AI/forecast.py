@@ -171,7 +171,8 @@ def main():
 
     try:
         logger.info("Starting forecast generation process...")
-        raw_df = get_database_data()
+        raw_data = get_raw_data_from_db()
+        raw_df = pd.DataFrame(raw_data)
         df = process_db_data(raw_df)
         df.rename(columns={'committee': 'Committee', 'category': 'Category'}, inplace=True)
 

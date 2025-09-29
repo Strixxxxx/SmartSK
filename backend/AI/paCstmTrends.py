@@ -173,7 +173,7 @@ def main(custom_category, other_category, forecast_year):
                 search_category = other_category
 
         # 1. Fetch Primary Data (Database)
-        data = get_raw_data_from_db(category_filter=db_category_filter)
+        data = get_raw_data_from_db(category=db_category_filter)
         primary_data = pd.DataFrame(data) if data else pd.DataFrame()
 
         # 2. Fetch Secondary Data (Internet)
