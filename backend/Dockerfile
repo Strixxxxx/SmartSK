@@ -45,13 +45,14 @@ FROM node:22-bullseye-slim
 
 WORKDIR /app
 
-# Install Python + pip + ODBC runtime libraries
+# Install Python + pip + ODBC runtime libraries + ffmpeg
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     unixodbc \
     curl \
     gnupg2 \
+    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Microsoft ODBC Driver 17 for SQL Server (runtime)

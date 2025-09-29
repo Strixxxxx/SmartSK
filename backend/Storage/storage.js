@@ -5,7 +5,8 @@ const path = require('path');
 // --- Azure Storage Configuration with Fallback ---
 
 const storageName = process.env.STORAGE_NAME;
-const containerName = process.env.DOCS_CONTAINER;
+const imageContainerName = process.env.IMAGE_CONTAINER;
+const videoContainerName = process.env.VIDEO_CONTAINER;
 
 // Primary credentials
 const primaryConnectionString = process.env.STORAGE_CONNECTION_STRING_1;
@@ -21,8 +22,8 @@ const connectionString = useSecondary ? secondaryConnectionString : primaryConne
 const key = useSecondary ? secondaryKey : primaryKey;
 
 // Validate that at least one set of credentials and essential info are present
-if (!storageName || !containerName || !connectionString || !key) {
-    throw new Error('Azure Storage environment variables are not sufficiently configured. Please check STORAGE_NAME, DOCS_CONTAINER, and at least one set of connection strings/keys.');
+if (!storageName || !imageContainerName || !videoContainerName || !connectionString || !key) {
+    throw new Error('Azure Storage environment variables are not sufficiently configured. Please check STORAGE_NAME, IMAGE_CONTAINER, VIDEO_CONTAINER, and at least one set of connection strings/keys.');
 }
 
 console.log(`Initializing Azure Storage with ${useSecondary ? 'secondary' : 'primary'} credentials.`);
@@ -38,6 +39,7 @@ const sharedKeyCredential = new StorageSharedKeyCredential(storageName, key);
  * @returns {Promise<string>} The name of the uploaded blob.
  */
 async function uploadFile(file) {
+    const containerName = file.mimetype.startsWith('image') ? imageContainerName : videoContainerName;
     const containerClient = blobServiceClient.getContainerClient(containerName);
     await containerClient.createIfNotExists();
 
@@ -53,9 +55,11 @@ async function uploadFile(file) {
 /**
  * Generates a temporary SAS URL for a blob.
  * @param {string} blobName - The name of the blob to generate a URL for.
+ * @param {string} fileType - The MIME type of the file.
  * @returns {Promise<string>} A temporary SAS URL for the blob.
  */
-async function getFileSasUrl(blobName) {
+async function getFileSasUrl(blobName, fileType) {
+    const containerName = fileType.startsWith('image') ? imageContainerName : videoContainerName;
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const blobClient = containerClient.getBlobClient(blobName);
 

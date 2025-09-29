@@ -1,38 +1,46 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
+import CreatePostModal from './CreatePostModal';
+import ProjectList from '../../Portfolio/ProjectList';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+    const { user } = useAuth();
+    const navigate = useNavigate();
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [refreshFeed, setRefreshFeed] = useState(false);
 
-  useEffect(() => {
-    // Check if user is logged in
-    if (!user) {
-      navigate('/login', { replace: true });
-    }
-  }, [user, navigate]);
+    useEffect(() => {
+        if (!user) {
+            navigate('/login', { replace: true });
+        }
+    }, [user, navigate]);
 
-  return (
-    <div className="dashboard-content">
-      <h2>Welcome to Smart SK Dashboard</h2>
-      <div className="dashboard-cards">
-        <div className="dashboard-card">
-          <h3>Projects</h3>
-          <p>View and manage your projects</p>
+    const handlePostCreated = () => {
+        setRefreshFeed(prev => !prev); // Toggle refresh state to trigger re-fetch in ProjectList
+    };
+
+    return (
+        <div className="dashboard-content">
+            <div className="dashboard-header">
+                <h2>Welcome to Smart SK Dashboard</h2>
+                <button onClick={() => setIsModalOpen(true)} className="create-post-btn">Create Post</button>
+            </div>
+
+            {isModalOpen && (
+                <CreatePostModal
+                    onClose={() => setIsModalOpen(false)}
+                    onPostCreated={handlePostCreated}
+                />
+            )}
+
+            <div className="dashboard-main-content">
+                <h3>Recent Project Posts</h3>
+                <ProjectList key={refreshFeed ? 'refresh' : 'initial'} />
+            </div>
         </div>
-        <div className="dashboard-card">
-          <h3>Tasks</h3>
-          <p>Track your assigned tasks</p>
-        </div>
-        <div className="dashboard-card">
-          <h3>Reports</h3>
-          <p>Generate and view reports</p>
-        </div>
-      </div>
-    </div>
-  );
+    );
 };
 
 export default Dashboard;

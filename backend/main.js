@@ -40,6 +40,8 @@ const archiveRouter = require('./Admin/archive');
 const accArchiveRouter = require('./Admin/accArchive');
 const projArchiveRouter = require('./Admin/projArchive');
 const projListRouter = require('./Admin/projList');
+const postPublicRouter = require('./Posting/postPublic');
+const protectedPostRouter = require('./Posting/post');
 
 // Import the new PyBridge modules with error handling
 let PyBridgeFC, PyBridgePA;
@@ -111,6 +113,8 @@ app.get('/api/health', (req, res) => {
   res.status(200).send('OK');
 });
 
+app.use('/api/posts', postPublicRouter);
+
 // --- AUTHENTICATION MIDDLEWARE ---
 // All routes defined after this point will be protected by the authMiddleware.
 if (authMiddleware && typeof authMiddleware === 'function') {
@@ -175,6 +179,12 @@ if (projListRouter && typeof projListRouter === 'function') {
   adminRouter.use('/', projListRouter);
 } else {
   console.error('projListRouter is not a valid middleware function');
+}
+
+if (postRouter && typeof postRouter === 'function') {
+    app.use('/api/posts', postRouter);
+} else {
+    console.error('postRouter is not a valid middleware function');
 }
 
 // Mount the consolidated admin router to the app.
