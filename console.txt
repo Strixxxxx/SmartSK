@@ -1,53 +1,15 @@
 --Frontend (Browser's Console)
 
-Creating custom forecast request with params: {selectedCategory: 'Others', selectedYear: '', otherCategory: 'youth pota'}otherCategory: "youth pota"selectedCategory: "Others"selectedYear: ""[[Prototype]]: Object
-index-BBiO0C9F.js:78  GET https://smartsk-backend-container.azurewebsites.net/api/custom-project-trends?customCategory=Others&otherCategory=youth+pota&_t=1759126836035 500 (Internal Server Error)
-(anonymous) @ index-BBiO0C9F.js:78
-xhr @ index-BBiO0C9F.js:78
-dS @ index-BBiO0C9F.js:80
-Promise.then
-_request @ index-BBiO0C9F.js:81
-request @ index-BBiO0C9F.js:80
-ci.<computed> @ index-BBiO0C9F.js:81
-(anonymous) @ index-BBiO0C9F.js:76
-z @ index-BBiO0C9F.js:885
-q @ index-BBiO0C9F.js:885
-s1 @ index-BBiO0C9F.js:48
-(anonymous) @ index-BBiO0C9F.js:48
-fb @ index-BBiO0C9F.js:48
-km @ index-BBiO0C9F.js:48
-Hm @ index-BBiO0C9F.js:49
-_N @ index-BBiO0C9F.js:49Understand this error
-index-BBiO0C9F.js:81 Server error: 500 {error: true, message: "Failed to generate custom project trends analysis:…ModuleNotFoundError: No module named 'profanity'\n"}error: truemessage: "Failed to generate custom project trends analysis: Python process failed with code 1: Traceback (most recent call last):\n  File \"/app/AI/paCstmTrends.py\", line 12, in <module>\n    from profanity import profanity\nModuleNotFoundError: No module named 'profanity'\n"[[Prototype]]: Object
-(anonymous) @ index-BBiO0C9F.js:81
-Promise.then
-_request @ index-BBiO0C9F.js:81
-request @ index-BBiO0C9F.js:80
-ci.<computed> @ index-BBiO0C9F.js:81
-(anonymous) @ index-BBiO0C9F.js:76
-z @ index-BBiO0C9F.js:885
-q @ index-BBiO0C9F.js:885
-s1 @ index-BBiO0C9F.js:48
-(anonymous) @ index-BBiO0C9F.js:48
-fb @ index-BBiO0C9F.js:48
-km @ index-BBiO0C9F.js:48
-Hm @ index-BBiO0C9F.js:49
-_N @ index-BBiO0C9F.js:49Understand this error
-index-BBiO0C9F.js:885 API fetch error: Be {message: 'Request failed with status code 500', name: 'AxiosError', code: 'ERR_BAD_RESPONSE', config: {…}, request: XMLHttpRequest, …}code: "ERR_BAD_RESPONSE"config: {transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}message: "Request failed with status code 500"name: "AxiosError"request: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}response: {data: {…}, status: 500, statusText: '', headers: qn, config: {…}, …}status: 500stack: "AxiosError: Request failed with status code 500\n    at ZC (https://smartsk.app/assets/index-BBiO0C9F.js:78:1088)\n    at XMLHttpRequest._ (https://smartsk.app/assets/index-BBiO0C9F.js:78:5742)\n    at ci.request (https://smartsk.app/assets/index-BBiO0C9F.js:80:2068)\n    at async z (https://smartsk.app/assets/index-BBiO0C9F.js:885:36855)"[[Prototype]]: Error
-z @ index-BBiO0C9F.js:885
-await in z
-q @ index-BBiO0C9F.js:885
-s1 @ index-BBiO0C9F.js:48
-(anonymous) @ index-BBiO0C9F.js:48
-fb @ index-BBiO0C9F.js:48
-km @ index-BBiO0C9F.js:48
-Hm @ index-BBiO0C9F.js:49
-_N @ index-BBiO0C9F.js:49Understand this error
+Failed to load resource: the server responded with a status of 500 ()Understand this error
+index-Cm8CaO6j.js:81 Server error: 500 {error: true, message: "Failed to generate custom project trends analysis:…ModuleNotFoundError: No module named 'profanity'\n"}error: truemessage: "Failed to generate custom project trends analysis: Python process failed with code 1: Traceback (most recent call last):\n  File \"/app/AI/paCstmTrends.py\", line 12, in <module>\n    from profanity import profanity\nModuleNotFoundError: No module named 'profanity'\n"[[Prototype]]: Object
+(anonymous) @ index-Cm8CaO6j.js:81Understand this error
+index-Cm8CaO6j.js:885 API fetch error: Be {message: 'Request failed with status code 500', name: 'AxiosError', code: 'ERR_BAD_RESPONSE', config: {…}, request: XMLHttpRequest, …}code: "ERR_BAD_RESPONSE"config: {transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}message: "Request failed with status code 500"name: "AxiosError"request: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}response: {data: {…}, status: 500, statusText: '', headers: qn, config: {…}, …}status: 500stack: "AxiosError: Request failed with status code 500\n    at ZC (https://smartsk.app/assets/index-Cm8CaO6j.js:78:1088)\n    at XMLHttpRequest._ (https://smartsk.app/assets/index-Cm8CaO6j.js:78:5742)\n    at ci.request (https://smartsk.app/assets/index-Cm8CaO6j.js:80:2068)\n    at async z (https://smartsk.app/assets/index-Cm8CaO6j.js:885:36855)"[[Prototype]]: Error
+z @ index-Cm8CaO6j.js:885Understand this error
 
 --Backend(Azure Portal's Log Stream)
 
 Connected!
-2025-09-29T06:21:22  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/28/2025 16:25:25/home/LogFiles/kudu/trace/03349c9f5437-f1350356-0aa3-49ec-a1cf-0fda6745b036.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03349c9f5437-f1350356-0aa3-49ec-a1cf-0fda6745b036.txt)
+2025-09-29T06:49:38  Welcome, you are now connected to log-streaming service.Starting Log Tail -n 10 of existing logs ----/home/LogFiles/__lastCheckTime.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/__lastCheckTime.txt)09/28/2025 16:25:25/home/LogFiles/kudu/trace/03349c9f5437-f1350356-0aa3-49ec-a1cf-0fda6745b036.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/03349c9f5437-f1350356-0aa3-49ec-a1cf-0fda6745b036.txt)
 2025-09-29T06:11:25  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 771,1,5, SCM_DO_BUILD_DURING_DEPLOYMENT: false, ScmType: None, SCM_DISABLE_NODE_MODULES_COMPRESSION: true/home/LogFiles/kudu/trace/0e52acce53b3-7d6a1366-f062-4b56-833c-a87d6608c7fe.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/0e52acce53b3-7d6a1366-f062-4b56-833c-a87d6608c7fe.txt)
 2025-09-28T16:29:18  Startup Request, url: /, method: GET, type: request, pid: 778,1,15, SCM_DO_BUILD_DURING_DEPLOYMENT: false, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, ScmType: None/home/LogFiles/kudu/trace/105c6bcec63a-a87b3240-4cd1-413d-ac18-f3b5b77f9d47.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/105c6bcec63a-a87b3240-4cd1-413d-ac18-f3b5b77f9d47.txt)
 2025-09-29T03:24:00  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 772,1,18, ScmType: None, SCM_DO_BUILD_DURING_DEPLOYMENT: false, SCM_DISABLE_NODE_MODULES_COMPRESSION: true/home/LogFiles/kudu/trace/15946ce7568e-5ddefc41-a1e0-4fd6-a582-4e611bba343f.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/15946ce7568e-5ddefc41-a1e0-4fd6-a582-4e611bba343f.txt)
@@ -55,8 +17,10 @@ Connected!
 2025-09-29T05:21:33  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 770,1,7, ScmType: None, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: false/home/LogFiles/kudu/trace/276b5fcc073e-be78965b-f70d-435a-88e8-ca382d182167.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/276b5fcc073e-be78965b-f70d-435a-88e8-ca382d182167.txt)
 2025-09-28T16:09:58  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 770,1,5, ScmType: None, SCM_DO_BUILD_DURING_DEPLOYMENT: false, SCM_DISABLE_NODE_MODULES_COMPRESSION: true/home/LogFiles/kudu/trace/33acef28a07f-67225933-fcb0-44c0-843a-889df941eeac.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/33acef28a07f-67225933-fcb0-44c0-843a-889df941eeac.txt)
 2025-09-29T06:10:07  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 776,1,15, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: false, ScmType: None/home/LogFiles/kudu/trace/593bb671125e-3b1c0232-a12b-429a-b278-5a959f80e76d.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/593bb671125e-3b1c0232-a12b-429a-b278-5a959f80e76d.txt)
-2025-09-29T05:39:55  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 774,1,36, SCM_DO_BUILD_DURING_DEPLOYMENT: false, ScmType: None, SCM_DISABLE_NODE_MODULES_COMPRESSION: true/home/LogFiles/kudu/trace/94ca4881ffe8-be344f30-e39d-4a14-bc0c-90e69ee4fa21.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/94ca4881ffe8-be344f30-e39d-4a14-bc0c-90e69ee4fa21.txt)
-2025-09-29T05:54:32  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 770,1,15, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: false, ScmType: None/home/LogFiles/kudu/trace/a0270709684f-89ec93de-c433-49ed-a5d5-f3f2e5e36aeb.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a0270709684f-89ec93de-c433-49ed-a5d5-f3f2e5e36aeb.txt)
+2025-09-29T05:39:55  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 774,1,36, SCM_DO_BUILD_DURING_DEPLOYMENT: false, ScmType: None, SCM_DISABLE_NODE_MODULES_COMPRESSION: true/home/LogFiles/kudu/trace/728356fb257b-02a177ad-c620-4b32-8b04-46e584db16e5.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/728356fb257b-02a177ad-c620-4b32-8b04-46e584db16e5.txt)
+2025-09-29T06:39:28  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 770,1,5, ScmType: None, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: false/home/LogFiles/kudu/trace/94ca4881ffe8-be344f30-e39d-4a14-bc0c-90e69ee4fa21.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/94ca4881ffe8-be344f30-e39d-4a14-bc0c-90e69ee4fa21.txt)
+2025-09-29T05:54:32  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 770,1,15, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: false, ScmType: None/home/LogFiles/kudu/trace/973deff7f1ec-d36822c9-3307-4f1a-a2ab-77f9c714fb4a.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/973deff7f1ec-d36822c9-3307-4f1a-a2ab-77f9c714fb4a.txt)
+2025-09-29T06:38:34  Startup Request, url: /api/deployments/?$orderby=ReceivedTime%20desc&$top=20&api-version=2022-03-01, method: GET, type: request, pid: 770,1,7, SCM_DO_BUILD_DURING_DEPLOYMENT: false, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, ScmType: None/home/LogFiles/kudu/trace/a0270709684f-89ec93de-c433-49ed-a5d5-f3f2e5e36aeb.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a0270709684f-89ec93de-c433-49ed-a5d5-f3f2e5e36aeb.txt)
 2025-09-29T06:21:22  Startup Request, url: /api/logstream/, method: GET, type: request, pid: 770,1,18, SCM_DO_BUILD_DURING_DEPLOYMENT: false, ScmType: None, SCM_DISABLE_NODE_MODULES_COMPRESSION: true/home/LogFiles/kudu/trace/a4773b305d14-2c8befdc-960b-4566-bfb2-735a1dd4c62b.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/a4773b305d14-2c8befdc-960b-4566-bfb2-735a1dd4c62b.txt)
 2025-09-29T01:48:52  Startup Request, url: /api/logs/docker, method: POST, type: request, pid: 770,1,5, ScmType: None, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, SCM_DO_BUILD_DURING_DEPLOYMENT: false/home/LogFiles/kudu/trace/abdd1d9b7164-f91ce545-8d97-42ec-bf01-719e2ac9b83f.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/abdd1d9b7164-f91ce545-8d97-42ec-bf01-719e2ac9b83f.txt)
 2025-09-29T02:25:42  Startup Request, url: /api/vfs/LogFiles/2025_09_29_lw1sdlwk0006KG_docker.log, method: POST, type: request, pid: 769,1,5, SCM_DISABLE_NODE_MODULES_COMPRESSION: true, ScmType: None, SCM_DO_BUILD_DURING_DEPLOYMENT: false/home/LogFiles/kudu/trace/cc314746e411-6196411d-ca63-4562-82fd-b2c5f9997e0f.txt  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/kudu/trace/cc314746e411-6196411d-ca63-4562-82fd-b2c5f9997e0f.txt)
@@ -84,16 +48,16 @@ Connected!
 2025-09-28T16:30:45.4575499Z Container start method finished after 13877 ms.
 2025-09-28T16:31:17.6866483Z Site startup probe succeeded after 31.845833 seconds.
 2025-09-28T16:31:18.5792766Z Site started./home/LogFiles/2025_09_29_lw1sdlwk0006KG_docker.log  (https://smartsk-backend-container.scm.azurewebsites.net/api/vfs/LogFiles/2025_09_29_lw1sdlwk0006KG_docker.log)
-2025-09-29T06:17:58.2942530Z Container start method finished after 33186 ms.
-2025-09-29T06:19:10.8930589Z Site startup probe succeeded after 72.0317999 seconds.
-2025-09-29T06:19:12.1434936Z Site started.
-2025-09-29T06:19:32.8247551Z Container is terminating. Grace period: 5 seconds.
-2025-09-29T06:19:33.0986946Z Stop and delete container. Retry count = 0
-2025-09-29T06:19:33.0991512Z Stopping container: 10a67988b57f_smartsk-backend-container.
-2025-09-29T06:19:38.0688195Z Deleting container: 10a67988b57f_smartsk-backend-container. Retry count = 0
-2025-09-29T06:19:39.0424662Z Container spec TerminationMessagePolicy  path
-2025-09-29T06:19:39.0492582Z Container is terminated. Total time elapsed: 6217 ms.
-2025-09-29T06:19:39.0508335Z Site: smartsk-backend-container stopped.Ending Log Tail of existing logs ---Starting Live Log Stream ---
+2025-09-29T06:41:00.6256776Z Successfully opened named pipe: /podr/container/pipe/fa0d892542c0_smartsk-backend-container/stderr_9147a2b2f68049beaf37241a0f24443e.
+2025-09-29T06:41:00.6266329Z Successfully removed non-blocking flag from /podr/container/pipe/fa0d892542c0_smartsk-backend-container/stderr_9147a2b2f68049beaf37241a0f24443e.
+2025-09-29T06:41:00.6271158Z Creating container with image: smartskregistry.azurecr.io/smartsk-backend:586ef3eaac04ceb980eb587c9369d4a3418b68c6 from registry: smartskregistry.azurecr.io and fully qualified image name: smartskregistry.azurecr.io/smartsk-backend:586ef3eaac04ceb980eb587c9369d4a3418b68c6
+2025-09-29T06:41:01.7087066Z Starting container: fa0d892542c0_smartsk-backend-container.
+2025-09-29T06:41:01.9533090Z Starting watchers and probes.
+2025-09-29T06:41:01.9807614Z Starting metrics collection.
+2025-09-29T06:41:01.9902881Z Container is running.
+2025-09-29T06:41:02.2243682Z Container start method finished after 61458 ms.
+2025-09-29T06:41:14.7757703Z Site startup probe succeeded after 12.226442 seconds.
+2025-09-29T06:41:15.0453480Z Site started.Ending Log Tail of existing logs ---Starting Live Log Stream ---
 
 --Development Logs
 
@@ -758,3 +722,46 @@ Connected!
 2025-09-29T06:19:39.0424662Z Container spec TerminationMessagePolicy path
 2025-09-29T06:19:39.0492582Z Container is terminated. Total time elapsed: 6217 ms.
 2025-09-29T06:19:39.0508335Z Site: smartsk-backend-container stopped.
+2025-09-29T06:34:26.4906951Z Site: smartsk-backend-container stopped.
+2025-09-29T06:34:56.8472955Z Container is terminating. Grace period: 5 seconds.
+2025-09-29T06:34:56.8654056Z Stop and delete container. Retry count = 0
+2025-09-29T06:34:56.8665539Z Stopping container: 4b11ce5d76db_smartsk-backend-container.
+2025-09-29T06:35:03.7751817Z Deleting container: 4b11ce5d76db_smartsk-backend-container. Retry count = 0
+2025-09-29T06:35:04.8129428Z Container spec TerminationMessagePolicy path
+2025-09-29T06:35:04.8139650Z Container is terminated. Total time elapsed: 7966 ms.
+2025-09-29T06:35:04.8211960Z Site: smartsk-backend-container stopped.
+2025-09-29T06:40:00.7659224Z Container start method called.
+2025-09-29T06:40:00.7666967Z Establishing network.
+2025-09-29T06:40:00.7669700Z Pulling image: smartskregistry.azurecr.io/smartsk-backend:586ef3eaac04ceb980eb587c9369d4a3418b68c6.
+2025-09-29T06:40:57.9920905Z Image smartskregistry.azurecr.io/smartsk-backend:586ef3eaac04ceb980eb587c9369d4a3418b68c6 is pulled from registry smartskregistry.azurecr.io
+2025-09-29T06:40:58.0027971Z Container is starting.
+2025-09-29T06:40:58.0118297Z Establishing user namespace if not established already.
+2025-09-29T06:40:58.0121266Z Establishing network if not established already.
+2025-09-29T06:40:58.0123272Z Mounting volumes.
+2025-09-29T06:40:58.0134830Z Nested mountpoint volatile/logs
+2025-09-29T06:40:58.0433111Z Nested mountpoint
+2025-09-29T06:40:58.1625726Z Nested mountpoint
+2025-09-29T06:40:58.1829397Z Nested mountpoint
+2025-09-29T06:40:58.1845591Z Nested mountpoint
+2025-09-29T06:40:58.5540053Z Nested mountpoint
+2025-09-29T06:40:58.6823843Z Nested mountpoint
+2025-09-29T06:41:00.5462679Z Creating container.
+2025-09-29T06:41:00.5465565Z Creating pipes for streaming container io.
+2025-09-29T06:41:00.5666080Z Creating stdout named pipe at /podr/container/pipe/fa0d892542c0_smartsk-backend-container/stdout_57e4a52494e6428585e36f4919f7ba9a.
+2025-09-29T06:41:00.5753377Z Successfully created stdout named pipe at: /podr/container/pipe/fa0d892542c0_smartsk-backend-container/stdout_57e4a52494e6428585e36f4919f7ba9a.
+2025-09-29T06:41:00.5767875Z Opening named pipe /podr/container/pipe/fa0d892542c0_smartsk-backend-container/stdout_57e4a52494e6428585e36f4919f7ba9a for reading in non-blocking mode.
+2025-09-29T06:41:00.6064335Z Successfully opened named pipe: /podr/container/pipe/fa0d892542c0_smartsk-backend-container/stdout_57e4a52494e6428585e36f4919f7ba9a.
+2025-09-29T06:41:00.6070768Z Successfully removed non-blocking flag from /podr/container/pipe/fa0d892542c0_smartsk-backend-container/stdout_57e4a52494e6428585e36f4919f7ba9a.
+2025-09-29T06:41:00.6151506Z Creating stderr named pipe at /podr/container/pipe/fa0d892542c0_smartsk-backend-container/stderr_9147a2b2f68049beaf37241a0f24443e.
+2025-09-29T06:41:00.6157680Z Successfully created stderr named pipe at: /podr/container/pipe/fa0d892542c0_smartsk-backend-container/stderr_9147a2b2f68049beaf37241a0f24443e.
+2025-09-29T06:41:00.6249826Z Opening named pipe /podr/container/pipe/fa0d892542c0_smartsk-backend-container/stderr_9147a2b2f68049beaf37241a0f24443e for reading in non-blocking mode.
+2025-09-29T06:41:00.6256776Z Successfully opened named pipe: /podr/container/pipe/fa0d892542c0_smartsk-backend-container/stderr_9147a2b2f68049beaf37241a0f24443e.
+2025-09-29T06:41:00.6266329Z Successfully removed non-blocking flag from /podr/container/pipe/fa0d892542c0_smartsk-backend-container/stderr_9147a2b2f68049beaf37241a0f24443e.
+2025-09-29T06:41:00.6271158Z Creating container with image: smartskregistry.azurecr.io/smartsk-backend:586ef3eaac04ceb980eb587c9369d4a3418b68c6 from registry: smartskregistry.azurecr.io and fully qualified image name: smartskregistry.azurecr.io/smartsk-backend:586ef3eaac04ceb980eb587c9369d4a3418b68c6
+2025-09-29T06:41:01.7087066Z Starting container: fa0d892542c0_smartsk-backend-container.
+2025-09-29T06:41:01.9533090Z Starting watchers and probes.
+2025-09-29T06:41:01.9807614Z Starting metrics collection.
+2025-09-29T06:41:01.9902881Z Container is running.
+2025-09-29T06:41:02.2243682Z Container start method finished after 61458 ms.
+2025-09-29T06:41:14.7757703Z Site startup probe succeeded after 12.226442 seconds.
+2025-09-29T06:41:15.0453480Z Site started.

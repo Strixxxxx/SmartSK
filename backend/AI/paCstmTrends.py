@@ -9,7 +9,7 @@ import re
 import requests
 import logging
 from db_utils import get_raw_data_from_db
-from profanity import profanity
+from better_profanity import profanity
 
 # ==============================================================================
 # Configuration

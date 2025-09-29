@@ -56,7 +56,7 @@ jobs:
           az webapp config container set \
             --name smartsk-backend-container \
             --resource-group Smart_SK \
-            --docker-custom-image-name smartskregistry.azurecr.io/smartsk-backend:$GIT_SHA \
+            --docker-custom-image-name smartskregistry.azurecr.io/smartsk-backend:latest \
             --enable-app-service-storage false
 
       - name: Restart Azure Web App
