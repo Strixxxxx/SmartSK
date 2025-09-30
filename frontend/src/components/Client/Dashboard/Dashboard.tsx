@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import CreatePostModal from './CreatePostModal';
-import ProjectList from '../../Portfolio/ProjectList';
+import DashboardFeed from './DashboardFeed';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -18,7 +18,7 @@ const Dashboard: React.FC = () => {
     }, [user, navigate]);
 
     const handlePostCreated = () => {
-        setRefreshFeed(prev => !prev); // Toggle refresh state to trigger re-fetch in ProjectList
+        setRefreshFeed(prev => !prev); // Toggle refresh state to trigger re-fetch in DashboardFeed
     };
 
     return (
@@ -37,7 +37,7 @@ const Dashboard: React.FC = () => {
 
             <div className="dashboard-main-content">
                 <h3>Recent Project Posts</h3>
-                <ProjectList key={refreshFeed ? 'refresh' : 'initial'} />
+                <DashboardFeed refreshFeed={refreshFeed} />
             </div>
         </div>
     );
