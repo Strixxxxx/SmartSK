@@ -181,8 +181,8 @@ if (projListRouter && typeof projListRouter === 'function') {
   console.error('projListRouter is not a valid middleware function');
 }
 
-if (postRouter && typeof postRouter === 'function') {
-    app.use('/api/posts', postRouter);
+if (protectedPostRouter && typeof protectedPostRouter === 'function') {
+    app.use('/api/posts', protectedPostRouter);
 } else {
     console.error('postRouter is not a valid middleware function');
 }
