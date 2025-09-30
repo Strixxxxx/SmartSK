@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AxiosProgressEvent } from 'axios';
@@ -26,6 +25,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
         if (files) {
+            // Clear old previews
+            previews.forEach(preview => URL.revokeObjectURL(preview));
+            
             const newPreviews = Array.from(files).map(file => URL.createObjectURL(file));
             setPreviews(newPreviews);
         }
@@ -52,10 +54,16 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
                     'Content-Type': 'multipart/form-data'
                 },
                 onUploadProgress: (progressEvent: AxiosProgressEvent) => {
-                    const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total ?? 0));
+                    const percentCompleted = Math.round(
+                        (progressEvent.loaded * 100) / (progressEvent.total ?? 1)
+                    );
                     setUploadProgress(percentCompleted);
                 }
             });
+            
+            // Clean up previews
+            previews.forEach(preview => URL.revokeObjectURL(preview));
+            
             onPostCreated();
             onClose();
         } catch (err: any) {
@@ -65,27 +73,40 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
         }
     };
 
+    const handleClose = () => {
+        // Clean up previews on close
+        previews.forEach(preview => URL.revokeObjectURL(preview));
+        onClose();
+    };
+
     return (
-        <div className="modal-overlay">
-            <div className="modal-content">
+        <div className="modal-overlay" onClick={handleClose}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2>Create New Post</h2>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="form-group">
                         <label htmlFor="title">Title</label>
                         <input
+                            type="text"
                             id="title"
+                            placeholder="Enter your post title..."
                             {...register('title', { required: 'Title is required' })}
+                            disabled={isSubmitting}
                         />
                         {errors.title && <p className="error-message">{errors.title.message}</p>}
                     </div>
+
                     <div className="form-group">
                         <label htmlFor="description">Description</label>
                         <textarea
                             id="description"
+                            placeholder="Share your thoughts..."
                             {...register('description', { required: 'Description is required' })}
+                            disabled={isSubmitting}
                         />
                         {errors.description && <p className="error-message">{errors.description.message}</p>}
                     </div>
+
                     <div className="form-group">
                         <label htmlFor="attachments">Attachments (Images/Videos)</label>
                         <input
@@ -95,21 +116,30 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
                             accept="image/jpeg,image/png,image/jpg,video/mp4"
                             {...register('attachments')}
                             onChange={handleFileChange}
+                            disabled={isSubmitting}
                         />
                     </div>
-                    <div className="previews">
-                        {previews.map((preview, index) => (
-                            <img key={index} src={preview} alt="Preview" className="preview-image" />
-                        ))}
-                    </div>
-                    {isSubmitting && (
+
+                    {previews.length > 0 && (
+                        <div className="previews">
+                            {previews.map((preview, index) => (
+                                <img key={index} src={preview} alt={`Preview ${index + 1}`} className="preview-image" />
+                            ))}
+                        </div>
+                    )}
+
+                    {isSubmitting && uploadProgress > 0 && (
                         <div className="progress-bar-container">
                             <div className="progress-bar" style={{ width: `${uploadProgress}%` }}></div>
                         </div>
                     )}
+
                     {error && <p className="error-message">{error}</p>}
+
                     <div className="form-actions">
-                        <button type="button" onClick={onClose} disabled={isSubmitting}>Cancel</button>
+                        <button type="button" onClick={handleClose} disabled={isSubmitting}>
+                            Cancel
+                        </button>
                         <button type="submit" disabled={isSubmitting}>
                             {isSubmitting ? `Uploading ${uploadProgress}%` : 'Create Post'}
                         </button>
