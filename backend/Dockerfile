@@ -76,4 +76,4 @@ COPY . .
 EXPOSE 8080
 
 # Simplified CMD - remove debug commands that might be causing crashes
-CMD node --trace-warnings main.js
+CMD ["/bin/sh", "-c", "node --trace-warnings main.js 2>&1"]

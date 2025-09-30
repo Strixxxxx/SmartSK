@@ -27,7 +27,7 @@ const style = {
   width: 'auto',
   bgcolor: 'background.paper',
   boxShadow: 24,
-  p: 5,
+  p:20,
   borderRadius: 2,
   zIndex: 1300,
 };
