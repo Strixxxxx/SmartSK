@@ -11,7 +11,7 @@ const AdminGuard: React.FC = () => {
 
   // If user is not authenticated, redirect to login
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   // Check if user is admin by position or role

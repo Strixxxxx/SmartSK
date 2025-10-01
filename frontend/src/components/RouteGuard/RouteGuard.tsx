@@ -16,7 +16,7 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ requiredRole }) => {
 
   // If user is not authenticated, redirect to login
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   // If a specific role is required and user doesn't have it, check position
