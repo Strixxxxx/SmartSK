@@ -7,7 +7,7 @@ const { sendAccountCreationEmail } = require('../Email/email');
 const { addAuditTrail } = require('../audit/auditService');
 
 // Get all users
-router.get('/users', authMiddleware, async (req, res) => {
+router.get('/', authMiddleware, async (req, res) => {
   try {
     // Check if user has MA or SA position
     if (req.user.position !== 'MA' && req.user.position !== 'SA') {

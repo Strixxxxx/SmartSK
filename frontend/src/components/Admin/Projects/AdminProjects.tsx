@@ -40,7 +40,7 @@ const AdminProjects: React.FC = () => {
     const fetchProjects = async () => {
       setLoading(true);
       try {
-        const response = await axiosInstance.get('/api/admin/projects');
+        const response = await axiosInstance.get('/api/admin/project-list');
         if (response.data.success) {
           setProjects(response.data.projects);
         } else {
@@ -87,7 +87,7 @@ const AdminProjects: React.FC = () => {
 
     setFileLoading(project.projectID);
     try {
-        const response = await axiosInstance.get(`/api/admin/projects/file-url/${project.projectID}`);
+        const response = await axiosInstance.get(`/api/admin/project-list/file-url/${project.projectID}`);
         if (response.data.success && response.data.url) {
             openFileViewer(response.data.url, project.fileName);
         } else {
@@ -109,7 +109,7 @@ const AdminProjects: React.FC = () => {
 
     setFileLoading(project.projectID);
     try {
-        const response = await axiosInstance.get(`/api/admin/projects/file-url/${project.projectID}`);
+        const response = await axiosInstance.get(`/api/admin/project-list/file-url/${project.projectID}`);
         if (response.data.success && response.data.url) {
             const link = document.createElement('a');
             link.href = response.data.url;

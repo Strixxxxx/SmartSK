@@ -70,7 +70,7 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get('/api/admin/users'); // Changed from fetch to axiosInstance
+      const response = await axiosInstance.get('/api/admin/user-list'); // Changed from fetch to axiosInstance
 
       if (response.data.success) {
         setUsers(response.data.users);
@@ -157,7 +157,7 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
     try {
       const defaultPassword = `${formData.username}.SmartSK2025`;
 
-      const response = await axiosInstance.post('/api/admin/create-account', { // Changed from fetch to axiosInstance
+      const response = await axiosInstance.post('/api/admin/user-list/create-account', { // Changed from fetch to axiosInstance
         username: formData.username,
         fullName: formData.fullName,
         barangay: formData.barangay,

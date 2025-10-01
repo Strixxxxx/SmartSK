@@ -47,7 +47,7 @@ const ProjectList: React.FC = () => {
 
         const fetchPosts = async () => {
             try {
-                const response = await axios.get('/posts');
+                const response = await axios.get('/api/posts');
                 setPosts(response.data);
             } catch (err) {
                 setError('Failed to fetch posts.');

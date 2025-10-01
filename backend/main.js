@@ -146,7 +146,7 @@ if (routeGuard.isAdmin && typeof routeGuard.isAdmin === 'function') {
 // Mount the specific admin routers onto the main admin router.
 if (accountCreationRouter && typeof accountCreationRouter === 'function') {
   // Changed from '/accounts' to '/' to match frontend path /api/admin/users
-  adminRouter.use('/', accountCreationRouter);
+  adminRouter.use('/user-list', accountCreationRouter);
 } else {
   console.error('accountCreationRouter is not a valid middleware function');
 }
@@ -175,14 +175,20 @@ if (projArchiveRouter && typeof projArchiveRouter === 'function') {
   console.error('projArchiveRouter is not a valid middleware function');
 }
 
+if (accArchiveRouter && typeof accArchiveRouter === 'function') {
+  adminRouter.use('/acc-archive', accArchiveRouter);
+} else {
+  console.error('accArchiveRouter is not a valid middleware function');
+}
+
 if (projListRouter && typeof projListRouter === 'function') {
-  adminRouter.use('/', projListRouter);
+  adminRouter.use('/project-list', projListRouter);
 } else {
   console.error('projListRouter is not a valid middleware function');
 }
 
 if (protectedPostRouter && typeof protectedPostRouter === 'function') {
-    app.use('/api/posts', protectedPostRouter);
+    app.use('/api', protectedPostRouter);
 } else {
     console.error('postRouter is not a valid middleware function');
 }

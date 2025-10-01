@@ -32,7 +32,7 @@ const getPHTimestamp = () => {
 };
 
 // POST /api/posts - Create a New Post
-router.post('/', authMiddleware, checkRole(['SKC', 'SKO']), upload.array('attachments'), async (req, res) => {
+router.post('/create-post', authMiddleware, checkRole(['SKC', 'SKO']), upload.array('attachments'), async (req, res) => {
     const { title, description } = req.body;
     const userID = req.user.userId;
 

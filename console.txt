@@ -1,6 +1,35 @@
 --Frontend (Browser's Console)
 
+Content Script Bridge: Sending response back to page context: ObjectisAllowListed: falseisProtectionEnabled: trueisScamsProtectionEnabled: true[[Prototype]]: Object
+injection-tss-mv3.js:1 TSS: Received response from checkDomainAndRun: Object
+smartsk-backend-container.azurewebsites.net/posts:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+index-BXCr4quv.js:81 Client error: 404 <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot GET /posts</pre>
+</body>
+</html>
 
+(anonymous) @ index-BXCr4quv.js:81Understand this error
+index-BXCr4quv.js:81 Upload Progress: 9%
+index-BXCr4quv.js:81 Upload Progress: 100%
+smartsk-backend-container.azurewebsites.net/posts:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
+index-BXCr4quv.js:81 Client error: 404 <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Error</title>
+</head>
+<body>
+<pre>Cannot POST /posts</pre>
+</body>
+</html>
+
+(anonymous) @ index-BXCr4quv.js:81Understand this error
 
 --Backend(Azure Portal's Log Stream in Platform)
 

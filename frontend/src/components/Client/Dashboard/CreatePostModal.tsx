@@ -49,7 +49,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
         }
 
         try {
-            await api.post('/posts', formData, {
+            await api.post('/api/create-post', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 },
