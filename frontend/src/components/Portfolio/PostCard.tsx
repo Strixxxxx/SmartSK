@@ -20,6 +20,31 @@ interface PostCardProps {
     onPostClick: (post: Post) => void;
 }
 
+const PostDescription: React.FC<{ description: string; onShowMore: () => void }> = ({ description, onShowMore }) => {
+    const maxLength = 100;
+
+    if (description.length <= maxLength) {
+        return <p className="post-description">{description}</p>;
+    }
+
+    const truncated = description.substring(0, maxLength) + '...';
+
+    return (
+        <p className="post-description">
+            {truncated}
+            <span 
+                className="show-more-link" 
+                onClick={(e) => { 
+                    e.stopPropagation(); 
+                    onShowMore(); 
+                }}
+            >
+                show more...
+            </span>
+        </p>
+    );
+};
+
 const PostCard: React.FC<PostCardProps> = ({ post, onPostClick }) => {
     const { attachments, title, author, description } = post;
     const visibleAttachments = attachments.slice(0, 4);
@@ -46,9 +71,11 @@ const PostCard: React.FC<PostCardProps> = ({ post, onPostClick }) => {
 
     return (
         <div className="post-card" onClick={() => onPostClick(post)}>
-            <h3 className="post-title">{title}</h3>
-            <p className="post-author">By: {author}</p>
-            <p className="post-description">{description}</p>
+            <div className="post-content">
+                <h3 className="post-title">{title}</h3>
+                <p className="post-author">By: {author}</p>
+                <PostDescription description={description} onShowMore={() => onPostClick(post)} />
+            </div>
             
             {visibleAttachments.length > 0 && (
                 <div className="post-images-grid">

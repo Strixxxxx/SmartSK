@@ -1,3 +1,4 @@
+
 .post-card {
     background: white;
     border: 1px solid #e2e8f0;
@@ -6,10 +7,17 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: box-shadow 0.3s ease;
     cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .post-card:hover {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.post-content {
+    flex-grow: 1;
 }
 
 .post-title {
@@ -32,6 +40,19 @@
     color: #333333;
     line-height: 1.5;
     margin: 0 0 16px 0;
+    flex-grow: 1;
+}
+
+.show-more-link {
+    color: grey;
+    cursor: pointer;
+    display: inline-block;
+    margin-left: 4px;
+    font-weight: 500;
+}
+
+.show-more-link:hover {
+    text-decoration: underline;
 }
 
 .post-images-grid {
@@ -40,6 +61,7 @@
     grid-template-rows: repeat(2, 1fr);
     gap: 10px;
     max-height: 400px; /* Or adjust as needed */
+    margin-top: auto; /* Push images to the bottom */
 }
 
 .post-image-wrapper {
