@@ -1,0 +1,233 @@
+.post-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.post-modal-content {
+    background-color: #fff;
+    border-radius: 12px;
+    width: 90vw;
+    max-width: 1400px;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+}
+
+.post-modal-close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.8rem;
+    cursor: pointer;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.post-modal-close-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.post-modal-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    background: #f8f9fa;
+}
+
+.post-modal-image-section {
+    flex: 3;
+    background-color: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    min-height: 400px;
+}
+
+.post-modal-image-section img,
+.post-modal-image-section video {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.post-modal-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.8rem;
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background 0.2s ease;
+    padding: 0;
+    line-height: 1;
+}
+
+.post-modal-nav:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.post-modal-nav.left {
+    left: 15px;
+}
+
+.post-modal-nav.right {
+    right: 15px;
+}
+
+.post-modal-info-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    background: #fff;
+}
+
+.post-modal-header-section {
+    background: linear-gradient(135deg, #646464 0%, #646464 100%);
+    padding: 24px 32px;
+}
+
+.post-modal-title {
+    margin: 0;
+    color: white;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.post-modal-author {
+    margin: 8px 0 0 0;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.post-modal-description-section {
+    background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+    padding: 20px 32px;
+    flex-grow: 1;
+}
+
+.post-modal-description-text {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+.thumbnail-strip {
+    display: flex;
+    gap: 8px;
+    padding: 16px;
+    background: #f5f5f5;
+    border-top: 1px solid #e0e0e0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    flex-shrink: 0;
+}
+
+.thumbnail-strip img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    cursor: pointer;
+    border-radius: 8px;
+    border: 3px solid transparent;
+    transition: border-color 0.2s ease;
+    flex-shrink: 0;
+}
+
+.thumbnail-strip img:hover {
+    border-color: #646464;
+    opacity: 0.8;
+}
+
+.thumbnail-strip img.active {
+    border-color: #646464;
+}
+
+.image-counter {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+    .post-modal-body {
+        flex-direction: column;
+    }
+
+    .post-modal-image-section {
+        flex: 0 0 50%;
+    }
+
+    .post-modal-info-section {
+        flex: 0 0 50%;
+    }
+
+    .post-modal-header-section {
+        padding: 20px 24px;
+    }
+
+    .post-modal-title {
+        font-size: 1.3rem;
+    }
+
+    .post-modal-description-section {
+        padding: 16px 24px;
+    }
+
+    .post-modal-description-text {
+        font-size: 0.85rem;
+    }
+
+    .thumbnail-strip {
+        padding: 12px;
+    }
+
+    .thumbnail-strip img {
+        width: 60px;
+        height: 60px;
+    }
+}

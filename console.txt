@@ -1,35 +1,9 @@
 --Frontend (Browser's Console)
 
-Content Script Bridge: Sending response back to page context: ObjectisAllowListed: falseisProtectionEnabled: trueisScamsProtectionEnabled: true[[Prototype]]: Object
-injection-tss-mv3.js:1 TSS: Received response from checkDomainAndRun: Object
-smartsk-backend-container.azurewebsites.net/posts:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
-index-BXCr4quv.js:81 Client error: 404 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Error</title>
-</head>
-<body>
-<pre>Cannot GET /posts</pre>
-</body>
-</html>
-
-(anonymous) @ index-BXCr4quv.js:81Understand this error
-index-BXCr4quv.js:81 Upload Progress: 9%
-index-BXCr4quv.js:81 Upload Progress: 100%
-smartsk-backend-container.azurewebsites.net/posts:1  Failed to load resource: the server responded with a status of 404 ()Understand this error
-index-BXCr4quv.js:81 Client error: 404 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Error</title>
-</head>
-<body>
-<pre>Cannot POST /posts</pre>
-</body>
-</html>
-
-(anonymous) @ index-BXCr4quv.js:81Understand this error
+Access to XMLHttpRequest at 'https://smartsk-backend-container.azurewebsites.net/api/create-post' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
+axiosConfig.ts:119 Network error - no response received: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 600000, withCredentials: true, upload: XMLHttpRequestUpload, …}onabort: ƒ handleAbort()onerror: ƒ handleError()onload: nullonloadend: ƒ onloadend()onloadstart: nullonprogress: nullonreadystatechange: nullontimeout: ƒ handleTimeout()readyState: 4response: ""responseText: ""responseType: ""responseURL: ""responseXML: nullstatus: 0statusText: ""timeout: 600000upload: XMLHttpRequestUpload {onloadstart: null, onprogress: null, onabort: null, onerror: null, onload: null, …}withCredentials: true[[Prototype]]: XMLHttpRequest
+(anonymous) @ axiosConfig.ts:119Understand this error
+smartsk-backend-container.azurewebsites.net/api/create-post:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
 
 --Backend(Azure Portal's Log Stream in Platform)
 

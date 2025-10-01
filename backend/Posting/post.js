@@ -57,8 +57,8 @@ router.post('/create-post', authMiddleware, checkRole(['SKC', 'SKO']), upload.ar
             .input('postReference', sql.NVarChar, postReference)
             .query(`
                 INSERT INTO posts (userID, title, description, postReference)
+                OUTPUT INSERTED.postID
                 VALUES (@userID, @title, @description, @postReference);
-                SELECT SCOPE_IDENTITY() AS postID;
             `);
 
         const postID = postResult.recordset[0].postID;

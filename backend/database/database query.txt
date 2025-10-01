@@ -163,7 +163,7 @@ CREATE TABLE otpStore (
 
 CREATE TABLE posts (
 postID INT PRIMARY KEY IDENTITY (1 , 1),
-postReference INT NOT NULL,
+postReference NVARCHAR(16) NOT NULL,
 userID INT NOT NULL,
 title NVARCHAR(255) NOT NULL,
 description NVARCHAR(MAX) NOT NULL,

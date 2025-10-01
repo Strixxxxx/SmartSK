@@ -1,23 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../backend connection/axiosConfig';
-import PostCard from './PostCard';
+import PostCard, { Post } from './PostCard';
 import Portal from '../Portal/portal';
 import Login from '../Login/Login';
+import PostModal from './PostModal'; // Import the modal component
 import './ProjectList.css';
-
-interface Attachment {
-    attachmentID: number;
-    fileType: string;
-    filePath: string;
-}
-
-interface Post {
-    postID: number;
-    title: string;
-    description: string;
-    author: string;
-    attachments: Attachment[];
-}
 
 const ProjectList: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -26,6 +13,9 @@ const ProjectList: React.FC = () => {
     const [isPortalOpen, setIsPortalOpen] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [selectedBarangay, setSelectedBarangay] = useState('');
+
+    const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const createParticles = () => {
@@ -65,6 +55,16 @@ const ProjectList: React.FC = () => {
         setIsLoginModalOpen(true);
     };
 
+    const openModal = (post: Post) => {
+        setSelectedPost(post);
+        setIsModalOpen(true);
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
+        setSelectedPost(null);
+    };
+
     return (
         <>
             <div className="portfolio">
@@ -92,7 +92,7 @@ const ProjectList: React.FC = () => {
                         {loading && <div>Loading...</div>}
                         {error && <div>{error}</div>}
                         {posts.map(post => (
-                            <PostCard key={post.postID} post={post} />
+                            <PostCard key={post.postID} post={post} onPostClick={openModal} />
                         ))}
                     </div>
                 </div>
@@ -113,6 +113,7 @@ const ProjectList: React.FC = () => {
                 onClose={() => setIsLoginModalOpen(false)}
                 barangay={selectedBarangay}
             />
+            <PostModal post={selectedPost} show={isModalOpen} onClose={closeModal} />
         </>
     );
 };

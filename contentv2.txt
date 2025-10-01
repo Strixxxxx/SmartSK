@@ -1,136 +1,182 @@
-Connected!
-2025-10-01T05:17:52.1611746Z Initializing active sessions from database...
-2025-10-01T05:17:53.8657138Z Initializing Azure Storage with primary credentials.
-2025-10-01T05:17:54.5327301Z Server is running on port 8080
-2025-10-01T05:17:57.4676856Z Initialized active sessions.
-2025-10-01T05:17:58.4055648Z Startup : 05.17.58.306457
-2025-10-01T05:17:58.5853692Z Configure Services : 05.17.58.575234
-2025-10-01T05:18:00.7895772Z Configure : 05.18.00.780372
-2025-10-01T05:18:03.5954018Z Setting Up Routes : 05.18.03.594950
-2025-10-01T05:18:04.9583045Z Exiting Configure : 05.18.04.907223
-2025-10-01T05:18:06.5696352Z Hosting environment: Production
-2025-10-01T05:18:06.5704142Z Content root path: /opt/Kudu
-2025-10-01T05:18:06.570711Z Now listening on: http://0.0.0.0:8181
-2025-10-01T05:18:06.5709928Z Application started. Press Ctrl+C to shut down.
-2025-10-01T05:19:05.6780017Z     __ __          __      __    _ __
-2025-10-01T05:19:05.6788033Z    / //_/_  _ ____/ /_  __/ /   (_) /____
-2025-10-01T05:19:05.6788106Z   / ,< / / / / __  / / / / /   / / __/ _
-2025-10-01T05:19:05.6788127Z  / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
-2025-10-01T05:19:05.6788187Z /_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/
-2025-10-01T05:19:05.6788216Z
-2025-10-01T05:19:05.6788238Z
-2025-10-01T05:19:05.6788258Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
-2025-10-01T05:19:05.6788275Z
-2025-10-01T05:19:05.6788298Z Documentation: http://aka.ms/webapp-linux
-2025-10-01T05:19:05.6788318Z Kudu Version : 20250917.3
-2025-10-01T05:19:05.6788338Z Commit       : 915b72833717358dab58b9a5b15812c44b8842d3
-2025-10-01T05:19:05.6788375Z
-2025-10-01T05:19:07.3357463Z chown: changing ownership of '/temp': Operation not permitted
-2025-10-01T05:19:07.3776348Z chmod: changing permissions of '/temp': Operation not permitted
-2025-10-01T05:19:11.9993599Z Restarting OpenBSD Secure Shell server: sshd.
-2025-10-01T05:19:12.4181532Z node not running, starting node /opt/webssh/index.js
-2025-10-01T05:19:35.1525268Z Wed Oct 1 05:19:35 UTC 2025 running .net core
-2025-10-01T05:19:38.8080832Z Startup : 05.19.38.780168
-2025-10-01T05:19:38.8450075Z Configure Services : 05.19.38.844471
-2025-10-01T05:19:39.5292321Z Configure : 05.19.39.529046
-2025-10-01T05:19:40.9134976Z Setting Up Routes : 05.19.40.913277
-2025-10-01T05:19:41.3470199Z Exiting Configure : 05.19.41.346636
-2025-10-01T05:19:41.8743602Z Hosting environment: Production
-2025-10-01T05:19:41.8744027Z Content root path: /opt/Kudu
-2025-10-01T05:19:41.8744058Z Now listening on: http://0.0.0.0:8181
-2025-10-01T05:19:41.8744117Z Application started. Press Ctrl+C to shut down.
-2025-10-01T05:20:24.6606357Z Initializing active sessions from database...
-2025-10-01T05:20:25.5667827Z Initializing Azure Storage with primary credentials.
-2025-10-01T05:20:25.863602Z Server is running on port 8080
-2025-10-01T05:20:27.5614375Z Initialized active sessions.
-2025-10-01T05:20:44.7307412Z Login attempt received
-2025-10-01T05:20:45.1256754Z Login successful for user.
-2025-10-01T05:20:57.921623Z Login attempt received
-2025-10-01T05:20:58.2276687Z Login successful for user.
-2025-10-01T05:36:46.5230257Z     __ __          __      __    _ __
-2025-10-01T05:36:46.5618236Z    / //_/_  _ ____/ /_  __/ /   (_) /____
-2025-10-01T05:36:46.5618521Z   / ,< / / / / __  / / / / /   / / __/ _
-2025-10-01T05:36:46.5618545Z  / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
-2025-10-01T05:36:46.5618569Z /_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/
-2025-10-01T05:36:46.5618592Z
-2025-10-01T05:36:46.5618644Z
-2025-10-01T05:36:46.5618718Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
-2025-10-01T05:36:46.5618735Z
-2025-10-01T05:36:46.5618755Z Documentation: http://aka.ms/webapp-linux
-2025-10-01T05:36:46.5618778Z Kudu Version : 20250917.3
-2025-10-01T05:36:46.5618801Z Commit       : 915b72833717358dab58b9a5b15812c44b8842d3
-2025-10-01T05:36:46.5618819Z
-2025-10-01T05:36:48.2630558Z chown: changing ownership of '/temp': Operation not permitted
-2025-10-01T05:36:48.2935759Z chmod: changing permissions of '/temp': Operation not permitted
-2025-10-01T05:37:02.2188557Z Restarting OpenBSD Secure Shell server: sshd.
-2025-10-01T05:37:03.2670171Z node not running, starting node /opt/webssh/index.js
-2025-10-01T05:37:33.8652989Z Wed Oct 1 05:37:33 UTC 2025 running .net core
-2025-10-01T05:37:39.879998Z Startup : 05.37.39.800263
-2025-10-01T05:37:39.9803151Z Configure Services : 05.37.39.978855
-2025-10-01T05:37:42.1675995Z Configure : 05.37.42.158908
-2025-10-01T05:37:44.1987357Z Setting Up Routes : 05.37.44.119028
-2025-10-01T05:37:44.8679039Z Exiting Configure : 05.37.44.867749
-2025-10-01T05:37:46.3012528Z Hosting environment: Production
-2025-10-01T05:37:46.3012978Z Content root path: /opt/Kudu
-2025-10-01T05:37:46.3013008Z Now listening on: http://0.0.0.0:8181
-2025-10-01T05:37:46.3013109Z Application started. Press Ctrl+C to shut down.
-2025-10-01T05:39:45.1265721Z     __ __          __      __    _ __
-2025-10-01T05:39:45.1672109Z    / //_/_  _ ____/ /_  __/ /   (_) /____
-2025-10-01T05:39:45.1672352Z   / ,< / / / / __  / / / / /   / / __/ _
-2025-10-01T05:39:45.1672373Z  / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
-2025-10-01T05:39:45.1672394Z /_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/
-2025-10-01T05:39:45.167244Z
-2025-10-01T05:39:45.1672469Z
-2025-10-01T05:39:45.1672489Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
-2025-10-01T05:39:45.1672572Z
-2025-10-01T05:39:45.1672594Z Documentation: http://aka.ms/webapp-linux
-2025-10-01T05:39:45.1672615Z Kudu Version : 20250917.3
-2025-10-01T05:39:45.1672636Z Commit       : 915b72833717358dab58b9a5b15812c44b8842d3
-2025-10-01T05:39:45.1672654Z
-2025-10-01T05:39:47.5994051Z chown: changing ownership of '/temp': Operation not permitted
-2025-10-01T05:39:47.8119948Z chmod: changing permissions of '/temp': Operation not permitted
-2025-10-01T05:40:00.2326554Z Restarting OpenBSD Secure Shell server: sshd.
-2025-10-01T05:40:00.7289656Z node not running, starting node /opt/webssh/index.js
-2025-10-01T05:40:28.5877145Z Wed Oct 1 05:40:28 UTC 2025 running .net core
-2025-10-01T05:40:34.1158137Z Startup : 05.40.33.535198
-2025-10-01T05:40:34.2442338Z Configure Services : 05.40.34.243892
-2025-10-01T05:40:35.961059Z Configure : 05.40.35.960631
-2025-10-01T05:40:37.526957Z Setting Up Routes : 05.40.37.516986
-2025-10-01T05:40:38.0877134Z Exiting Configure : 05.40.38.058930
-2025-10-01T05:40:38.7912953Z Hosting environment: Production
-2025-10-01T05:40:38.7913658Z Content root path: /opt/Kudu
-2025-10-01T05:40:38.7913689Z Now listening on: http://0.0.0.0:8181
-2025-10-01T05:40:38.7913727Z Application started. Press Ctrl+C to shut down.
-2025-10-01T05:41:33.7664781Z     __ __          __      __    _ __
-2025-10-01T05:41:33.7829871Z    / //_/_  _ ____/ /_  __/ /   (_) /____
-2025-10-01T05:41:33.7830098Z   / ,< / / / / __  / / / / /   / / __/ _
-2025-10-01T05:41:33.783016Z  / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
-2025-10-01T05:41:33.7830181Z /_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/
-2025-10-01T05:41:33.7830207Z
-2025-10-01T05:41:33.7830257Z
-2025-10-01T05:41:33.7830277Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
-2025-10-01T05:41:33.7830293Z
-2025-10-01T05:41:33.7830312Z Documentation: http://aka.ms/webapp-linux
-2025-10-01T05:41:33.7830335Z Kudu Version : 20250917.3
-2025-10-01T05:41:33.7830373Z Commit       : 915b72833717358dab58b9a5b15812c44b8842d3
-2025-10-01T05:41:33.7830398Z
-2025-10-01T05:41:36.2398226Z chown: changing ownership of '/temp': Operation not permitted
-2025-10-01T05:41:36.2473136Z chmod: changing permissions of '/temp': Operation not permitted
-2025-10-01T05:41:40.7271708Z Restarting OpenBSD Secure Shell server: sshd.
-2025-10-01T05:41:41.0189745Z node not running, starting node /opt/webssh/index.js
-2025-10-01T05:42:09.9103524Z Login attempt received
-2025-10-01T05:42:22.1557257Z Login successful for user.
-2025-10-01T05:42:33.190006Z Wed Oct 1 05:42:32 UTC 2025 running .net core
-2025-10-01T05:42:39.7808264Z Startup : 05.42.39.693421
-2025-10-01T05:42:39.8888468Z Configure Services : 05.42.39.881083
-2025-10-01T05:42:43.0129689Z Configure : 05.42.42.783744
-2025-10-01T05:42:45.7958804Z Setting Up Routes : 05.42.45.795599
-2025-10-01T05:42:47.4775231Z Exiting Configure : 05.42.47.470159
-2025-10-01T05:42:49.1834595Z Hosting environment: Production
-2025-10-01T05:42:49.1835335Z Content root path: /opt/Kudu
-2025-10-01T05:42:49.1835365Z Now listening on: http://0.0.0.0:8181
-2025-10-01T05:42:49.1835406Z Application started. Press Ctrl+C to shut down.
-2025-10-01T05:44:54.6305262Z Initializing active sessions from database...
-2025-10-01T05:44:55.2411939Z Initializing Azure Storage with primary credentials.
-2025-10-01T05:44:55.52774Z Server is running on port 8080
-2025-10-01T05:44:56.2581255Z Initialized active sess
+# AI Development Prompt: Redesign Project List Module
+
+## Overview
+I need to redesign the **Project List Module** (homepage) to match the design and layout of the **Dashboard Feed Module** (client's dashboard). The goal is to create visual consistency across both pages.
+
+## Current State Analysis
+
+### Screenshot 1: Project List Module (NEEDS FIXING)
+**Location:** Homepage (`localhost:5173/project-list`)
+**Current Issues:**
+- Full-width layout with minimal styling
+- Images displayed in a single horizontal row
+- No card container wrapping the post
+- Title and author info appear directly on the page background
+- Lacks visual hierarchy and organization
+- No clear separation between posts
+- Images are in-line without proper grid structure
+
+### Screenshot 2: Dashboard Feed Module (REFERENCE DESIGN)
+**Location:** Client Dashboard (`localhost:5173/dashboard`)
+**Design Elements to Replicate:**
+- Clean white card container with shadow/border
+- Compact, organized layout
+- Post title as a heading inside the card
+- Author name styled as subtle secondary text ("By: Jeff Aldreich S. Bontuyan")
+- Post content/description below author
+- **2x2 grid layout for images** (not horizontal row)
+- Rounded corners on images
+- "+5" overlay on the 4th image indicating more images
+- Proper padding and spacing throughout
+- Card hover effects (if applicable)
+
+## Required Changes
+
+### 1. Card Container
+Transform the post into a contained card:
+- Add white background (`background: white`)
+- Add subtle shadow or border for depth
+- Apply border-radius for rounded corners (8-12px)
+- Add padding inside the card (16-24px)
+- Set max-width if needed to prevent overstretching
+- Add margin between multiple posts
+
+### 2. Content Layout Structure
+```
+┌─────────────────────────────────────┐
+│  Post Title (h2/h3 styling)        │
+│  By: Author Name (smaller, gray)    │
+│  Post description text              │
+│                                     │
+│  ┌────────┐ ┌────────┐            │
+│  │ Image 1│ │ Image 2│            │
+│  └────────┘ └────────┘            │
+│  ┌────────┐ ┌────────┐            │
+│  │ Image 3│ │Image+5 │            │
+│  └────────┘ └────────┘            │
+└─────────────────────────────────────┘
+```
+
+### 3. Image Gallery Grid
+**Critical Change:** Convert from horizontal row to 2x2 grid
+- Use CSS Grid or Flexbox with wrap
+- Display maximum 4 images in the preview
+- Grid template: 2 columns × 2 rows
+- Add gap between images (8-12px)
+- Maintain aspect ratio (use object-fit: cover)
+- Add rounded corners to images (4-8px)
+- On the 4th image, overlay a "+X" indicator showing remaining image count
+
+### 4. Typography & Styling
+
+**Post Title:**
+- Font size: 18-24px
+- Font weight: 600-700 (semi-bold/bold)
+- Color: Dark gray or black (#1a1a1a or similar)
+- Margin bottom: 8px
+
+**Author Line:**
+- Format: "By: [Author Name]"
+- Font size: 14px
+- Font weight: 400 (normal)
+- Color: Medium gray (#666 or #888)
+- Font style: Italic (optional)
+- Margin bottom: 12px
+
+**Post Description:**
+- Font size: 14-16px
+- Font weight: 400
+- Color: Dark gray (#333 or #444)
+- Line height: 1.5
+- Margin bottom: 16px
+
+### 5. "+X More" Image Overlay
+For the 4th image when there are more than 4 images:
+- Add semi-transparent dark overlay (rgba(0,0,0,0.6))
+- Center white text showing "+X" (where X = remaining image count)
+- Font size: 24-32px
+- Font weight: 600-700
+- Ensure text is clearly visible
+
+### 6. Responsive Behavior
+- On mobile/tablet: Consider switching to single column or stacked layout
+- Maintain 2x2 grid for images on most screen sizes
+- Adjust card padding for smaller screens
+
+## Technical Requirements
+
+### CSS/Styling Approach
+- Use consistent spacing variables/tokens
+- Apply box-shadow for card elevation: `box-shadow: 0 2px 8px rgba(0,0,0,0.1)`
+- Ensure proper z-index layering
+- Add smooth transitions for hover effects (optional)
+
+### HTML Structure
+```html
+<div class="post-card">
+  <h3 class="post-title">testing</h3>
+  <p class="post-author">By: Jeff Aldreich S. Bontuyan</p>
+  <p class="post-description">posting a test</p>
+  
+  <div class="post-images-grid">
+    <img src="..." alt="Image 1" class="post-image" />
+    <img src="..." alt="Image 2" class="post-image" />
+    <img src="..." alt="Image 3" class="post-image" />
+    <div class="post-image-wrapper">
+      <img src="..." alt="Image 4" class="post-image" />
+      <div class="more-images-overlay">+5</div>
+    </div>
+  </div>
+</div>
+```
+
+### JavaScript Considerations
+- Calculate remaining image count dynamically
+- Only show overlay if images.length > 4
+- Ensure images are clickable to open modal (from previous requirement)
+
+## Design Specifications
+
+**Colors:**
+- Card background: `#FFFFFF`
+- Card border/shadow: `rgba(0,0,0,0.1)`
+- Title text: `#1a1a1a`
+- Author text: `#666666`
+- Description text: `#333333`
+- Overlay background: `rgba(0,0,0,0.6)`
+- Overlay text: `#FFFFFF`
+
+**Spacing:**
+- Card padding: `20px` or `24px`
+- Image grid gap: `10px` or `12px`
+- Title margin-bottom: `8px`
+- Author margin-bottom: `12px`
+- Description margin-bottom: `16px`
+
+**Border Radius:**
+- Card: `8px` or `12px`
+- Images: `6px` or `8px`
+
+## Expected Outcome
+
+After implementation:
+1. Project list page should have the same visual design as the dashboard feed
+2. Posts should appear as organized cards instead of full-width content
+3. Images should display in a neat 2×2 grid instead of horizontal row
+4. Typography hierarchy should match the dashboard design
+5. The "+X" indicator should appear on the 4th image when applicable
+6. Overall page should look more polished and professional
+
+## Files to Modify
+- Component: ProjectList.tsx (or similar)
+- Styles: ProjectList.css / ProjectList.module.css (or equivalent)
+- May need to update: Image rendering logic
+
+## Additional Notes
+- Maintain the existing functionality (clicking to open modal from previous requirement)
+- Ensure the "Filter by Barangay" dropdown is not affected by these changes
+- Keep the page footer intact
+- Test with different numbers of images (1, 2, 3, 4, 5+ images)
+- Ensure consistency with the overall Smart SK branding
+
+Please implement these changes while keeping the code clean, maintainable, and well-commented.

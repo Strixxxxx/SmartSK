@@ -37,19 +37,6 @@ axiosInstance.interceptors.request.use(
     // Special handling for file uploads with extended timeout
     if (config.headers['Content-Type'] === 'multipart/form-data') {
       config.timeout = 600000; // 10 minutes for file uploads
-      
-      // Add upload progress tracking
-      config.onUploadProgress = (progressEvent) => {
-        if (progressEvent.total) {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          console.log(`Upload Progress: ${percentCompleted}%`);
-          
-          // Dispatch custom event for progress tracking
-          window.dispatchEvent(new CustomEvent('uploadProgress', {
-            detail: { progress: percentCompleted }
-          }));
-        }
-      };
     }
     
     return config;

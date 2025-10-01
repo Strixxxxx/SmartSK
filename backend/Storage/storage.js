@@ -39,7 +39,10 @@ const sharedKeyCredential = new StorageSharedKeyCredential(storageName, key);
  * @returns {Promise<string>} The name of the uploaded blob.
  */
 async function uploadFile(file) {
+    console.log(`Uploading file with mimetype: ${file.mimetype}`);
     const containerName = file.mimetype.startsWith('image') ? imageContainerName : videoContainerName;
+    console.log(`Selected container: ${containerName}`);
+    
     const containerClient = blobServiceClient.getContainerClient(containerName);
     await containerClient.createIfNotExists();
 
