@@ -40,6 +40,10 @@ const PostModal: React.FC<PostModalProps> = ({ post, show, onClose }) => {
         }
     }, [show, post]);
 
+    useEffect(() => {
+        setCurrentImageIndex(0);
+    }, [post]);
+
     if (!show || !post) {
         return null;
     }
@@ -58,7 +62,15 @@ const PostModal: React.FC<PostModalProps> = ({ post, show, onClose }) => {
         if (attachment.fileType.startsWith('image')) {
             return <img src={attachment.filePath} alt={title} />;
         }
-        return <video src={attachment.filePath} controls />;
+        if (attachment.fileType.startsWith('video')) {
+            return (
+                <div className="post-modal-video-wrapper">
+                    <video src={attachment.filePath} className="post-modal-video-bg" autoPlay muted loop playsInline />
+                    <video src={attachment.filePath} className="post-modal-video-main" controls autoPlay playsInline />
+                </div>
+            );
+        }
+        return null;
     };
 
     return (
@@ -98,7 +110,7 @@ const PostModal: React.FC<PostModalProps> = ({ post, show, onClose }) => {
                                 {attachments.map((att, index) => (
                                     <img
                                         key={att.attachmentID}
-                                        src={att.filePath}
+                                        src={att.filePath} // Assuming thumbnails are available, otherwise this might need adjustment
                                         alt={`thumbnail-${index}`}
                                         className={index === currentImageIndex ? 'active' : ''}
                                         onClick={() => setCurrentImageIndex(index)}
