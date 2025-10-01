@@ -289,7 +289,7 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
               sx={{ mb: 2 }}
             >
               <MenuItem value="San Bartolome">San Bartolome</MenuItem>
-              <MenuItem value="Nagkaisang Ngayon">Nagkaisang Ngayon</MenuItem>
+              <MenuItem value="Nagkaisang Nayon">Nagkaisang Nayon</MenuItem>
             </TextField>
             <TextField
               margin="dense"
