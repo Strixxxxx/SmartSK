@@ -25,6 +25,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
     const [previews, setPreviews] = useState<string[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [uploadProgress, setUploadProgress] = useState(0);
+    const [showVideoWarning, setShowVideoWarning] = useState(false);
 
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [selectedVideoUrl, setSelectedVideoUrl] = useState('');
@@ -37,6 +38,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
         const files = event.target.files;
         if (files) {
             const newFilesArray = Array.from(files);
+            if (newFilesArray.some(file => file.type.startsWith('video'))) {
+                setShowVideoWarning(true);
+            }
             setSelectedFiles(prevFiles => [...prevFiles, ...newFilesArray]);
 
             const newPreviews = newFilesArray.map(file => URL.createObjectURL(file));
@@ -52,6 +56,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
 
         const updatedPreviews = previews.filter((_, index) => index !== indexToRemove);
         setPreviews(updatedPreviews);
+
+        if (!updatedFiles.some(file => file.type.startsWith('video'))) {
+            setShowVideoWarning(false);
+        }
     };
 
     const handleDragEnd = () => {
@@ -226,6 +234,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
                                         {...register('attachments')}
                                         onChange={handleFileChange}
                                     />
+                                    {showVideoWarning && <p className="video-warning">Video uploads may take a few moments to process after uploading.</p>}
                                 </div>
 
                                 {previews.length > 0 && renderPreviews()}

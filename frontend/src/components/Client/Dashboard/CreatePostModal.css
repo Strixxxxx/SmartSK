@@ -100,6 +100,12 @@
     background-color: #f0f7ff;
 }
 
+.video-warning {
+    font-size: 0.875rem;
+    color: #f59e0b; /* Amber color */
+    margin-top: 0.5rem;
+}
+
 .previews {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
