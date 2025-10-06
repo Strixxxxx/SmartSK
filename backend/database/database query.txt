@@ -73,17 +73,17 @@ CREATE TABLE StatusLookup (
     StatusName NVARCHAR(255) NOT NULL
 );
 
-INSERT INTO StatusLookup (StatusID, StatusName) VALUES
-(1, 'Pending Review'),
-(2, 'Revision Requested'),
-(3, 'Proposal Accepted'),
-(4, 'Proposal Rejected'),
-(5, 'In Compilation'),
-(6, 'Brgy. Captain''s Review'),
-(7, 'Submitted to LGU'),
-(8, 'LGU Revision Requested'),
-(9, 'LGU Approval'),
-(10, 'LGU Rejected');
+INSERT INTO StatusLookup (StatusID, StatusName, description) VALUES
+(1, 'Pending Review' , 'Proposal under Review by the SK Chairperson.'),
+(2, 'Revision Requested', 'The proposal needs revision, said the SK Chairperson.'),
+(3, 'Proposal Accepted', 'The proposal is accepted and will be compiled'),
+(4, 'Proposal Rejected', 'The proposal is rejected due to the following reasons.'),
+(5, 'Collaboration', 'The proposal would have a collaboration with the Baranggay.'),
+(6, 'In Compilation', 'The proposal is under compilation for the budget hearing.'),
+(7, 'Waiting Approval', 'Passed on the budget hearing, included for approval to the LGU.'),
+(8, 'LGU Approval', 'Approved by the LGU, waiting to be implemented.'),
+(9, 'Not yet Implemented', 'The project is not yet implemented, waiting for the implementation.'),
+(10, 'Implemented', 'The project is ongoing or already implemented.');
 
 --Projects Table
 CREATE TABLE projects (
