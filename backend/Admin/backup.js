@@ -6,6 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const { addAuditTrail } = require('../audit/auditService');
 const { authMiddleware } = require('../session/session');
+const { uploadBackupFile } = require('../Storage/storage');
 
 // Configure email transporter
 const transporter = nodemailer.createTransport({
@@ -43,6 +44,11 @@ router.post('/', authMiddleware, async (req, res) => {
     console.log('Starting database backup...');
     await pool.request().query(backupQuery);
     console.log('Database backup completed successfully.');
+
+    // Upload to Azure
+    console.log(`Uploading ${backupFileName} to Azure Storage...`);
+    await uploadBackupFile(backupFilePath, backupFileName);
+    console.log('Backup file uploaded to Azure Storage successfully.');
 
     addAuditTrail({
         actor: 'A',

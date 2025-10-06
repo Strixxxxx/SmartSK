@@ -7,6 +7,7 @@ const path = require('path');
 const storageName = process.env.STORAGE_NAME;
 const imageContainerName = process.env.IMAGE_CONTAINER;
 const videoContainerName = process.env.VIDEO_CONTAINER;
+const backupContainerName = process.env.BACKUP_CONTAINER;
 
 // Primary credentials
 const primaryConnectionString = process.env.STORAGE_CONNECTION_STRING_1;
@@ -22,8 +23,8 @@ const connectionString = useSecondary ? secondaryConnectionString : primaryConne
 const key = useSecondary ? secondaryKey : primaryKey;
 
 // Validate that at least one set of credentials and essential info are present
-if (!storageName || !imageContainerName || !videoContainerName || !connectionString || !key) {
-    throw new Error('Azure Storage environment variables are not sufficiently configured. Please check STORAGE_NAME, IMAGE_CONTAINER, VIDEO_CONTAINER, and at least one set of connection strings/keys.');
+if (!storageName || !imageContainerName || !videoContainerName || !backupContainerName || !connectionString || !key) {
+    throw new Error('Azure Storage environment variables are not sufficiently configured. Please check STORAGE_NAME, IMAGE_CONTAINER, VIDEO_CONTAINER, BACKUP_CONTAINER and at least one set of connection strings/keys.');
 }
 
 console.log(`Initializing Azure Storage with ${useSecondary ? 'secondary' : 'primary'} credentials.`);
@@ -78,7 +79,25 @@ async function getFileSasUrl(blobName, fileType) {
     return `${blobClient.url}?${sasToken}`;
 }
 
+/**
+ * Uploads a local file to the backup container in Azure Blob Storage.
+ * @param {string} filePath - The local path to the file to upload.
+ * @param {string} blobName - The name for the blob in Azure.
+ * @returns {Promise<void>}
+ */
+async function uploadBackupFile(filePath, blobName) {
+    console.log(`Uploading backup file to container: ${backupContainerName}`);
+    const containerClient = blobServiceClient.getContainerClient(backupContainerName);
+    await containerClient.createIfNotExists();
+
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+
+    await blockBlobClient.uploadFile(filePath);
+    console.log(`Successfully uploaded ${blobName} to container ${backupContainerName}.`);
+}
+
 module.exports = {
     uploadFile,
     getFileSasUrl,
+    uploadBackupFile,
 };

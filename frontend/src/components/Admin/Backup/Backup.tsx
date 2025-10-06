@@ -30,7 +30,7 @@ const Backup = () => {
     }, 500);
 
     try {
-      const response = await axios.post(`/api/backup`);
+      const response = await axios.post(`/api/admin/backup`);
       setProgress(100);
       setBackupStatus(response.data.message);
     } catch (error) {
@@ -74,7 +74,7 @@ const Backup = () => {
         }, 500);
 
       try {
-        const response = await axios.post(`/api/backup/install`, { file: base64File });
+        const response = await axios.post(`/api/admin/backup/install`, { file: base64File });
         setProgress(100);
         setBackupStatus(response.data.message);
       } catch (error) {
