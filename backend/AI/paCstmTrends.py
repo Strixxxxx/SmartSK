@@ -56,11 +56,11 @@ filipino_bad_words = [
     "hayop", "bwisit", "lintik", "leche", "animal ka", "ampucha", "ampota",
     "amputa", "anak ng tokwa", "bilat", "binibrocha", "demonyo", "engot",
     "hinayupak", "hindot", "inutil", "kupal", "pakingshet", "potangina", "tangina",
-    "putragis", "pakshet", "tarantado", "ungas"
+    "putragis", "pakshet", "tarantado", "ungas", "pota", "yawa", "tangalog", "bisakol", "bisayawa", "putaragis", "potaragis", "hayup", "ampota", "bading", "bakla", "binibirocha", "gaga", "punyeta", "ponyeta", "hinayupak", "sira ulo", "abnoy"
 ]
 spanish_bad_words = [
     "joder", "mierda", "puta", "puto", "cabron", "gilipollas", "pendejo",
-    "capullo", "hijoputa", "mamón", "marica", "maricón"
+    "capullo", "hijoputa", "mamón", "marica", "maricón", " hijo de puta", "hijo de pota", "lechebay", "karajo"
 ]
 profanity.add_censor_words(filipino_bad_words)
 profanity.add_censor_words(spanish_bad_words)
