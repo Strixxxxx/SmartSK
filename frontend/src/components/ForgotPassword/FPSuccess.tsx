@@ -26,7 +26,7 @@ const FPSuccess: React.FC<FPSuccessProps> = ({ onBackToLogin }) => {
       <h3>Password Reset Successful!</h3>
       <p>Your password has been updated successfully. You can now log in with your new password.</p>
       <button onClick={onBackToLogin} className="login-button">
-        Back to Login
+        Back to Homepage
       </button>
     </div>
   );
