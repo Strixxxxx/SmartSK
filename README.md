@@ -187,7 +187,7 @@ Contains static assets such as images and logos.
     ```
 2.  **Start the frontend development server:**
     ```bash
-    cd ../frontend
+    cd frontend
     npm run dev
     ```
 
