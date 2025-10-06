@@ -8,11 +8,11 @@ const getBaseURL = (): string => {
 
   if (import.meta.env.PROD) {
     // In production, use the environment variable if it's set, otherwise use a relative path.
-    return backendUrl || '';
+    return backendUrl;
   }
   
   // In development, prioritize the environment variable, with a fallback to the original hardcoded URL.
-  return backendUrl || 'https://smartsk-backend-fsc6fhfphybqacfa.southeastasia-01.azurewebsites.net';
+  return backendUrl;
 };
 
 // Create axios instance instead of modifying global defaults

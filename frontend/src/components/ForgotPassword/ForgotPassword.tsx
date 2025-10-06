@@ -5,6 +5,8 @@ import FPOTP from './FPOTP';
 import FPChange from './FPChange';
 import FPSuccess from './FPSuccess';
 import './ForgotPassword.css';
+import axiosInstance from '../../backend connection/axiosConfig';
+import { AxiosError } from 'axios';
 
 const ForgotPassword: React.FC = () => {
   const [step, setStep] = useState<number>(1);
@@ -17,75 +19,54 @@ const ForgotPassword: React.FC = () => {
   const handleUsernameSubmit = async (submittedUsername: string) => {
     try {
       setError('');
-      const response = await fetch('http://localhost:3000/api/forgotpassword/request', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username: submittedUsername }),
-      });
+      const response = await axiosInstance.post('/api/forgotpassword/request', { username: submittedUsername });
 
-      const data = await response.json();
-      
-      if (response.ok) {
+      if (response.data.success) {
         setUsername(submittedUsername);
         setStep(2); // Move to OTP step
       } else {
-        setError(data.message || 'Failed to send OTP. Please try again.');
+        setError(response.data.message || 'Failed to send OTP. Please try again.');
       }
-    } catch (error) {
-      console.error('Error requesting password reset:', error);
-      setError('An error occurred. Please try again later.');
+    } catch (err) {
+      console.error('Error requesting password reset:', err);
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError(axiosError.response?.data?.message || 'An error occurred. Please try again later.');
     }
   };
 
   const handleOTPSubmit = async (submittedOTP: string) => {
     try {
       setError('');
-      const response = await fetch('http://localhost:3000/api/forgotpassword/verify-otp', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, otp: submittedOTP }),
-      });
+      const response = await axiosInstance.post('/api/forgotpassword/verify-otp', { username, otp: submittedOTP });
 
-      const data = await response.json();
-      
-      if (response.ok) {
+      if (response.data.success) {
         setOtp(submittedOTP);
         setStep(3); // Move to change password step
       } else {
-        setError(data.message || 'Invalid OTP. Please try again.');
+        setError(response.data.message || 'Invalid OTP. Please try again.');
       }
-    } catch (error) {
-      console.error('Error verifying OTP:', error);
-      setError('An error occurred. Please try again later.');
+    } catch (err) {
+      console.error('Error verifying OTP:', err);
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError(axiosError.response?.data?.message || 'An error occurred. Please try again later.');
     }
   };
 
   const handlePasswordChange = async (password: string) => {
     try {
       setError('');
-      const response = await fetch('http://localhost:3000/api/forgotpassword/reset', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, otp, newPassword: password }),
-      });
+      const response = await axiosInstance.post('/api/forgotpassword/reset', { username, otp, newPassword: password });
 
-      const data = await response.json();
-      
-      if (response.ok) {
+      if (response.data.success) {
         setNewPassword(password);
         setStep(4); // Move to success step
       } else {
-        setError(data.message || 'Failed to reset password. Please try again.');
+        setError(response.data.message || 'Failed to reset password. Please try again.');
       }
-    } catch (error) {
-      console.error('Error resetting password:', error);
-      setError('An error occurred. Please try again later.');
+    } catch (err) {
+      console.error('Error resetting password:', err);
+      const axiosError = err as AxiosError<{ message?: string }>;
+      setError(axiosError.response?.data?.message || 'An error occurred. Please try again later.');
     }
   };
 

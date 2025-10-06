@@ -1,9 +1,36 @@
 --Frontend (Browser's Console)
 
-Access to XMLHttpRequest at 'https://smartsk-backend-container.azurewebsites.net/api/create-post' from origin 'http://localhost:5173' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.Understand this error
-axiosConfig.ts:119 Network error - no response received: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 600000, withCredentials: true, upload: XMLHttpRequestUpload, …}onabort: ƒ handleAbort()onerror: ƒ handleError()onload: nullonloadend: ƒ onloadend()onloadstart: nullonprogress: nullonreadystatechange: nullontimeout: ƒ handleTimeout()readyState: 4response: ""responseText: ""responseType: ""responseURL: ""responseXML: nullstatus: 0statusText: ""timeout: 600000upload: XMLHttpRequestUpload {onloadstart: null, onprogress: null, onabort: null, onerror: null, onload: null, …}withCredentials: true[[Prototype]]: XMLHttpRequest
-(anonymous) @ axiosConfig.ts:119Understand this error
-smartsk-backend-container.azurewebsites.net/api/create-post:1  Failed to load resource: net::ERR_FAILEDUnderstand this error
+index-x3eXC3PK.js:292 
+ POST http://localhost:3000/api/forgotpassword/request net::ERR_CONNECTION_REFUSED
+m	@	index-x3eXC3PK.js:292
+p	@	index-x3eXC3PK.js:292
+$1	@	index-x3eXC3PK.js:48
+(anonymous)	@	index-x3eXC3PK.js:48
+Wb	@	index-x3eXC3PK.js:48
+eg	@	index-x3eXC3PK.js:48
+hg	@	index-x3eXC3PK.js:49
+jA	@	index-x3eXC3PK.js:49
+
+index-x3eXC3PK.js:292 Error requesting password reset: TypeError: Failed to fetch
+    at m (index-x3eXC3PK.js:292:29979)
+    at p (index-x3eXC3PK.js:292:22644)
+    at $1 (index-x3eXC3PK.js:48:118068)
+    at index-x3eXC3PK.js:48:123348
+    at Wb (index-x3eXC3PK.js:48:9040)
+    at eg (index-x3eXC3PK.js:48:119304)
+    at hg (index-x3eXC3PK.js:49:26824)
+    at jA (index-x3eXC3PK.js:49:26646)
+m	@	index-x3eXC3PK.js:292
+await in m		
+p	@	index-x3eXC3PK.js:292
+$1	@	index-x3eXC3PK.js:48
+(anonymous)	@	index-x3eXC3PK.js:48
+Wb	@	index-x3eXC3PK.js:48
+eg	@	index-x3eXC3PK.js:48
+hg	@	index-x3eXC3PK.js:49
+jA	@	index-x3eXC3PK.js:49
+
+﻿
 
 --Backend(Azure Portal's Log Stream in Platform)
 

@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import axiosInstance from '../../backend connection/axiosConfig';
+import { AxiosError } from 'axios';
 
 interface FPOTPProps {
   onSubmit: (otp: string) => void;
@@ -113,7 +115,8 @@ const FPOTP: React.FC<FPOTPProps> = ({ onSubmit, username }) => {
     } catch (error) {
       console.error('Error submitting OTP:', error);
       setError('An error occurred. Please try again.');
-    } finally {
+    }
+    finally {
       setIsSubmitting(false);
     }
   };
@@ -121,17 +124,9 @@ const FPOTP: React.FC<FPOTPProps> = ({ onSubmit, username }) => {
   const handleResendOTP = async () => {
     try {
       setIsResending(true);
-      const response = await fetch('http://localhost:3000/api/forgotpassword/request', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username }),
-      });
+      const response = await axiosInstance.post('/api/forgotpassword/request', { username });
 
-      const data = await response.json();
-      
-      if (response.ok) {
+      if (response.data.success) {
         setTimeLeft(60); // Reset timer to 1 minute
         setCanResend(false);
         setError('');
@@ -144,12 +139,14 @@ const FPOTP: React.FC<FPOTPProps> = ({ onSubmit, username }) => {
         
         alert('A new verification code has been sent to your email.');
       } else {
-        setError(data.message || 'Failed to resend verification code. Please try again.');
+        setError(response.data.message || 'Failed to resend verification code. Please try again.');
       }
     } catch (error) {
       console.error('Error resending OTP:', error);
-      setError('An error occurred. Please try again later.');
-    } finally {
+      const axiosError = error as AxiosError<{ message?: string }>;
+      setError(axiosError.response?.data?.message || 'An error occurred. Please try again later.');
+    }
+    finally {
       setIsResending(false);
     }
   };
