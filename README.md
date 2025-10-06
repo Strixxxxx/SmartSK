@@ -172,7 +172,7 @@ Contains static assets such as images and logos.
     ```
 3.  **Install frontend dependencies:**
     ```bash
-    cd ../frontend
+    cd frontend
     npm install
     ```
 4.  **Set up environment variables:**
