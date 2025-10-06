@@ -76,7 +76,7 @@ const FPUsername: React.FC<FPUsernameProps> = ({ onSubmit }) => {
         <button 
           type="button"
           className="fp-cancel-btn"
-          onClick={() => navigate('/login')}
+          onClick={() => navigate('/home')}
           disabled={isSubmitting}
         >
           Back to Login
