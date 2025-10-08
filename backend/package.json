@@ -7,6 +7,8 @@
     "@azure/arm-sql": "^10.0.0",
     "@azure/identity": "^4.12.0",
     "@azure/storage-blob": "^12.28.0",
+    "archiver": "^7.0.1",
+    "archiver-zip-encrypted": "^2.0.0",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",

@@ -1,83 +1,10 @@
 --Frontend (Browser's Console)
 
-index-Bfxc27p8.js:78 
- POST https://smartsk-backend-container.azurewebsites.net/api/backup 404 (Not Found)
-(anonymous)	@	index-Bfxc27p8.js:78
-xhr	@	index-Bfxc27p8.js:78
-VS	@	index-Bfxc27p8.js:80
-Promise.then		
-_request	@	index-Bfxc27p8.js:81
-request	@	index-Bfxc27p8.js:80
-(anonymous)	@	index-Bfxc27p8.js:81
-(anonymous)	@	index-Bfxc27p8.js:76
-m	@	index-Bfxc27p8.js:319
-$1	@	index-Bfxc27p8.js:48
-(anonymous)	@	index-Bfxc27p8.js:48
-Wb	@	index-Bfxc27p8.js:48
-eg	@	index-Bfxc27p8.js:48
-hg	@	index-Bfxc27p8.js:49
-jA	@	index-Bfxc27p8.js:49
-
-index-Bfxc27p8.js:81 Client error: 404 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Error</title>
-</head>
-<body>
-<pre>Cannot POST /api/backup</pre>
-</body>
-</html>
-(anonymous)	@	index-Bfxc27p8.js:81
-Promise.then		
-_request	@	index-Bfxc27p8.js:81
-request	@	index-Bfxc27p8.js:80
-(anonymous)	@	index-Bfxc27p8.js:81
-(anonymous)	@	index-Bfxc27p8.js:76
-m	@	index-Bfxc27p8.js:319
-$1	@	index-Bfxc27p8.js:48
-(anonymous)	@	index-Bfxc27p8.js:48
-Wb	@	index-Bfxc27p8.js:48
-eg	@	index-Bfxc27p8.js:48
-hg	@	index-Bfxc27p8.js:49
-jA	@	index-Bfxc27p8.js:49
-index-Bfxc27p8.js:319 Backup failed: 
-Ke {message: 'Request failed with status code 404', name: 'AxiosError', code: 'ERR_BAD_REQUEST', config: {…}, request: XMLHttpRequest, …}
-code
-: 
-"ERR_BAD_REQUEST"
-config
-: 
-{transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}
-message
-: 
-"Request failed with status code 404"
-name
-: 
-"AxiosError"
-request
-: 
-XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
-response
-: 
-{data: '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta char…re>Cannot POST /api/backup</pre>\n</body>\n</html>\n', status: 404, statusText: '', headers: ss, config: {…}, …}
-status
-: 
-404
-stack
-: 
-"AxiosError: Request failed with status code 404\n    at Hj (https://smartsk.app/assets/index-Bfxc27p8.js:78:1088)\n    at XMLHttpRequest._ (https://smartsk.app/assets/index-Bfxc27p8.js:78:5742)\n    at ji.request (https://smartsk.app/assets/index-Bfxc27p8.js:80:2068)\n    at async m (https://smartsk.app/assets/index-Bfxc27p8.js:319:95297)"
-[[Prototype]]
-: 
-Error
-m	@	index-Bfxc27p8.js:319
-await in m		
-$1	@	index-Bfxc27p8.js:48
-(anonymous)	@	index-Bfxc27p8.js:48
-Wb	@	index-Bfxc27p8.js:48
-eg	@	index-Bfxc27p8.js:48
-hg	@	index-Bfxc27p8.js:49
-jA	@	index-Bfxc27p8.js:49
+Failed to load resource: the server responded with a status of 500 ()Understand this error
+axiosConfig.ts:87 Server error: 500 Blob
+(anonymous) @ axiosConfig.ts:87Understand this error
+Backup.tsx:62 Backup failed: AxiosError
+handleBackup @ Backup.tsx:62Understand this error
 
 --Backend(Azure Portal's Log Stream in Platform)
 

@@ -96,8 +96,43 @@ async function uploadBackupFile(filePath, blobName) {
     console.log(`Successfully uploaded ${blobName} to container ${backupContainerName}.`);
 }
 
+/**
+ * Lists all backups in the backup container.
+ * @returns {Promise<Array<{name: string, createdOn: Date, size: number}>>} A list of backup files.
+ */
+async function listBackups() {
+    const containerClient = blobServiceClient.getContainerClient(backupContainerName);
+    await containerClient.createIfNotExists();
+    const backups = [];
+    for await (const blob of containerClient.listBlobsFlat()) {
+        backups.push({
+            name: blob.name,
+            createdOn: blob.properties.createdOn,
+            size: blob.properties.contentLength
+        });
+    }
+    // Sort by creation date, newest first
+    return backups.sort((a, b) => new Date(b.createdOn) - new Date(a.createdOn));
+}
+
+/**
+ * Downloads a blob from the backup container to a local file path.
+ * @param {string} blobName - The name of the blob to download.
+ * @param {string} downloadPath - The local path to save the file to.
+ * @returns {Promise<void>}
+ */
+async function downloadBackupFile(blobName, downloadPath) {
+    const containerClient = blobServiceClient.getContainerClient(backupContainerName);
+    const blobClient = containerClient.getBlobClient(blobName);
+
+    await blobClient.downloadToFile(downloadPath);
+    console.log(`Successfully downloaded ${blobName} to ${downloadPath}.`);
+}
+
 module.exports = {
     uploadFile,
     getFileSasUrl,
     uploadBackupFile,
+    listBackups,
+    downloadBackupFile,
 };
