@@ -8,18 +8,34 @@
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-08T09:27:18.3821551Z Raw data request with filters
-2025-10-08T09:27:19.295628Z Stored procedure result count
-2025-10-08T09:27:33.4066862Z [Job ffebe7df-b96e-4a35-89d1-23ff11dc73d8] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
-2025-10-08T09:27:33.5866473Z [Job ffebe7df-b96e-4a35-89d1-23ff11dc73d8] Updated in database to processing: Acquiring Azure AD token...
-2025-10-08T09:27:43.499319Z Successfully acquired Azure AD token.
-2025-10-08T09:27:43.5590368Z [Job ffebe7df-b96e-4a35-89d1-23ff11dc73d8] Updated in database to processing: Exporting database using sqlpackage...
-2025-10-08T09:27:43.5600007Z [Job ffebe7df-b96e-4a35-89d1-23ff11dc73d8] Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_17-27-33.bacpac" /p:Authentication="Active Directory Access Token"
-2025-10-08T09:27:47.5662784Z [Job ffebe7df-b96e-4a35-89d1-23ff11dc73d8] sqlpackage stderr: *** 'Authentication' is not a valid argument for the 'Export' action.
-2025-10-08T09:27:47.5677231Z
-2025-10-08T09:27:47.6054848Z [Job ffebe7df-b96e-4a35-89d1-23ff11dc73d8] sqlpackage process exited with code 1
-2025-10-08T09:27:47.6133085Z [Job ffebe7df-b96e-4a35-89d1-23ff11dc73d8] Backup process failed: sqlpackage process exited with code 1
-2025-10-08T09:27:47.6339739Z [Job ffebe7df-b96e-4a35-89d1-23ff11dc73d8] Updated in database to failed: Backup failed: sqlpackage process exited with code 1
+2025-10-08T09:43:28.5488645Z Raw data request with filters
+2025-10-08T09:43:31.676532Z Stored procedure result count
+2025-10-08T09:43:33.5111142Z Wed Oct 8 09:43:33 UTC 2025 running .net core
+2025-10-08T09:43:37.7028313Z Startup : 09.43.37.633586
+2025-10-08T09:43:37.8409361Z Configure Services : 09.43.37.820541
+2025-10-08T09:43:39.0678053Z Configure : 09.43.39.067616
+2025-10-08T09:43:41.0265267Z Setting Up Routes : 09.43.41.026343
+2025-10-08T09:43:41.5837023Z Initializing active sessions from database...
+2025-10-08T09:43:41.7675645Z Exiting Configure : 09.43.41.759980
+2025-10-08T09:43:42.5791951Z Hosting environment: Production
+2025-10-08T09:43:42.5792766Z Content root path: /opt/Kudu
+2025-10-08T09:43:42.5792796Z Now listening on: http://0.0.0.0:8181
+2025-10-08T09:43:42.6187955Z Application started. Press Ctrl+C to shut down.
+2025-10-08T09:43:43.2519722Z Initializing Azure Storage with primary credentials.
+2025-10-08T09:43:45.417502Z Job management system initialized with database storage.
+2025-10-08T09:43:45.4175379Z Created backup directory at: /database_backup
+2025-10-08T09:43:47.310173Z Server is running on port 8080
+2025-10-08T09:43:48.1918107Z [Job f55f5c27-d86a-4204-aac0-c3e3e5c0c14f] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
+2025-10-08T09:43:48.6850758Z [Job f55f5c27-d86a-4204-aac0-c3e3e5c0c14f] Updated in database to processing: Acquiring Azure AD token...
+2025-10-08T09:43:52.799375Z Initialized active sessions.
+2025-10-08T09:44:20.0048592Z Successfully acquired Azure AD token.
+2025-10-08T09:44:20.2081065Z [Job f55f5c27-d86a-4204-aac0-c3e3e5c0c14f] Updated in database to processing: Exporting database using sqlpackage...
+2025-10-08T09:44:20.208989Z [Job f55f5c27-d86a-4204-aac0-c3e3e5c0c14f] Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_17-43-48.bacpac" /p:AccessToken=***
+2025-10-08T09:44:23.2396139Z [Job f55f5c27-d86a-4204-aac0-c3e3e5c0c14f] sqlpackage stderr: *** 'AccessToken' is not a valid argument for the 'Export' action.
+2025-10-08T09:44:23.2396585Z
+2025-10-08T09:44:23.3013735Z [Job f55f5c27-d86a-4204-aac0-c3e3e5c0c14f] sqlpackage process exited with code 1
+2025-10-08T09:44:23.320563Z [Job f55f5c27-d86a-4204-aac0-c3e3e5c0c14f] Backup process failed: sqlpackage process exited with code 1
+2025-10-08T09:44:23.4605099Z [Job f55f5c27-d86a-4204-aac0-c3e3e5c0c14f] Updated in database to failed: Backup failed: sqlpackage process exited with code 1
 
 --Deployment Container Logs
 

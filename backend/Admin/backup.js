@@ -152,9 +152,9 @@ async function executeBackup(jobId) {
         await updateJob(jobId, 'processing', 'Acquiring Azure AD token...');
         const token = await getAzureAdToken();
 
-        const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${bacpacFilePath}" /p:AccessToken=${token}`;
-        const sanitizedCommand = `sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${bacpacFilePath}" /p:AccessToken=***`;
-        
+        const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${bacpacFilePath}" /at:${token}`;
+        const sanitizedCommand = `sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${bacpacFilePath}" /at:***`;
+
         await updateJob(jobId, 'processing', 'Exporting database using sqlpackage...', { processing: true });
         console.log(`[Job ${jobId}] Executing command: ${sanitizedCommand}`);
 
@@ -223,7 +223,8 @@ async function executeBackup(jobId) {
     } catch (error) {
         console.error(`[Job ${jobId}] Backup process failed:`, error.message);
         await updateJob(jobId, 'failed', `Backup failed: ${error.message}`, { ErrorMessage: error.stack });
-    } finally {
+    }
+    finally {
         // Clean up the .bacpac file as it's either uploaded or zipped
         if (fs.existsSync(bacpacFilePath)) {
             fs.unlinkSync(bacpacFilePath);
