@@ -1684,3 +1684,81 @@ w                                                                               
   not visible in the logs.
 
   This directly addresses the error message from the latest log. I am confident this will resolve the backup issue. Please try it one more time.
+
+  ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  ReadManyFiles Will attempt to read and concatenate files using patterns:                                                                                             │
+ │    console.txt`, `contentv2.txt                                                                                                                                         │
+ │     (within target directory:                                                                                                                                           │
+ │    D:\Projects\Projects\smartSK                                                                                                                                         │
+ │    ) . Excluding: patterns like                                                                                                                                         │
+ │    **/node_modules/**`, `**/.git/**...`. File encoding: utf-8. Separator: "--- path/to/file.ext ---".                                                                   │
+ │                                                                                                                                                                         │
+ │    ### ReadManyFiles Result (Target Dir: `D:\Projects\Projects\smartSK`)                                                                                                │
+ │                                                                                                                                                                         │
+ │    Successfully read and concatenated content from **2 file(s)**.                                                                                                       │
+ │                                                                                                                                                                         │
+ │    **Processed Files:**                                                                                                                                                 │
+ │    - `console.txt`                                                                                                                                                      │
+ │    - `contentv2.txt`                                                                                                                                                    │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+> so im still getting an error. You can look at the @console.txt for the log stream and @contentv2.txt for the database error message and message
+
+✦ This is indeed frustrating, and I am sorry that the previous attempts did not work. The error is now very specific and points to a fundamental issue with how sqlpackage is
+  behaving in your Azure environment.
+
+  The log *** 'AccessToken' is not a valid argument for the 'Export' action indicates that the version of sqlpackage on your Linux App Service is rejecting all modern Azure AD
+  authentication parameters we've tried (/p:Authentication and /p:AccessToken). This is highly unusual and suggests an issue with the tool's version or its configuration in the
+  container.
+
+  Since the standard documented methods are failing, I need to find information specific to this environment. I will perform a web search to find documentation or user reports
+  on using sqlpackage in a Linux App Service with an Azure AD token. This will help determine if there's a different, undocumented syntax required.
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  GoogleSearch Searching the web for: "sqlpackage linux azure app service azure ad token export"                                                                       │
+ │                                                                                                                                                                         │
+ │    Search results for "sqlpackage linux azure app service azure ad token export" returned.                                                                              │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ I am sorry this is so persistent. The new log is definitive proof that we are fighting an environment-specific syntax issue with sqlpackage.
+
+  My web search confirms that for some versions and environments of sqlpackage, especially on Linux, the correct parameter to pass a token is not a property (/p:) but a direct
+  argument: /at.
+
+  This is the last syntax variation to try, and it's the most direct. I will modify the command to use /at:${token}.
+
+  However, given the multiple failures, I want to provide a definitive solution. If this attempt also fails, it proves the sqlpackage tool in your environment is problematic. The
+   most robust, secure, and modern solution is to enable a System-Assigned Managed Identity on your App Service. This is a simple switch in the Azure Portal and it allows the App
+   Service to authenticate to your SQL database securely without any tokens in the code at all.
+
+  For now, I will apply the fix using the /at parameter. This is our last attempt at a code-only solution.
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  Edit backend\Admin\backup.js: const express = require('expre... => const express = require('expre...                                                                 │
+ │                                                                                                                                                                         │
+ │    152       await updateJob(jobId, 'processing', 'Acquiring Azure AD token...');                                                                                       │
+ │    153       const token = await getAzureAdToken();                                                                                                                     │
+ │    154                                                                                                                                                                  │
+ │    155 -     const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${bacpacFilePath}" /p:AccessToken=${token}`;                                    │
+ │    156 -     const sanitizedCommand = `sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${bacpacFilePath}" /p:AccessToken=***`;                                              │
+ │    155 +     const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${bacpacFilePath}" /at:${token}`;                                               │
+ │    156 +     const sanitizedCommand = `sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${bacpacFilePath}" /at:***`;                                                         │
+ │    157                                                                                                                                                                  │
+ │    158       await updateJob(jobId, 'processing', 'Exporting database using sqlpackage...', { processing: true });                                                      │
+ │    159       console.log(`[Job ${jobId}] Executing command: ${sanitizedCommand}`);                                                                                      │
+ │    ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════  │
+ │    223   } catch (error) {                                                                                                                                              │
+ │    224       console.error(`[Job ${jobId}] Backup process failed:`, error.message);                                                                                     │
+ │    225       await updateJob(jobId, 'failed', `Backup failed: ${error.message}`, { ErrorMessage: error.stack });                                                        │
+ │    226 - } finally {                                                                                                                                                    │
+ │    226 + }                                                                                                                                                              │
+ │    227 + finally {                                                                                                                                                      │
+ │    228       // Clean up the .bacpac file as it's either uploaded or zipped                                                                                             │
+ │    229       if (fs.existsSync(bacpacFilePath)) {                                                                                                                       │
+ │    230           fs.unlinkSync(bacpacFilePath);                                                                                                                         │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ The fix is applied. We are now using the /at: parameter, which the search results indicated is correct for passing a token directly in certain Linux environments. I have also
+  ensured the token is redacted from the logs.
+
+  This is the last variation of passwordless authentication we can try with code alone. If this does not succeed, it confirms an issue with the sqlpackage tool in your specific
+  Azure environment. In that event, the best and most permanent solution is to enable Managed Identity for your App Service, which will resolve these authentication issues
+  entirely.
+
+  Please try the backup one more time.

@@ -3,7 +3,6 @@ const router = express.Router();
 const { exec, spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-const { DefaultAzureCredential } = require('@azure/identity');
 const { addAuditTrail } = require('../audit/auditService');
 const { authMiddleware } = require('../session/session');
 const { uploadBackupFile, listBackups, downloadBackupFile } = require('../Storage/storage');
@@ -22,7 +21,7 @@ if (!fs.existsSync(backupDir)) {
 const upload = multer({ dest: backupDir });
 
 // --- Environment Variable Validation ---
-const requiredEnv = ['DB_SERVER', 'DB_DATABASE', 'EMAIL_USER', 'EMAIL_PASS', 'ZIP_LOCK'];
+const requiredEnv = ['DB_SERVER', 'DB_DATABASE', 'DB_USER', 'DB_PASSWORD', 'EMAIL_USER', 'EMAIL_PASS', 'ZIP_LOCK'];
 for (const envVar of requiredEnv) {
     if (!process.env[envVar]) {
         throw new Error(`Missing required environment variable: ${envVar}. Please check your .env file.`);
@@ -31,19 +30,6 @@ for (const envVar of requiredEnv) {
 
 const dbServer = process.env.DB_SERVER;
 const dbName = process.env.DB_DATABASE;
-
-// --- Helper function to get Azure AD Token ---
-async function getAzureAdToken() {
-    try {
-        const credential = new DefaultAzureCredential();
-        const tokenResponse = await credential.getToken("https://database.windows.net/.default");
-        console.log("Successfully acquired Azure AD token.");
-        return tokenResponse.token;
-    } catch (error) {
-        console.error("Failed to acquire Azure AD token:", error);
-        throw new Error("Azure AD token acquisition failed.");
-    }
-}
 
 // --- GET / : List available backups from Azure Storage ---
 router.get('/', authMiddleware, async (req, res) => {
@@ -149,11 +135,8 @@ async function executeBackup(jobId) {
     const bacpacFilePath = path.join(backupDir, bacpacFileName);
 
     try {
-        await updateJob(jobId, 'processing', 'Acquiring Azure AD token...');
-        const token = await getAzureAdToken();
-
-        const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${bacpacFilePath}" /at:${token}`;
-        const sanitizedCommand = `sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${bacpacFilePath}" /at:***`;
+        const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${bacpacFilePath}" /su:${process.env.DB_USER} /sp:${process.env.DB_PASSWORD}`;
+        const sanitizedCommand = `sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${bacpacFilePath}" /su:${process.env.DB_USER} /sp:***`;
 
         await updateJob(jobId, 'processing', 'Exporting database using sqlpackage...', { processing: true });
         console.log(`[Job ${jobId}] Executing command: ${sanitizedCommand}`);
@@ -223,8 +206,7 @@ async function executeBackup(jobId) {
     } catch (error) {
         console.error(`[Job ${jobId}] Backup process failed:`, error.message);
         await updateJob(jobId, 'failed', `Backup failed: ${error.message}`, { ErrorMessage: error.stack });
-    }
-    finally {
+    } finally {
         // Clean up the .bacpac file as it's either uploaded or zipped
         if (fs.existsSync(bacpacFilePath)) {
             fs.unlinkSync(bacpacFilePath);
@@ -290,17 +272,15 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             console.log(`Successfully downloaded backup to ${downloadPath}.`);
         }
 
-        console.log('Acquiring Azure AD token for database import...');
-        const token = await getAzureAdToken();
-
-        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${dbName} /sf:"${downloadPath}"`;
-        
         console.log('Starting database restore using sqlpackage...');
-        console.log(`Executing command: sqlpackage /a:Import /tsn:*** /tdn:*** /sf:"${downloadPath}"`);
+        const sanitizedCommand = `sqlpackage /a:Import /tsn:*** /tdn:*** /sf:"${downloadPath}" /su:${process.env.DB_USER} /sp:***`;
+        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${dbName} /sf:"${downloadPath}" /su:${process.env.DB_USER} /sp:${process.env.DB_PASSWORD}`;
+
+        console.log(`Executing command: ${sanitizedCommand}`);
 
         // This restore process is still synchronous and can time out.
         // For now, leaving as-is since the request was about fixing backups.
-        exec(command, { env: { ...process.env, SQLPACKAGE_ACCESSTOKEN: token } }, (error, stdout, stderr) => {
+        exec(command, (error, stdout, stderr) => {
             if (fs.existsSync(downloadPath)) {
                 fs.unlinkSync(downloadPath);
             }
