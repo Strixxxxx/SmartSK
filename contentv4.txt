@@ -1,0 +1,41 @@
+Current Error Analysis
+The new error is:
+Login failed for user '<token-identified principal>'. 
+The server is not currently configured to accept this token.
+This means the Azure SQL Database itself is not configured to accept Azure AD authentication, not just a sqlpackage syntax issue.
+Do You Need to Switch to Managed Identity?
+No, you don't necessarily need to switch to Managed Identity in the Deployment Center. The deployment authentication (Admin Credentials vs Managed Identity) is separate from how your application authenticates to the SQL database.
+The Real Issue
+Your Azure SQL Database needs to be configured to accept Azure AD authentication. Here's what needs to be done:
+Option 1: Enable Azure AD Authentication on SQL Database (Recommended)
+This allows you to keep using Admin Credentials for deployment while using Azure AD for database access:
+
+In Azure Portal → SQL Server (not database)
+Go to Settings → Microsoft Entra ID (formerly Azure AD)
+Click Set admin and assign an Azure AD admin
+After setting the admin, your App Service's managed identity can authenticate
+
+Important: Even with Admin Credentials for deployment, your App Service already has a System-Assigned Managed Identity available. You just need to:
+
+Enable it in App Service → Identity
+Grant it access to the SQL database
+
+Option 2: Use SQL Authentication (Simpler but Less Secure)
+If you want to avoid Azure AD complexity entirely, use traditional SQL authentication:
+Changes needed in backup.js:
+javascript// Remove the getAzureAdToken function entirely
+// Remove DefaultAzureCredential import
+
+// Change the command to use SQL authentication:
+const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${bacpacFilePath}" /su:${process.env.DB_USER} /sp:${process.env.DB_PASSWORD}`;
+This uses your existing DB_USER and DB_PASSWORD environment variables.
+My Recommendation
+Use Option 2 (SQL Authentication) because:
+
+✅ No Azure Portal changes needed - works with your current setup
+✅ No Dockerfile changes - no need to modify containers
+✅ No GitHub workflow changes - deployment stays the same
+✅ Keeps Admin Credentials for deployment - as you requested
+✅ Works immediately - uses credentials you already have configured
+
+The Azure AD token approach is more secure, but it requires proper Azure SQL configuration which seems to be missing in your current setup.

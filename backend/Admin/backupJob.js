@@ -58,13 +58,19 @@ const updateJob = async (jobId, status, message, data = {}) => {
 
     let updateFields = ['Status = @Status', 'Message = @Message', 'UpdatedAt = @UpdatedAt'];
 
+    // Set StartedAt on the first transition to 'processing'
+    if (status === 'processing' && data.processing) {
+        request.input('StartedAt', sql.DateTime2, new Date());
+        updateFields.push('StartedAt = @StartedAt');
+    }
+
     // Handle ErrorMessage
     if (data.ErrorMessage) {
         request.input('ErrorMessage', sql.NVarChar(sql.MAX), data.ErrorMessage);
         updateFields.push('ErrorMessage = @ErrorMessage');
     }
     
-    // Handle direct properties instead of nested 'result' object
+    // Handle direct properties
     if (data.FileName) {
         request.input('FileName', sql.NVarChar(255), data.FileName);
         updateFields.push('FileName = @FileName');
@@ -80,15 +86,24 @@ const updateJob = async (jobId, status, message, data = {}) => {
         updateFields.push('BlobName = @BlobName');
     }
 
-    if (status === 'processing' && !data.processing) {
-        request.input('StartedAt', sql.DateTime2, new Date());
-        updateFields.push('StartedAt = @StartedAt');
+    if (data.BlobURL) {
+        request.input('BlobURL', sql.NVarChar(500), data.BlobURL);
+        updateFields.push('BlobURL = @BlobURL');
     }
-    
+
+    if (data.FileSize) {
+        request.input('FileSize', sql.BigInt, data.FileSize);
+        updateFields.push('FileSize = @FileSize');
+    }
+
+    if (data.Duration) {
+        request.input('Duration', sql.Int, data.Duration);
+        updateFields.push('Duration = @Duration');
+    }
+
     if (status === 'completed' || status === 'failed') {
         request.input('CompletedAt', sql.DateTime2, new Date());
         updateFields.push('CompletedAt = @CompletedAt');
-        updateFields.push('Duration = DATEDIFF(SECOND, StartedAt, GETDATE())');
     }
 
     await request.query(`UPDATE BackupJobs SET ${updateFields.join(', ')} WHERE JobID = @JobID`);

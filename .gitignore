@@ -23,11 +23,3 @@ dist-ssr
 *.sw?
 /node_modules
 
-# Files
-Audit Layout.txt
-backend.txt
-console.txt
-contentv2.txt
-contentv3.txt
-contentv4.txt
-frontend.txt

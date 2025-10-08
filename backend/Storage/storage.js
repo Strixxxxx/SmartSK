@@ -94,6 +94,7 @@ async function uploadBackupFile(filePath, blobName) {
 
     await blockBlobClient.uploadFile(filePath);
     console.log(`Successfully uploaded ${blobName} to container ${backupContainerName}.`);
+    return blockBlobClient.url;
 }
 
 /**

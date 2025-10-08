@@ -124,14 +124,13 @@ router.get('/download/:jobId', authMiddleware, async (req, res) => {
 
 // --- Main Asynchronous Backup Execution Logic ---
 async function executeBackup(jobId) {
-    const startTime = Date.now();
     let job = await getJob(jobId);
     if (!job) {
         console.error(`[Job ${jobId}] Cannot execute non-existent job.`);
         return;
     }
 
-    const { BackupType, UserID, CreatedBy } = job;
+    const { BackupType, UserID } = job;
     const now = new Date();
     const phTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
     const date = phTime.toISOString().slice(0, 10);
@@ -140,38 +139,44 @@ async function executeBackup(jobId) {
     const bacpacFilePath = path.join(backupDir, bacpacFileName);
 
     try {
-        await updateJob(jobId, 'processing', 'Exporting database using sqlpackage...', { processing: true });
-
         const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${bacpacFilePath}" /su:${process.env.DB_USER} /sp:${process.env.DB_PASSWORD}`;
         const sanitizedCommand = `sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${bacpacFilePath}" /su:${process.env.DB_USER} /sp:***`;
+
+        await updateJob(jobId, 'processing', 'Exporting database using sqlpackage...', { processing: true });
         console.log(`[Job ${jobId}] Executing command: ${sanitizedCommand}`);
 
         await new Promise((resolve, reject) => {
-            const sqlPackageProcess = spawn(command, { shell: true });
-            sqlPackageProcess.stdout.on('data', (data) => console.log(`[Job ${jobId}] sqlpackage stdout: ${data}`));
-            sqlPackageProcess.stderr.on('data', (data) => console.error(`[Job ${jobId}] sqlpackage stderr: ${data}`));
+            const sqlPackageProcess = spawn(command, {
+                shell: true
+            });
+
+            sqlPackageProcess.stdout.on('data', (data) => {
+                console.log(`[Job ${jobId}] sqlpackage stdout: ${data}`);
+            });
+
+            sqlPackageProcess.stderr.on('data', (data) => {
+                console.error(`[Job ${jobId}] sqlpackage stderr: ${data}`);
+            });
+
             sqlPackageProcess.on('close', (code) => {
                 if (code === 0) {
                     console.log(`[Job ${jobId}] Database export to .bacpac completed.`);
                     resolve();
                 } else {
+                    console.error(`[Job ${jobId}] sqlpackage process exited with code ${code}`);
                     reject(new Error(`sqlpackage process exited with code ${code}`));
                 }
             });
-            sqlPackageProcess.on('error', (err) => reject(err));
+
+            sqlPackageProcess.on('error', (err) => {
+                console.error(`[Job ${jobId}] Failed to start sqlpackage process:`, err);
+                reject(err);
+            });
         });
 
         await updateJob(jobId, 'processing', 'Uploading .bacpac file to Azure Storage...');
         const blobName = bacpacFileName;
-        const blobURL = await uploadBackupFile(bacpacFilePath, blobName);
-        const bacpacFileSize = fs.statSync(bacpacFilePath).size;
-
-        let finalUpdateData = {
-            BlobName: blobName,
-            BlobURL: blobURL,
-            FileSize: bacpacFileSize,
-            Duration: Math.round((Date.now() - startTime) / 1000),
-        };
+        await uploadBackupFile(bacpacFilePath, blobName);
 
         if (BackupType === 'hybrid') {
             await updateJob(jobId, 'processing', 'Creating encrypted zip file for download...');
@@ -179,37 +184,34 @@ async function executeBackup(jobId) {
             const zipFilePath = path.join(backupDir, zipFileName);
 
             await createEncryptedZip(bacpacFilePath, zipFilePath, bacpacFileName);
-            const zipFileSize = fs.statSync(zipFilePath).size;
 
-            finalUpdateData = {
-                ...finalUpdateData,
-                FilePath: zipFilePath, // Store the full, absolute path
+            await updateJob(jobId, 'completed', 'Backup complete. File is ready for download.', {
+                FilePath: zipFilePath,
                 FileName: zipFileName,
-                FileSize: zipFileSize, // Overwrite with zip file size
-            };
+                BlobName: blobName
+            });
         } else { // cloud-only
-            finalUpdateData.FileName = bacpacFileName;
+            await updateJob(jobId, 'completed', 'Backup complete. File uploaded to cloud storage.', {
+                FileName: bacpacFileName,
+                BlobName: blobName
+            });
         }
 
-        await updateJob(jobId, 'completed', 'Backup complete.', finalUpdateData);
-
+        // Add audit trail
         addAuditTrail({
             actor: 'A',
             module: 'B',
             userID: UserID,
             actions: `backup-database-${BackupType}`,
             newValue: bacpacFileName,
-            descriptions: `${CreatedBy} initiated a ${BackupType} database backup.`
+            descriptions: `Admin user initiated a ${BackupType} database backup.`
         });
 
     } catch (error) {
         console.error(`[Job ${jobId}] Backup process failed:`, error.message);
-        const duration = Math.round((Date.now() - startTime) / 1000);
-        await updateJob(jobId, 'failed', `Backup failed: ${error.message}`, { 
-            ErrorMessage: error.stack,
-            Duration: duration
-        });
+        await updateJob(jobId, 'failed', `Backup failed: ${error.message}`, { ErrorMessage: error.stack });
     } finally {
+        // Clean up the .bacpac file as it's either uploaded or zipped
         if (fs.existsSync(bacpacFilePath)) {
             fs.unlinkSync(bacpacFilePath);
             console.log(`[Job ${jobId}] Cleaned up local .bacpac file: ${bacpacFilePath}`);
