@@ -13,7 +13,7 @@ RUN echo "Installing Node.js dependencies..." && npm ci --omit=dev
 # ============================
 # Stage 2: Build Python deps
 # ============================
-FROM python:3.9-slim AS python-builder
+FROM python:3.9-slim-bullseye AS python-builder
 
 WORKDIR /app
 
