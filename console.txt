@@ -8,27 +8,54 @@
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-08T08:54:32.6467322Z Restarting OpenBSD Secure Shell server: sshd.
-2025-10-08T08:54:32.8593673Z node not running, starting node /opt/webssh/index.js
-2025-10-08T08:54:47.2553751Z Wed Oct 8 08:54:47 UTC 2025 running .net core
-2025-10-08T08:54:48.8340844Z Startup : 08.54.48.765332
-2025-10-08T08:54:49.1174797Z Configure Services : 08.54.49.117283
-2025-10-08T08:54:50.270453Z Configure : 08.54.50.270271
-2025-10-08T08:54:50.8403419Z Setting Up Routes : 08.54.50.840137
-2025-10-08T08:54:51.2430924Z Exiting Configure : 08.54.51.242746
-2025-10-08T08:54:51.4113102Z Hosting environment: Production
-2025-10-08T08:54:51.4117827Z Content root path: /opt/Kudu
-2025-10-08T08:54:51.4127066Z Now listening on: http://0.0.0.0:8181
-2025-10-08T08:54:51.4129988Z Application started. Press Ctrl+C to shut down.
-2025-10-08T08:55:24.4743098Z Raw data request with filters
-2025-10-08T08:55:24.5929896Z Stored procedure result count
-2025-10-08T08:55:32.180173Z [Job 96222487-46fa-4dc7-848c-b16a3f56d958] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
-2025-10-08T08:55:32.6626511Z [Job 96222487-46fa-4dc7-848c-b16a3f56d958] Updated in database to processing: Acquiring Azure AD token...
-2025-10-08T08:55:39.1403899Z Successfully acquired Azure AD token.
-2025-10-08T08:55:39.1608931Z [Job 96222487-46fa-4dc7-848c-b16a3f56d958] Updated in database to processing: Exporting database using sqlpackage...
-2025-10-08T08:55:39.1609405Z [Job 96222487-46fa-4dc7-848c-b16a3f56d958] Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_16-55-32.bacpac"
-2025-10-08T08:55:39.160943Z [Job 96222487-46fa-4dc7-848c-b16a3f56d958] Backup process failed: Cannot access 'process' before initialization
-2025-10-08T08:55:39.1923345Z [Job 96222487-46fa-4dc7-848c-b16a3f56d958] Updated in database to failed: Backup failed: Cannot access 'process' before initialization
+2025-10-08T09:07:51.5105046Z Raw data request with filters
+2025-10-08T09:07:51.6402327Z Stored procedure result count
+2025-10-08T09:08:16.1965634Z [Job 7a1cb2f6-c9ef-4b81-ad7e-588e219b9069] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
+2025-10-08T09:08:17.8699802Z [Job 7a1cb2f6-c9ef-4b81-ad7e-588e219b9069] Updated in database to processing: Acquiring Azure AD token...
+2025-10-08T09:08:25.4591781Z Successfully acquired Azure AD token.
+2025-10-08T09:08:25.4806702Z [Job 7a1cb2f6-c9ef-4b81-ad7e-588e219b9069] Updated in database to processing: Exporting database using sqlpackage...
+2025-10-08T09:08:25.4817561Z [Job 7a1cb2f6-c9ef-4b81-ad7e-588e219b9069] Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_17-08-16.bacpac"
+2025-10-08T09:08:27.8242424Z [Job 7a1cb2f6-c9ef-4b81-ad7e-588e219b9069] sqlpackage stdout: Connecting to database 'smartSK' on server 'smart-sk.database.windows.net'.
+2025-10-08T09:08:27.8242749Z
+2025-10-08T09:08:32.517654Z [Job 7a1cb2f6-c9ef-4b81-ad7e-588e219b9069] sqlpackage stdout: *** Cannot authenticate using Kerberos. Ensure Kerberos has been initialized on the client with 'kinit' and a Service Principal Name has been registered for the SQL Server to allow Kerberos authentication.
+2025-10-08T09:08:32.5176971Z ErrorCode=InternalError, Exception=Interop+NetSecurityNative+GssApiException: GSSAPI operation failed with error - Unspecified GSS failure.  Minor code may provide more information (SPNEGO cannot find mechanisms to negotiate).
+2025-10-08T09:08:32.5176999Z    at System.Net.Security.NegotiateStreamPal.GssInitSecurityContext(SafeGssContextHandle& context, SafeGssCredHandle credential, Boolean isNtlm, SafeGssNameHandle targetName, GssFlags inFlags, Byte[] buffer, Byte[]& outputBuffer, UInt32& outFlags, Int32& isNtlmUsed)
+2025-10-08T09:08:32.5177024Z    at System.Net.Security.NegotiateStreamPal.EstablishSecurityContext(SafeFreeNegoCredentials credential, SafeDeleteContext& context, String targetName, ContextFlagsPal inFlags, SecurityBuffer inputBuffer, SecurityBuffer outputBuffer, ContextFlagsPal& outFlags)
+2025-10-08T09:08:32.5177047Z    at Microsoft.Data.SqlClient.SNI.SNIProxy.GenSspiClientContext(SspiClientContextStatus sspiClientContextStatus, Byte[] receivedBuff, Byte[]& sendBuff, Byte[][] serverName)
+2025-10-08T09:08:32.5177085Z    at Microsoft.Data.SqlClient.SNI.TdsParserStateObjectManaged.GenerateSspiClientContext(Byte[] receivedBuff, UInt32 receivedLength, Byte[]& sendBuff, UInt32& sendLength, Byte[][] _sniSpnBuffer)
+2025-10-08T09:08:32.5177105Z    at Microsoft.Data.SqlClient.TdsParser.SNISSPIData(Byte[] receivedBuff, UInt32 receivedLength, Byte[]& sendBuff, UInt32& sendLength)
+2025-10-08T09:08:32.5177143Z
+2025-10-08T09:08:32.5895625Z [Job 7a1cb2f6-c9ef-4b81-ad7e-588e219b9069] sqlpackage stdout: *** Cannot authenticate using Kerberos. Ensure Kerberos has been initialized on the client with 'kinit' and a Service Principal Name has been registered for the SQL Server to allow Kerberos authentication.
+2025-10-08T09:08:32.589616Z ErrorCode=InternalError, Exception=Interop+NetSecurityNative+GssApiException: GSSAPI operation failed with error - Unspecified GSS failure.  Minor code may provide more information (SPNEGO cannot find mechanisms to negotiate).
+2025-10-08T09:08:32.5896191Z    at System.Net.Security.NegotiateStreamPal.GssInitSecurityContext(SafeGssContextHandle& context, SafeGssCredHandle credential, Boolean isNtlm, SafeGssNameHandle targetName, GssFlags inFlags, Byte[] buffer, Byte[]& outputBuffer, UInt32& outFlags, Int32& isNtlmUsed)
+2025-10-08T09:08:32.589622Z    at System.Net.Security.NegotiateStreamPal.EstablishSecurityContext(SafeFreeNegoCredentials credential, SafeDeleteContext& context, String targetName, ContextFlagsPal inFlags, SecurityBuffer inputBuffer, SecurityBuffer outputBuffer, ContextFlagsPal& outFlags)
+2025-10-08T09:08:32.589624Z    at Microsoft.Data.SqlClient.SNI.SNIProxy.GenSspiClientContext(SspiClientContextStatus sspiClientContextStatus, Byte[] receivedBuff, Byte[]& sendBuff, Byte[][] serverName)
+2025-10-08T09:08:32.5896262Z    at Microsoft.Data.SqlClient.SNI.TdsParserStateObjectManaged.GenerateSspiClientContext(Byte[] receivedBuff, UInt32 receivedLength, Byte[]& sendBuff, UInt32& sendLength, Byte[][] _sniSpnBuffer)
+2025-10-08T09:08:32.589628Z    at Microsoft.Data.SqlClient.TdsParser.SNISSPIData(Byte[] receivedBuff, UInt32 receivedLength, Byte[]& sendBuff, UInt32& sendLength)
+2025-10-08T09:08:32.5896365Z
+2025-10-08T09:08:38.178328Z [Job 7a1cb2f6-c9ef-4b81-ad7e-588e219b9069] sqlpackage stdout: *** Cannot authenticate using Kerberos. Ensure Kerberos has been initialized on the client with 'kinit' and a Service Principal Name has been registered for the SQL Server to allow Kerberos authentication.
+2025-10-08T09:08:38.1783735Z ErrorCode=InternalError, Exception=Interop+NetSecurityNative+GssApiException: GSSAPI operation failed with error - Unspecified GSS failure.  Minor code may provide more information (SPNEGO cannot find mechanisms to negotiate).
+2025-10-08T09:08:38.1783766Z    at System.Net.Security.NegotiateStreamPal.GssInitSecurityContext(SafeGssContextHandle& context, SafeGssCredHandle credential, Boolean isNtlm, SafeGssNameHandle targetName, GssFlags inFlags, Byte[] buffer, Byte[]& outputBuffer, UInt32& outFlags, Int32& isNtlmUsed)
+2025-10-08T09:08:38.1783796Z    at System.Net.Security.NegotiateStreamPal.EstablishSecurityContext(SafeFreeNegoCredentials credential, SafeDeleteContext& context, String targetName, ContextFlagsPal inFlags, SecurityBuffer inputBuffer, SecurityBuffer outputBuffer, ContextFlagsPal& outFlags)
+2025-10-08T09:08:38.1783818Z    at Microsoft.Data.SqlClient.SNI.SNIProxy.GenSspiClientContext(SspiClientContextStatus sspiClientContextStatus, Byte[] receivedBuff, Byte[]& sendBuff, Byte[][] serverName)
+2025-10-08T09:08:38.1783839Z    at Microsoft.Data.SqlClient.SNI.TdsParserStateObjectManaged.GenerateSspiClientContext(Byte[] receivedBuff, UInt32 receivedLength, Byte[]& sendBuff, UInt32& sendLength, Byte[][] _sniSpnBuffer)
+2025-10-08T09:08:38.1783943Z    at Microsoft.Data.SqlClient.TdsParser.SNISSPIData(Byte[] receivedBuff, UInt32 receivedLength, Byte[]& sendBuff, UInt32& sendLength)
+2025-10-08T09:08:38.1783958Z
+2025-10-08T09:08:49.2150718Z [Job 7a1cb2f6-c9ef-4b81-ad7e-588e219b9069] sqlpackage stdout: *** Cannot authenticate using Kerberos. Ensure Kerberos has been initialized on the client with 'kinit' and a Service Principal Name has been registered for the SQL Server to allow Kerberos authentication.
+2025-10-08T09:08:49.2151252Z ErrorCode=InternalError, Exception=Interop+NetSecurityNative+GssApiException: GSSAPI operation failed with error - Unspecified GSS failure.  Minor code may provide more information (SPNEGO cannot find mechanisms to negotiate).
+2025-10-08T09:08:49.2151283Z    at System.Net.Security.NegotiateStreamPal.GssInitSecurityContext(SafeGssContextHandle& context, SafeGssCredHandle credential, Boolean isNtlm, SafeGssNameHandle targetName, GssFlags inFlags, Byte[] buffer, Byte[]& outputBuffer, UInt32& outFlags, Int32& isNtlmUsed)
+2025-10-08T09:08:49.2151309Z    at System.Net.Security.NegotiateStreamPal.EstablishSecurityContext(SafeFreeNegoCredentials credential, SafeDeleteContext& context, String targetName, ContextFlagsPal inFlags, SecurityBuffer inputBuffer, SecurityBuffer outputBuffer, ContextFlagsPal& outFlags)
+2025-10-08T09:08:49.2151331Z    at Microsoft.Data.SqlClient.SNI.SNIProxy.GenSspiClientContext(SspiClientContextStatus sspiClientContextStatus, Byte[] receivedBuff, Byte[]& sendBuff, Byte[][] serverName)
+2025-10-08T09:08:49.2151356Z    at Microsoft.Data.SqlClient.SNI.TdsParserStateObjectManaged.GenerateSspiClientContext(Byte[] receivedBuff, UInt32 receivedLength, Byte[]& sendBuff, UInt32& sendLength, Byte[][] _sniSpnBuffer)
+2025-10-08T09:08:49.2151451Z    at Microsoft.Data.SqlClient.TdsParser.SNISSPIData(Byte[] receivedBuff, UInt32 receivedLength, Byte[]& sendBuff, UInt32& sendLength)
+2025-10-08T09:08:49.2151467Z
+2025-10-08T09:09:11.3676227Z [Job 7a1cb2f6-c9ef-4b81-ad7e-588e219b9069] sqlpackage stdout: *** Cannot authenticate using Kerberos. Ensure Kerberos has been initialized on the client with 'kinit' and a Service Principal Name has been registered for the SQL Server to allow Kerberos authentication.
+2025-10-08T09:09:11.3676666Z ErrorCode=InternalError, Exception=Interop+NetSecurityNative+GssApiException: GSSAPI operation failed with error - Unspecified GSS failure.  Minor code may provide more information (SPNEGO cannot find mechanisms to negotiate).
+2025-10-08T09:09:11.3676695Z    at System.Net.Security.NegotiateStreamPal.GssInitSecurityContext(SafeGssContextHandle& context, SafeGssCredHandle credential, Boolean isNtlm, SafeGssNameHandle targetName, GssFlags inFlags, Byte[] buffer, Byte[]& outputBuffer, UInt32& outFlags, Int32& isNtlmUsed)
+2025-10-08T09:09:11.3676719Z    at System.Net.Security.NegotiateStreamPal.EstablishSecurityContext(SafeFreeNegoCredentials credential, SafeDeleteContext& context, String targetName, ContextFlagsPal inFlags, SecurityBuffer inputBuffer, SecurityBuffer outputBuffer, ContextFlagsPal& outFlags)
+2025-10-08T09:09:11.3676739Z    at Microsoft.Data.SqlClient.SNI.SNIProxy.GenSspiClientContext(SspiClientContextStatus sspiClientContextStatus, Byte[] receivedBuff, Byte[]& sendBuff, Byte[][] serverName)
+2025-10-08T09:09:11.367676Z    at Microsoft.Data.SqlClient.SNI.TdsParserStateObjectManaged.GenerateSspiClientContext(Byte[] receivedBuff, UInt32 receivedLength, Byte[]& sendBuff, UInt32& sendLength, Byte[][] _sniSpnBuffer)
+2025-10-08T09:09:11.3676779Z    at Microsoft.Data.SqlClient.TdsParser.SNISSPIData(Byte[] receivedBuff, UInt32 receivedLength, Byte[]& sendBuff, UInt32& sendLength)
 
 --Deployment Container Logs
 
