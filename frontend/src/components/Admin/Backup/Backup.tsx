@@ -1,11 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import axios from '../../../backend connection/axiosConfig';
 import './Backup.css';
-
-interface OutletContextType {
-  sidebarCollapsed: boolean;
-}
 
 interface CloudBackup {
   name: string;
@@ -14,203 +10,270 @@ interface CloudBackup {
   size: number;
 }
 
-const Backup = () => {
-  const { sidebarCollapsed } = useOutletContext<OutletContextType>();
-  const [status, setStatus] = useState('');
+interface Job {
+  JobID: string;
+  Status: 'pending' | 'processing' | 'completed' | 'failed';
+  Message: string;
+  BackupType: 'hybrid' | 'cloud-only';
+  ErrorMessage?: string;
+  FileName?: string;
+  FilePath?: string;
+}
+
+interface OutletContextType {
+  sidebarCollapsed: boolean;
+  showFlashMessage: (message: string, type: 'success' | 'error' | 'info') => void;
+}
+
+const Backup: React.FC = () => {
+  const { showFlashMessage, sidebarCollapsed } = useOutletContext<OutletContextType>();
   const [loading, setLoading] = useState(false);
-  const [isRestoreModalOpen, setRestoreModalOpen] = useState(false);
-  const [isCloudRestoreModalOpen, setCloudRestoreModalOpen] = useState(false);
+  const [status, setStatus] = useState('');
   const [cloudBackups, setCloudBackups] = useState<CloudBackup[]>([]);
+  const [restoreModalOpen, setRestoreModalOpen] = useState(false);
+  const [cloudRestoreModalOpen, setCloudRestoreModalOpen] = useState(false);
+  const [selectedCloudBackup, setSelectedCloudBackup] = useState<string | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [activeJobId, setActiveJobId] = useState<string | null>(null);
+  const pollingIntervalRef = useRef<number | null>(null);
 
-  const handleBackup = async (backupType: 'hybrid' | 'cloud-only') => {
+  const fetchCloudBackups = async () => {
     setLoading(true);
-    setStatus(`Creating ${backupType} backup... This may take a few minutes.`);
-    
-    try {
-      const response = await axios.post('/api/admin/backup', 
-        { backupType },
-        { responseType: backupType === 'hybrid' ? 'blob' : 'json' }
-      );
-
-      if (backupType === 'hybrid') {
-        const disposition = response.headers['content-disposition'];
-        let filename = 'backup.zip';
-        if (disposition && disposition.indexOf('attachment') !== -1) {
-          const filenameRegex = /filename[^;=\n]*=((['"])(.*?)\2|[^;\n]*)/;
-          const matches = filenameRegex.exec(disposition);
-          if (matches != null && matches[3]) {
-            filename = matches[3];
-          }
-        }
-        
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', filename);
-        document.body.appendChild(link);
-        link.click();
-        link.remove();
-        setStatus('Hybrid backup created and download started.');
-      } else {
-        setStatus(response.data.message);
-      }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Backup failed. Please try again.';
-      setStatus(`Error: ${errorMessage}`);
-      console.error('Backup failed:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const openRestoreModal = () => setRestoreModalOpen(true);
-  const closeRestoreModal = () => setRestoreModalOpen(false);
-
-  const openCloudRestoreModal = async () => {
-    closeRestoreModal();
-    setLoading(true);
-    setStatus('Fetching cloud backups...');
     try {
       const response = await axios.get('/api/admin/backup');
       setCloudBackups(response.data);
-      setCloudRestoreModalOpen(true);
-      setStatus('');
     } catch (error) {
-      setStatus('Failed to fetch cloud backups.');
+      showFlashMessage('Failed to fetch cloud backups.', 'error');
       console.error('Failed to fetch cloud backups:', error);
     } finally {
       setLoading(false);
     }
   };
-  const closeCloudRestoreModal = () => setCloudRestoreModalOpen(false);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      if (file.name.endsWith('.bacpac')) {
-        setSelectedFile(file);
-        setStatus(`Selected file: ${file.name}`);
-      } else {
-        setStatus('Invalid file type. Please select a .bacpac file.');
-        setSelectedFile(null);
+  useEffect(() => {
+    fetchCloudBackups();
+    // Clear interval on component unmount
+    return () => {
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
       }
+    };
+  }, []);
+
+  const pollJobStatus = (jobId: string) => {
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+    }
+
+    pollingIntervalRef.current = window.setInterval(async () => {
+      try {
+        const response = await axios.get<Job>(`/api/admin/backup/status/${jobId}`);
+        const job = response.data;
+        setStatus(`Status: ${job.Message}`); // Update status message
+
+        if (job.Status === 'completed' || job.Status === 'failed') {
+          if (pollingIntervalRef.current) {
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+          }
+          setActiveJobId(null); // Re-enable buttons
+          setLoading(false);
+          fetchCloudBackups(); // Refresh the list of backups
+
+          if (job.Status === 'completed') {
+            showFlashMessage(`Backup (${job.BackupType}) completed successfully!`, 'success');
+            if (job.BackupType === 'hybrid') {
+              // Trigger download for hybrid backups
+              showFlashMessage('Starting download...', 'info');
+              try {
+                const downloadResponse = await axios.get(`/api/admin/backup/download/${jobId}`, {
+                  responseType: 'blob',
+                });
+                const url = window.URL.createObjectURL(new Blob([downloadResponse.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', job.FileName || `backup-${jobId}.zip`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+              } catch (downloadError) {
+                console.error('Download failed:', downloadError);
+                showFlashMessage('Failed to download backup file.', 'error');
+              }
+            }
+          } else { // Failed
+            showFlashMessage(`Backup failed: ${job.ErrorMessage || job.Message}`, 'error');
+          }
+        }
+      } catch (error) {
+        console.error('Polling error:', error);
+        showFlashMessage('Error checking backup status.', 'error');
+        if (pollingIntervalRef.current) {
+          clearInterval(pollingIntervalRef.current);
+        }
+        setActiveJobId(null);
+        setLoading(false);
+      }
+    }, 3000); // Poll every 3 seconds
+  };
+
+  const handleBackup = async (backupType: 'hybrid' | 'cloud-only') => {
+    setLoading(true);
+    setStatus(`Initiating ${backupType} backup...`);
+
+    try {
+      const response = await axios.post<{ jobId: string }>('/api/admin/backup', { backupType });
+      const { jobId } = response.data;
+      setActiveJobId(jobId);
+      setStatus('Backup process started. Polling for status updates...');
+      showFlashMessage(`Backup initiated with Job ID: ${jobId}`, 'info');
+      pollJobStatus(jobId);
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to initiate backup.';
+      setStatus(`Error: ${errorMessage}`);
+      showFlashMessage(errorMessage, 'error');
+      setLoading(false);
     }
   };
 
-  const handleLocalRestore = async () => {
-    if (!selectedFile) {
-      setStatus('Please select a .bacpac file to restore.');
-      return;
-    }
-
+  const handleRestore = async (restoreType: 'cloud' | 'local') => {
     setLoading(true);
-    setStatus('Restoring from local backup... This may take several minutes.');
-    closeRestoreModal();
+    setStatus(`Starting ${restoreType} restore... This may take several minutes.`);
+    showFlashMessage('Restore process initiated. Please do not navigate away.', 'info');
 
     const formData = new FormData();
-    formData.append('restoreType', 'local');
-    formData.append('backupFile', selectedFile);
+    formData.append('restoreType', restoreType);
+
+    if (restoreType === 'local' && selectedFile) {
+        formData.append('backupFile', selectedFile);
+    } else if (restoreType === 'cloud' && selectedCloudBackup) {
+      formData.append('fileName', selectedCloudBackup);
+    } else {
+      showFlashMessage('No file selected for restore.', 'error');
+      setLoading(false);
+      return;
+    }
 
     try {
       const response = await axios.post('/api/admin/backup/restore', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        timeout: 600000, // 10 minute timeout for restore
       });
-      setStatus(response.data.message);
+      showFlashMessage(response.data.message, 'success');
+      setStatus('Restore completed successfully.');
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Restore failed. Please try again.';
+      const errorMessage = error.response?.data?.message || 'Restore failed.';
+      showFlashMessage(errorMessage, 'error');
       setStatus(`Error: ${errorMessage}`);
-      console.error('Local restore failed:', error);
     } finally {
       setLoading(false);
+      closeRestoreModal();
+      closeCloudRestoreModal();
       setSelectedFile(null);
-      if(fileInputRef.current) fileInputRef.current.value = '';
+      setSelectedCloudBackup(null);
     }
   };
-  
-  const handleCloudRestore = async (fileName: string) => {
-    setLoading(true);
-    setStatus(`Restoring from ${fileName}... This may take several minutes.`);
-    closeCloudRestoreModal();
 
-    try {
-      const response = await axios.post('/api/admin/backup/restore', {
-        restoreType: 'cloud',
-        fileName: fileName,
-      });
-      setStatus(response.data.message);
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Restore failed. Please try again.';
-      setStatus(`Error: ${errorMessage}`);
-      console.error('Cloud restore failed:', error);
-    } finally {
-      setLoading(false);
+  const openRestoreModal = () => setRestoreModalOpen(true);
+  const closeRestoreModal = () => {
+    setRestoreModalOpen(false);
+    setSelectedFile(null);
+  };
+
+  const openCloudRestoreModal = async () => {
+    closeRestoreModal();
+    await fetchCloudBackups();
+    setCloudRestoreModalOpen(true);
+  };
+  const closeCloudRestoreModal = () => setCloudRestoreModalOpen(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+        const file = e.target.files[0];
+        if (file.name.endsWith('.bacpac')) {
+            setSelectedFile(file);
+        } else {
+            showFlashMessage('Invalid file type. Please select a .bacpac file.', 'error');
+            setSelectedFile(null);
+        }
     }
   };
 
   return (
     <div className={`backup-page-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
       <div className="backup-container">
-        <h2>Database Backup & Restore</h2>
-        <p>Create a cloud-only backup or a hybrid backup (cloud + local download). Restore from a local file or a cloud copy.</p>
-        
-        <div className="button-group">
-          <button onClick={() => handleBackup('cloud-only')} disabled={loading}>Cloud-Only Backup</button>
-          <button onClick={() => handleBackup('hybrid')} disabled={loading}>Hybrid Backup</button>
+        <h2>Database Backup and Restore</h2>
+        <div className="status-box">{status || 'Ready'}</div>
+
+        <div className="backup-actions">
+          <button onClick={() => handleBackup('hybrid')} disabled={!!activeJobId || loading}>
+            Create Hybrid Backup (Cloud + Download)
+          </button>
+          <button onClick={() => handleBackup('cloud-only')} disabled={!!activeJobId || loading}>
+            Create Cloud-Only Backup
+          </button>
+          <button onClick={openRestoreModal} disabled={!!activeJobId || loading}>
+            Restore from Backup
+          </button>
         </div>
-        <button onClick={openRestoreModal} disabled={loading} className="restore-btn">Restore Database</button>
 
-        {status && <p className="backup-status">{status}</p>}
-      </div>
-
-      {isRestoreModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>Choose Restore Option</h3>
-              <button onClick={closeRestoreModal} className="modal-close-button">&times;</button>
-            </div>
-            <div className="modal-body">
-              <input type="file" onChange={handleFileChange} ref={fileInputRef} style={{ display: 'none' }} accept=".bacpac"/>
-              <button onClick={() => fileInputRef.current?.click()} disabled={loading}>Select Local .bacpac File</button>
-              {selectedFile && <p className="selected-file">Selected: {selectedFile.name}</p>}
-              <button onClick={handleLocalRestore} disabled={loading || !selectedFile}>Restore from Local Copy</button>
-              <hr style={{margin: '20px 0'}}/>
-              <button onClick={openCloudRestoreModal} disabled={loading}>Restore from Cloud Copy</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isCloudRestoreModalOpen && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>Restore from Cloud Backup</h3>
-              <button onClick={closeCloudRestoreModal} className="modal-close-button">&times;</button>
-            </div>
-            <div className="modal-body">
-              {loading ? <p>Loading backups...</p> : (
-                <ul className="cloud-backup-list">
-                  {cloudBackups.length > 0 ? cloudBackups.map(backup => (
-                    <li key={backup.name}>
-                      <span>
-                        {backup.name} ({Math.round(backup.size / 1024 / 1024)} MB)
-                        <br/>
-                        <small>{new Date(backup.lastModified).toLocaleString()}</small>
-                      </span>
-                      <button onClick={() => handleCloudRestore(backup.name)} disabled={loading}>Restore</button>
-                    </li>
-                  )) : <p>No cloud backups found.</p>}
-                </ul>
+        {/* Main Restore Modal */}
+        {restoreModalOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h3>Choose Restore Source</h3>
+              <div className="restore-options">
+                <button onClick={openCloudRestoreModal}>Restore from Cloud</button>
+                <input type="file" accept=".bacpac" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
+                <button onClick={() => fileInputRef.current?.click()}>Restore from Local File</button>
+              </div>
+              {selectedFile && (
+                <div className="local-restore-confirm">
+                  <p>Selected file: {selectedFile.name}</p>
+                  <button onClick={() => handleRestore('local')} disabled={loading}>Confirm & Restore Local</button>
+                </div>
               )}
+              <button onClick={closeRestoreModal} className="close-button">Cancel</button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Cloud Restore Modal */}
+        {cloudRestoreModalOpen && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <h3>Select a Cloud Backup to Restore</h3>
+              <div className="cloud-backup-list">
+                {cloudBackups.length > 0 ? (
+                  cloudBackups.map((backup) => (
+                    <div key={backup.name} className={`backup-item ${selectedCloudBackup === backup.name ? 'selected' : ''}`}>
+                      <label>
+                        <input
+                          type="radio"
+                          name="cloudBackup"
+                          value={backup.name}
+                          checked={selectedCloudBackup === backup.name}
+                          onChange={() => setSelectedCloudBackup(backup.name)}
+                        />
+                        {backup.name} - {new Date(backup.lastModified).toLocaleString()} ({(backup.size / 1024 / 1024).toFixed(2)} MB)
+                      </label>
+                    </div>
+                  ))
+                ) : (
+                  <p>No cloud backups found.</p>
+                )}
+              </div>
+              <div className="restore-actions">
+                <button onClick={() => handleRestore('cloud')} disabled={!selectedCloudBackup || loading}>Confirm & Restore Cloud</button>
+                <button onClick={closeCloudRestoreModal} className="close-button">Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

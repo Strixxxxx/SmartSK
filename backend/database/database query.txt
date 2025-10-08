@@ -179,6 +179,48 @@ filePath NVARCHAR(255) NOT NULL,
 CONSTRAINT FK_Attachments_Posts FOREIGN KEY (postID)  REFERENCES posts(postID) ON DELETE CASCADE
 );
 
+-- BackupJobs table
+
+CREATE TABLE BackupJobs (
+    JobID NVARCHAR(50) PRIMARY KEY,  -- UUID from the job system
+    BackupType NVARCHAR(20) NOT NULL CHECK (BackupType IN ('hybrid', 'cloud-only')),
+    Status NVARCHAR(20) NOT NULL CHECK (Status IN ('pending', 'processing', 'completed', 'failed')),
+    Message NVARCHAR(500) NULL,
+    ErrorMessage NVARCHAR(MAX) NULL,
+    
+    -- File Information
+    FileName NVARCHAR(255) NULL,
+    FilePath NVARCHAR(500) NULL,  -- For hybrid backups, path to the zip file
+    FileSize BIGINT NULL,  -- Size in bytes
+    
+    -- Azure Storage Information
+    BlobURL NVARCHAR(500) NULL,  -- URL to the .bacpac in Azure Storage
+    BlobName NVARCHAR(255) NULL,
+    
+    -- Timestamps
+    CreatedAt DATETIME2 NOT NULL DEFAULT GETDATE(),
+    StartedAt DATETIME2 NULL,  -- When processing actually started
+    CompletedAt DATETIME2 NULL,  -- When job finished (success or failure)
+    UpdatedAt DATETIME2 NOT NULL DEFAULT GETDATE(),
+    ExpiresAt DATETIME2 NULL,  -- When the job record should be cleaned up
+    
+    -- Audit Information
+    CreatedBy NVARCHAR(100) NOT NULL,  -- Admin user who initiated the backup
+    UserID INT NULL,  -- Foreign key to your users table
+    
+    -- Additional Metadata
+    Duration INT NULL,  -- Duration in seconds
+    Progress INT NULL DEFAULT 0,  -- Percentage (0-100) for future progress tracking
+    
+    CONSTRAINT FK_BackupJobs_Users FOREIGN KEY (UserID) REFERENCES userInfo(UserID)
+);
+
+-- Create indexes for better query performance
+CREATE INDEX IX_BackupJobs_Status ON BackupJobs(Status);
+CREATE INDEX IX_BackupJobs_CreatedAt ON BackupJobs(CreatedAt DESC);
+CREATE INDEX IX_BackupJobs_CreatedBy ON BackupJobs(CreatedBy);
+CREATE INDEX IX_BackupJobs_ExpiresAt ON BackupJobs(ExpiresAt) WHERE ExpiresAt IS NOT NULL;
+
 --Stored Procedures
 
 --Status Creation for the Project

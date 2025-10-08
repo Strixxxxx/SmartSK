@@ -1,49 +1,133 @@
 --Frontend (Browser's Console)
 
-backup:1 
- Failed to load resource: the server responded with a status of 500 ()
-index-qKegqXLu.js:81 Server error: 500 
-{message: 'Database backup failed.', error: "*** Unrecognized command line argument 'uat'.\n"}
-error
+Access to XMLHttpRequest at 'https://smartsk-backend-container.azurewebsites.net/api/admin/backup' from origin 'https://smartsk.app' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+index-qKegqXLu.js:81 Network error - no response received: 
+XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
+onabort
 : 
-"*** Unrecognized command line argument 'uat'.\n"
-message
+ƒ ()
+onerror
 : 
-"Database backup failed."
+ƒ ()
+onload
+: 
+null
+onloadend
+: 
+ƒ _()
+onloadstart
+: 
+null
+onprogress
+: 
+null
+onreadystatechange
+: 
+null
+ontimeout
+: 
+ƒ ()
+readyState
+: 
+4
+response
+: 
+null
+responseText
+: 
+(...)
+responseType
+: 
+"blob"
+responseURL
+: 
+""
+responseXML
+: 
+(...)
+status
+: 
+0
+statusText
+: 
+""
+timeout
+: 
+300000
+upload
+: 
+XMLHttpRequestUpload {onloadstart: null, onprogress: null, onabort: null, onerror: null, onload: null, …}
+withCredentials
+: 
+true
 [[Prototype]]
 : 
-Object
+XMLHttpRequest
 (anonymous)	@	index-qKegqXLu.js:81
+Promise.then		
+_request	@	index-qKegqXLu.js:81
+request	@	index-qKegqXLu.js:80
+(anonymous)	@	index-qKegqXLu.js:81
+(anonymous)	@	index-qKegqXLu.js:76
+x	@	index-qKegqXLu.js:319
+onClick	@	index-qKegqXLu.js:319
+$1	@	index-qKegqXLu.js:48
+(anonymous)	@	index-qKegqXLu.js:48
+Wb	@	index-qKegqXLu.js:48
+eg	@	index-qKegqXLu.js:48
+hg	@	index-qKegqXLu.js:49
+jA	@	index-qKegqXLu.js:49
+
 index-qKegqXLu.js:319 Backup failed: 
-Ke {message: 'Request failed with status code 500', name: 'AxiosError', code: 'ERR_BAD_RESPONSE', config: {…}, request: XMLHttpRequest, …}
+Ke {message: 'Network Error', name: 'AxiosError', code: 'ERR_NETWORK', config: {…}, request: XMLHttpRequest, …}
 code
 : 
-"ERR_BAD_RESPONSE"
+"ERR_NETWORK"
 config
 : 
 {transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}
 message
 : 
-"Request failed with status code 500"
+"Network Error"
 name
 : 
 "AxiosError"
 request
 : 
 XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
-response
-: 
-{data: {…}, status: 500, statusText: '', headers: ss, config: {…}, …}
-status
-: 
-500
 stack
 : 
-"AxiosError: Request failed with status code 500\n    at H2 (https://smartsk.app/assets/index-qKegqXLu.js:78:1088)\n    at XMLHttpRequest._ (https://smartsk.app/assets/index-qKegqXLu.js:78:5742)\n    at ji.request (https://smartsk.app/assets/index-qKegqXLu.js:80:2068)\n    at async x (https://smartsk.app/assets/index-qKegqXLu.js:319:95324)"
+"AxiosError: Network Error\n    at j.onerror (https://smartsk.app/assets/index-qKegqXLu.js:78:6072)\n    at ji.request (https://smartsk.app/assets/index-qKegqXLu.js:80:2068)\n    at async x (https://smartsk.app/assets/index-qKegqXLu.js:319:95324)"
 [[Prototype]]
 : 
 Error
 x	@	index-qKegqXLu.js:319
+await in x		
+onClick	@	index-qKegqXLu.js:319
+$1	@	index-qKegqXLu.js:48
+(anonymous)	@	index-qKegqXLu.js:48
+Wb	@	index-qKegqXLu.js:48
+eg	@	index-qKegqXLu.js:48
+hg	@	index-qKegqXLu.js:49
+jA	@	index-qKegqXLu.js:49
+index-qKegqXLu.js:78 
+ POST https://smartsk-backend-container.azurewebsites.net/api/admin/backup net::ERR_FAILED
+(anonymous)	@	index-qKegqXLu.js:78
+xhr	@	index-qKegqXLu.js:78
+VS	@	index-qKegqXLu.js:80
+Promise.then		
+_request	@	index-qKegqXLu.js:81
+request	@	index-qKegqXLu.js:80
+(anonymous)	@	index-qKegqXLu.js:81
+(anonymous)	@	index-qKegqXLu.js:76
+x	@	index-qKegqXLu.js:319
+onClick	@	index-qKegqXLu.js:319
+$1	@	index-qKegqXLu.js:48
+(anonymous)	@	index-qKegqXLu.js:48
+Wb	@	index-qKegqXLu.js:48
+eg	@	index-qKegqXLu.js:48
+hg	@	index-qKegqXLu.js:49
+jA	@	index-qKegqXLu.js:49
 
 --Backend(Azure Portal's Log Stream in Platform)
 
@@ -51,19 +135,20 @@ x	@	index-qKegqXLu.js:319
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-08T06:33:00.8796432Z Initializing active sessions from database...
-2025-10-08T06:33:01.8632785Z Initializing Azure Storage with primary credentials.
-2025-10-08T06:33:03.2226262Z Created backup directory at: /database_backup
-2025-10-08T06:33:03.365579Z Server is running on port 8080
-2025-10-08T06:33:05.4912002Z Initialized active sessions.
-2025-10-08T06:33:27.8321496Z Acquiring Azure AD token for database export...
-2025-10-08T06:33:33.0132335Z Successfully acquired Azure AD token.
-2025-10-08T06:33:33.0132819Z Starting database backup using sqlpackage...
-2025-10-08T06:33:33.0132862Z Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_14-33-27.bacpac" /uat:true
-2025-10-08T06:33:35.1074341Z sqlpackage export failed: Command failed: sqlpackage /a:Export /ssn:smart-sk.database.windows.net /sdn:smartSK /tf:"/database_backup/smartSK_2025-10-08_14-33-27.bacpac" /uat:true
-2025-10-08T06:33:35.1074941Z *** Unrecognized command line argument 'uat'.
-2025-10-08T06:33:35.1074964Z
-2025-10-08T06:33:35.1074982Z stderr: *** Unrecognized command line argument 'uat'.
+2025-10-08T06:47:56.3041792Z Initializing active sessions from database...
+2025-10-08T06:47:56.9071782Z Initializing Azure Storage with primary credentials.
+2025-10-08T06:47:58.2712375Z Created backup directory at: /database_backup
+2025-10-08T06:47:58.4561631Z Server is running on port 8080
+2025-10-08T06:48:01.4227928Z Initialized active sessions.
+2025-10-08T06:48:11.0684522Z Login attempt received
+2025-10-08T06:48:12.1553585Z Login successful for user.
+2025-10-08T06:48:16.2130923Z Acquiring Azure AD token for database export...
+2025-10-08T06:48:20.8587887Z Successfully acquired Azure AD token.
+2025-10-08T06:48:20.8588353Z Starting database backup using sqlpackage...
+2025-10-08T06:48:20.8588398Z Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_14-48-16.bacpac"
+2025-10-08T06:49:18.202Z No new trace in the past 1 min(s).
+2025-10-08T06:50:18.202Z No new trace in the past 2 min(s).
+2025-10-08T06:51:18.202Z No new trace in the past 3 min(s).
 
 --Deployment Container Logs
 

@@ -1,32 +1,36 @@
-import React, { useState } from 'react';
-import { Box } from '@mui/material';
-import Sidebar from '../Sidebar/SidebarAdmin';
-import './Layout.css';
 import { Outlet } from 'react-router-dom';
-import { FaBars } from 'react-icons/fa';
+import Sidebar from '../Sidebar/SidebarAdmin';
+import './LayoutAdmin.css';
+import FlashMessage from '../../FlashMessage/FlashMessage';
+import { useState } from 'react';
 
-const LayoutAdmin: React.FunctionComponent = () => {
-  const [collapsed, setCollapsed] = useState(false);
+const LayoutAdmin: React.FC = () => {
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [flashMessage, setFlashMessage] = useState<{ message: string, type: 'success' | 'error' | 'info' } | null>(null);
 
-  const toggleSidebar = () => {
-    setCollapsed(!collapsed);
-  };
+    const toggleSidebar = () => {
+        setSidebarCollapsed(!sidebarCollapsed);
+    };
 
-  return (
-    <Box className="admin-layout-container">
-      <button className="mobile-sidebar-toggle" onClick={toggleSidebar}>
-        <FaBars />
-      </button>
+    const showFlashMessage = (message: string, type: 'success' | 'error' | 'info') => {
+        setFlashMessage({ message, type });
+    };
 
-      {/* Backdrop for mobile overlay */}
-      {!collapsed && <div className="sidebar-backdrop" onClick={toggleSidebar}></div>}
-
-      <Sidebar collapsed={collapsed} toggleSidebar={toggleSidebar} />
-      <Box className={`admin-main-content ${collapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-        <Outlet context={{ sidebarCollapsed: collapsed }} />
-      </Box>
-    </Box>
-  );
+    return (
+        <div className={`admin-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+            <Sidebar collapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
+            <div className="main-content">
+                {flashMessage && (
+                    <FlashMessage
+                        message={flashMessage.message}
+                        type={flashMessage.type}
+                        onClose={() => setFlashMessage(null)}
+                    />
+                )}
+                <Outlet context={{ sidebarCollapsed, showFlashMessage }} />
+            </div>
+        </div>
+    );
 };
 
 export default LayoutAdmin;
