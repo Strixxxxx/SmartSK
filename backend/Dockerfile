@@ -45,7 +45,7 @@ FROM node:22-bullseye-slim
 
 WORKDIR /app
 
-# Install Python + pip + ODBC runtime libraries + ffmpeg
+# Install Python + pip + ODBC runtime libraries + ffmpeg + sqlpackage dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
@@ -53,6 +53,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gnupg2 \
     ffmpeg \
+    unzip \
+    libicu67 \
+    libunwind8 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Microsoft ODBC Driver 17 for SQL Server (runtime)
@@ -62,7 +65,15 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /u
     && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo "Final container build:" && node --version && npm --version && python3 --version && pip --version
+# Install sqlpackage
+RUN curl -L -o /tmp/sqlpackage.zip "https://go.microsoft.com/fwlink/?linkid=2186397" \
+    && unzip /tmp/sqlpackage.zip -d /opt/sqlpackage \
+    && rm /tmp/sqlpackage.zip
+
+# Add sqlpackage to PATH
+ENV PATH="/opt/sqlpackage:${PATH}"
+
+RUN echo "Final container build:" && node --version && npm --version && python3 --version && pip --version && sqlpackage /?
 
 # Copy node modules
 COPY --from=node-builder /app/node_modules ./node_modules

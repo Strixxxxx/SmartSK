@@ -1,10 +1,50 @@
 --Frontend (Browser's Console)
 
-Failed to load resource: the server responded with a status of 500 ()Understand this error
-axiosConfig.ts:87 Server error: 500 Blob
-(anonymous) @ axiosConfig.ts:87Understand this error
-Backup.tsx:62 Backup failed: AxiosError
-handleBackup @ Backup.tsx:62Understand this error
+backup:1 
+ Failed to load resource: the server responded with a status of 500 ()
+
+index-qKegqXLu.js:81 Server error: 500 
+{message: 'Database backup failed.', error: '/bin/sh: 1: sqlpackage: not found\n'}
+error
+: 
+"/bin/sh: 1: sqlpackage: not found\n"
+message
+: 
+"Database backup failed."
+[[Prototype]]
+: 
+Object
+(anonymous)	@	index-qKegqXLu.js:81
+index-qKegqXLu.js:319 Backup failed: 
+Ke {message: 'Request failed with status code 500', name: 'AxiosError', code: 'ERR_BAD_RESPONSE', config: {…}, request: XMLHttpRequest, …}
+code
+: 
+"ERR_BAD_RESPONSE"
+config
+: 
+{transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}
+message
+: 
+"Request failed with status code 500"
+name
+: 
+"AxiosError"
+request
+: 
+XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
+response
+: 
+{data: {…}, status: 500, statusText: '', headers: ss, config: {…}, …}
+status
+: 
+500
+stack
+: 
+"AxiosError: Request failed with status code 500\n    at H2 (https://smartsk.app/assets/index-qKegqXLu.js:78:1088)\n    at XMLHttpRequest._ (https://smartsk.app/assets/index-qKegqXLu.js:78:5742)\n    at ji.request (https://smartsk.app/assets/index-qKegqXLu.js:80:2068)\n    at async x (https://smartsk.app/assets/index-qKegqXLu.js:319:95324)"
+[[Prototype]]
+: 
+Error
+x	@	index-qKegqXLu.js:319
 
 --Backend(Azure Portal's Log Stream in Platform)
 
@@ -12,7 +52,17 @@ handleBackup @ Backup.tsx:62Understand this error
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-
+2025-10-08T05:58:08.249842Z Login attempt received
+2025-10-08T05:58:11.775585Z Login successful for user.
+2025-10-08T05:58:16.6572302Z Acquiring Azure AD token for database export...
+2025-10-08T05:58:23.3545668Z Successfully acquired Azure AD token.
+2025-10-08T05:58:23.3546214Z Starting database backup using sqlpackage...
+2025-10-08T05:58:23.3546265Z Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_13-58-16.bacpac" /uat:true
+2025-10-08T05:58:23.4244754Z sqlpackage export failed: Command failed: sqlpackage /a:Export /ssn:undefined /sdn:undefined /tf:"/database_backup/smartSK_2025-10-08_13-58-16.bacpac" /uat:true
+2025-10-08T05:58:23.4245178Z /bin/sh: 1: sqlpackage: not found
+2025-10-08T05:58:23.4245202Z
+2025-10-08T05:58:23.4245221Z stderr: /bin/sh: 1: sqlpackage: not found
+2025-10-08T05:58:23.4245302Z
 
 --Deployment Container Logs
 

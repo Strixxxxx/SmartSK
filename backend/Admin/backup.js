@@ -28,8 +28,8 @@ for (const envVar of requiredEnv) {
     }
 }
 
-const dbServer = process.env.AZURE_DB_SERVER;
-const dbName = process.env.AZURE_DB_NAME;
+const dbServer = process.env.DB_SERVER;
+const dbName = process.env.DB_DATABASE;
 
 // --- Helper function to get Azure AD Token ---
 async function getAzureAdToken() {
