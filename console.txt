@@ -1,133 +1,6 @@
 --Frontend (Browser's Console)
 
-Access to XMLHttpRequest at 'https://smartsk-backend-container.azurewebsites.net/api/admin/backup' from origin 'https://smartsk.app' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
-index-qKegqXLu.js:81 Network error - no response received: 
-XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
-onabort
-: 
-ƒ ()
-onerror
-: 
-ƒ ()
-onload
-: 
-null
-onloadend
-: 
-ƒ _()
-onloadstart
-: 
-null
-onprogress
-: 
-null
-onreadystatechange
-: 
-null
-ontimeout
-: 
-ƒ ()
-readyState
-: 
-4
-response
-: 
-null
-responseText
-: 
-(...)
-responseType
-: 
-"blob"
-responseURL
-: 
-""
-responseXML
-: 
-(...)
-status
-: 
-0
-statusText
-: 
-""
-timeout
-: 
-300000
-upload
-: 
-XMLHttpRequestUpload {onloadstart: null, onprogress: null, onabort: null, onerror: null, onload: null, …}
-withCredentials
-: 
-true
-[[Prototype]]
-: 
-XMLHttpRequest
-(anonymous)	@	index-qKegqXLu.js:81
-Promise.then		
-_request	@	index-qKegqXLu.js:81
-request	@	index-qKegqXLu.js:80
-(anonymous)	@	index-qKegqXLu.js:81
-(anonymous)	@	index-qKegqXLu.js:76
-x	@	index-qKegqXLu.js:319
-onClick	@	index-qKegqXLu.js:319
-$1	@	index-qKegqXLu.js:48
-(anonymous)	@	index-qKegqXLu.js:48
-Wb	@	index-qKegqXLu.js:48
-eg	@	index-qKegqXLu.js:48
-hg	@	index-qKegqXLu.js:49
-jA	@	index-qKegqXLu.js:49
 
-index-qKegqXLu.js:319 Backup failed: 
-Ke {message: 'Network Error', name: 'AxiosError', code: 'ERR_NETWORK', config: {…}, request: XMLHttpRequest, …}
-code
-: 
-"ERR_NETWORK"
-config
-: 
-{transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}
-message
-: 
-"Network Error"
-name
-: 
-"AxiosError"
-request
-: 
-XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
-stack
-: 
-"AxiosError: Network Error\n    at j.onerror (https://smartsk.app/assets/index-qKegqXLu.js:78:6072)\n    at ji.request (https://smartsk.app/assets/index-qKegqXLu.js:80:2068)\n    at async x (https://smartsk.app/assets/index-qKegqXLu.js:319:95324)"
-[[Prototype]]
-: 
-Error
-x	@	index-qKegqXLu.js:319
-await in x		
-onClick	@	index-qKegqXLu.js:319
-$1	@	index-qKegqXLu.js:48
-(anonymous)	@	index-qKegqXLu.js:48
-Wb	@	index-qKegqXLu.js:48
-eg	@	index-qKegqXLu.js:48
-hg	@	index-qKegqXLu.js:49
-jA	@	index-qKegqXLu.js:49
-index-qKegqXLu.js:78 
- POST https://smartsk-backend-container.azurewebsites.net/api/admin/backup net::ERR_FAILED
-(anonymous)	@	index-qKegqXLu.js:78
-xhr	@	index-qKegqXLu.js:78
-VS	@	index-qKegqXLu.js:80
-Promise.then		
-_request	@	index-qKegqXLu.js:81
-request	@	index-qKegqXLu.js:80
-(anonymous)	@	index-qKegqXLu.js:81
-(anonymous)	@	index-qKegqXLu.js:76
-x	@	index-qKegqXLu.js:319
-onClick	@	index-qKegqXLu.js:319
-$1	@	index-qKegqXLu.js:48
-(anonymous)	@	index-qKegqXLu.js:48
-Wb	@	index-qKegqXLu.js:48
-eg	@	index-qKegqXLu.js:48
-hg	@	index-qKegqXLu.js:49
-jA	@	index-qKegqXLu.js:49
 
 --Backend(Azure Portal's Log Stream in Platform)
 
@@ -135,20 +8,47 @@ jA	@	index-qKegqXLu.js:49
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-08T06:47:56.3041792Z Initializing active sessions from database...
-2025-10-08T06:47:56.9071782Z Initializing Azure Storage with primary credentials.
-2025-10-08T06:47:58.2712375Z Created backup directory at: /database_backup
-2025-10-08T06:47:58.4561631Z Server is running on port 8080
-2025-10-08T06:48:01.4227928Z Initialized active sessions.
-2025-10-08T06:48:11.0684522Z Login attempt received
-2025-10-08T06:48:12.1553585Z Login successful for user.
-2025-10-08T06:48:16.2130923Z Acquiring Azure AD token for database export...
-2025-10-08T06:48:20.8587887Z Successfully acquired Azure AD token.
-2025-10-08T06:48:20.8588353Z Starting database backup using sqlpackage...
-2025-10-08T06:48:20.8588398Z Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_14-48-16.bacpac"
-2025-10-08T06:49:18.202Z No new trace in the past 1 min(s).
-2025-10-08T06:50:18.202Z No new trace in the past 2 min(s).
-2025-10-08T06:51:18.202Z No new trace in the past 3 min(s).
+2025-10-08T08:24:16.0767883Z Restarting OpenBSD Secure Shell server: sshd.
+2025-10-08T08:24:16.81843Z node not running, starting node /opt/webssh/index.js
+2025-10-08T08:24:30.0267023Z Login attempt received
+2025-10-08T08:24:46.5387402Z Login successful for user.
+2025-10-08T08:24:48.2354951Z Wed Oct 8 08:24:48 UTC 2025 running .net core
+2025-10-08T08:24:52.0336008Z Startup : 08.24.52.002742
+2025-10-08T08:24:52.142268Z Configure Services : 08.24.52.142033
+2025-10-08T08:24:53.4078119Z Configure : 08.24.53.347545
+2025-10-08T08:24:56.5200985Z Setting Up Routes : 08.24.56.519865
+2025-10-08T08:24:57.7449998Z Exiting Configure : 08.24.57.704657
+2025-10-08T08:24:58.3364562Z Hosting environment: Production
+2025-10-08T08:24:58.3365078Z Content root path: /opt/Kudu
+2025-10-08T08:24:58.3365107Z Now listening on: http://0.0.0.0:8181
+2025-10-08T08:24:58.3365144Z Application started. Press Ctrl+C to shut down.
+2025-10-08T08:25:05.9831023Z Initializing active sessions from database...
+2025-10-08T08:25:08.8327201Z [Job 265b3489-cbc8-4e03-9e09-778db9a79497] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
+2025-10-08T08:25:10.0531366Z [Job 265b3489-cbc8-4e03-9e09-778db9a79497] Updated in database to processing: Acquiring Azure AD token...
+2025-10-08T08:25:11.0054271Z Initializing Azure Storage with primary credentials.
+2025-10-08T08:25:18.9938579Z Job management system initialized with database storage.
+2025-10-08T08:25:18.9939118Z Created backup directory at: /database_backup
+2025-10-08T08:25:19.7280088Z Server is running on port 8080
+2025-10-08T08:25:25.2957111Z Initialized active sessions.
+2025-10-08T08:25:47.9506345Z Successfully acquired Azure AD token.
+2025-10-08T08:25:48.1844074Z [Job 265b3489-cbc8-4e03-9e09-778db9a79497] Updated in database to processing: Exporting database using sqlpackage...
+2025-10-08T08:25:48.1844387Z [Job 265b3489-cbc8-4e03-9e09-778db9a79497] Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_16-25-09.bacpac"
+2025-10-08T08:26:49.547Z No new trace in the past 1 min(s).
+2025-10-08T08:27:20.9272603Z Raw data request with filters
+2025-10-08T08:27:21.9664472Z Stored procedure result count
+2025-10-08T08:28:23.845Z No new trace in the past 1 min(s).
+2025-10-08T08:29:23.845Z No new trace in the past 2 min(s).
+2025-10-08T08:30:23.845Z No new trace in the past 3 min(s).
+2025-10-08T08:31:23.845Z No new trace in the past 4 min(s).
+2025-10-08T08:32:23.845Z No new trace in the past 5 min(s).
+2025-10-08T08:33:23.845Z No new trace in the past 6 min(s).
+2025-10-08T08:34:23.845Z No new trace in the past 7 min(s).
+2025-10-08T08:35:23.845Z No new trace in the past 8 min(s).
+2025-10-08T08:36:23.845Z No new trace in the past 9 min(s).
+2025-10-08T08:37:23.845Z No new trace in the past 10 min(s).
+2025-10-08T08:38:23.845Z No new trace in the past 11 min(s).
+2025-10-08T08:39:23.845Z No new trace in the past 12 min(s).
+2025-10-08T08:40:23.845Z No new trace in the past 13 min(s).
 
 --Deployment Container Logs
 

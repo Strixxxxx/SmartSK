@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { exec } = require('child_process');
+const { exec, spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const { DefaultAzureCredential } = require('@azure/identity');
@@ -157,15 +157,32 @@ async function executeBackup(jobId) {
         console.log(`[Job ${jobId}] Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${bacpacFilePath}"`);
 
         await new Promise((resolve, reject) => {
-            exec(command, { env: { ...process.env, SQLPACKAGE_ACCESSTOKEN: token } }, (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`[Job ${jobId}] sqlpackage export failed: ${error.message}`);
-                    console.error(`[Job ${jobId}] stderr: ${stderr}`);
-                    return reject(new Error(`sqlpackage failed: ${stderr || error.message}`));
+            const process = spawn(command, {
+                shell: true,
+                env: { ...process.env, SQLPACKAGE_ACCESSTOKEN: token }
+            });
+
+            process.stdout.on('data', (data) => {
+                console.log(`[Job ${jobId}] sqlpackage stdout: ${data}`);
+            });
+
+            process.stderr.on('data', (data) => {
+                console.error(`[Job ${jobId}] sqlpackage stderr: ${data}`);
+            });
+
+            process.on('close', (code) => {
+                if (code === 0) {
+                    console.log(`[Job ${jobId}] Database export to .bacpac completed.`);
+                    resolve();
+                } else {
+                    console.error(`[Job ${jobId}] sqlpackage process exited with code ${code}`);
+                    reject(new Error(`sqlpackage process exited with code ${code}`));
                 }
-                console.log(`[Job ${jobId}] Database export to .bacpac completed.`);
-                console.log(`[Job ${jobId}] stdout: ${stdout}`);
-                resolve();
+            });
+
+            process.on('error', (err) => {
+                console.error(`[Job ${jobId}] Failed to start sqlpackage process:`, err);
+                reject(err);
             });
         });
 
