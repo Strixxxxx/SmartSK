@@ -89,36 +89,79 @@ router.get('/status/:jobId', authMiddleware, async (req, res) => {
     res.status(200).json(clientJob);
 });
 
-// --- GET /download/:jobId : Download the result of a completed hybrid backup ---
+// --- GET /download/:jobId : Download and stream the zip file on-the-fly ---
 router.get('/download/:jobId', authMiddleware, async (req, res) => {
     const { jobId } = req.params;
-    const job = await getJob(jobId);
+    let tempBacpacPath = ''; // Keep track of the temp file for cleanup
 
-    if (!job) {
-        return res.status(404).json({ message: 'Job not found.' });
-    }
-    if (job.Status !== 'completed') {
-        return res.status(400).json({ message: 'Job is not yet complete.' });
-    }
-    if (job.BackupType !== 'hybrid') {
-        return res.status(400).json({ message: 'This job was not a hybrid backup and has no file to download.' });
-    }
-    if (!job.FilePath || !job.FileName) {
-        return res.status(404).json({ message: 'Backup file not found for this job.' });
-    }
+    try {
+        const job = await getJob(jobId);
 
-    res.download(job.FilePath, job.FileName, (err) => {
-        if (err) {
-            console.error(`[Job ${jobId}] Error sending file to user:`, err);
-        } else {
-            console.log(`[Job ${jobId}] File ${job.FileName} successfully sent to user.`);
+        if (!job) {
+            return res.status(404).json({ message: 'Job not found.' });
         }
-        // Clean up the zip file after download attempt
-        if (fs.existsSync(job.FilePath)) {
-            fs.unlinkSync(job.FilePath);
-            console.log(`[Job ${jobId}] Cleaned up downloaded zip file: ${job.FilePath}`);
+        if (job.Status !== 'completed') {
+            return res.status(400).json({ message: 'Job is not yet complete.' });
         }
-    });
+        if (job.BackupType !== 'hybrid') {
+            return res.status(400).json({ message: 'This job was not a hybrid backup and cannot be downloaded.' });
+        }
+        if (!job.BlobName) {
+            return res.status(404).json({ message: 'Cloud backup file not found for this job.' });
+        }
+
+        // 1. Download the .bacpac from Azure to a temporary local file
+        const bacpacFileName = job.BlobName;
+        tempBacpacPath = path.join(backupDir, `temp_${bacpacFileName}`);
+        console.log(`[Job ${jobId}] Downloading ${bacpacFileName} from Azure to ${tempBacpacPath} for zipping...`);
+        await downloadBackupFile(bacpacFileName, tempBacpacPath);
+        console.log(`[Job ${jobId}] Download complete.`);
+
+        // 2. Prepare to stream an encrypted zip file to the user
+        const zipFileName = bacpacFileName.replace('.bacpac', '.zip');
+        res.setHeader('Content-Type', 'application/zip');
+        res.setHeader('Content-Disposition', `attachment; filename="${zipFileName}"`);
+
+        const archive = archiver('zip-encrypted', {
+            zlib: { level: 8 },
+            encryptionMethod: 'aes256',
+            password: process.env.ZIP_LOCK
+        });
+
+        // 3. Set up event handlers for the stream
+        archive.on('error', (err) => {
+            throw err; // Throw to be caught by the main catch block
+        });
+
+        // When the stream to the user finishes, clean up the temp file
+        res.on('finish', () => {
+            console.log(`[Job ${jobId}] Zip stream finished. Cleaning up temp file: ${tempBacpacPath}`);
+            if (fs.existsSync(tempBacpacPath)) {
+                fs.unlinkSync(tempBacpacPath);
+            }
+        });
+
+        // 4. Pipe the archive stream to the response
+        archive.pipe(res);
+
+        // 5. Add the downloaded .bacpac file to the archive
+        archive.file(tempBacpacPath, { name: bacpacFileName });
+
+        // 6. Finalize the archive to send it to the user
+        await archive.finalize();
+
+    } catch (error) {
+        console.error(`[Job ${jobId}] On-the-fly zip and download failed:`, error);
+        // If an error occurs and the response hasn't been sent, send an error status
+        if (!res.headersSent) {
+            res.status(500).json({ message: 'Failed to create and download backup zip.' });
+        }
+        // Ensure cleanup happens even on error
+        if (tempBacpacPath && fs.existsSync(tempBacpacPath)) {
+            fs.unlinkSync(tempBacpacPath);
+            console.log(`[Job ${jobId}] Cleaned up temp file after error: ${tempBacpacPath}`);
+        }
+    }
 });
 
 
@@ -143,8 +186,7 @@ async function executeBackup(jobId) {
         await updateJob(jobId, 'processing', 'Exporting database using sqlpackage...', { processing: true });
 
         const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${bacpacFilePath}" /su:${process.env.DB_USER} /sp:${process.env.DB_PASSWORD}`;
-        const sanitizedCommand = `sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${bacpacFilePath}" /su:${process.env.DB_USER} /sp:***`;
-        console.log(`[Job ${jobId}] Executing command: ${sanitizedCommand}`);
+        console.log(`[Job ${jobId}] Executing sqlpackage command...`);
 
         await new Promise((resolve, reject) => {
             const sqlPackageProcess = spawn(command, { shell: true });
@@ -164,34 +206,20 @@ async function executeBackup(jobId) {
         await updateJob(jobId, 'processing', 'Uploading .bacpac file to Azure Storage...');
         const blobName = bacpacFileName;
         const blobURL = await uploadBackupFile(bacpacFilePath, blobName);
-        const bacpacFileSize = fs.statSync(bacpacFilePath).size;
+        const fileSize = fs.statSync(bacpacFilePath).size;
 
-        let finalUpdateData = {
+        const finalUpdateData = {
+            FileName: bacpacFileName, // For both types, the primary file is the .bacpac
             BlobName: blobName,
             BlobURL: blobURL,
-            FileSize: bacpacFileSize,
+            FileSize: fileSize,
             Duration: Math.round((Date.now() - startTime) / 1000),
         };
 
-        if (BackupType === 'hybrid') {
-            await updateJob(jobId, 'processing', 'Creating encrypted zip file for download...');
-            const zipFileName = bacpacFileName.replace('.bacpac', '.zip');
-            const zipFilePath = path.join(backupDir, zipFileName);
-
-            await createEncryptedZip(bacpacFilePath, zipFilePath, bacpacFileName);
-            const zipFileSize = fs.statSync(zipFilePath).size;
-
-            finalUpdateData = {
-                ...finalUpdateData,
-                FilePath: zipFilePath, // Store the full, absolute path
-                FileName: zipFileName,
-                FileSize: zipFileSize, // Overwrite with zip file size
-            };
-        } else { // cloud-only
-            finalUpdateData.FileName = bacpacFileName;
-        }
-
-        await updateJob(jobId, 'completed', 'Backup complete.', finalUpdateData);
+        // For hybrid, the job is complete. The zip is created on-demand.
+        // For cloud-only, the job is also complete.
+        const message = BackupType === 'hybrid' ? 'Backup complete. Ready for download.' : 'Backup complete. File uploaded to cloud storage.';
+        await updateJob(jobId, 'completed', message, finalUpdateData);
 
         addAuditTrail({
             actor: 'A',
@@ -210,38 +238,13 @@ async function executeBackup(jobId) {
             Duration: duration
         });
     } finally {
+        // Clean up the local .bacpac file after it has been uploaded
         if (fs.existsSync(bacpacFilePath)) {
             fs.unlinkSync(bacpacFilePath);
             console.log(`[Job ${jobId}] Cleaned up local .bacpac file: ${bacpacFilePath}`);
         }
     }
 }
-
-// --- Helper to create encrypted zip ---
-function createEncryptedZip(sourceFilePath, zipFilePath, fileNameInZip) {
-    return new Promise((resolve, reject) => {
-        const output = fs.createWriteStream(zipFilePath);
-        const archive = archiver('zip-encrypted', {
-            zlib: { level: 8 },
-            encryptionMethod: 'aes256',
-            password: process.env.ZIP_LOCK
-        });
-
-        output.on('close', () => {
-            console.log(`Encrypted archive created: ${zipFilePath} (${archive.pointer()} total bytes)`);
-            resolve();
-        });
-
-        archive.on('error', (err) => {
-            reject(err);
-        });
-
-        archive.pipe(output);
-        archive.file(sourceFilePath, { name: fileNameInZip });
-        archive.finalize();
-    });
-}
-
 
 // --- POST /restore : Restore a database from a backup (Unchanged) ---
 router.post('/restore', authMiddleware, upload.single('backupFile'), async (req, res) => {
@@ -275,13 +278,8 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
         }
 
         console.log('Starting database restore using sqlpackage...');
-        const sanitizedCommand = `sqlpackage /a:Import /tsn:*** /tdn:*** /sf:"${downloadPath}" /su:${process.env.DB_USER} /sp:***`;
         const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${dbName} /sf:"${downloadPath}" /su:${process.env.DB_USER} /sp:${process.env.DB_PASSWORD}`;
 
-        console.log(`Executing command: ${sanitizedCommand}`);
-
-        // This restore process is still synchronous and can time out.
-        // For now, leaving as-is since the request was about fixing backups.
         exec(command, (error, stdout, stderr) => {
             if (fs.existsSync(downloadPath)) {
                 fs.unlinkSync(downloadPath);
