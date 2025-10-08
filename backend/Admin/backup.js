@@ -7,8 +7,12 @@ const { addAuditTrail } = require('../audit/auditService');
 const { authMiddleware } = require('../session/session');
 const { uploadBackupFile, listBackups, downloadBackupFile } = require('../Storage/storage');
 const archiver = require('archiver');
+const archiverZipEncrypted = require('archiver-zip-encrypted');
 const multer = require('multer');
 const { createJob, getJob, updateJob } = require('./backupJob');
+
+// Register the zip-encrypted format
+archiver.registerFormat('zip-encrypted', archiverZipEncrypted);
 
 // --- Backup Directory Setup ---
 const backupDir = path.join(__dirname, '..', '..', 'database_backup');
@@ -21,7 +25,7 @@ if (!fs.existsSync(backupDir)) {
 const upload = multer({ dest: backupDir });
 
 // --- Environment Variable Validation ---
-const requiredEnv = ['DB_SERVER', 'DB_DATABASE', 'DB_USER', 'DB_PASSWORD', 'EMAIL_USER', 'EMAIL_PASS', 'ZIP_LOCK'];
+const requiredEnv = ['DB_SERVER', 'DB_DATABASE', 'DB_USER', 'DB_PASSWORD', 'EMAIL_USER', 'EMAIL_PASS', 'ZIP_LOCK', 'BACKUP_CONTAINER'];
 for (const envVar of requiredEnv) {
     if (!process.env[envVar]) {
         throw new Error(`Missing required environment variable: ${envVar}. Please check your .env file.`);
@@ -171,7 +175,7 @@ async function executeBackup(jobId) {
         });
 
         await updateJob(jobId, 'processing', 'Uploading .bacpac file to Azure Storage...');
-        const blobName = `backups/${bacpacFileName}`;
+        const blobName = bacpacFileName;
         await uploadBackupFile(bacpacFilePath, blobName);
 
         if (BackupType === 'hybrid') {
