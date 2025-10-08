@@ -152,14 +152,15 @@ async function executeBackup(jobId) {
         await updateJob(jobId, 'processing', 'Acquiring Azure AD token...');
         const token = await getAzureAdToken();
 
-        const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${bacpacFilePath}" /p:Authentication="Active Directory Access Token"`;
+        const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${bacpacFilePath}" /p:AccessToken=${token}`;
+        const sanitizedCommand = `sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${bacpacFilePath}" /p:AccessToken=***`;
+        
         await updateJob(jobId, 'processing', 'Exporting database using sqlpackage...', { processing: true });
-        console.log(`[Job ${jobId}] Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${bacpacFilePath}" /p:Authentication="Active Directory Access Token"`);
+        console.log(`[Job ${jobId}] Executing command: ${sanitizedCommand}`);
 
         await new Promise((resolve, reject) => {
             const sqlPackageProcess = spawn(command, {
-                shell: true,
-                env: { ...process.env, SQLPACKAGE_ACCESSTOKEN: token }
+                shell: true
             });
 
             sqlPackageProcess.stdout.on('data', (data) => {
