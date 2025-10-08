@@ -66,7 +66,7 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /u
     && rm -rf /var/lib/apt/lists/*
 
 # Install sqlpackage
-RUN curl -L -o /tmp/sqlpackage.zip "https://go.microsoft.com/fwlink/?linkid=2186397" \
+RUN curl -L -o /tmp/sqlpackage.zip "https://aka.ms/sqlpackage-linux" \
     && unzip /tmp/sqlpackage.zip -d /opt/sqlpackage \
     && rm /tmp/sqlpackage.zip
 
