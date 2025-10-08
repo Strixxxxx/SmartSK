@@ -157,20 +157,20 @@ async function executeBackup(jobId) {
         console.log(`[Job ${jobId}] Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${bacpacFilePath}"`);
 
         await new Promise((resolve, reject) => {
-            const process = spawn(command, {
+            const sqlPackageProcess = spawn(command, {
                 shell: true,
                 env: { ...process.env, SQLPACKAGE_ACCESSTOKEN: token }
             });
 
-            process.stdout.on('data', (data) => {
+            sqlPackageProcess.stdout.on('data', (data) => {
                 console.log(`[Job ${jobId}] sqlpackage stdout: ${data}`);
             });
 
-            process.stderr.on('data', (data) => {
+            sqlPackageProcess.stderr.on('data', (data) => {
                 console.error(`[Job ${jobId}] sqlpackage stderr: ${data}`);
             });
 
-            process.on('close', (code) => {
+            sqlPackageProcess.on('close', (code) => {
                 if (code === 0) {
                     console.log(`[Job ${jobId}] Database export to .bacpac completed.`);
                     resolve();
@@ -180,7 +180,7 @@ async function executeBackup(jobId) {
                 }
             });
 
-            process.on('error', (err) => {
+            sqlPackageProcess.on('error', (err) => {
                 console.error(`[Job ${jobId}] Failed to start sqlpackage process:`, err);
                 reject(err);
             });

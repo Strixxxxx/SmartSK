@@ -8,47 +8,27 @@
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-08T08:24:16.0767883Z Restarting OpenBSD Secure Shell server: sshd.
-2025-10-08T08:24:16.81843Z node not running, starting node /opt/webssh/index.js
-2025-10-08T08:24:30.0267023Z Login attempt received
-2025-10-08T08:24:46.5387402Z Login successful for user.
-2025-10-08T08:24:48.2354951Z Wed Oct 8 08:24:48 UTC 2025 running .net core
-2025-10-08T08:24:52.0336008Z Startup : 08.24.52.002742
-2025-10-08T08:24:52.142268Z Configure Services : 08.24.52.142033
-2025-10-08T08:24:53.4078119Z Configure : 08.24.53.347545
-2025-10-08T08:24:56.5200985Z Setting Up Routes : 08.24.56.519865
-2025-10-08T08:24:57.7449998Z Exiting Configure : 08.24.57.704657
-2025-10-08T08:24:58.3364562Z Hosting environment: Production
-2025-10-08T08:24:58.3365078Z Content root path: /opt/Kudu
-2025-10-08T08:24:58.3365107Z Now listening on: http://0.0.0.0:8181
-2025-10-08T08:24:58.3365144Z Application started. Press Ctrl+C to shut down.
-2025-10-08T08:25:05.9831023Z Initializing active sessions from database...
-2025-10-08T08:25:08.8327201Z [Job 265b3489-cbc8-4e03-9e09-778db9a79497] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
-2025-10-08T08:25:10.0531366Z [Job 265b3489-cbc8-4e03-9e09-778db9a79497] Updated in database to processing: Acquiring Azure AD token...
-2025-10-08T08:25:11.0054271Z Initializing Azure Storage with primary credentials.
-2025-10-08T08:25:18.9938579Z Job management system initialized with database storage.
-2025-10-08T08:25:18.9939118Z Created backup directory at: /database_backup
-2025-10-08T08:25:19.7280088Z Server is running on port 8080
-2025-10-08T08:25:25.2957111Z Initialized active sessions.
-2025-10-08T08:25:47.9506345Z Successfully acquired Azure AD token.
-2025-10-08T08:25:48.1844074Z [Job 265b3489-cbc8-4e03-9e09-778db9a79497] Updated in database to processing: Exporting database using sqlpackage...
-2025-10-08T08:25:48.1844387Z [Job 265b3489-cbc8-4e03-9e09-778db9a79497] Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_16-25-09.bacpac"
-2025-10-08T08:26:49.547Z No new trace in the past 1 min(s).
-2025-10-08T08:27:20.9272603Z Raw data request with filters
-2025-10-08T08:27:21.9664472Z Stored procedure result count
-2025-10-08T08:28:23.845Z No new trace in the past 1 min(s).
-2025-10-08T08:29:23.845Z No new trace in the past 2 min(s).
-2025-10-08T08:30:23.845Z No new trace in the past 3 min(s).
-2025-10-08T08:31:23.845Z No new trace in the past 4 min(s).
-2025-10-08T08:32:23.845Z No new trace in the past 5 min(s).
-2025-10-08T08:33:23.845Z No new trace in the past 6 min(s).
-2025-10-08T08:34:23.845Z No new trace in the past 7 min(s).
-2025-10-08T08:35:23.845Z No new trace in the past 8 min(s).
-2025-10-08T08:36:23.845Z No new trace in the past 9 min(s).
-2025-10-08T08:37:23.845Z No new trace in the past 10 min(s).
-2025-10-08T08:38:23.845Z No new trace in the past 11 min(s).
-2025-10-08T08:39:23.845Z No new trace in the past 12 min(s).
-2025-10-08T08:40:23.845Z No new trace in the past 13 min(s).
+2025-10-08T08:54:32.6467322Z Restarting OpenBSD Secure Shell server: sshd.
+2025-10-08T08:54:32.8593673Z node not running, starting node /opt/webssh/index.js
+2025-10-08T08:54:47.2553751Z Wed Oct 8 08:54:47 UTC 2025 running .net core
+2025-10-08T08:54:48.8340844Z Startup : 08.54.48.765332
+2025-10-08T08:54:49.1174797Z Configure Services : 08.54.49.117283
+2025-10-08T08:54:50.270453Z Configure : 08.54.50.270271
+2025-10-08T08:54:50.8403419Z Setting Up Routes : 08.54.50.840137
+2025-10-08T08:54:51.2430924Z Exiting Configure : 08.54.51.242746
+2025-10-08T08:54:51.4113102Z Hosting environment: Production
+2025-10-08T08:54:51.4117827Z Content root path: /opt/Kudu
+2025-10-08T08:54:51.4127066Z Now listening on: http://0.0.0.0:8181
+2025-10-08T08:54:51.4129988Z Application started. Press Ctrl+C to shut down.
+2025-10-08T08:55:24.4743098Z Raw data request with filters
+2025-10-08T08:55:24.5929896Z Stored procedure result count
+2025-10-08T08:55:32.180173Z [Job 96222487-46fa-4dc7-848c-b16a3f56d958] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
+2025-10-08T08:55:32.6626511Z [Job 96222487-46fa-4dc7-848c-b16a3f56d958] Updated in database to processing: Acquiring Azure AD token...
+2025-10-08T08:55:39.1403899Z Successfully acquired Azure AD token.
+2025-10-08T08:55:39.1608931Z [Job 96222487-46fa-4dc7-848c-b16a3f56d958] Updated in database to processing: Exporting database using sqlpackage...
+2025-10-08T08:55:39.1609405Z [Job 96222487-46fa-4dc7-848c-b16a3f56d958] Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_16-55-32.bacpac"
+2025-10-08T08:55:39.160943Z [Job 96222487-46fa-4dc7-848c-b16a3f56d958] Backup process failed: Cannot access 'process' before initialization
+2025-10-08T08:55:39.1923345Z [Job 96222487-46fa-4dc7-848c-b16a3f56d958] Updated in database to failed: Backup failed: Cannot access 'process' before initialization
 
 --Deployment Container Logs
 
