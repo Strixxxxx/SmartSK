@@ -2,12 +2,11 @@
 
 backup:1 
  Failed to load resource: the server responded with a status of 500 ()
-
 index-qKegqXLu.js:81 Server error: 500 
-{message: 'Database backup failed.', error: '/bin/sh: 1: sqlpackage: not found\n'}
+{message: 'Database backup failed.', error: "*** Unrecognized command line argument 'uat'.\n"}
 error
 : 
-"/bin/sh: 1: sqlpackage: not found\n"
+"*** Unrecognized command line argument 'uat'.\n"
 message
 : 
 "Database backup failed."
@@ -52,17 +51,19 @@ x	@	index-qKegqXLu.js:319
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-08T05:58:08.249842Z Login attempt received
-2025-10-08T05:58:11.775585Z Login successful for user.
-2025-10-08T05:58:16.6572302Z Acquiring Azure AD token for database export...
-2025-10-08T05:58:23.3545668Z Successfully acquired Azure AD token.
-2025-10-08T05:58:23.3546214Z Starting database backup using sqlpackage...
-2025-10-08T05:58:23.3546265Z Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_13-58-16.bacpac" /uat:true
-2025-10-08T05:58:23.4244754Z sqlpackage export failed: Command failed: sqlpackage /a:Export /ssn:undefined /sdn:undefined /tf:"/database_backup/smartSK_2025-10-08_13-58-16.bacpac" /uat:true
-2025-10-08T05:58:23.4245178Z /bin/sh: 1: sqlpackage: not found
-2025-10-08T05:58:23.4245202Z
-2025-10-08T05:58:23.4245221Z stderr: /bin/sh: 1: sqlpackage: not found
-2025-10-08T05:58:23.4245302Z
+2025-10-08T06:33:00.8796432Z Initializing active sessions from database...
+2025-10-08T06:33:01.8632785Z Initializing Azure Storage with primary credentials.
+2025-10-08T06:33:03.2226262Z Created backup directory at: /database_backup
+2025-10-08T06:33:03.365579Z Server is running on port 8080
+2025-10-08T06:33:05.4912002Z Initialized active sessions.
+2025-10-08T06:33:27.8321496Z Acquiring Azure AD token for database export...
+2025-10-08T06:33:33.0132335Z Successfully acquired Azure AD token.
+2025-10-08T06:33:33.0132819Z Starting database backup using sqlpackage...
+2025-10-08T06:33:33.0132862Z Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"/database_backup/smartSK_2025-10-08_14-33-27.bacpac" /uat:true
+2025-10-08T06:33:35.1074341Z sqlpackage export failed: Command failed: sqlpackage /a:Export /ssn:smart-sk.database.windows.net /sdn:smartSK /tf:"/database_backup/smartSK_2025-10-08_14-33-27.bacpac" /uat:true
+2025-10-08T06:33:35.1074941Z *** Unrecognized command line argument 'uat'.
+2025-10-08T06:33:35.1074964Z
+2025-10-08T06:33:35.1074982Z stderr: *** Unrecognized command line argument 'uat'.
 
 --Deployment Container Logs
 

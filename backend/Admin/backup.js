@@ -79,10 +79,10 @@ router.post('/', authMiddleware, async (req, res) => {
         console.log('Acquiring Azure AD token for database export...');
         const token = await getAzureAdToken();
 
-        const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${backupFilePath}" /uat:true`;
+        const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${backupFilePath}"`;
 
         console.log('Starting database backup using sqlpackage...');
-        console.log(`Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${backupFilePath}" /uat:true`);
+        console.log(`Executing command: sqlpackage /a:Export /ssn:*** /sdn:*** /tf:"${backupFilePath}"`);
 
         exec(command, { env: { ...process.env, SQLPACKAGE_ACCESSTOKEN: token } }, async (error, stdout, stderr) => {
             if (error) {
@@ -205,10 +205,10 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
         console.log('Acquiring Azure AD token for database import...');
         const token = await getAzureAdToken();
 
-        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${dbName} /sf:"${downloadPath}" /uat:true`;
+        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${dbName} /sf:"${downloadPath}"`;
         
         console.log('Starting database restore using sqlpackage...');
-        console.log(`Executing command: sqlpackage /a:Import /tsn:*** /tdn:*** /sf:"${downloadPath}" /uat:true`);
+        console.log(`Executing command: sqlpackage /a:Import /tsn:*** /tdn:*** /sf:"${downloadPath}"`);
 
         exec(command, { env: { ...process.env, SQLPACKAGE_ACCESSTOKEN: token } }, (error, stdout, stderr) => {
             // Clean up the downloaded/uploaded file regardless of outcome
