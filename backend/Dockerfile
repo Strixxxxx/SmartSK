@@ -68,6 +68,7 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /u
 # Install sqlpackage
 RUN curl -L -o /tmp/sqlpackage.zip "https://aka.ms/sqlpackage-linux" \
     && unzip /tmp/sqlpackage.zip -d /opt/sqlpackage \
+    && chmod +x /opt/sqlpackage/sqlpackage \
     && rm /tmp/sqlpackage.zip
 
 # Add sqlpackage to PATH
