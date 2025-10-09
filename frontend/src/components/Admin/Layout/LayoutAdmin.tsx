@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../Sidebar/SidebarAdmin';
-import './LayoutAdmin.css';
+import './Layout.css';
 import FlashMessage from '../../FlashMessage/FlashMessage';
 import { useState } from 'react';
 
