@@ -1,4 +1,8 @@
 const sql = require('mssql');
+const dotenv = require('dotenv');
+
+//Configuration of local .env
+dotenv.config();
 
 // Database configuration is loaded from environment variables provided by the platform.
 const dbConfig = {
@@ -6,7 +10,7 @@ const dbConfig = {
   database: process.env.DB_DATABASE,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
-  port: parseInt(process.env.DB_PORT, 10) || 1433,
+  port: parseInt(process.env.DB_PORT, 10),
   requestTimeout: 300000, // 5 minutes
   connectionTimeout: 30000, // 30 seconds
   pool: {
