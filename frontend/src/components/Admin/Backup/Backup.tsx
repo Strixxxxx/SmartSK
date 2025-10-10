@@ -93,7 +93,7 @@ const Backup: React.FC = () => {
                 const url = window.URL.createObjectURL(new Blob([downloadResponse.data]));
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', job.FileName || `backup-${jobId}.zip`);
+                link.setAttribute('download', (job.FileName || `backup-${jobId}`).replace('.bacpac', '.zip'));
                 document.body.appendChild(link);
                 link.click();
                 link.remove();
