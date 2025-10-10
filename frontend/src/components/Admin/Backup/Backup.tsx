@@ -208,16 +208,25 @@ const Backup: React.FC = () => {
         <h2>Database Backup and Restore</h2>
         <div className="status-box">{status || 'Ready'}</div>
 
-        <div className="button-group">
-          <button onClick={() => handleBackup('hybrid')} disabled={!!activeJobId || loading}>
-            Create Hybrid Backup (Cloud + Download)
-          </button>
-          <button onClick={() => handleBackup('cloud-only')} disabled={!!activeJobId || loading}>
-            Create Cloud-Only Backup
-          </button>
-          <button onClick={openRestoreModal} disabled={!!activeJobId || loading}>
-            Restore from Backup
-          </button>
+        <div className="backup-section">
+          <h3>Create Backup</h3>
+          <div className="button-group">
+            <button onClick={() => handleBackup('hybrid')} disabled={!!activeJobId || loading}>
+              Hybrid Backup (Cloud + Local)
+            </button>
+            <button onClick={() => handleBackup('cloud-only')} disabled={!!activeJobId || loading}>
+              Cloud-Only Backup
+            </button>
+          </div>
+        </div>
+
+        <div className="restore-section">
+          <h3>Restore Database</h3>
+          <div className="button-group">
+            <button onClick={openRestoreModal} disabled={!!activeJobId || loading} className="restore-btn">
+              Restore from Backup
+            </button>
+          </div>
         </div>
 
         {/* Main Restore Modal */}
