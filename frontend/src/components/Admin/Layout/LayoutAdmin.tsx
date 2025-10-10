@@ -17,9 +17,9 @@ const LayoutAdmin: React.FC = () => {
     };
 
     return (
-        <div className={`admin-layout ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+        <div className="admin-layout-container">
             <Sidebar collapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />
-            <div className="main-content">
+            <div className={`admin-main-content ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
                 {flashMessage && (
                     <FlashMessage
                         message={flashMessage.message}

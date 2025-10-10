@@ -208,7 +208,7 @@ const Backup: React.FC = () => {
         <h2>Database Backup and Restore</h2>
         <div className="status-box">{status || 'Ready'}</div>
 
-        <div className="backup-actions">
+        <div className="button-group">
           <button onClick={() => handleBackup('hybrid')} disabled={!!activeJobId || loading}>
             Create Hybrid Backup (Cloud + Download)
           </button>

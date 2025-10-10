@@ -2,69 +2,31 @@
 
 
 
+--Backend(Local Machine)
+
+Initializing active sessions from database...
+Initializing Azure Storage with primary credentials.
+Job management system initialized with database storage.
+Server is running on port 8080
+Initialized active sessions.
+Login attempt received
+Login successful for user.
+[Job 778125a0-593c-429d-867e-5ec149a198f2] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
+[Job 778125a0-593c-429d-867e-5ec149a198f2] Updated in database to processing: Exporting database using sqlpackage...
+[Job 778125a0-593c-429d-867e-5ec149a198f2] Executing sqlpackage command...
+[Job 778125a0-593c-429d-867e-5ec149a198f2] sqlpackage stderr: 'sqlpackage' is not recognized as an internal or external command,
+operable program or batch file.
+
+[Job 778125a0-593c-429d-867e-5ec149a198f2] Backup process failed: sqlpackage process exited with code 1
+[Job 778125a0-593c-429d-867e-5ec149a198f2] Updated in database to failed: Backup failed: sqlpackage process exited with code 1
+
 --Backend(Azure Portal's Log Stream in Platform)
 
 
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-09T01:30:12.8473972Z Login attempt received
-2025-10-09T01:30:14.5723676Z Login successful for user.
-2025-10-09T01:31:12.0031288Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
-2025-10-09T01:31:12.1008566Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] Updated in database to processing: Exporting database using sqlpackage...
-2025-10-09T01:31:12.1009019Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] Executing sqlpackage command...
-2025-10-09T01:31:13.7107394Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Connecting to database 'smartSK' on server 'smart-sk.database.windows.net'.
-2025-10-09T01:31:13.7107911Z
-2025-10-09T01:31:16.4811331Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Extracting schema
-2025-10-09T01:31:16.4811771Z
-2025-10-09T01:31:16.4993902Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Extracting schema from database
-2025-10-09T01:31:16.4994196Z
-2025-10-09T01:31:20.5776373Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Resolving references in schema model
-2025-10-09T01:31:20.5776744Z
-2025-10-09T01:31:21.1709266Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Validating schema model
-2025-10-09T01:31:21.1709436Z
-2025-10-09T01:31:21.1709488Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Validating schema model for data package
-2025-10-09T01:31:21.1709503Z
-2025-10-09T01:31:21.1709522Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Validating schema
-2025-10-09T01:31:21.1709555Z
-2025-10-09T01:31:21.1898452Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Processing tables for data extraction
-2025-10-09T01:31:21.1898701Z
-2025-10-09T01:31:21.3302051Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Exporting data from database
-2025-10-09T01:31:21.330248Z
-2025-10-09T01:31:21.3312325Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Exporting data
-2025-10-09T01:31:21.3312511Z
-2025-10-09T01:31:21.6639332Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Processing Export.
-2025-10-09T01:31:21.6639605Z
-2025-10-09T01:31:21.9668382Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Processing Table '[dbo].[barangays]'.
-2025-10-09T01:31:21.9668647Z
-2025-10-09T01:31:21.9743946Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Processing Table '[dbo].[userInfoARC]'.
-2025-10-09T01:31:21.9744173Z
-2025-10-09T01:31:22.9180634Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Processing Table '[dbo].[projects]'.
-2025-10-09T01:31:22.9181074Z Processing Table '[dbo].[rawDataTrack]'.
-2025-10-09T01:31:22.9181096Z Processing Table '[dbo].[StatusLookup]'.
-2025-10-09T01:31:22.9181111Z Processing Table '[dbo].[posts]'.
-2025-10-09T01:31:22.9181127Z Processing Table '[dbo].[rawDataDetails]'.
-2025-10-09T01:31:22.9181143Z Processing Table '[dbo].[rawData]'.
-2025-10-09T01:31:22.9181158Z Processing Table '[dbo].[roles]'.
-2025-10-09T01:31:22.9181173Z Processing Table '[dbo].[userInfo]'.
-2025-10-09T01:31:22.9181188Z Processing Table '[dbo].[projectsARC]'.
-2025-10-09T01:31:22.9181204Z Processing Table '[dbo].[postAttachments]'.
-2025-10-09T01:31:22.9181218Z Processing Table '[dbo].[sessions]'.
-2025-10-09T01:31:22.9181233Z Processing Table '[dbo].[audit_trail]'.
-2025-10-09T01:31:22.9181248Z Processing Table '[dbo].[BackupJobs]'.
-2025-10-09T01:31:22.9181284Z Processing Table '[dbo].[audit trail]'.
-2025-10-09T01:31:22.91813Z Processing Table '[dbo].[otpStore]'.
-2025-10-09T01:31:22.918134Z
-2025-10-09T01:31:25.0519165Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Successfully exported database and saved it to file '/database_backup/smartSK_2025-10-09_09-31-12.bacpac'.
-2025-10-09T01:31:25.0519535Z
-2025-10-09T01:31:25.0633925Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] sqlpackage stdout: Time elapsed 0:00:11.41
-2025-10-09T01:31:25.0634516Z
-2025-10-09T01:31:25.3322253Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] Database export to .bacpac completed.
-2025-10-09T01:31:25.3626376Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] Updated in database to processing: Uploading .bacpac file to Azure Storage...
-2025-10-09T01:31:25.3657314Z Uploading backup file to container: backup
-2025-10-09T01:31:26.1956281Z Successfully uploaded smartSK_2025-10-09_09-31-12.bacpac to container backup.
-2025-10-09T01:31:26.3276159Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] Updated in database to completed: Backup complete. Ready for download.
-2025-10-09T01:31:26.3361694Z [Job ea7e181d-cb62-4da6-8249-38f19d95f9cc] Cleaned up local .bacpac file: /database_backup/smartSK_2025-10-09_09-31-12.bacpac
+
 
 --Deployment Container Logs
 
