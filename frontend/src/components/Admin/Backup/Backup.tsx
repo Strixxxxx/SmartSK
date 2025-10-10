@@ -193,10 +193,10 @@ const Backup: React.FC = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
         const file = e.target.files[0];
-        if (file.name.endsWith('.bacpac')) {
+        if (file.name.toLowerCase().endsWith('.zip')) {
             setSelectedFile(file);
         } else {
-            showFlashMessage('Invalid file type. Please select a .bacpac file.', 'error');
+            showFlashMessage('Invalid file type. Please select a .zip backup file.', 'error');
             setSelectedFile(null);
         }
     }
@@ -236,7 +236,7 @@ const Backup: React.FC = () => {
               <h3>Choose Restore Source</h3>
               <div className="restore-options">
                 <button onClick={openCloudRestoreModal}>Restore from Cloud</button>
-                <input type="file" accept=".bacpac" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
+                <input type="file" accept=".zip" ref={fileInputRef} onChange={handleFileChange} style={{ display: 'none' }} />
                 <button onClick={() => fileInputRef.current?.click()}>Restore from Local File</button>
               </div>
               {selectedFile && (

@@ -246,16 +246,23 @@ async function executeBackup(jobId) {
     }
 }
 
-// --- POST /restore : Restore a database from a backup (Unchanged) ---
+// --- POST /restore : Restore a database from a backup ---
 router.post('/restore', authMiddleware, upload.single('backupFile'), async (req, res) => {
     const { restoreType, fileName } = req.body; // 'cloud' or 'local'
 
-    let downloadPath;
+    let bacpacFilePath; // This will be the path to the .bacpac file to restore
+    let tempDirs = []; // Keep track of dirs to clean up
+    let tempFiles = []; // Keep track of files to clean up
     let originalFileName;
+
+    const cleanup = () => {
+        tempFiles.forEach(f => { if (fs.existsSync(f)) fs.unlinkSync(f); });
+        tempDirs.forEach(d => { if (fs.existsSync(d)) fs.rmdirSync(d, { recursive: true }); });
+    };
 
     try {
         if (!restoreType || !['cloud', 'local'].includes(restoreType)) {
-            if (req.file) fs.unlinkSync(req.file.path);
+            if (req.file) fs.unlinkSync(req.file.path); // cleanup multer file
             return res.status(400).json({ message: "Restore type ('cloud' or 'local') is required." });
         }
 
@@ -263,35 +270,70 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             if (!req.file) {
                 return res.status(400).json({ message: 'No backup file uploaded for local restore.' });
             }
-            downloadPath = req.file.path;
+            const uploadedZipPath = req.file.path;
+            tempFiles.push(uploadedZipPath);
             originalFileName = req.file.originalname;
+
+            // Check if file is a zip
+            if (path.extname(originalFileName).toLowerCase() !== '.zip') {
+                cleanup();
+                return res.status(400).json({ message: 'Invalid file type. Please upload a .zip backup file.' });
+            }
+
+            const tempExtractDir = path.join(backupDir, `extract_${Date.now()}`);
+            fs.mkdirSync(tempExtractDir);
+            tempDirs.push(tempExtractDir);
+
+            console.log(`[Restore] Extracting ${originalFileName}...`);
+            const unzipCommand = `unzip -o -P "${process.env.ZIP_LOCK}" "${uploadedZipPath}" -d "${tempExtractDir}"`;
+            
+            const { exec: execPromise } = require('child_process');
+            await new Promise((resolve, reject) => {
+                execPromise(unzipCommand, (err, stdout, stderr) => {
+                    if (err) {
+                        console.error(`[Restore] Unzip failed: ${stderr}`);
+                        return reject(new Error('Failed to extract backup file. Is it a valid password-protected zip?'));
+                    }
+                    resolve(stdout);
+                });
+            });
+
+            const files = fs.readdirSync(tempExtractDir);
+            const bacpacFile = files.find(f => f.endsWith('.bacpac'));
+
+            if (!bacpacFile) {
+                throw new Error('.bacpac file not found in the zip archive.');
+            }
+            bacpacFilePath = path.join(tempExtractDir, bacpacFile);
+            console.log(`[Restore] Extracted ${bacpacFile}.`);
+
         } else { // cloud
             if (!fileName) {
                 return res.status(400).json({ message: 'Backup file name is required for cloud restore.' });
             }
             originalFileName = fileName;
-            downloadPath = path.join(backupDir, fileName);
+            bacpacFilePath = path.join(backupDir, fileName);
+            tempFiles.push(bacpacFilePath);
 
-            console.log(`Downloading ${fileName} from Azure Storage...`);
-            await downloadBackupFile(fileName, downloadPath);
-            console.log(`Successfully downloaded backup to ${downloadPath}.`);
+            console.log(`[Restore] Downloading ${fileName} from Azure Storage...`);
+            await downloadBackupFile(fileName, bacpacFilePath);
+            console.log(`[Restore] Successfully downloaded backup to ${bacpacFilePath}.`);
         }
 
-        console.log('Starting database restore using sqlpackage...');
-        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${dbName} /sf:"${downloadPath}" /su:${process.env.DB_USER} /sp:${process.env.DB_PASSWORD}`;
+        console.log('[Restore] Starting database restore using sqlpackage...');
+        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${dbName} /sf:"${bacpacFilePath}" /su:${process.env.DB_USER} /sp:${process.env.DB_PASSWORD}`;
 
-        exec(command, (error, stdout, stderr) => {
-            if (fs.existsSync(downloadPath)) {
-                fs.unlinkSync(downloadPath);
-            }
+        const { exec: execCallback } = require('child_process');
+        execCallback(command, (error, stdout, stderr) => {
+            cleanup(); // Clean up everything regardless of outcome
 
             if (error) {
-                console.error(`sqlpackage import failed: ${error.message}`);
-                console.error(`stderr: ${stderr}`);
+                console.error(`[Restore] sqlpackage import failed: ${error.message}`);
+                console.error(`[Restore] stderr: ${stderr}`);
                 return res.status(500).json({ message: 'Database restore failed.', error: stderr });
             }
 
-            console.log('Database import/restore completed successfully.');
+            console.log('[Restore] Database import/restore completed successfully.');
             addAuditTrail({
                 actor: 'A',
                 module: 'B',
@@ -305,10 +347,8 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
         });
 
     } catch (error) {
-        console.error('Restore process failed:', error.message);
-        if (downloadPath && fs.existsSync(downloadPath)) {
-            fs.unlinkSync(downloadPath);
-        }
+        console.error('[Restore] Process failed:', error.message);
+        cleanup();
         if (!res.headersSent) {
             res.status(500).json({ message: error.message });
         }
