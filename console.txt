@@ -1,24 +1,12 @@
 --Frontend (Browser's Console)
 
-
+Failed to load resource: the server responded with a status of 500 ()
+index-DMhWH6Gm.js:81 Server error: 500 Objecterror: "*** 'SourceUser' is not a valid argument for the 'Import' action.\n*** 'SourcePassword' is not a valid argument for the 'Import' action.\n"message: "Database restore failed."[[Prototype]]: Object
+(anonymous) @ index-DMhWH6Gm.js:81
 
 --Backend(Local Machine)
 
-Initializing active sessions from database...
-Initializing Azure Storage with primary credentials.
-Job management system initialized with database storage.
-Server is running on port 8080
-Initialized active sessions.
-Login attempt received
-Login successful for user.
-[Job 778125a0-593c-429d-867e-5ec149a198f2] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
-[Job 778125a0-593c-429d-867e-5ec149a198f2] Updated in database to processing: Exporting database using sqlpackage...
-[Job 778125a0-593c-429d-867e-5ec149a198f2] Executing sqlpackage command...
-[Job 778125a0-593c-429d-867e-5ec149a198f2] sqlpackage stderr: 'sqlpackage' is not recognized as an internal or external command,
-operable program or batch file.
 
-[Job 778125a0-593c-429d-867e-5ec149a198f2] Backup process failed: sqlpackage process exited with code 1
-[Job 778125a0-593c-429d-867e-5ec149a198f2] Updated in database to failed: Backup failed: sqlpackage process exited with code 1
 
 --Backend(Azure Portal's Log Stream in Platform)
 
