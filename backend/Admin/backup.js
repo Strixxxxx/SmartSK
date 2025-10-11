@@ -322,7 +322,7 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
         }
 
         console.log('[Restore] Starting database restore using sqlpackage...');
-        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${dbName} /sf:"${bacpacFilePath}" /tu:${process.env.DB_USER} /tp:${process.env.DB_PASSWORD}`;
+        const command = `sqlpackage /a:Publish /tsn:${dbServer} /tdn:${dbName} /sf:"${bacpacFilePath}" /tu:${process.env.DB_USER} /tp:${process.env.DB_PASSWORD} /p:DropObjectsNotInSource=true /p:BlockOnPossibleDataLoss=false`;
 
         const { exec: execCallback } = require('child_process');
         execCallback(command, (error, stdout, stderr) => {
