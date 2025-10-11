@@ -61,7 +61,7 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
       } else {
         // This is a fallback in case the auth state is lost.
         // The AdminGuard should handle this, but this makes it more robust.
-        navigate('/login', { replace: true });
+        navigate('/home', { replace: true });
       }
       setAuthChecked(true);
     }
@@ -80,7 +80,7 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
     } catch (error) {
       const axiosError = error as AxiosError; // Added type assertion
       if (axiosError.response?.status === 401) {
-        navigate('/login', { replace: true });
+        navigate('/home', { replace: true });
         return;
       }
       if (axiosError.response?.status === 403) {
@@ -176,7 +176,7 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
     } catch (error) {
       const axiosError = error as AxiosError; // Added type assertion
       if (axiosError.response?.status === 401) {
-        navigate('/login', { replace: true });
+        navigate('/home', { replace: true });
         return;
       }
       if (axiosError.response?.status === 403) {

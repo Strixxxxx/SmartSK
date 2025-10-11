@@ -55,7 +55,7 @@ const AccountCreation: React.FC<AccountCreationProps> = ({ sidebarCollapsed = fa
       if (user) {
         fetchUsers();
       } else {
-        navigate('/login', { replace: true });
+        navigate('/home', { replace: true });
       }
       setAuthChecked(true);
     }
@@ -73,7 +73,7 @@ const AccountCreation: React.FC<AccountCreationProps> = ({ sidebarCollapsed = fa
     } catch (error) {
       const axiosError = error as AxiosError;
       if (axiosError.response?.status === 401) {
-        navigate('/login', { replace: true });
+        navigate('/home', { replace: true });
         return;
       }
       if (axiosError.response?.status === 403) {
@@ -169,7 +169,7 @@ const AccountCreation: React.FC<AccountCreationProps> = ({ sidebarCollapsed = fa
     } catch (error) {
       const axiosError = error as AxiosError;
       if (axiosError.response?.status === 401) {
-        navigate('/login', { replace: true });
+        navigate('/home', { replace: true });
         return;
       }
       if (axiosError.response?.status === 403) {

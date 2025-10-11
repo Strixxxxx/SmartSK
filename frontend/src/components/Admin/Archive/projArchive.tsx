@@ -64,7 +64,7 @@ const ProjArchive: React.FC = () => {
         const axiosError = error as AxiosError;
         if (axiosError.response?.status === 401) {
           toast.error('Your session has expired. Please log in again.');
-          navigate('/login', { replace: true });
+          navigate('/home', { replace: true });
           return;
         }
         if (axiosError.response?.status === 403) {

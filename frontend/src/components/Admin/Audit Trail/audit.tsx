@@ -42,7 +42,7 @@ const AuditTrail: React.FC<AuditTrailProps> = () => {
         if (axiosError.response?.status === 401) {
           setError('Authentication failed. Please log in again.');
           toast.error('Authentication failed. Please log in again.');
-          navigate('/login');
+          navigate('/home');
           return;
         }
         

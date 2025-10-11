@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import axios from '../../../backend connection/axiosConfig';
+import { useAuth } from '../../../context/AuthContext'; // Import useAuth
 import './Backup.css';
 
 interface CloudBackup {
@@ -27,6 +28,7 @@ interface OutletContextType {
 
 const Backup: React.FC = () => {
   const { showFlashMessage, sidebarCollapsed } = useOutletContext<OutletContextType>();
+  const { logout } = useAuth(); // Get logout function
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
   const [cloudBackups, setCloudBackups] = useState<CloudBackup[]>([]);
@@ -164,6 +166,10 @@ const Backup: React.FC = () => {
       });
       showFlashMessage(response.data.message, 'success');
       setStatus('Restore completed successfully.');
+      showFlashMessage('You will be logged out in 10 seconds for security reasons.', 'info');
+      setTimeout(() => {
+        logout();
+      }, 10000);
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Restore failed.';
       showFlashMessage(errorMessage, 'error');

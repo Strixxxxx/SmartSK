@@ -77,7 +77,7 @@ const Roles: React.FC<RolesProps> = () => {
         
         if (axiosError.response?.status === 401) {
           toast.error('Authentication failed. Please log in again.');
-          navigate('/login');
+          navigate('/home');
           return;
         }
         
@@ -138,7 +138,7 @@ const Roles: React.FC<RolesProps> = () => {
         
         if (axiosError.response?.status === 401) {
           toast.error('Authentication failed. Please log in again.');
-          navigate('/login');
+          navigate('/home');
           return;
         }
         
@@ -185,7 +185,7 @@ const Roles: React.FC<RolesProps> = () => {
         
         if (axiosError.response?.status === 401) {
           toast.error('Authentication failed. Please log in again.');
-          navigate('/login');
+          navigate('/home');
           return;
         }
         

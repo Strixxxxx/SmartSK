@@ -15,7 +15,7 @@ const Projects: React.FC = () => {
 
   useEffect(() => {
     if (!user) {
-      navigate('/login', { replace: true });
+      navigate('/home', { replace: true });
     }
   }, [user, navigate]);
 
