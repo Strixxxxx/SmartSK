@@ -40,8 +40,9 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
   const [showFileViewer, setShowFileViewer] = useState<boolean>(false);
   const [viewingFileUrl, setViewingFileUrl] = useState<string>('');
   const [viewingFileName, setViewingFileName] = useState<string>('');
-  const [statusLegend, setStatusLegend] = useState<{ visible: boolean; projectId: string | null }>({ visible: false, projectId: null });
+  const [statusLegend, setStatusLegend] = useState<{ visible: boolean; projectId: string | null; position: { top: number; left: number } }>({ visible: false, projectId: null, position: { top: 0, left: 0 } });
   const [statusList, setStatusList] = useState([]);
+  const [hideTimeoutId, setHideTimeoutId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchStatuses = async () => {
@@ -196,6 +197,33 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
     }
   };
 
+  const handleStatusHover = (e: React.MouseEvent<HTMLElement>, project: Project) => {
+    if (hideTimeoutId) {
+      clearTimeout(hideTimeoutId);
+      setHideTimeoutId(null);
+    }
+    const rect = e.currentTarget.getBoundingClientRect();
+    setStatusLegend({
+      visible: true,
+      projectId: project.id,
+      position: { top: rect.bottom, left: rect.left }
+    });
+  };
+
+  const handleStatusLeave = () => {
+    const timeoutId = setTimeout(() => {
+      setStatusLegend(prev => ({ ...prev, visible: false, projectId: null }));
+    }, 200);
+    setHideTimeoutId(timeoutId);
+  };
+
+  const handlePopoverEnter = () => {
+    if (hideTimeoutId) {
+      clearTimeout(hideTimeoutId);
+      setHideTimeoutId(null);
+    }
+  };
+
   return (
     <div className="project-submission-container">
       <h3>Proposed Project Submissions</h3>
@@ -271,20 +299,15 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
                       <p className="project-description">{project.description}</p>
                     </td>
                     <td 
-                      onMouseEnter={() => setStatusLegend({ visible: true, projectId: project.id })} 
-                      onMouseLeave={() => setStatusLegend({ visible: false, projectId: null })}
-                      style={{ position: 'relative', cursor: 'pointer' }}
+                      onMouseEnter={(e) => handleStatusHover(e, project)} 
+                      onMouseLeave={handleStatusLeave}
+                      style={{ cursor: 'pointer' }}
                     >
                       <span className={`status-badge status-${project.status.replace(/\s+/g, '-').toLowerCase()}`}>
                         {project.status}
                       </span>
                       {project.status !== 'Pending Review' && (
                         <div className="reviewer-name">By: {project.reviewedBy || 'N/A'}</div>
-                      )}
-                      {statusLegend.visible && statusLegend.projectId === project.id && (
-                        <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 1001 }}>
-                          <StatusLegend currentStatus={project.status} statusList={statusList} />
-                        </div>
                       )}
                     </td>
                     <td className="document-actions-cell">
@@ -320,6 +343,16 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
         </table>
       </div>
       
+      {statusLegend.visible && statusLegend.projectId && (
+        <StatusLegend 
+          currentStatus={projects.find(p => p.id === statusLegend.projectId)?.status || ''} 
+          statusList={statusList}
+          position={statusLegend.position}
+          onMouseEnter={handlePopoverEnter}
+          onMouseLeave={handleStatusLeave}
+        />
+      )}
+
       {showFileViewer && (
         <div className="modal-overlay">
             <div className="file-viewer-modal">

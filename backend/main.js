@@ -210,6 +210,12 @@ if (projectSubmissionRouter && typeof projectSubmissionRouter === 'function') {
   console.error('projectSubmissionRouter is not a valid middleware function');
 }
 
+if (pStatusListRouter && typeof pStatusListRouter === 'function') {
+  app.use('/api/projects', pStatusListRouter);
+} else {
+  console.error('pStatusListRouter is not a valid middleware function');
+}
+
 if (emailRouter && typeof emailRouter === 'function') {
   app.use('/api/email', emailRouter);
 } else {
