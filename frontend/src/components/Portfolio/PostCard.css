@@ -41,6 +41,7 @@
     line-height: 1.5;
     margin: 0 0 16px 0;
     flex-grow: 1;
+    white-space: pre-line; /* This will respect newlines */
 }
 
 .show-more-link {
