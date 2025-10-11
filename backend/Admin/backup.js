@@ -285,8 +285,9 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             tempDirs.push(tempExtractDir);
 
             console.log(`[Restore] Extracting ${originalFileName}...`);
-            const unzipCommand = `unzip -o -P "${process.env.ZIP_LOCK}" "${uploadedZipPath}" -d "${tempExtractDir}"`;
-            
+            // Use 7z to extract the AES256-encrypted zip file
+            const unzipCommand = `7z x -o"${tempExtractDir}" -p"${process.env.ZIP_LOCK}" "${uploadedZipPath}"`;
+
             const { exec: execPromise } = require('child_process');
             await new Promise((resolve, reject) => {
                 execPromise(unzipCommand, (err, stdout, stderr) => {

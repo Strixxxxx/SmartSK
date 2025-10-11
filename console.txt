@@ -1,8 +1,41 @@
 --Frontend (Browser's Console)
 
-Failed to load resource: the server responded with a status of 500 ()
-index-DMhWH6Gm.js:81 Server error: 500 Objecterror: "*** 'SourceUser' is not a valid argument for the 'Import' action.\n*** 'SourcePassword' is not a valid argument for the 'Import' action.\n"message: "Database restore failed."[[Prototype]]: Object
-(anonymous) @ index-DMhWH6Gm.js:81
+index-CPBZlAtJ.js:78 
+ POST https://smartsk-backend-container.azurewebsites.net/api/admin/backup/restore 500 (Internal Server Error)
+(anonymous)	@	index-CPBZlAtJ.js:78
+xhr	@	index-CPBZlAtJ.js:78
+HS	@	index-CPBZlAtJ.js:80
+Promise.then		
+_request	@	index-CPBZlAtJ.js:81
+request	@	index-CPBZlAtJ.js:80
+(anonymous)	@	index-CPBZlAtJ.js:81
+(anonymous)	@	index-CPBZlAtJ.js:76
+P	@	index-CPBZlAtJ.js:319
+onClick	@	index-CPBZlAtJ.js:319
+L1	@	index-CPBZlAtJ.js:48
+(anonymous)	@	index-CPBZlAtJ.js:48
+Vb	@	index-CPBZlAtJ.js:48
+eg	@	index-CPBZlAtJ.js:48
+hg	@	index-CPBZlAtJ.js:49
+jA	@	index-CPBZlAtJ.js:49
+
+index-CPBZlAtJ.js:81 Server error: 500 
+{message: 'Failed to extract backup file. Is it a valid password-protected zip?'}
+(anonymous)	@	index-CPBZlAtJ.js:81
+Promise.then		
+_request	@	index-CPBZlAtJ.js:81
+request	@	index-CPBZlAtJ.js:80
+(anonymous)	@	index-CPBZlAtJ.js:81
+(anonymous)	@	index-CPBZlAtJ.js:76
+P	@	index-CPBZlAtJ.js:319
+onClick	@	index-CPBZlAtJ.js:319
+L1	@	index-CPBZlAtJ.js:48
+(anonymous)	@	index-CPBZlAtJ.js:48
+Vb	@	index-CPBZlAtJ.js:48
+eg	@	index-CPBZlAtJ.js:48
+hg	@	index-CPBZlAtJ.js:49
+jA	@	index-CPBZlAtJ.js:49
+﻿
 
 --Backend(Local Machine)
 
@@ -14,7 +47,81 @@ index-DMhWH6Gm.js:81 Server error: 500 Objecterror: "*** 'SourceUser' is not a v
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-
+2025-10-11T00:55:34.2197243Z Initialized active sessions.
+2025-10-11T00:55:41.3281735Z Login attempt received
+2025-10-11T00:55:42.4410196Z Login successful for user.
+2025-10-11T00:55:47.0086139Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
+2025-10-11T00:55:47.1589189Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] Updated in database to processing: Exporting database using sqlpackage...
+2025-10-11T00:55:47.1602428Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] Executing sqlpackage command...
+2025-10-11T00:55:50.8748281Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Connecting to database 'smartSK' on server 'smart-sk.database.windows.net'.
+2025-10-11T00:55:50.8748749Z
+2025-10-11T00:55:54.2869367Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Extracting schema
+2025-10-11T00:55:54.2869756Z
+2025-10-11T00:55:54.2973884Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Extracting schema from database
+2025-10-11T00:55:54.2974213Z
+2025-10-11T00:56:05.0098841Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Resolving references in schema model
+2025-10-11T00:56:05.009928Z
+2025-10-11T00:56:05.7945547Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Validating schema model
+2025-10-11T00:56:05.7946047Z
+2025-10-11T00:56:06.3067294Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Validating schema model for data package
+2025-10-11T00:56:06.3067755Z
+2025-10-11T00:56:06.3077662Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Validating schema
+2025-10-11T00:56:06.3077894Z
+2025-10-11T00:56:06.518636Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Processing tables for data extraction
+2025-10-11T00:56:06.5186821Z
+2025-10-11T00:56:07.0822266Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Exporting data from database
+2025-10-11T00:56:07.0822801Z
+2025-10-11T00:56:07.0914407Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Exporting data
+2025-10-11T00:56:07.0914635Z
+2025-10-11T00:56:07.7600168Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Processing Export.
+2025-10-11T00:56:07.7600645Z
+2025-10-11T00:56:08.0651063Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Processing Table '[dbo].[barangays]'.
+2025-10-11T00:56:08.0651474Z
+2025-10-11T00:56:08.0756344Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Processing Table '[dbo].[userInfoARC]'.
+2025-10-11T00:56:08.0756903Z
+2025-10-11T00:56:08.1029059Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Processing Table '[dbo].[projects]'.
+2025-10-11T00:56:08.1029295Z
+2025-10-11T00:56:08.1337171Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Processing Table '[dbo].[StatusLookup]'.
+2025-10-11T00:56:08.1338196Z Processing Table '[dbo].[posts]'.
+2025-10-11T00:56:08.1338225Z Processing Table '[dbo].[rawDataDetails]'.
+2025-10-11T00:56:08.1338241Z Processing Table '[dbo].[rawData]'.
+2025-10-11T00:56:08.1338255Z Processing Table '[dbo].[roles]'.
+2025-10-11T00:56:08.1338293Z Processing Table '[dbo].[userInfo]'.
+2025-10-11T00:56:08.1338308Z Processing Table '[dbo].[projectsARC]'.
+2025-10-11T00:56:08.1338393Z Processing Table '[dbo].[postAttachments]'.
+2025-10-11T00:56:08.133841Z Processing Table '[dbo].[sessions]'.
+2025-10-11T00:56:08.1338427Z Processing Table '[dbo].[audit_trail]'.
+2025-10-11T00:56:08.1338442Z Processing Table '[dbo].[BackupJobs]'.
+2025-10-11T00:56:08.1338456Z Processing Table '[dbo].[rawDataTrack]'.
+2025-10-11T00:56:08.133847Z Processing Table '[dbo].[otpStore]'.
+2025-10-11T00:56:08.1338484Z Processing Table '[dbo].[audit trail]'.
+2025-10-11T00:56:08.1338497Z
+2025-10-11T00:56:10.7108325Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Successfully exported database and saved it to file '/database_backup/smartSK_2025-10-11_08-55-47.bacpac'.
+2025-10-11T00:56:10.7108867Z
+2025-10-11T00:56:10.7128227Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] sqlpackage stdout: Time elapsed 0:00:19.86
+2025-10-11T00:56:10.7128533Z
+2025-10-11T00:56:10.822123Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] Database export to .bacpac completed.
+2025-10-11T00:56:10.8810787Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] Updated in database to processing: Uploading .bacpac file to Azure Storage...
+2025-10-11T00:56:10.8811196Z Uploading backup file to container: backup
+2025-10-11T00:56:10.9234688Z Successfully uploaded smartSK_2025-10-11_08-55-47.bacpac to container backup.
+2025-10-11T00:56:10.9504551Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] Updated in database to completed: Backup complete. Ready for download.
+2025-10-11T00:56:10.9512694Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] Cleaned up local .bacpac file: /database_backup/smartSK_2025-10-11_08-55-47.bacpac
+2025-10-11T00:56:11.6621792Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] Downloading smartSK_2025-10-11_08-55-47.bacpac from Azure to /database_backup/temp_smartSK_2025-10-11_08-55-47.bacpac for zipping...
+2025-10-11T00:56:11.7293151Z Successfully downloaded smartSK_2025-10-11_08-55-47.bacpac to /database_backup/temp_smartSK_2025-10-11_08-55-47.bacpac.
+2025-10-11T00:56:11.7301189Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] Download complete.
+2025-10-11T00:56:12.0903122Z [Job 93701aaf-2a8f-4d60-8de5-84b207b4e449] Zip stream finished. Cleaning up temp file: /database_backup/temp_smartSK_2025-10-11_08-55-47.bacpac
+2025-10-11T00:56:53.8877938Z [Restore] Extracting smartSK_2025-10-11_08-55-47.zip...
+2025-10-11T00:56:53.9389038Z [Restore] Unzip failed:    skipping: smartSK_2025-10-11_08-55-47.bacpac  need PK compat. v5.1 (can do v4.6)
+2025-10-11T00:56:53.9389286Z
+2025-10-11T00:56:53.9392317Z [Restore] Process failed: Failed to extract backup file. Is it a valid password-protected zip?
+2025-10-11T00:56:53.9580817Z (node:8) [DEP0147] DeprecationWarning: In future versions of Node.js, fs.rmdir(path, { recursive: true }) will be removed. Use fs.rm(path, { recursive: true }) instead
+2025-10-11T00:56:53.9581053Z     at emitRecursiveRmdirWarning (node:internal/fs/utils:880:13)
+2025-10-11T00:56:53.9581073Z     at Object.rmdirSync (node:fs:1191:5)
+2025-10-11T00:56:53.9581092Z     at /app/Admin/backup.js:260:58
+2025-10-11T00:56:53.9581109Z     at Array.forEach (<anonymous>)
+2025-10-11T00:56:53.9581125Z     at cleanup (/app/Admin/backup.js:260:18)
+2025-10-11T00:56:53.9581203Z     at /app/Admin/backup.js:351:9
+2025-10-11T00:56:53.9581221Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
 
 --Deployment Container Logs
 

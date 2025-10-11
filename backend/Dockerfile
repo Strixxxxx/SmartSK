@@ -54,6 +54,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg2 \
     ffmpeg \
     unzip \
+    p7zip-full \
     libicu67 \
     libunwind8 \
     && rm -rf /var/lib/apt/lists/*
