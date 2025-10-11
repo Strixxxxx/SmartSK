@@ -176,6 +176,7 @@
     font-size: 0.95rem;
     line-height: 1.6;
     font-weight: 500;
+    white-space: pre-line;
 }
 
 .thumbnail-strip {
