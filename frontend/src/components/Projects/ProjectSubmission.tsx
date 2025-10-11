@@ -21,6 +21,11 @@ interface Project {
   reviewedBy?: string;
 }
 
+interface Status {
+  StatusName: string;
+  description: string;
+}
+
 interface ProjectSubmissionProps {
   userId?: number;
   userRole?: string;
@@ -41,7 +46,7 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
   const [viewingFileUrl, setViewingFileUrl] = useState<string>('');
   const [viewingFileName, setViewingFileName] = useState<string>('');
   const [statusLegend, setStatusLegend] = useState<{ visible: boolean; projectId: string | null; position: { top: number; left: number } }>({ visible: false, projectId: null, position: { top: 0, left: 0 } });
-  const [statusList, setStatusList] = useState([]);
+  const [statusList, setStatusList] = useState<Status[]>([]);
   const [hideTimeoutId, setHideTimeoutId] = useState<number | null>(null);
 
   useEffect(() => {

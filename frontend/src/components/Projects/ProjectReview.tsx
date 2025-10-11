@@ -28,6 +28,11 @@ interface ProjectReviewProps {
   userRole?: string;
 }
 
+interface Status {
+    StatusName: string;
+    description: string;
+}
+
 const ProjectReview: React.FC<ProjectReviewProps> = ({ userFullName, userRole }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -35,18 +40,13 @@ const ProjectReview: React.FC<ProjectReviewProps> = ({ userFullName, userRole })
   const [editingProjectId, setEditingProjectId] = useState<number | null>(null);
   const [reviewComment, setReviewComment] = useState<string>('');
   
-  const statusOptions = [
-    'Pending Review', 'Revision Requested', 'Proposal Accepted', 'Proposal Rejected',
-    'In Compilation', "Brgy. Captain's Review", 'Submitted to LGU', 'LGU Revision Requested',
-    'LGU Approval', 'LGU Rejected'
-  ];
-  const [reviewStatus, setReviewStatus] = useState<string>(statusOptions[0]);
+  const [reviewStatus, setReviewStatus] = useState<string>('');
 
   const [showFileViewer, setShowFileViewer] = useState<boolean>(false);
   const [viewingFileUrl, setViewingFileUrl] = useState<string>('');
   const [viewingFileName, setViewingFileName] = useState<string>('');
   const [statusLegend, setStatusLegend] = useState<{ visible: boolean; projectId: number | null; position: { top: number; left: number } }>({ visible: false, projectId: null, position: { top: 0, left: 0 } });
-  const [statusList, setStatusList] = useState([]);
+  const [statusList, setStatusList] = useState<Status[]>([]);
   const [hideTimeoutId, setHideTimeoutId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -87,7 +87,7 @@ const ProjectReview: React.FC<ProjectReviewProps> = ({ userFullName, userRole })
   const handleReviewClick = (project: Project) => {
     setEditingProjectId(project.id);
     setReviewComment(project.remarks || '');
-    setReviewStatus(project.status || statusOptions[0]);
+    setReviewStatus(project.status || (statusList.length > 0 ? statusList[0].StatusName : ''));
   };
   
   const handleCancelClick = () => {
@@ -279,8 +279,8 @@ const ProjectReview: React.FC<ProjectReviewProps> = ({ userFullName, userRole })
                               onChange={(e) => setReviewStatus(e.target.value)}
                               required
                             >
-                              {statusOptions.map(status => (
-                                  <option key={status} value={status}>{status}</option>
+                              {statusList.map(status => (
+                                  <option key={status.StatusName} value={status.StatusName}>{status.StatusName}</option>
                               ))}
                             </select>
                           </div>
