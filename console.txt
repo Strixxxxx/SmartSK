@@ -1,7 +1,6 @@
 --Frontend (Browser's Console)
 
-Failed to load resource: the server responded with a status of 500 ()
-index-BJkhP-ce.js:81 Server error: 500 Objectmessage: "An error occurred while generating the file link."success: false[[Prototype]]: Object
+
 
 --Frontend (VSC Terminal)
 
@@ -17,10 +16,13 @@ index-BJkhP-ce.js:81 Server error: 500 Objectmessage: "An error occurred while g
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-11T12:24:09.5023836Z Error generating SAS URL: TypeError: Cannot read properties of undefined (reading 'startsWith')
-2025-10-11T12:24:09.5024907Z     at getFileSasUrl (/app/Storage/storage.js:66:36)
-2025-10-11T12:24:09.5024929Z     at /app/projectSubmission/projectSubmission.js:152:26
-2025-10-11T12:24:09.5024947Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-11T13:03:17.3062724Z Uploading file with mimetype: video/mp4
+2025-10-11T13:03:17.3266818Z Selected container: videos
+2025-10-11T13:04:21.356Z No new trace in the past 1 min(s).
+2025-10-11T13:05:21.356Z No new trace in the past 2 min(s).
+2025-10-11T13:06:21.356Z No new trace in the past 3 min(s).
+2025-10-11T13:07:21.356Z No new trace in the past 4 min(s).
+2025-10-11T13:08:21.356Z No new trace in the past 5 min(s).
 
 --Deployment Container Logs
 

@@ -246,13 +246,69 @@ async function executeBackup(jobId) {
     }
 }
 
+// --- Helper function to clean up orphaned restore databases ---
+async function cleanupOrphanedRestoreDatabases() {
+    const dbToCleanPattern = `${dbName}_restore_%`;
+    console.log(`[Restore Cleanup] Searching for orphaned databases matching: ${dbToCleanPattern}`);
+    let connection;
+    try {
+        const sql = require('mssql');
+        // Centralized config for master DB connection
+        const masterDbConfig = {
+            server: dbServer,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: 'master',
+            options: {
+                encrypt: process.env.DB_ENCRYPT !== 'false', // Default to true
+                trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true' // Default to false
+            }
+        };
+        connection = await sql.connect(masterDbConfig);
+        
+        const result = await connection.request()
+            .input('pattern', sql.NVarChar, dbToCleanPattern)
+            .query('SELECT name FROM sys.databases WHERE name LIKE @pattern');
+
+        if (result.recordset.length === 0) {
+            console.log('[Restore Cleanup] No orphaned databases found.');
+            return;
+        }
+
+        console.log(`[Restore Cleanup] Found ${result.recordset.length} orphaned database(s): ${result.recordset.map(r => r.name).join(', ')}`);
+
+        for (const row of result.recordset) {
+            const orphanDbName = row.name;
+            try {
+                console.log(`[Restore Cleanup] Attempting to drop orphaned database: ${orphanDbName}`);
+                // Forcibly close connections and drop the database
+                await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
+                await connection.request().query(`DROP DATABASE [${orphanDbName}];`);
+                console.log(`[Restore Cleanup] Successfully dropped orphaned database: ${orphanDbName}`);
+            } catch (dropError) {
+                console.error(`[Restore Cleanup] Failed to drop database ${orphanDbName}. It may require manual deletion. Error: ${dropError.message}`);
+            }
+        }
+    } catch (error) {
+        console.error(`[Restore Cleanup] An error occurred during the cleanup process: ${error.message}`);
+    } finally {
+        if (connection && connection.connected) {
+            await connection.close();
+        }
+    }
+}
+
 // --- POST /restore : Restore a database from a backup ---
 router.post('/restore', authMiddleware, upload.single('backupFile'), async (req, res) => {
     const { restoreType, fileName } = req.body; // 'cloud' or 'local'
 
-    let bacpacFilePath; // This will be the path to the .bacpac file to restore
-    let tempDirs = []; // Keep track of dirs to clean up
-    let tempFiles = []; // Keep track of files to clean up
+    // --- Start: Proactive cleanup of orphaned databases ---
+    await cleanupOrphanedRestoreDatabases();
+    // --- End: Proactive cleanup ---
+
+    let bacpacFilePath;
+    let tempDirs = [];
+    let tempFiles = [];
     let originalFileName;
     const tempDbName = `${dbName}_restore_${Date.now()}`;
 
@@ -263,7 +319,7 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
 
     try {
         if (!restoreType || !['cloud', 'local'].includes(restoreType)) {
-            if (req.file) fs.unlinkSync(req.file.path); // cleanup multer file
+            if (req.file) fs.unlinkSync(req.file.path);
             return res.status(400).json({ message: "Restore type ('cloud' or 'local') is required." });
         }
 
@@ -276,8 +332,7 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             originalFileName = req.file.originalname;
 
             if (path.extname(originalFileName).toLowerCase() !== '.zip') {
-                cleanup();
-                return res.status(400).json({ message: 'Invalid file type. Please upload a .zip backup file.' });
+                throw new Error('Invalid file type. Please upload a .zip backup file.');
             }
 
             const tempExtractDir = path.join(backupDir, `extract_${Date.now()}`);
@@ -286,13 +341,12 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
 
             console.log(`[Restore] Extracting ${originalFileName}...`);
             const unzipCommand = `7z x -o"${tempExtractDir}" -p"${process.env.ZIP_LOCK}" "${uploadedZipPath}"`;
-
             const { exec: execPromise } = require('child_process');
             await new Promise((resolve, reject) => {
                 execPromise(unzipCommand, (err, stdout, stderr) => {
                     if (err) {
                         console.error(`[Restore] Unzip failed: ${stderr}`);
-                        return reject(new Error('Failed to extract backup file. Is it a valid password-protected zip?'));
+                        return reject(new Error('Failed to extract backup file. Check password or file integrity.'));
                     }
                     resolve(stdout);
                 });
@@ -300,10 +354,7 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
 
             const files = fs.readdirSync(tempExtractDir);
             const bacpacFile = files.find(f => f.endsWith('.bacpac'));
-
-            if (!bacpacFile) {
-                throw new Error('.bacpac file not found in the zip archive.');
-            }
+            if (!bacpacFile) throw new Error('.bacpac file not found in the zip archive.');
             bacpacFilePath = path.join(tempExtractDir, bacpacFile);
             console.log(`[Restore] Extracted ${bacpacFile}.`);
 
@@ -325,15 +376,26 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
 
         const { exec: execCallback } = require('child_process');
         execCallback(command, async (error, stdout, stderr) => {
+            const masterDbConfig = {
+                server: dbServer,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: 'master',
+                options: {
+                    encrypt: process.env.DB_ENCRYPT !== 'false',
+                    trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'
+                }
+            };
+
             if (error) {
                 console.error(`[Restore] sqlpackage import to temp DB failed: ${error.message}`);
                 console.error(`[Restore] stderr: ${stderr}`);
-                cleanup(); // Original file cleanup
+                cleanup();
                 try {
                     console.log(`[Restore] Attempting to clean up failed temporary database: ${tempDbName}`);
                     const sql = require('mssql');
-                    await sql.connect({ server: dbServer, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: 'master', options: { encrypt: true, trustServerCertificate: true } });
-                    await sql.query(`DROP DATABASE [${tempDbName}]`);
+                    await sql.connect(masterDbConfig);
+                    await sql.query(`DROP DATABASE IF EXISTS [${tempDbName}]`);
                     await sql.close();
                     console.log(`[Restore] Successfully cleaned up temporary database: ${tempDbName}`);
                 } catch (cleanupError) {
@@ -343,28 +405,28 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             }
 
             console.log(`[Restore] Successfully imported to temporary database. Proceeding with swap.`);
-
+            let sql;
             try {
-                const sql = require('mssql');
-                await sql.connect({ server: dbServer, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: 'master', options: { encrypt: true, trustServerCertificate: true } });
+                sql = require('mssql');
+                await sql.connect(masterDbConfig);
+
+                console.log(`[Restore] Setting original database '${dbName}' to single-user mode.`);
+                await sql.query(`ALTER DATABASE [${dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
 
                 console.log(`[Restore] Dropping original database: ${dbName}`);
-                await sql.query(`DROP DATABASE [${dbName}]`);
+                await sql.query(`DROP DATABASE [${dbName}];`);
 
                 console.log(`[Restore] Renaming temporary database '${tempDbName}' to '${dbName}'`);
-                await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${dbName}]`);
+                await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${dbName}];`);
+
+                console.log(`[Restore] Setting new database '${dbName}' back to multi-user mode.`);
+                await sql.query(`ALTER DATABASE [${dbName}] SET MULTI_USER;`);
                 
-                await sql.close();
-
                 console.log('[Restore] Database restore completed successfully.');
-                cleanup(); // Final cleanup of local files
-
+                
                 addAuditTrail({
-                    actor: 'A',
-                    module: 'B',
-                    userID: req.user.userId,
-                    actions: 'restore-database',
-                    newValue: originalFileName,
+                    actor: 'A', module: 'B', userID: req.user.userId,
+                    actions: 'restore-database', newValue: originalFileName,
                     descriptions: `Admin ${req.user.fullName} restored the database from ${originalFileName} (${restoreType}).`
                 });
 
@@ -372,11 +434,13 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
 
             } catch (swapError) {
                 console.error(`[Restore] CRITICAL: Failed during database swap: ${swapError.message}`);
-                cleanup();
                 res.status(500).json({
                     message: 'CRITICAL: Database restore failed during final swap. Manual intervention required.',
-                    error: `The database may be in an inconsistent state. The temporary database '${tempDbName}' may need to be manually renamed to '${dbName}'. Error: ${swapError.message}`
+                    error: `The database may be in an inconsistent state. The temporary database '${tempDbName}' may still exist and need to be manually renamed to '${dbName}'. Error: ${swapError.message}`
                 });
+            } finally {
+                if (sql && sql.connected) await sql.close();
+                cleanup();
             }
         });
 

@@ -222,6 +222,34 @@ CREATE INDEX IX_BackupJobs_CreatedAt ON BackupJobs(CreatedAt DESC);
 CREATE INDEX IX_BackupJobs_CreatedBy ON BackupJobs(CreatedBy);
 CREATE INDEX IX_BackupJobs_ExpiresAt ON BackupJobs(ExpiresAt) WHERE ExpiresAt IS NOT NULL;
 
+--PostUploadJobs Table
+
+CREATE TABLE PostUploadJobs(
+  JobID nvarchar(50) NOT NULL,
+  JobType nvarchar(20) NOT NULL,
+  Status nvarchar(20) NOT NULL,
+  Message nvarchar(500) NULL,
+  Payload nvarchar(max) NULL,
+  Result nvarchar(max) NULL,
+  ErrorMessage nvarchar(max) NULL,
+  CreatedBy nvarchar(100) NULL,
+  UserID int NULL,
+  CreatedAt datetime2(7) NOT NULL,
+  UpdatedAt datetime2(7) NULL,
+  StartedAt datetime2(7) NULL,
+  CompletedAt datetime2(7) NULL,
+  ExpiresAt datetime2(7) NULL,
+  
+ CONSTRAINT PK_PostUploadJobs PRIMARY KEY CLUSTERED 
+(
+  JobID ASC
+)WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY] 
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+GO
+
+ALTER TABLE PostUploadJobs ADD  CONSTRAINT DF_PostUploadJobs_CreatedAt  DEFAULT (getdate()) FOR CreatedAt
+GO
+
 --Stored Procedures
 
 --Status Creation for the Project

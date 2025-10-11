@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { AxiosProgressEvent } from 'axios';
 import api from '../../../backend connection/axiosConfig';
@@ -20,19 +20,60 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
     const { register, handleSubmit, formState: { errors }, trigger, getValues } = useForm<IFormInput>({ mode: 'onChange' });
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isProcessing, setIsProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [previews, setPreviews] = useState<string[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [showVideoWarning, setShowVideoWarning] = useState(false);
+    const [jobId, setJobId] = useState<string | null>(null);
+    const [jobStatus, setJobStatus] = useState<string | null>(null);
+    const [statusMessage, setStatusMessage] = useState<string>('');
 
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [selectedVideoUrl, setSelectedVideoUrl] = useState('');
 
-    // Drag and drop state
     const dragItem = useRef<number | null>(null);
     const dragOverItem = useRef<number | null>(null);
+    const pollingInterval = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        if (jobId) {
+            setStatusMessage('Post creation has started...');
+            pollingInterval.current = setInterval(pollJobStatus, 2000); // Poll every 2 seconds
+        }
+        return () => {
+            if (pollingInterval.current) {
+                clearInterval(pollingInterval.current);
+            }
+        };
+    }, [jobId]);
+
+    const pollJobStatus = async () => {
+        if (!jobId) return;
+
+        try {
+            const response = await api.get(`/api/post-status/${jobId}`);
+            const { job } = response.data;
+
+            setJobStatus(job.Status);
+            setStatusMessage(job.Message || 'Processing...');
+
+            if (job.Status === 'completed') {
+                if (pollingInterval.current) clearInterval(pollingInterval.current);
+                previews.forEach(preview => URL.revokeObjectURL(preview));
+                onPostCreated();
+                onClose();
+            } else if (job.Status === 'failed') {
+                if (pollingInterval.current) clearInterval(pollingInterval.current);
+                setError(job.ErrorMessage || 'An unknown error occurred during post processing.');
+                setIsSubmitting(false);
+            }
+        } catch (err: any) {
+            if (pollingInterval.current) clearInterval(pollingInterval.current);
+            setError('Failed to get post status. Please check your connection.');
+            setIsSubmitting(false);
+        }
+    };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -50,14 +91,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
 
     const handleRemoveFile = (indexToRemove: number) => {
         URL.revokeObjectURL(previews[indexToRemove]);
-
-        const updatedFiles = selectedFiles.filter((_, index) => index !== indexToRemove);
-        setSelectedFiles(updatedFiles);
-
-        const updatedPreviews = previews.filter((_, index) => index !== indexToRemove);
-        setPreviews(updatedPreviews);
-
-        if (!updatedFiles.some(file => file.type.startsWith('video'))) {
+        setSelectedFiles(prev => prev.filter((_, index) => index !== indexToRemove));
+        setPreviews(prev => prev.filter((_, index) => index !== indexToRemove));
+        if (!selectedFiles.some(file => file.type.startsWith('video'))) {
             setShowVideoWarning(false);
         }
     };
@@ -88,111 +124,93 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
         setSelectedVideoUrl('');
     };
 
-    const generatePostReference = () => {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const hours = now.getHours().toString().padStart(2, '0');
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        const seconds = now.getSeconds().toString().padStart(2, '0');
-        return `G-${year}${month}${day}${hours}${minutes}${seconds}`;
-    };
-
     const onSubmit = async (data: IFormInput) => {
         setIsSubmitting(true);
-        setIsProcessing(false);
         setError(null);
         setUploadProgress(0);
+        setJobStatus(null);
+        setStatusMessage('Preparing to upload...');
 
         const formData = new FormData();
-        const postReference = generatePostReference();
-        formData.append('postReference', postReference);
         formData.append('title', data.title);
         formData.append('description', data.description);
 
-        if (selectedFiles.length > 0) {
-            selectedFiles.forEach(file => {
-                formData.append('attachments', file);
-            });
-        }
+        selectedFiles.forEach(file => {
+            formData.append('attachments', file);
+        });
 
         try {
-            await api.post('/api/create-post', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                },
+            const response = await api.post('/api/create-post', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
                 onUploadProgress: (progressEvent: AxiosProgressEvent) => {
                     const percentCompleted = Math.round(
                         (progressEvent.loaded * 100) / (progressEvent.total ?? 1)
                     );
                     setUploadProgress(percentCompleted);
                     if (percentCompleted === 100) {
-                        setIsProcessing(true);
+                        setStatusMessage('Upload complete. Waiting for server to process...');
+                    } else {
+                        setStatusMessage(`Uploading... ${percentCompleted}%`);
                     }
                 }
             });
             
-            previews.forEach(preview => URL.revokeObjectURL(preview));
-            onPostCreated();
-            onClose();
+            setJobId(response.data.jobId);
+
         } catch (err: any) {
             setError(err.response?.data?.message || 'An error occurred while creating the post.');
-        } finally {
             setIsSubmitting(false);
-            setIsProcessing(false);
         }
     };
 
     const handleNext = async () => {
         const isValid = await trigger();
-        if (isValid) {
-            setStep(2);
-        }
+        if (isValid) setStep(2);
     };
 
-    const handleBack = () => {
-        setStep(1);
-    };
+    const handleBack = () => setStep(1);
 
     const handleClose = () => {
         previews.forEach(preview => URL.revokeObjectURL(preview));
+        if (pollingInterval.current) clearInterval(pollingInterval.current);
         onClose();
     };
 
-    const renderPreviews = () => {
-        return (
-            <div className="previews">
-                {previews.map((preview, index) => {
-                    const file = selectedFiles[index];
-                    const isVideo = file.type.startsWith('video');
+    const renderPreviews = () => (
+        <div className="previews">
+            {previews.map((preview, index) => {
+                const file = selectedFiles[index];
+                const isVideo = file.type.startsWith('video');
+                return (
+                    <div 
+                        key={index} 
+                        className="preview-container"
+                        draggable
+                        onDragStart={() => dragItem.current = index}
+                        onDragEnter={() => dragOverItem.current = index}
+                        onDragEnd={handleDragEnd}
+                        onDragOver={(e) => e.preventDefault()}
+                    >
+                        {isVideo ? (
+                            <div className="video-preview" onClick={() => openVideoModal(preview)}>
+                                <video src={preview} className="preview-image" />
+                                <div className="play-icon"><div className="play-icon-shape"></div></div>
+                            </div>
+                        ) : (
+                            <img src={preview} alt={`Preview ${index + 1}`} className="preview-image" />
+                        )}
+                        <button type="button" className="remove-attachment-btn" onClick={() => handleRemoveFile(index)}>&times;</button>
+                    </div>
+                );
+            })}
+        </div>
+    );
 
-                    return (
-                        <div 
-                            key={index} 
-                            className="preview-container"
-                            draggable
-                            onDragStart={() => dragItem.current = index}
-                            onDragEnter={() => dragOverItem.current = index}
-                            onDragEnd={handleDragEnd}
-                            onDragOver={(e) => e.preventDefault()}
-                        >
-                            {isVideo ? (
-                                <div className="video-preview" onClick={() => openVideoModal(preview)}>
-                                    <video src={preview} className="preview-image" />
-                                    <div className="play-icon"><div className="play-icon-shape"></div></div>
-                                </div>
-                            ) : (
-                                <img src={preview} alt={`Preview ${index + 1}`} className="preview-image" />
-                            )}
-                            <button type="button" className="remove-attachment-btn" onClick={() => handleRemoveFile(index)}>
-                                &times;
-                            </button>
-                        </div>
-                    );
-                })}
-            </div>
-        );
+    const getButtonText = () => {
+        if (!isSubmitting) return 'Post';
+        if (jobId) return jobStatus ? `Processing...` : 'Finalizing...';
+        if (uploadProgress < 100) return `Uploading ${uploadProgress}%`;
+        return 'Processing...';
     };
 
     return (
@@ -213,7 +231,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
                                     />
                                     {errors.title && <p className="error-message">{errors.title.message}</p>}
                                 </div>
-
                                 <div className="form-group">
                                     <label htmlFor="description">Description</label>
                                     <textarea
@@ -223,7 +240,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
                                     />
                                     {errors.description && <p className="error-message">{errors.description.message}</p>}
                                 </div>
-
                                 <div className="form-group">
                                     <label htmlFor="attachments">Attachments (Images/Videos)</label>
                                     <input
@@ -236,16 +252,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
                                     />
                                     {showVideoWarning && <p className="video-warning">Video uploads may take a few moments to process after uploading.</p>}
                                 </div>
-
                                 {previews.length > 0 && renderPreviews()}
-
                                 <div className="form-actions">
-                                    <button type="button" onClick={handleClose}>
-                                        Cancel
-                                    </button>
-                                    <button type="button" onClick={handleNext}>
-                                        Next
-                                    </button>
+                                    <button type="button" onClick={handleClose}>Cancel</button>
+                                    <button type="button" onClick={handleNext}>Next</button>
                                 </div>
                             </form>
                         </>
@@ -260,20 +270,21 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
                                 {previews.length > 0 && renderPreviews()}
                             </div>
 
-                            {isSubmitting && uploadProgress > 0 && (
-                                <div className="progress-bar-container">
-                                    <div className="progress-bar" style={{ width: `${uploadProgress}%` }}></div>
+                            {isSubmitting && (
+                                <div className="status-container">
+                                    <div className="progress-bar-container">
+                                        <div className="progress-bar" style={{ width: `${uploadProgress}%` }}></div>
+                                    </div>
+                                    <p className="status-message">{statusMessage}</p>
                                 </div>
                             )}
 
                             {error && <p className="error-message">{error}</p>}
 
                             <div className="form-actions">
-                                <button type="button" onClick={handleBack} disabled={isSubmitting}>
-                                    Back
-                                </button>
+                                <button type="button" onClick={handleBack} disabled={isSubmitting}>Back</button>
                                 <button type="button" onClick={handleSubmit(onSubmit)} disabled={isSubmitting}>
-                                    {isSubmitting ? (isProcessing ? 'Processing...' : `Uploading ${uploadProgress}%`) : 'Post'}
+                                    {getButtonText()}
                                 </button>
                             </div>
                         </>

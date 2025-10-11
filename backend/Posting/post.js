@@ -7,6 +7,10 @@ const { checkRole } = require('../routeGuard/permission');
 const { uploadFile } = require('../Storage/storage');
 const { compressVideo } = require('../FFmpeg/ffmpeg');
 const { addAuditTrail } = require('../audit/auditService');
+const postJob = require('./postJob');
+const fs = require('fs').promises;
+const path = require('path');
+const os = require('os');
 
 // Multer configuration for in-memory storage
 const storage = multer.memoryStorage();
@@ -31,7 +35,7 @@ const getPHTimestamp = () => {
     return localNow;
 };
 
-// POST /api/posts - Create a New Post
+// POST /api/create-post - Starts an asynchronous job to create a new post
 router.post('/create-post', authMiddleware, checkRole(['SKC', 'SKO']), upload.array('attachments'), async (req, res) => {
     const { title, description } = req.body;
     const userID = req.user.userId;
@@ -40,81 +44,161 @@ router.post('/create-post', authMiddleware, checkRole(['SKC', 'SKO']), upload.ar
         return res.status(400).json({ success: false, message: 'Title and description are required.' });
     }
 
-    const pool = await getConnection();
-    const transaction = new sql.Transaction(pool);
-
+    let tempDir;
     try {
-        await transaction.begin();
+        // 1. Create a job
+        const jobId = await postJob.createJob({
+            title,
+            description,
+            initiatedBy: req.user.fullName,
+            userId: userID,
+        });
 
-        const timestamp = getPHTimestamp();
-        const postReference = `G-${timestamp.toISOString().slice(0, 19).replace(/[-T:]/g, '')}`;
-
-        const postRequest = new sql.Request(transaction);
-        const postResult = await postRequest
-            .input('userID', sql.Int, userID)
-            .input('title', sql.NVarChar, title)
-            .input('description', sql.NVarChar, description)
-            .input('postReference', sql.NVarChar, postReference)
-            .query(`
-                INSERT INTO posts (userID, title, description, postReference)
-                OUTPUT INSERTED.postID
-                VALUES (@userID, @title, @description, @postReference);
-            `);
-
-        const postID = postResult.recordset[0].postID;
-
+        // 2. Save files to a temporary location
+        tempDir = await fs.mkdtemp(path.join(os.tmpdir(), `post-upload-${jobId}-`));
+        const tempFiles = [];
         if (req.files && req.files.length > 0) {
             for (const file of req.files) {
-                let fileBuffer = file.buffer;
-                let finalMimeType = file.mimetype;
-
-                // Video processing
-                if (file.mimetype === 'video/mp4' && file.size > 25 * 1024 * 1024) {
-                    try {
-                        fileBuffer = await compressVideo(file.buffer, file.originalname);
-                    } catch (compressionError) {
-                        await transaction.rollback();
-                        return res.status(500).json({ success: false, message: 'Video compression failed.', error: compressionError.message });
-                    }
-                }
-                
-                const azureBlobName = await uploadFile({
-                    buffer: fileBuffer,
+                const tempFilePath = path.join(tempDir, file.originalname);
+                await fs.writeFile(tempFilePath, file.buffer);
+                tempFiles.push({
+                    path: tempFilePath,
                     originalname: file.originalname,
-                    mimetype: finalMimeType
+                    mimetype: file.mimetype,
                 });
-
-                const attachmentRequest = new sql.Request(transaction);
-                await attachmentRequest
-                    .input('postID', sql.Int, postID)
-                    .input('fileType', sql.NVarChar, finalMimeType)
-                    .input('filePath', sql.NVarChar, azureBlobName)
-                    .query(`
-                        INSERT INTO postAttachments (postID, fileType, filePath)
-                        VALUES (@postID, @fileType, @filePath);
-                    `);
             }
         }
 
-        await transaction.commit();
-        
-        addAuditTrail({
-            actor: 'C',
-            module: 'G',
-            userID: userID,
-            actions: 'create-post',
-            oldValue: null,
-            newValue: `Reference: ${postReference}`,
-            descriptions: `User ${req.user.fullName} created a new post: ${title}`
-        });
+        // 3. Respond to client immediately
+        res.status(202).json({ success: true, message: 'Post creation job accepted.', jobId });
 
-        res.status(201).json({ success: true, message: 'Post created successfully.', postID });
+        // 4. Start background processing (fire and forget)
+        processPostUploadJob(jobId, userID, req.user.fullName, tempFiles, tempDir);
 
     } catch (error) {
-        await transaction.rollback();
-        console.error('Error creating post:', error);
-        res.status(500).json({ success: false, message: 'Failed to create post.', error: error.message });
+        console.error('Error initiating post creation job:', error);
+        // Cleanup temp dir if it was created
+        if (tempDir) {
+            try {
+                await fs.rm(tempDir, { recursive: true, force: true });
+            } catch (cleanupError) {
+                console.error(`Failed to clean up temporary directory ${tempDir} after job initiation failure:`, cleanupError);
+            }
+        }
+        res.status(500).json({ success: false, message: 'Failed to initiate post creation job.', error: error.message });
     }
 });
+
+// GET /api/post-status/:jobId - Checks the status of a post creation job
+router.get('/post-status/:jobId', authMiddleware, async (req, res) => {
+    try {
+        const { jobId } = req.params;
+        const job = await postJob.getJob(jobId);
+        if (!job) {
+            return res.status(404).json({ success: false, message: 'Job not found.' });
+        }
+        // Security check: ensure the user requesting status is the one who created the job
+        if (job.UserID !== req.user.userId) {
+             return res.status(403).json({ success: false, message: 'You are not authorized to view this job status.' });
+        }
+        res.status(200).json({ success: true, job });
+    } catch (error) {
+        console.error('Error fetching job status:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch job status.' });
+    }
+});
+
+// Background processing function
+async function processPostUploadJob(jobId, userID, userFullName, tempFiles, tempDir) {
+    try {
+        await postJob.updateJob(jobId, 'processing', 'Processing post and uploading files.');
+
+        const job = await postJob.getJob(jobId);
+        const { title, description } = JSON.parse(job.Payload);
+
+        const pool = await getConnection();
+        const transaction = new sql.Transaction(pool);
+        await transaction.begin();
+
+        try {
+            const timestamp = getPHTimestamp();
+            const postReference = `G-${timestamp.toISOString().slice(0, 19).replace(/[-T:]/g, '')}`;
+
+            const postRequest = new sql.Request(transaction);
+            const postResult = await postRequest
+                .input('userID', sql.Int, userID)
+                .input('title', sql.NVarChar, title)
+                .input('description', sql.NVarChar, description)
+                .input('postReference', sql.NVarChar, postReference)
+                .query(`
+                    INSERT INTO posts (userID, title, description, postReference)
+                    OUTPUT INSERTED.postID
+                    VALUES (@userID, @title, @description, @postReference);
+                `);
+
+            const postID = postResult.recordset[0].postID;
+
+            if (tempFiles && tempFiles.length > 0) {
+                for (const file of tempFiles) {
+                    let fileBuffer = await fs.readFile(file.path);
+                    let finalMimeType = file.mimetype;
+
+                    if (file.mimetype === 'video/mp4' && fileBuffer.length > 25 * 1024 * 1024) {
+                        try {
+                            fileBuffer = await compressVideo(fileBuffer, file.originalname);
+                        } catch (compressionError) {
+                            throw new Error(`Video compression failed for ${file.originalname}: ${compressionError.message}`);
+                        }
+                    }
+                    
+                    const azureBlobName = await uploadFile({
+                        buffer: fileBuffer,
+                        originalname: file.originalname,
+                        mimetype: finalMimeType
+                    });
+
+                    const attachmentRequest = new sql.Request(transaction);
+                    await attachmentRequest
+                        .input('postID', sql.Int, postID)
+                        .input('fileType', sql.NVarChar, finalMimeType)
+                        .input('filePath', sql.NVarChar, azureBlobName)
+                        .query(`
+                            INSERT INTO postAttachments (postID, fileType, filePath)
+                            VALUES (@postID, @fileType, @filePath);
+                        `);
+                }
+            }
+
+            await transaction.commit();
+            
+            addAuditTrail({
+                actor: 'C',
+                module: 'G',
+                userID: userID,
+                actions: 'create-post-async',
+                oldValue: null,
+                newValue: `Reference: ${postReference}`,
+                descriptions: `User ${userFullName} created a new post via async job: ${title}`
+            });
+
+            await postJob.updateJob(jobId, 'completed', 'Post created successfully.', { Result: { postID } });
+
+        } catch (innerError) {
+            await transaction.rollback();
+            throw innerError; // Propagate to outer catch
+        }
+
+    } catch (error) {
+        console.error(`[Job ${jobId}] Failed to process post upload:`, error);
+        await postJob.updateJob(jobId, 'failed', 'Failed to create post.', { ErrorMessage: error.message });
+    } finally {
+        // Cleanup temporary files
+        try {
+            await fs.rm(tempDir, { recursive: true, force: true });
+        } catch (cleanupError) {
+            console.error(`[Job ${jobId}] Failed to clean up temporary directory ${tempDir}:`, cleanupError);
+        }
+    }
+}
 
 module.exports = router;
