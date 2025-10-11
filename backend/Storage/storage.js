@@ -7,6 +7,7 @@ const path = require('path');
 const storageName = process.env.STORAGE_NAME;
 const imageContainerName = process.env.IMAGE_CONTAINER;
 const videoContainerName = process.env.VIDEO_CONTAINER;
+const docContainerName = process.env.DOCS_CONTAINER;
 const backupContainerName = process.env.BACKUP_CONTAINER;
 
 // Primary credentials
@@ -23,8 +24,8 @@ const connectionString = useSecondary ? secondaryConnectionString : primaryConne
 const key = useSecondary ? secondaryKey : primaryKey;
 
 // Validate that at least one set of credentials and essential info are present
-if (!storageName || !imageContainerName || !videoContainerName || !backupContainerName || !connectionString || !key) {
-    throw new Error('Azure Storage environment variables are not sufficiently configured. Please check STORAGE_NAME, IMAGE_CONTAINER, VIDEO_CONTAINER, BACKUP_CONTAINER and at least one set of connection strings/keys.');
+if (!storageName || !imageContainerName || !videoContainerName || !docContainerName || !backupContainerName || !connectionString || !key) {
+    throw new Error('Azure Storage environment variables are not sufficiently configured. Please check STORAGE_NAME, IMAGE_CONTAINER, VIDEO_CONTAINER, DOCS_CONTAINER, BACKUP_CONTAINER and at least one set of connection strings/keys.');
 }
 
 console.log(`Initializing Azure Storage with ${useSecondary ? 'secondary' : 'primary'} credentials.`);
@@ -41,7 +42,18 @@ const sharedKeyCredential = new StorageSharedKeyCredential(storageName, key);
  */
 async function uploadFile(file) {
     console.log(`Uploading file with mimetype: ${file.mimetype}`);
-    const containerName = file.mimetype.startsWith('image') ? imageContainerName : videoContainerName;
+    
+    let containerName;
+    const mimetype = file.mimetype;
+
+    if (mimetype.startsWith('image')) {
+        containerName = imageContainerName;
+    } else if (mimetype.startsWith('video')) {
+        containerName = videoContainerName;
+    } else {
+        containerName = docContainerName; // For documents and other files
+    }
+
     console.log(`Selected container: ${containerName}`);
     
     const containerClient = blobServiceClient.getContainerClient(containerName);
@@ -63,7 +75,17 @@ async function uploadFile(file) {
  * @returns {Promise<string>} A temporary SAS URL for the blob.
  */
 async function getFileSasUrl(blobName, fileType) {
-    const containerName = fileType.startsWith('image') ? imageContainerName : videoContainerName;
+    let containerName;
+    const mimetype = fileType || '';
+
+    if (mimetype.startsWith('image')) {
+        containerName = imageContainerName;
+    } else if (mimetype.startsWith('video')) {
+        containerName = videoContainerName;
+    } else {
+        containerName = docContainerName; // Default to doc container for other file types
+    }
+    
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const blobClient = containerClient.getBlobClient(blobName);
 

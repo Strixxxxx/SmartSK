@@ -1,16 +1,11 @@
 --Frontend (Browser's Console)
 
-
+Failed to load resource: the server responded with a status of 500 ()
+index-BJkhP-ce.js:81 Server error: 500 Objectmessage: "An error occurred while generating the file link."success: false[[Prototype]]: Object
 
 --Frontend (VSC Terminal)
 
-src/components/Projects/StatusLegend.tsx:64:19 - error TS2304: Cannot find name 'modalWidth'.
 
-64         width: `${modalWidth}px`
-                     ~~~~~~~~~~
-
-
-Found 1 error.
 
 --Backend(VSC Terminal)
 
@@ -22,7 +17,10 @@ Found 1 error.
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-
+2025-10-11T12:24:09.5023836Z Error generating SAS URL: TypeError: Cannot read properties of undefined (reading 'startsWith')
+2025-10-11T12:24:09.5024907Z     at getFileSasUrl (/app/Storage/storage.js:66:36)
+2025-10-11T12:24:09.5024929Z     at /app/projectSubmission/projectSubmission.js:152:26
+2025-10-11T12:24:09.5024947Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
 
 --Deployment Container Logs
 
