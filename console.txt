@@ -5,6 +5,13 @@
 --Frontend (VSC Terminal)
 
 
+src/components/Client/Dashboard/CreatePostModal.tsx:37:36 - error TS2503: Cannot find namespace 'NodeJS'.
+
+37     const pollingInterval = useRef<NodeJS.Timeout | null>(null);
+                                      ~~~~~~
+
+
+Found 1 error.
 
 --Backend(VSC Terminal)
 
@@ -16,13 +23,7 @@
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-11T13:03:17.3062724Z Uploading file with mimetype: video/mp4
-2025-10-11T13:03:17.3266818Z Selected container: videos
-2025-10-11T13:04:21.356Z No new trace in the past 1 min(s).
-2025-10-11T13:05:21.356Z No new trace in the past 2 min(s).
-2025-10-11T13:06:21.356Z No new trace in the past 3 min(s).
-2025-10-11T13:07:21.356Z No new trace in the past 4 min(s).
-2025-10-11T13:08:21.356Z No new trace in the past 5 min(s).
+
 
 --Deployment Container Logs
 

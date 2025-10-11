@@ -34,7 +34,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
 
     const dragItem = useRef<number | null>(null);
     const dragOverItem = useRef<number | null>(null);
-    const pollingInterval = useRef<NodeJS.Timeout | null>(null);
+    const pollingInterval = useRef<number | null>(null);
 
     useEffect(() => {
         if (jobId) {
