@@ -254,6 +254,7 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
     let tempDirs = []; // Keep track of dirs to clean up
     let tempFiles = []; // Keep track of files to clean up
     let originalFileName;
+    const tempDbName = `${dbName}_restore_${Date.now()}`;
 
     const cleanup = () => {
         tempFiles.forEach(f => { if (fs.existsSync(f)) fs.unlinkSync(f); });
@@ -274,7 +275,6 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             tempFiles.push(uploadedZipPath);
             originalFileName = req.file.originalname;
 
-            // Check if file is a zip
             if (path.extname(originalFileName).toLowerCase() !== '.zip') {
                 cleanup();
                 return res.status(400).json({ message: 'Invalid file type. Please upload a .zip backup file.' });
@@ -285,7 +285,6 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             tempDirs.push(tempExtractDir);
 
             console.log(`[Restore] Extracting ${originalFileName}...`);
-            // Use 7z to extract the AES256-encrypted zip file
             const unzipCommand = `7z x -o"${tempExtractDir}" -p"${process.env.ZIP_LOCK}" "${uploadedZipPath}"`;
 
             const { exec: execPromise } = require('child_process');
@@ -321,30 +320,64 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             console.log(`[Restore] Successfully downloaded backup to ${bacpacFilePath}.`);
         }
 
-        console.log('[Restore] Starting database restore using sqlpackage...');
-        const command = `sqlpackage /a:Publish /tsn:${dbServer} /tdn:${dbName} /sf:"${bacpacFilePath}" /tu:${process.env.DB_USER} /tp:${process.env.DB_PASSWORD} /p:DropObjectsNotInSource=true /p:BlockOnPossibleDataLoss=false`;
+        console.log(`[Restore] Starting database import to temporary database '${tempDbName}'...`);
+        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${tempDbName} /sf:"${bacpacFilePath}" /tu:${process.env.DB_USER} /tp:${process.env.DB_PASSWORD}`;
 
         const { exec: execCallback } = require('child_process');
-        execCallback(command, (error, stdout, stderr) => {
-            cleanup(); // Clean up everything regardless of outcome
-
+        execCallback(command, async (error, stdout, stderr) => {
             if (error) {
-                console.error(`[Restore] sqlpackage import failed: ${error.message}`);
+                console.error(`[Restore] sqlpackage import to temp DB failed: ${error.message}`);
                 console.error(`[Restore] stderr: ${stderr}`);
-                return res.status(500).json({ message: 'Database restore failed.', error: stderr });
+                cleanup(); // Original file cleanup
+                try {
+                    console.log(`[Restore] Attempting to clean up failed temporary database: ${tempDbName}`);
+                    const sql = require('mssql');
+                    await sql.connect({ server: dbServer, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: 'master', options: { encrypt: true, trustServerCertificate: true } });
+                    await sql.query(`DROP DATABASE [${tempDbName}]`);
+                    await sql.close();
+                    console.log(`[Restore] Successfully cleaned up temporary database: ${tempDbName}`);
+                } catch (cleanupError) {
+                    console.error(`[Restore] CRITICAL: Failed to clean up temporary database ${tempDbName}. Manual intervention may be required.`, cleanupError.message);
+                }
+                return res.status(500).json({ message: 'Database restore failed during import phase.', error: stderr });
             }
 
-            console.log('[Restore] Database import/restore completed successfully.');
-            addAuditTrail({
-                actor: 'A',
-                module: 'B',
-                userID: req.user.userId,
-                actions: 'restore-database',
-                newValue: originalFileName,
-                descriptions: `Admin ${req.user.fullName} restored the database from ${originalFileName} (${restoreType}).`
-            });
+            console.log(`[Restore] Successfully imported to temporary database. Proceeding with swap.`);
 
-            res.status(200).json({ message: 'Database restored successfully.' });
+            try {
+                const sql = require('mssql');
+                await sql.connect({ server: dbServer, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: 'master', options: { encrypt: true, trustServerCertificate: true } });
+
+                console.log(`[Restore] Dropping original database: ${dbName}`);
+                await sql.query(`DROP DATABASE [${dbName}]`);
+
+                console.log(`[Restore] Renaming temporary database '${tempDbName}' to '${dbName}'`);
+                await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${dbName}]`);
+                
+                await sql.close();
+
+                console.log('[Restore] Database restore completed successfully.');
+                cleanup(); // Final cleanup of local files
+
+                addAuditTrail({
+                    actor: 'A',
+                    module: 'B',
+                    userID: req.user.userId,
+                    actions: 'restore-database',
+                    newValue: originalFileName,
+                    descriptions: `Admin ${req.user.fullName} restored the database from ${originalFileName} (${restoreType}).`
+                });
+
+                res.status(200).json({ message: 'Database restored successfully.' });
+
+            } catch (swapError) {
+                console.error(`[Restore] CRITICAL: Failed during database swap: ${swapError.message}`);
+                cleanup();
+                res.status(500).json({
+                    message: 'CRITICAL: Database restore failed during final swap. Manual intervention required.',
+                    error: `The database may be in an inconsistent state. The temporary database '${tempDbName}' may need to be manually renamed to '${dbName}'. Error: ${swapError.message}`
+                });
+            }
         });
 
     } catch (error) {

@@ -1,8 +1,40 @@
 --Frontend (Browser's Console)
 
-Failed to load resource: the server responded with a status of 500 ()
-index-CPBZlAtJ.js:81 Server error: 500 {message: 'Database restore failed.', error: '*** Error importing database:Data cannot be import…uld be performed against a new, empty database.\n\n'}error: "*** Error importing database:Data cannot be imported into target because it contains one or more user objects. Import should be performed against a new, empty database.\nError SQL71659: Data cannot be imported into target because it contains one or more user objects. Import should be performed against a new, empty database.\n\n"message: "Database restore failed."[[Prototype]]: Object
-(anonymous) @ index-CPBZlAtJ.js:81
+index-CPBZlAtJ.js:78 
+ POST https://smartsk-backend-container.azurewebsites.net/api/admin/backup/restore 500 (Internal Server Error)
+(anonymous)	@	index-CPBZlAtJ.js:78
+xhr	@	index-CPBZlAtJ.js:78
+HS	@	index-CPBZlAtJ.js:80
+Promise.then		
+_request	@	index-CPBZlAtJ.js:81
+request	@	index-CPBZlAtJ.js:80
+(anonymous)	@	index-CPBZlAtJ.js:81
+(anonymous)	@	index-CPBZlAtJ.js:76
+P	@	index-CPBZlAtJ.js:319
+onClick	@	index-CPBZlAtJ.js:319
+L1	@	index-CPBZlAtJ.js:48
+(anonymous)	@	index-CPBZlAtJ.js:48
+Vb	@	index-CPBZlAtJ.js:48
+eg	@	index-CPBZlAtJ.js:48
+hg	@	index-CPBZlAtJ.js:49
+jA	@	index-CPBZlAtJ.js:49
+index-CPBZlAtJ.js:81 Server error: 500 
+{message: 'Database restore failed.', error: "*** The SourceFile argument must refer to a file with a '.dacpac' extension.\n"}
+(anonymous)	@	index-CPBZlAtJ.js:81
+Promise.then		
+_request	@	index-CPBZlAtJ.js:81
+request	@	index-CPBZlAtJ.js:80
+(anonymous)	@	index-CPBZlAtJ.js:81
+(anonymous)	@	index-CPBZlAtJ.js:76
+P	@	index-CPBZlAtJ.js:319
+onClick	@	index-CPBZlAtJ.js:319
+L1	@	index-CPBZlAtJ.js:48
+(anonymous)	@	index-CPBZlAtJ.js:48
+Vb	@	index-CPBZlAtJ.js:48
+eg	@	index-CPBZlAtJ.js:48
+hg	@	index-CPBZlAtJ.js:49
+jA	@	index-CPBZlAtJ.js:49
+
 
 --Backend(Local Machine)
 
@@ -14,43 +46,31 @@ index-CPBZlAtJ.js:81 Server error: 500 {message: 'Database restore failed.', err
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-025-10-11T01:17:49.0717337Z Initializing active sessions from database...
-2025-10-11T01:17:49.9488657Z Initializing Azure Storage with primary credentials.
-2025-10-11T01:17:51.6356352Z Job management system initialized with database storage.
-2025-10-11T01:17:51.6867084Z Created backup directory at: /database_backup
-2025-10-11T01:17:52.2844572Z Server is running on port 8080
-2025-10-11T01:17:54.0604024Z Initialized active sessions.
-2025-10-11T01:18:05.4222803Z Login attempt received
-2025-10-11T01:18:07.5054789Z Login successful for user.
-2025-10-11T01:19:53.1957082Z [Restore] Extracting smartSK_2025-10-11_08-55-47.zip...
-2025-10-11T01:19:53.2746497Z [Restore] Extracted smartSK_2025-10-11_08-55-47.bacpac.
-2025-10-11T01:19:53.2748349Z [Restore] Starting database restore using sqlpackage...
-2025-10-11T01:21:44.193Z No new trace in the past 1 min(s).
-2025-10-11T01:22:44.193Z No new trace in the past 2 min(s).
-2025-10-11T01:22:51.8872235Z [Restore] sqlpackage import failed: Command failed: sqlpackage /a:Import /tsn:smart-sk.database.windows.net /tdn:smartSK /sf:"/database_backup/extract_1760145593195/smartSK_2025-10-11_08-55-47.bacpac" /tu:smartSK /tp:Smart-SK2025
-2025-10-11T01:22:51.8913Z *** Error importing database:Data cannot be imported into target because it contains one or more user objects. Import should be performed against a new, empty database.
-2025-10-11T01:22:51.8913108Z Error SQL71659: Data cannot be imported into target because it contains one or more user objects. Import should be performed against a new, empty database.
-2025-10-11T01:22:51.8913123Z
-2025-10-11T01:22:51.8913136Z
-2025-10-11T01:22:51.8915507Z [Restore] stderr: *** Error importing database:Data cannot be imported into target because it contains one or more user objects. Import should be performed against a new, empty database.
-2025-10-11T01:22:51.8915544Z Error SQL71659: Data cannot be imported into target because it contains one or more user objects. Import should be performed against a new, empty database.
-2025-10-11T01:22:51.8915558Z
-2025-10-11T01:22:51.8915571Z
-2025-10-11T01:22:51.9226211Z (node:8) [DEP0147] DeprecationWarning: In future versions of Node.js, fs.rmdir(path, { recursive: true }) will be removed. Use fs.rm(path, { recursive: true }) instead
-2025-10-11T01:22:51.9226549Z     at emitRecursiveRmdirWarning (node:internal/fs/utils:880:13)
-2025-10-11T01:22:51.9226569Z     at Object.rmdirSync (node:fs:1191:5)
-2025-10-11T01:22:51.9226585Z     at /app/Admin/backup.js:260:58
-2025-10-11T01:22:51.92266Z     at Array.forEach (<anonymous>)
-2025-10-11T01:22:51.9226616Z     at cleanup (/app/Admin/backup.js:260:18)
-2025-10-11T01:22:51.922663Z     at /app/Admin/backup.js:329:13
-2025-10-11T01:22:51.9226647Z     at ChildProcess.exithandler (node:child_process:424:5)
-2025-10-11T01:22:51.9226663Z     at ChildProcess.emit (node:events:519:28)
-2025-10-11T01:22:51.9226705Z     at maybeClose (node:internal/child_process:1101:16)
-2025-10-11T01:22:51.9226721Z     at Socket.<anonymous> (node:internal/child_process:456:11)
-2025-10-11T01:24:01.284Z No new trace in the past 1 min(s).
-2025-10-11T01:24:11.5409335Z warn: Microsoft.AspNetCore.Server.Kestrel[22]
-2025-10-11T01:24:11.5517194Z       As of "10/11/2025 01:24:11 +00:00", the heartbeat has been running for "00:00:01.3551064" which is longer than "00:00:01". This could be caused by thread pool starvation.
-2025-10-11T01:25:24.347Z No new trace in the past 1 min(s).
+2025-10-11T01:43:11.0431647Z Initializing active sessions from database...
+2025-10-11T01:43:12.2634368Z Initializing Azure Storage with primary credentials.
+2025-10-11T01:43:13.9921004Z Job management system initialized with database storage.
+2025-10-11T01:43:14.0050075Z Created backup directory at: /database_backup
+2025-10-11T01:43:14.3616606Z Server is running on port 8080
+2025-10-11T01:43:15.2133781Z Initialized active sessions.
+2025-10-11T01:44:20.1269357Z [Restore] Extracting smartSK_2025-10-11_08-55-47.zip...
+2025-10-11T01:44:20.2796516Z [Restore] Extracted smartSK_2025-10-11_08-55-47.bacpac.
+2025-10-11T01:44:20.2884097Z [Restore] Starting database restore using sqlpackage...
+2025-10-11T01:44:24.8917423Z [Restore] sqlpackage import failed: Command failed: sqlpackage /a:Publish /tsn:smart-sk.database.windows.net /tdn:smartSK /sf:"/database_backup/extract_1760147060125/smartSK_2025-10-11_08-55-47.bacpac" /tu:smartSK /tp:Smart-SK2025 /p:DropObjectsNotInSource=true /p:BlockOnPossibleDataLoss=false
+2025-10-11T01:44:24.8917965Z *** The SourceFile argument must refer to a file with a '.dacpac' extension.
+2025-10-11T01:44:24.8917988Z
+2025-10-11T01:44:24.8930403Z [Restore] stderr: *** The SourceFile argument must refer to a file with a '.dacpac' extension.
+2025-10-11T01:44:24.8930734Z
+2025-10-11T01:44:24.9118197Z (node:7) [DEP0147] DeprecationWarning: In future versions of Node.js, fs.rmdir(path, { recursive: true }) will be removed. Use fs.rm(path, { recursive: true }) instead
+2025-10-11T01:44:24.9118433Z     at emitRecursiveRmdirWarning (node:internal/fs/utils:880:13)
+2025-10-11T01:44:24.9118456Z     at Object.rmdirSync (node:fs:1191:5)
+2025-10-11T01:44:24.9118472Z     at /app/Admin/backup.js:260:58
+2025-10-11T01:44:24.9118487Z     at Array.forEach (<anonymous>)
+2025-10-11T01:44:24.9118522Z     at cleanup (/app/Admin/backup.js:260:18)
+2025-10-11T01:44:24.911854Z     at /app/Admin/backup.js:329:13
+2025-10-11T01:44:24.9118559Z     at ChildProcess.exithandler (node:child_process:424:5)
+2025-10-11T01:44:24.9118575Z     at ChildProcess.emit (node:events:519:28)
+2025-10-11T01:44:24.9118661Z     at maybeClose (node:internal/child_process:1101:16)
+2025-10-11T01:44:24.9118679Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
 
 --Deployment Container Logs
 
