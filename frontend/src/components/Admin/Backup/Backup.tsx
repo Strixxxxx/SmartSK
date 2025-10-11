@@ -129,7 +129,7 @@ const Backup: React.FC = () => {
       const { jobId } = response.data;
       setActiveJobId(jobId);
       setStatus('Backup process started. Polling for status updates...');
-      showFlashMessage(`Backup initiated with Job ID: ${jobId}`, 'info');
+      showFlashMessage('Backup process initiated. You will be notified upon completion.', 'info');
       pollJobStatus(jobId);
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Failed to initiate backup.';
@@ -264,18 +264,21 @@ const Backup: React.FC = () => {
               <div className="cloud-backup-list">
                 {cloudBackups.length > 0 ? (
                   cloudBackups.map((backup) => (
-                    <div key={backup.name} className={`backup-item ${selectedCloudBackup === backup.name ? 'selected' : ''}`}>
-                      <label>
-                        <input
-                          type="radio"
-                          name="cloudBackup"
-                          value={backup.name}
-                          checked={selectedCloudBackup === backup.name}
-                          onChange={() => setSelectedCloudBackup(backup.name)}
-                        />
-                        {backup.name} - {new Date(backup.lastModified).toLocaleString()} ({(backup.size / 1024 / 1024).toFixed(2)} MB)
-                      </label>
-                    </div>
+                    <label key={backup.name} className={`backup-item ${selectedCloudBackup === backup.name ? 'selected' : ''}`}>
+                      <input
+                        type="radio"
+                        name="cloudBackup"
+                        value={backup.name}
+                        checked={selectedCloudBackup === backup.name}
+                        onChange={() => setSelectedCloudBackup(backup.name)}
+                      />
+                      <div className="backup-item-details">
+                        <span className="backup-name">{backup.name}</span>
+                        <span className="backup-metadata">
+                          {new Date(backup.lastModified).toLocaleString()} - ({(backup.size / 1024 / 1024).toFixed(2)} MB)
+                        </span>
+                      </div>
+                    </label>
                   ))
                 ) : (
                   <p>No cloud backups found.</p>
