@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
-import { FaEye, FaDownload, FaSpinner } from 'react-icons/fa';
+import { FaEye, FaDownload, FaSpinner, FaInfoCircle } from 'react-icons/fa';
 import './AdminProjects.css';
+import StatusLegend from '../../Projects/StatusLegend';
 
 interface OutletContextType {
   sidebarCollapsed: boolean;
@@ -22,6 +23,11 @@ interface Project {
   fileName: string;
 }
 
+interface Status {
+  StatusName: string;
+  description: string;
+}
+
 const AdminProjects: React.FC = () => {
   const { sidebarCollapsed } = useOutletContext<OutletContextType>();
   const [projects, setProjects] = useState<Project[]>([]);
@@ -35,6 +41,10 @@ const AdminProjects: React.FC = () => {
 
   const [showArchiveConfirm, setShowArchiveConfirm] = useState<boolean>(false);
   const [archivingProjectId, setArchivingProjectId] = useState<number | null>(null);
+
+  const [statusList, setStatusList] = useState<Status[]>([]);
+  const [showStatusLegend, setShowStatusLegend] = useState<boolean>(false);
+  const infoIconRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -66,6 +76,20 @@ const AdminProjects: React.FC = () => {
 
     fetchProjects();
   }, [navigate]);
+
+  useEffect(() => {
+    const fetchStatuses = async () => {
+        try {
+            const response = await axiosInstance.get('/api/projects/statuses');
+            if (response.data.success) {
+                setStatusList(response.data.statuses);
+            }
+        } catch (error) {
+            console.error('Failed to fetch statuses', error);
+        }
+    };
+    fetchStatuses();
+  }, []);
 
   const openFileViewer = (url: string, fileName: string) => {
     setViewingFileUrl(url);
@@ -186,6 +210,11 @@ const AdminProjects: React.FC = () => {
             <div className="loading">Loading projects...</div>
           ) : (
             <div className="projects-table-container">
+               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button ref={infoIconRef} onClick={() => setShowStatusLegend(!showStatusLegend)} style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#646cff', padding: '0 10px'}}>
+                  <FaInfoCircle />
+                </button>
+              </div>
               <table className="projects-table">
                 <thead>
                   <tr>
@@ -286,6 +315,14 @@ const AdminProjects: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {showStatusLegend && (
+        <StatusLegend 
+          statusList={statusList} 
+          onClose={() => setShowStatusLegend(false)} 
+          triggerRef={infoIconRef} 
+        />
       )}
     </div>
   );

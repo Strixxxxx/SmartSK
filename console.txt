@@ -1,53 +1,18 @@
 --Frontend (Browser's Console)
 
-smartsk-backend-cont…tes.net/api/login:1 
- Failed to load resource: the server responded with a status of 401 ()
-smartsk-backend-cont…projects/statuses:1 
- Failed to load resource: the server responded with a status of 500 ()
-index-D_PIb1g7.js:81 Server error: 500 
-Object
-message
-: 
-"Failed to fetch statuses"
-success
-: 
-false
-[[Prototype]]
-: 
-Object
-(anonymous)	@	index-D_PIb1g7.js:81
-index-D_PIb1g7.js:292 Failed to fetch statuses 
-Ke
-code
-: 
-"ERR_BAD_RESPONSE"
-config
-: 
-{transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}
-message
-: 
-"Request failed with status code 500"
-name
-: 
-"AxiosError"
-request
-: 
-XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
-response
-: 
-{data: {…}, status: 500, statusText: '', headers: ss, config: {…}, …}
-status
-: 
-500
-stack
-: 
-"AxiosError: Request failed with status code 500\n    at U2 (https://smartsk.app/assets/index-D_PIb1g7.js:78:1088)\n    at XMLHttpRequest._ (https://smartsk.app/assets/index-D_PIb1g7.js:78:5742)\n    at ji.request (https://smartsk.app/assets/index-D_PIb1g7.js:80:2068)\n    at async https://smartsk.app/assets/index-D_PIb1g7.js:292:85978"
-[[Prototype]]
-: 
-Error
-(anonymous)	@	index-D_PIb1g7.js:292
 
---Backend(Local Machine)
+
+--Frontend (VSC Terminal)
+
+src/components/Projects/StatusLegend.tsx:64:19 - error TS2304: Cannot find name 'modalWidth'.
+
+64         width: `${modalWidth}px`
+                     ~~~~~~~~~~
+
+
+Found 1 error.
+
+--Backend(VSC Terminal)
 
 
 

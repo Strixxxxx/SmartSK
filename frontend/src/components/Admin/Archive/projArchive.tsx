@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
-import { FaEye, FaDownload, FaSpinner } from 'react-icons/fa';
+import { FaEye, FaDownload, FaSpinner, FaInfoCircle } from 'react-icons/fa';
 import {
   Dialog,
   DialogActions,
@@ -13,6 +13,7 @@ import {
   Button,
 } from '@mui/material';
 import '../Projects/AdminProjects.css'; // Reusing the same CSS
+import StatusLegend from '../../Projects/StatusLegend';
 
 interface OutletContextType {
   sidebarCollapsed: boolean;
@@ -33,6 +34,11 @@ interface Project {
   statusName: string;
 }
 
+interface Status {
+  StatusName: string;
+  description: string;
+}
+
 const ProjArchive: React.FC = () => {
   const { sidebarCollapsed } = useOutletContext<OutletContextType>();
   const [projects, setProjects] = useState<Project[]>([]);
@@ -47,6 +53,10 @@ const ProjArchive: React.FC = () => {
 
   const [showRestoreConfirm, setShowRestoreConfirm] = useState<boolean>(false);
   const [projectToRestore, setProjectToRestore] = useState<Project | null>(null);
+
+  const [statusList, setStatusList] = useState<Status[]>([]);
+  const [showStatusLegend, setShowStatusLegend] = useState<boolean>(false);
+  const infoIconRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -82,6 +92,20 @@ const ProjArchive: React.FC = () => {
 
     fetchProjects();
   }, [navigate]);
+
+  useEffect(() => {
+    const fetchStatuses = async () => {
+        try {
+            const response = await axiosInstance.get('/api/projects/statuses');
+            if (response.data.success) {
+                setStatusList(response.data.statuses);
+            }
+        } catch (error) {
+            console.error('Failed to fetch statuses', error);
+        }
+    };
+    fetchStatuses();
+  }, []);
 
   const openFileViewer = (url: string, fileName: string) => {
     setViewingFileUrl(url);
@@ -220,6 +244,11 @@ const ProjArchive: React.FC = () => {
         </div>
         <div className="table-card">
           <div className="projects-table-container">
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <button ref={infoIconRef} onClick={() => setShowStatusLegend(!showStatusLegend)} style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#646cff', padding: '0 10px'}}>
+                  <FaInfoCircle />
+                </button>
+              </div>
             {(!projects || projects.length === 0) ? (
               <p style={{ textAlign: 'center', padding: '40px', color: '#64748b', fontSize: '1rem', fontStyle: 'italic' }}>
                 No archived projects found.
@@ -304,20 +333,6 @@ const ProjArchive: React.FC = () => {
         </div>
       )}
 
-      {showFileViewer && (
-        <div className="modal-overlay">
-          <div className="file-viewer-modal">
-            <div className="file-viewer-header">
-              <h3 className="file-viewer-title">{viewingFileName}</h3>
-              <button className="file-viewer-close" onClick={handleCloseFileViewer}>×</button>
-            </div>
-            <div className="file-viewer-content">
-              <iframe className="file-viewer-iframe" src={viewingFileUrl} title="File Viewer" allowFullScreen></iframe>
-            </div>
-          </div>
-        </div>
-      )}
-
       <Dialog
         open={showRestoreConfirm}
         onClose={handleCancelRestore}
@@ -373,6 +388,14 @@ const ProjArchive: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {showStatusLegend && (
+        <StatusLegend 
+          statusList={statusList} 
+          onClose={() => setShowStatusLegend(false)} 
+          triggerRef={infoIconRef} 
+        />
+      )}
     </div>
   );
 };

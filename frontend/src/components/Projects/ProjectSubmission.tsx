@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './ProjectSubmission.css';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -7,6 +7,7 @@ import Tooltip from '@mui/material/Tooltip';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../backend connection/axiosConfig';
 import StatusLegend from './StatusLegend';
+import { FaInfoCircle } from 'react-icons/fa';
 
 interface Project {
   id: string;
@@ -45,9 +46,9 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
   const [showFileViewer, setShowFileViewer] = useState<boolean>(false);
   const [viewingFileUrl, setViewingFileUrl] = useState<string>('');
   const [viewingFileName, setViewingFileName] = useState<string>('');
-  const [statusLegend, setStatusLegend] = useState<{ visible: boolean; projectId: string | null; position: { top: number; left: number } }>({ visible: false, projectId: null, position: { top: 0, left: 0 } });
+  const [showStatusLegend, setShowStatusLegend] = useState<boolean>(false);
   const [statusList, setStatusList] = useState<Status[]>([]);
-  const [hideTimeoutId, setHideTimeoutId] = useState<number | null>(null);
+  const infoIconRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     const fetchStatuses = async () => {
@@ -202,33 +203,6 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
     }
   };
 
-  const handleStatusHover = (e: React.MouseEvent<HTMLElement>, project: Project) => {
-    if (hideTimeoutId) {
-      clearTimeout(hideTimeoutId);
-      setHideTimeoutId(null);
-    }
-    const rect = e.currentTarget.getBoundingClientRect();
-    setStatusLegend({
-      visible: true,
-      projectId: project.id,
-      position: { top: rect.bottom, left: rect.left }
-    });
-  };
-
-  const handleStatusLeave = () => {
-    const timeoutId = setTimeout(() => {
-      setStatusLegend(prev => ({ ...prev, visible: false, projectId: null }));
-    }, 200);
-    setHideTimeoutId(timeoutId);
-  };
-
-  const handlePopoverEnter = () => {
-    if (hideTimeoutId) {
-      clearTimeout(hideTimeoutId);
-      setHideTimeoutId(null);
-    }
-  };
-
   return (
     <div className="project-submission-container">
       <h3>Proposed Project Submissions</h3>
@@ -281,6 +255,11 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
       )}
 
       <div className="projects-table-container">
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <button ref={infoIconRef} onClick={() => setShowStatusLegend(!showStatusLegend)} style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#646cff', padding: '0 10px'}}>
+              <FaInfoCircle />
+            </button>
+          </div>
         <table className="projects-table">
             <thead>
               <tr>
@@ -303,11 +282,7 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
                       <strong>{project.title}</strong>
                       <p className="project-description">{project.description}</p>
                     </td>
-                    <td 
-                      onMouseEnter={(e) => handleStatusHover(e, project)} 
-                      onMouseLeave={handleStatusLeave}
-                      style={{ cursor: 'pointer' }}
-                    >
+                    <td>
                       <span className={`status-badge status-${project.status.replace(/\s+/g, '-').toLowerCase()}`}>
                         {project.status}
                       </span>
@@ -347,16 +322,6 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
             </tbody>
         </table>
       </div>
-      
-      {statusLegend.visible && statusLegend.projectId && (
-        <StatusLegend 
-          currentStatus={projects.find(p => p.id === statusLegend.projectId)?.status || ''} 
-          statusList={statusList}
-          position={statusLegend.position}
-          onMouseEnter={handlePopoverEnter}
-          onMouseLeave={handleStatusLeave}
-        />
-      )}
 
       {showFileViewer && (
         <div className="modal-overlay">
@@ -370,6 +335,14 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
                 </div>
             </div>
         </div>
+      )}
+
+      {showStatusLegend && (
+        <StatusLegend 
+          statusList={statusList} 
+          onClose={() => setShowStatusLegend(false)} 
+          triggerRef={infoIconRef} 
+        />
       )}
     </div>
   );
