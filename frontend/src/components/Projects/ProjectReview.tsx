@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../backend connection/axiosConfig';
+import StatusLegend from './StatusLegend';
 
 interface Project {
   id: number;
@@ -44,6 +45,22 @@ const ProjectReview: React.FC<ProjectReviewProps> = ({ userFullName, userRole })
   const [showFileViewer, setShowFileViewer] = useState<boolean>(false);
   const [viewingFileUrl, setViewingFileUrl] = useState<string>('');
   const [viewingFileName, setViewingFileName] = useState<string>('');
+  const [statusLegend, setStatusLegend] = useState<{ visible: boolean; projectId: number | null }>({ visible: false, projectId: null });
+  const [statusList, setStatusList] = useState([]);
+
+  useEffect(() => {
+    const fetchStatuses = async () => {
+        try {
+            const response = await axiosInstance.get('/api/projects/statuses');
+            if (response.data.success) {
+                setStatusList(response.data.statuses);
+            }
+        } catch (error) {
+            console.error('Failed to fetch statuses', error);
+        }
+    };
+    fetchStatuses();
+  }, []);
 
   useEffect(() => {
     fetchProjects();
@@ -183,10 +200,19 @@ const ProjectReview: React.FC<ProjectReviewProps> = ({ userFullName, userRole })
                       <p className="project-description">{project.description}</p>
                     </td>
                     <td>{project.proposerName}</td>
-                    <td>
+                    <td
+                      onMouseEnter={() => setStatusLegend({ visible: true, projectId: project.id })}
+                      onMouseLeave={() => setStatusLegend({ visible: false, projectId: null })}
+                      style={{ position: 'relative', cursor: 'pointer' }}
+                    >
                       <span className={getStatusClassName(project.status)}>
                         {project.status}
                       </span>
+                      {statusLegend.visible && statusLegend.projectId === project.id && (
+                        <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 1001 }}>
+                          <StatusLegend currentStatus={project.status} statusList={statusList} />
+                        </div>
+                      )}
                     </td>
                     <td className="document-actions-cell">
                       {project.fileUrl && (
@@ -256,8 +282,7 @@ const ProjectReview: React.FC<ProjectReviewProps> = ({ userFullName, userRole })
                     </tr>
                   )}
                 </React.Fragment>
-              ))
-            }
+              ))}
           </tbody>
         </table>
       </div>

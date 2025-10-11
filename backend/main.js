@@ -42,6 +42,7 @@ const projArchiveRouter = require('./Admin/projArchive');
 const projListRouter = require('./Admin/projList');
 const postPublicRouter = require('./Posting/postPublic');
 const protectedPostRouter = require('./Posting/post');
+const pStatusListRouter = require('./Projects/pStatusList.js');
 
 // Import the new PyBridge modules with error handling
 let PyBridgeFC, PyBridgePA;

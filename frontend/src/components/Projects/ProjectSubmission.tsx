@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../backend connection/axiosConfig';
+import StatusLegend from './StatusLegend';
 
 interface Project {
   id: string;
@@ -39,6 +40,22 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
   const [showFileViewer, setShowFileViewer] = useState<boolean>(false);
   const [viewingFileUrl, setViewingFileUrl] = useState<string>('');
   const [viewingFileName, setViewingFileName] = useState<string>('');
+  const [statusLegend, setStatusLegend] = useState<{ visible: boolean; projectId: string | null }>({ visible: false, projectId: null });
+  const [statusList, setStatusList] = useState([]);
+
+  useEffect(() => {
+    const fetchStatuses = async () => {
+        try {
+            const response = await axiosInstance.get('/api/projects/statuses');
+            if (response.data.success) {
+                setStatusList(response.data.statuses);
+            }
+        } catch (error) {
+            console.error('Failed to fetch statuses', error);
+        }
+    };
+    fetchStatuses();
+  }, []);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -253,12 +270,21 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
                       <strong>{project.title}</strong>
                       <p className="project-description">{project.description}</p>
                     </td>
-                    <td>
+                    <td 
+                      onMouseEnter={() => setStatusLegend({ visible: true, projectId: project.id })} 
+                      onMouseLeave={() => setStatusLegend({ visible: false, projectId: null })}
+                      style={{ position: 'relative', cursor: 'pointer' }}
+                    >
                       <span className={`status-badge status-${project.status.replace(/\s+/g, '-').toLowerCase()}`}>
                         {project.status}
                       </span>
                       {project.status !== 'Pending Review' && (
                         <div className="reviewer-name">By: {project.reviewedBy || 'N/A'}</div>
+                      )}
+                      {statusLegend.visible && statusLegend.projectId === project.id && (
+                        <div style={{ position: 'absolute', top: '100%', left: 0, zIndex: 1001 }}>
+                          <StatusLegend currentStatus={project.status} statusList={statusList} />
+                        </div>
                       )}
                     </td>
                     <td className="document-actions-cell">
