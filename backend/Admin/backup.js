@@ -282,15 +282,30 @@ async function cleanupOrphanedRestoreDatabases() {
             const orphanDbName = row.name;
             try {
                 console.log(`[Restore Cleanup] Attempting to drop orphaned database: ${orphanDbName}`);
-                
-                // **FIX**: Break the ghost replication link before any other operation.
+
+                // **FIX**: Diagnose and then remove from the availability group.
                 try {
-                    console.log(`[Restore Cleanup] Attempting to break replication link for ${orphanDbName}...`);
-                    await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET HADR OFF;`);
-                    console.log(`[Restore Cleanup] Successfully broke replication link for ${orphanDbName}.`);
-                } catch (replicationError) {
-                    // Log the error but continue. This error is expected if the DB is not in a mirroring session.
-                    console.log(`[Restore Cleanup] Info: Could not break replication link for ${orphanDbName} (may not exist): ${replicationError.message}`);
+                    console.log(`[Restore Cleanup] Diagnosing availability group for ${orphanDbName}...`);
+                    const agResult = await connection.request()
+                        .input('dbName', sql.NVarChar, orphanDbName)
+                        .query(`
+                            SELECT ag.name as agName 
+                            FROM sys.availability_groups ag
+                            JOIN sys.dm_hadr_database_replica_states drs ON ag.group_id = drs.group_id
+                            WHERE drs.database_id = DB_ID(@dbName)
+                        `);
+
+                    if (agResult.recordset.length > 0) {
+                        const agName = agResult.recordset[0].agName;
+                        console.log(`[Restore Cleanup] Found database ${orphanDbName} in availability group ${agName}. Attempting to remove it.`);
+                        await connection.request().query(`ALTER AVAILABILITY GROUP [${agName}] REMOVE DATABASE [${orphanDbName}];`);
+                        console.log(`[Restore Cleanup] Successfully removed ${orphanDbName} from availability group ${agName}.`);
+                    } else {
+                        console.log(`[Restore Cleanup] Database ${orphanDbName} is not in any availability group, no action needed.`);
+                    }
+                } catch (agError) {
+                    console.error(`[Restore Cleanup] Error during availability group diagnosis/removal for ${orphanDbName}: ${agError.message}`);
+                    // We will still proceed to the next step, as the original error might have been misleading.
                 }
 
                 // Forcibly close connections and drop the database
@@ -429,14 +444,29 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
                 sql = require('mssql');
                 await sql.connect(masterDbConfig);
 
-                // **FIX**: Break the ghost replication link on the main database before the swap.
+                // **FIX**: Remove the main database from any availability group before swapping.
                 try {
-                    console.log(`[Restore] Attempting to break replication link for main database ${dbName}...`);
-                    await sql.query(`ALTER DATABASE [${dbName}] SET HADR OFF;`);
-                    console.log(`[Restore] Successfully broke replication link for ${dbName}.`);
-                } catch (replicationError) {
-                    // Log the error but continue. This error is expected if the DB is not in a mirroring session.
-                    console.log(`[Restore] Info: Could not break replication link for ${dbName} (may not exist): ${replicationError.message}`);
+                    console.log(`[Restore] Diagnosing availability group for main database ${dbName}...`);
+                    const agResult = await sql.request()
+                        .input('dbName', sql.NVarChar, dbName)
+                        .query(`
+                            SELECT ag.name as agName 
+                            FROM sys.availability_groups ag
+                            JOIN sys.dm_hadr_database_replica_states drs ON ag.group_id = drs.group_id
+                            WHERE drs.database_id = DB_ID(@dbName)
+                        `);
+
+                    if (agResult.recordset.length > 0) {
+                        const agName = agResult.recordset[0].agName;
+                        console.log(`[Restore] Found main database ${dbName} in availability group ${agName}. Attempting to remove it.`);
+                        await sql.request().query(`ALTER AVAILABILITY GROUP [${agName}] REMOVE DATABASE [${dbName}];`);
+                        console.log(`[Restore] Successfully removed ${dbName} from availability group ${agName}.`);
+                    } else {
+                        console.log(`[Restore] Main database ${dbName} is not in any availability group, no action needed.`);
+                    }
+                } catch (agError) {
+                    console.error(`[Restore] Error during availability group diagnosis/removal for main database ${dbName}: ${agError.message}`);
+                    // We will still proceed, as the original error might have been misleading or the DB might be offline.
                 }
 
                 console.log(`[Restore] Setting original database '${dbName}' to single-user mode.`);
