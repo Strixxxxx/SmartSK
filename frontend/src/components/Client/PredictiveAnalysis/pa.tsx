@@ -1,5 +1,6 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { Card, Button, Form, Spinner, Alert } from 'react-bootstrap';
+import { ArrowClockwise } from 'react-bootstrap-icons';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import { toast } from 'react-toastify'; // Ensure toast is imported
 import PredictiveAnalysisResponse from './paResponse'; // Existing component for general results
@@ -73,6 +74,7 @@ const PredictiveAnalysis: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   // **** MODIFIED: Update state type to use the new AnalysisResult union ****
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult>(null);
+  const initialized = useRef(false);
 
   // Form states for customization options
   const [timePeriod, setTimePeriod] = useState<string>('None');
@@ -135,14 +137,10 @@ const PredictiveAnalysis: React.FC = () => {
         params.time_sub_category = timeSubCategory;
       }
 
-      console.log('Running general predictive analysis with options:', params);
-
       // Always call the predictive-analysis endpoint for general analysis (pa.py)
       // **** MODIFIED: Specify expected type ****
       const response = await axiosInstance.get<GeneralAnalysisResult>('/api/predictive-analysis/trends', { params }); // Corrected endpoint for general analysis
-      console.log('Received general analysis response (raw):', response);
-      console.log('Received general analysis response (data):', response.data);
-
+      
       // Set the result (explicitly casting for clarity)
       // **** MODIFIED: Cast result ****
       setAnalysisResult(response.data as GeneralAnalysisResult);
@@ -171,6 +169,31 @@ const PredictiveAnalysis: React.FC = () => {
 
   // Add useEffect to run general analysis and fetch categories on component mount
   useEffect(() => {
+    if (initialized.current === false) {
+      initialized.current = true;
+      // Prepare general parameters (all true or defaults)
+      const generalParams = {
+        analysis_type: 'general',
+        time_period: 'None',
+        category: 'None',
+        time_sub_category: '',
+        // Explicitly include all sections for general response
+        include_budget: true,
+        include_duration: true,
+        include_implement_date: true,
+        include_recommendations: true,
+        include_risks: true,
+        include_trends: true,
+        include_success_factors: true,
+        include_feedback: true
+      };
+      // Run general analysis when component mounts
+      runGeneralAnalysis(generalParams);
+      fetchCategories(); // Fetch categories on mount
+    }
+  }, [runGeneralAnalysis, fetchCategories]);
+
+  const handleRefresh = () => {
     // Prepare general parameters (all true or defaults)
     const generalParams = {
       analysis_type: 'general',
@@ -187,12 +210,9 @@ const PredictiveAnalysis: React.FC = () => {
       include_success_factors: true,
       include_feedback: true
     };
-    // Run general analysis when component mounts
+    // Run general analysis
     runGeneralAnalysis(generalParams);
-    fetchCategories(); // Fetch categories on mount
-  }, [runGeneralAnalysis, fetchCategories]); // Use empty dependency array to run only on mount
-
-  
+  };
 
   // Function to get time sub-category options based on selected time period (Keep implementation)
   const getTimeSubCategoryOptions = () => {
@@ -242,7 +262,7 @@ const PredictiveAnalysis: React.FC = () => {
         analysis_type: analysisType,
         time_period: timePeriod,
         time_detail: timeSubCategory || '',
-        category: category,
+        category: category === 'None' ? undefined : category,
         include_budget: includeBudget,
         include_duration: includeDuration,
         include_implement_date: includeImplementDate,
@@ -253,19 +273,14 @@ const PredictiveAnalysis: React.FC = () => {
         include_feedback: includeFeedback,
       };
 
-      console.log('Running analysis with options:', options);
-
       if (analysisType === 'customized') {
         const requestData = { options }; // Send options wrapped in an object
-
-        console.log('Sending customized analysis request with data:', requestData);
 
         const response = await axiosInstance.post<PaCstmApiResponse>(
           `/api/predictive-analysis/custom`,
           requestData
         );
 
-        console.log('Received customized analysis response:', response.data);
         setAnalysisResult(response.data);
 
         if (response.data.error) {
@@ -289,7 +304,6 @@ const PredictiveAnalysis: React.FC = () => {
             },
           }
         );
-        console.log('Received analysis response (non-customized/file):', response.data);
         setAnalysisResult(response.data);
 
         if (response.data.error) {
@@ -336,7 +350,12 @@ const PredictiveAnalysis: React.FC = () => {
 
   const renderCustomizedAnalysisForm = () => (
     <div className="mb-4">
-      <h3 className="forecast-title">Customize Response</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h3 className="forecast-title" style={{ margin: 0 }}>Customize Response</h3>
+        <Button variant="primary" size="sm" onClick={handleRefresh} disabled={loading} className="refresh-button">
+          <ArrowClockwise />
+        </Button>
+      </div>
       <div className="forecast-filters">
         <Card className="mb-3" style={{ border: '1px solid #dee2e6', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
           <Card.Body className="pb-2">
@@ -402,7 +421,7 @@ const PredictiveAnalysis: React.FC = () => {
 
         <Card style={{ border: '1px solid #dee2e6', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
           <Card.Body className="pt-2 pb-3">
-            {/* Second row: First set of checkboxes */}
+            {/* Checkboxes in a 4x2 grid */}
             <div className="filter-row mt-2">
               <div className="checkbox-item">
                 <span className="checkbox-label">Success Factors</span>
@@ -412,6 +431,8 @@ const PredictiveAnalysis: React.FC = () => {
                 <span className="checkbox-label">Recommendations</span>
                 <Form.Check type="checkbox" id="include-recommendations" checked={includeRecommendations} onChange={(e) => setIncludeRecommendations(e.target.checked)} className="custom-checkbox" />
               </div>
+            </div>
+            <div className="filter-row mt-3">
               <div className="checkbox-item">
                 <span className="checkbox-label" style={{ fontSize: '0.9em' }}>Risk & Mitigation Strategies</span>
                 <Form.Check type="checkbox" id="include-risks" checked={includeRisks} onChange={(e) => setIncludeRisks(e.target.checked)} className="custom-checkbox" />
@@ -421,8 +442,6 @@ const PredictiveAnalysis: React.FC = () => {
                 <Form.Check type="checkbox" id="include-trends" checked={includeTrends} onChange={(e) => setIncludeTrends(e.target.checked)} className="custom-checkbox" />
               </div>
             </div>
-
-            {/* Third row: Second set of checkboxes */}
             <div className="filter-row mt-3">
               <div className="checkbox-item">
                 <span className="checkbox-label">Budget</span>
@@ -432,6 +451,8 @@ const PredictiveAnalysis: React.FC = () => {
                 <span className="checkbox-label">Implementation Date</span>
                 <Form.Check type="checkbox" id="include-implement-date" checked={includeImplementDate} onChange={(e) => setIncludeImplementDate(e.target.checked)} className="custom-checkbox" />
               </div>
+            </div>
+            <div className="filter-row mt-3">
               <div className="checkbox-item">
                 <span className="checkbox-label">Estimated Duration</span>
                 <Form.Check type="checkbox" id="include-duration" checked={includeDuration} onChange={(e) => setIncludeDuration(e.target.checked)} className="custom-checkbox" />

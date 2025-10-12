@@ -1,17 +1,81 @@
+--Frontend(Page Itself)
+
+
+
 --Frontend (Browser's Console)
 
 
 
 --Frontend (VSC Terminal)
 
-
-src/components/Client/Dashboard/CreatePostModal.tsx:37:36 - error TS2503: Cannot find namespace 'NodeJS'.
-
-37     const pollingInterval = useRef<NodeJS.Timeout | null>(null);
-                                      ~~~~~~
-
-
-Found 1 error.
+1:12:52 PM [vite] (client) hmr update /src/components/Client/PredictiveAnalysis/pa.tsx
+1:12:52 PM [vite] Internal server error: Failed to resolve import "react-bootstrap-icons" from "src/components/Client/PredictiveAnalysis/pa.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: D:/Projects/Projects/smartSK/frontend/src/components/Client/PredictiveAnalysis/pa.tsx:3:31
+  18 |  import { useState, useCallback, useEffect, useRef } from "react";
+  19 |  import { Card, Button, Form, Spinner, Alert } from "react-bootstrap";
+  20 |  import { ArrowClockwise } from "react-bootstrap-icons";
+     |                                  ^
+  21 |  import axiosInstance from "../../../backend connection/axiosConfig";
+  22 |  import { toast } from "react-toastify";
+      at TransformPluginContext._formatLog (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31522:43)
+      at TransformPluginContext.error (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31519:14)
+      at normalizeUrl (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:29991:18)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:30049:32
+      at async Promise.all (index 5)
+      at async TransformPluginContext.transform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:30017:4)
+      at async EnvironmentPluginContainer.transform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31320:14)
+      at async loadAndTransform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:26407:26)
+      at async viteTransformMiddleware (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:27492:20)
+1:13:14 PM [vite] (client) hmr update /src/components/Client/PredictiveAnalysis/pa.css
+1:13:35 PM [vite] (client) Pre-transform error: Failed to resolve import "react-bootstrap-icons" from "src/components/Client/PredictiveAnalysis/pa.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: D:/Projects/Projects/smartSK/frontend/src/components/Client/PredictiveAnalysis/pa.tsx:3:31
+  18 |  import { useState, useCallback, useEffect, useRef } from "react";
+  19 |  import { Card, Button, Form, Spinner, Alert } from "react-bootstrap";
+  20 |  import { ArrowClockwise } from "react-bootstrap-icons";
+     |                                  ^
+  21 |  import axiosInstance from "../../../backend connection/axiosConfig";
+  22 |  import { toast } from "react-toastify";
+1:13:35 PM [vite] Internal server error: Failed to resolve import "react-bootstrap-icons" from "src/components/Client/PredictiveAnalysis/pa.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: D:/Projects/Projects/smartSK/frontend/src/components/Client/PredictiveAnalysis/pa.tsx:3:31
+  18 |  import { useState, useCallback, useEffect, useRef } from "react";
+  19 |  import { Card, Button, Form, Spinner, Alert } from "react-bootstrap";
+  20 |  import { ArrowClockwise } from "react-bootstrap-icons";
+     |                                  ^
+  21 |  import axiosInstance from "../../../backend connection/axiosConfig";
+  22 |  import { toast } from "react-toastify";
+      at TransformPluginContext._formatLog (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31522:43)
+      at TransformPluginContext.error (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31519:14)
+      at normalizeUrl (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:29991:18)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:30049:32
+      at async Promise.all (index 5)
+      at async TransformPluginContext.transform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:30017:4)
+      at async EnvironmentPluginContainer.transform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31320:14)
+      at async loadAndTransform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:26407:26)
+      at async viteTransformMiddleware (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:27492:20)
+1:13:47 PM [vite] Internal server error: Failed to resolve import "react-bootstrap-icons" from "src/components/Client/PredictiveAnalysis/pa.tsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: D:/Projects/Projects/smartSK/frontend/src/components/Client/PredictiveAnalysis/pa.tsx:3:31
+  18 |  import { useState, useCallback, useEffect, useRef } from "react";
+  19 |  import { Card, Button, Form, Spinner, Alert } from "react-bootstrap";
+  20 |  import { ArrowClockwise } from "react-bootstrap-icons";
+     |                                  ^
+  21 |  import axiosInstance from "../../../backend connection/axiosConfig";
+  22 |  import { toast } from "react-toastify";
+      at TransformPluginContext._formatLog (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31522:43)
+      at TransformPluginContext.error (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31519:14)
+      at normalizeUrl (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:29991:18)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:30049:32
+      at async Promise.all (index 5)
+      at async TransformPluginContext.transform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:30017:4)
+      at async EnvironmentPluginContainer.transform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31320:14)
+      at async loadAndTransform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:26407:26)
+      at async viteTransformMiddleware (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:27492:20) (x2)
 
 --Backend(VSC Terminal)
 

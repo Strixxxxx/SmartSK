@@ -290,3 +290,14 @@
 .custom-checkbox {
   margin: 0;
 }
+
+.refresh-button {
+  background-color: #0d6efd !important;
+  border-color: #0d6efd !important;
+  color: #fff !important;
+}
+
+.refresh-button:hover {
+  background-color: #0b5ed7 !important;
+  border-color: #0a58ca !important;
+}

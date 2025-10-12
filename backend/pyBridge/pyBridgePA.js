@@ -52,7 +52,6 @@ class PyBridgePA {
   static async handleProjectTrendsRequest(req, res) {
     try {
       const options = req.query;
-      console.log(`Received project trends request with options:`, options);
       
       const trendsData = await PyBridgePA.runProjectTrends(options);
       
@@ -124,7 +123,6 @@ class PyBridgePA {
       const isYearOnlyRequest = options.year && (!options.customCategory || options.customCategory === 'General');
       
       if (isYearOnlyRequest) {
-        console.log('Processing year-only analysis request');
         // For year-only requests, only pass the year parameter
         if (options.year) args.push('--year', options.year);
       } else {
@@ -151,10 +149,6 @@ class PyBridgePA {
       if (options.startDate) args.push('--startDate', options.startDate);
       if (options.endDate) args.push('--endDate', options.endDate);
       
-      console.log(`Running ${isYearOnlyRequest ? 'year-only' : 'custom'} project trends analysis with options:`, options);
-      console.log(`Script path: ${scriptPath}`);
-      console.log(`Arguments: ${args.join(' ')}`);
-      
       // Set a timeout for the Python process (5 minutes)
       const timeout = 5 * 60 * 1000; // 5 minutes in milliseconds
       let isTimedOut = false;
@@ -169,8 +163,6 @@ class PyBridgePA {
       } else {
         env.PYTHONPATH = aiDirPath;
       }
-      
-      console.log(`Setting PYTHONPATH to include: ${aiDirPath}`);
       
       // Spawn the Python process with arguments and enhanced environment
       const pythonProcess = spawn(PYTHON_EXECUTABLE, [scriptPath, ...args], { env });
@@ -216,7 +208,6 @@ class PyBridgePA {
                     // or even a success response, resolve with it and we're done.
                     if (result.error || result.trends) {
                         if(result.error) console.warn('Python script returned a structured error:', result.message);
-                        else console.log("Successfully parsed custom trends JSON result");
                         
                         resolve(result);
                         return;
@@ -262,15 +253,12 @@ class PyBridgePA {
       // Get any query parameters
       const options = req.query;
       
-      console.log(`Received custom project trends request with options:`, options);
-      
       // Allow year-only analysis (without requiring a custom category)
       const isYearOnlyRequest = options.year && !options.customCategory;
       
       if (isYearOnlyRequest) {
-        console.log(`Processing year-only analysis request for year: ${options.year}`);
-      } else if (!options.customCategory && !options.year) {
         // If no year and no category, require at least one parameter
+      } else if (!options.customCategory && !options.year) {
         return res.status(400).json({
           error: true,
           message: 'Either customCategory or year parameter is required for customized trends analysis'
@@ -379,7 +367,6 @@ class PyBridgePA {
             console.log(`Modified user category '${originalCategory}' to '${options.otherCategory}' to ensure youth focus`);
           }
         } else {
-          console.log(`Category '${options.otherCategory}' is inherently relevant to youth development - no modification needed`);
         }
       }
       
@@ -437,10 +424,6 @@ class PyBridgePA {
       if (options.startDate) args.push('--startDate', options.startDate);
       if (options.endDate) args.push('--endDate', options.endDate);
       
-      console.log(`Running project trends analysis with options:`, options);
-      console.log(`Script path: ${scriptPath}`);
-      console.log(`Arguments: ${args.join(' ')}`);
-      
       // Set a timeout for the Python process (5 minutes)
       const timeout = 5 * 60 * 1000; // 5 minutes in milliseconds
       let isTimedOut = false;
@@ -455,8 +438,6 @@ class PyBridgePA {
       } else {
         env.PYTHONPATH = aiDirPath;
       }
-      
-      console.log(`Setting PYTHONPATH to include: ${aiDirPath}`);
       
       // Spawn the Python process with arguments and enhanced environment
       const pythonProcess = spawn(PYTHON_EXECUTABLE, [scriptPath, ...args], { env });
@@ -481,7 +462,6 @@ class PyBridgePA {
         const lines = chunk.split('\n');
         lines.forEach(line => {
           if (line.trim().startsWith('INFO:') || line.trim().startsWith('ERROR:')) {
-            console.log(`Python: ${line.trim()}`);
           }
         });
       });
@@ -507,18 +487,15 @@ class PyBridgePA {
         }
         
         try {
-          console.log("Processing Python trends output...");
           
           // Find the JSON object by looking for the structure that looks like JSON
           const jsonMatches = dataString.match(/\{[\s\S]*\}/g);
           if (jsonMatches && jsonMatches.length > 0) {
             // Take the last (and typically largest) JSON object found
             const lastJsonObject = jsonMatches[jsonMatches.length - 1];
-            console.log("JSON data found in trends output");
             
             try {
               const result = JSON.parse(lastJsonObject);
-              console.log("Successfully parsed trends JSON result");
               
               // Check if the result is an error response
               if (result.error) {
@@ -729,7 +706,6 @@ class PyBridgePA {
    */
   static handlePredictiveAnalysisRequest(req, res) {
     const options = req.body;
-    console.log('Running predictive analysis with options:', options);
     
     PyBridgePA.runPredictiveAnalysis(options)
       .then(result => {
@@ -761,12 +737,10 @@ class PyBridgePA {
   static handlePaTrendsRequest(req, res) {
     const options = {
         view_by: req.query.view_by || 'Committee',
-        category: req.query.category,
+        category: req.query.category === 'None' ? undefined : req.query.category,
         custom_category: req.query.customCategory,
         year: req.query.year
     };
-
-    console.log('Running predictive analysis trends with options:', options);
 
     PyBridgePA.runPredictiveAnalysis(options)
         .then(result => {
@@ -827,7 +801,6 @@ class PyBridgePA {
 
       // Handle process completion
       pythonProcess.on('close', (code) => {
-        console.log(`Python process for paCstm.py exited with code ${code}`);
         if (code !== 0) {
           console.error(`Full Python stderr for paCstm.py:\n${errorString}`);
           // Reject with a more informative error, including stderr if available
@@ -835,13 +808,9 @@ class PyBridgePA {
           return;
         }
 
-        // Log the full output received before parsing
-        console.log("Full Python stdout received by Node.js before parsing:\n", dataString);
-
         try {
           // Attempt to parse the entire received string as JSON
           const result = JSON.parse(dataString.trim());
-          console.log("Successfully parsed JSON result from paCstm.py");
           resolve(result);
         } catch (error) {
           console.error('Node.js failed to parse JSON output from paCstm.py:', error);
@@ -865,7 +834,6 @@ class PyBridgePA {
    */
   static handleCustomizedAnalysisRequest(req, res) {
     const { data, options } = req.body;
-    console.log('Running customized analysis with options:', options);
     
     PyBridgePA.runCustomizedAnalysis(data, options)
       .then(result => {

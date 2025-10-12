@@ -223,8 +223,16 @@ def generate_gemini_analysis(df, view_by, custom_category=None, forecast_year=No
 
 def main():
     """Main function to handle predictive analysis."""
+    logger.info("--- Python script pa.py starting ---")
+    logger.info(f"Received arguments: {sys.argv}")
+
     if len(sys.argv) > 1:
-        options = json.loads(sys.argv[1])
+        try:
+            options = json.loads(sys.argv[1])
+            logger.info(f"Parsed options: {options}")
+        except json.JSONDecodeError:
+            logger.error(f"Failed to parse JSON from arguments: {sys.argv[1]}")
+            options = {}
     else:
         options = {}
 
@@ -233,8 +241,16 @@ def main():
     custom_category = options.get('custom_category')
     year = options.get('year')
 
+    logger.info(f"Category filter to be used: {category}")
+
     try:
         data = get_raw_data_from_db(category=category)
+
+        if data:
+            logger.info(f"Database query returned {len(data)} records.")
+        else:
+            logger.warning("Database query returned no data.")
+
         if not data:
             response = {
                 "error": True,
