@@ -1,38 +1,75 @@
-
-> so i tried to look on the smartSK_2025-10-08_18-56-08.zip on my file explorer and i still cant find it. Even though it is completed, the logic where it would automatically
-  downloads the zip file to the browser, there isnt even a download pop up that happened. If you look at the @contentv2.txt which contains the row of the current backup that i
-  created, the file size and the BlobURl are NULL, the duration is 0 and the progress is 0 even though when i check to the storage account of the azure portal, there is a size
-  which is 23.95 KiB. Now tell me why in the database, it was incomplete, in the audit trailing, it only says admin user when it should be admin (full name) too, and there are
-  still parts that NULL? For the schema of the BackupJobs table, you could look at @backend/database/database\ query.txt
-
-✦ Thank you for the excellent and detailed report. You have pinpointed the exact problem. The database record shows the job is "complete," but the NULL and 0 values for FileSize,
-  BlobURL, and Duration tell a different story.
-
-  Here is my analysis of what's going wrong:
-
-   1. Incomplete Database Updates: My code is marking the job as "completed" without saving the final details. I am not capturing the file size or the blob's URL after the upload,
-      which is why they are NULL.
-   2. Incorrect Duration (The Smoking Gun): The Duration is 0 because the job's CompletedAt timestamp is being recorded almost immediately after its StartedAt timestamp. This
-      proves there is a fundamental timing issue. The code is rushing to the "completed" step before the time-consuming operations (sqlpackage export, upload, zip) are actually
-      finished. The spawn process is likely exiting, but the file stream isn't fully flushed to disk before the next step begins.
-   3. Missing Download: The frontend never starts the download because it's likely receiving a completed status before the FilePath (the path to the zip file) is actually written
-      to the database record.
-   4. Audit Trail: You are right. The audit trail description is hardcoded. It should be using the full name of the admin who initiated the backup.
-
-  To fix all of these issues, I need to restructure the executeBackup function to be more robust and to correctly gather and save all the necessary data.
-
-  I will start by reading your storage.js file to understand how to retrieve the BlobURL after an upload. This is the first step in gathering all the required data to save to
-  the database.
- ╭─────────────────────────────────────────╮
- │ ✓  ReadFile backend\Storage\storage.js  │
- ╰─────────────────────────────────────────╯
-✦ You are right, the database record is the key. It's missing critical information, which causes the rest of the process to fail. Based on my analysis of your storage service,
-  I've identified the necessary changes to fix this.
-
-  I will now restructure the backup process to ensure:
-   1. The .bacpac file's size is captured after creation.
-   2. The Blob URL is constructed and saved after the upload to Azure Storage.
-   3. The Duration is calculated correctly by marking the job as "completed" only after all other steps are finished.
-   4. The Audit Trail description uses the admin's full name.
-
-  This will fix the incomplete database record, which in turn will allow the automatic download to trigger correctly. I will now apply these changes.
+rui [ ~ ]$ az sql db show --resource-group "Smart_SK" --server "smart-sk" --name "smartSK"
+{
+  "autoPauseDelay": null,
+  "availabilityZone": "NoPreference",
+  "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+  "collation": "SQL_Latin1_General_CP1_CI_AS",
+  "createMode": null,
+  "creationDate": "2025-10-11T03:12:50.030000+00:00",
+  "currentBackupStorageRedundancy": "Geo",
+  "currentServiceObjectiveName": "GP_Gen5_2",
+  "currentSku": {
+    "capacity": 2,
+    "family": "Gen5",
+    "name": "GP_Gen5",
+    "size": null,
+    "tier": "GeneralPurpose"
+  },
+  "databaseId": "415b799c-17ea-4aa2-8c66-ad65879270c0",
+  "defaultSecondaryLocation": "eastasia",
+  "earliestRestoreDate": "2025-10-11T03:16:06+00:00",
+  "edition": "GeneralPurpose",
+  "elasticPoolId": null,
+  "elasticPoolName": null,
+  "encryptionProtector": null,
+  "encryptionProtectorAutoRotation": null,
+  "failoverGroupId": null,
+  "federatedClientId": null,
+  "freeLimitExhaustionBehavior": null,
+  "highAvailabilityReplicaCount": null,
+  "id": "/subscriptions/0b42eb46-0f69-4263-86b9-a408ca348b28/resourceGroups/Smart_SK/providers/Microsoft.Sql/servers/smart-sk/databases/smartSK",
+  "identity": null,
+  "isInfraEncryptionEnabled": false,
+  "keys": null,
+  "kind": "v12.0,user,vcore",
+  "ledgerOn": false,
+  "licenseType": "LicenseIncluded",
+  "location": "southeastasia",
+  "longTermRetentionBackupResourceId": null,
+  "maintenanceConfigurationId": "/subscriptions/0b42eb46-0f69-4263-86b9-a408ca348b28/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
+  "managedBy": null,
+  "manualCutover": null,
+  "maxLogSizeBytes": 193273528320,
+  "maxSizeBytes": 34359738368,
+  "minCapacity": null,
+  "name": "smartSK",
+  "pausedDate": null,
+  "performCutover": null,
+  "preferredEnclaveType": null,
+  "readScale": "Disabled",
+  "recoverableDatabaseId": null,
+  "recoveryServicesRecoveryPointId": null,
+  "requestedBackupStorageRedundancy": "Geo",
+  "requestedServiceObjectiveName": "GP_Gen5_2",
+  "resourceGroup": "Smart_SK",
+  "restorableDroppedDatabaseId": null,
+  "restorePointInTime": null,
+  "resumedDate": null,
+  "sampleName": null,
+  "secondaryType": null,
+  "sku": {
+    "capacity": 2,
+    "family": "Gen5",
+    "name": "GP_Gen5",
+    "size": null,
+    "tier": "GeneralPurpose"
+  },
+  "sourceDatabaseDeletionDate": null,
+  "sourceDatabaseId": null,
+  "sourceResourceId": null,
+  "status": "Online",
+  "tags": null,
+  "type": "Microsoft.Sql/servers/databases",
+  "useFreeLimit": null,
+  "zoneRedundant": false
+}
