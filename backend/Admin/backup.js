@@ -282,6 +282,17 @@ async function cleanupOrphanedRestoreDatabases() {
             const orphanDbName = row.name;
             try {
                 console.log(`[Restore Cleanup] Attempting to drop orphaned database: ${orphanDbName}`);
+                
+                // **FIX**: Break the ghost replication link before any other operation.
+                try {
+                    console.log(`[Restore Cleanup] Attempting to break replication link for ${orphanDbName}...`);
+                    await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET PARTNER OFF;`);
+                    console.log(`[Restore Cleanup] Successfully broke replication link for ${orphanDbName}.`);
+                } catch (replicationError) {
+                    // Log the error but continue. This error is expected if the DB is not in a mirroring session.
+                    console.log(`[Restore Cleanup] Info: Could not break replication link for ${orphanDbName} (may not exist): ${replicationError.message}`);
+                }
+
                 // Forcibly close connections and drop the database
                 await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
                 await connection.request().query(`DROP DATABASE [${orphanDbName}];`);
@@ -417,6 +428,16 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             try {
                 sql = require('mssql');
                 await sql.connect(masterDbConfig);
+
+                // **FIX**: Break the ghost replication link on the main database before the swap.
+                try {
+                    console.log(`[Restore] Attempting to break replication link for main database ${dbName}...`);
+                    await sql.query(`ALTER DATABASE [${dbName}] SET PARTNER OFF;`);
+                    console.log(`[Restore] Successfully broke replication link for ${dbName}.`);
+                } catch (replicationError) {
+                    // Log the error but continue. This error is expected if the DB is not in a mirroring session.
+                    console.log(`[Restore] Info: Could not break replication link for ${dbName} (may not exist): ${replicationError.message}`);
+                }
 
                 console.log(`[Restore] Setting original database '${dbName}' to single-user mode.`);
                 await sql.query(`ALTER DATABASE [${dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
