@@ -409,30 +409,22 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
 
             console.log(`[Restore] Successfully imported to temporary database. Proceeding with swap.`);
 
-            // Close the main application's connection pool before attempting the swap.
-            console.log('[Restore] Closing application connection pool before swap...');
+            // Close the main application's connection pool
+            console.log('[Restore] Closing application connection pool...');
             const pool = await getConnection();
             await pool.close();
-            console.log('[Restore] Connection pool closed. The application will restart after the restore completes.');
+            console.log('[Restore] Connection pool closed.');
 
             let sql;
             try {
                 sql = require('mssql');
                 await sql.connect(masterDbConfig);
-
-                console.log(`[Restore] Attempting to force drop original database '${dbName}'...`);
-                await sql.query(`ALTER DATABASE [${dbName}] SET EMERGENCY;`);
-                console.log(`[Restore] Set ${dbName} to EMERGENCY mode.`);
-                await sql.query(`ALTER DATABASE [${dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
-                console.log(`[Restore] Set ${dbName} to SINGLE_USER mode.`);
-                await sql.query(`DROP DATABASE [${dbName}];`);
-                console.log(`[Restore] Successfully dropped original database: ${dbName}`);
-
-                console.log(`[Restore] Renaming temporary database '${tempDbName}' to '${dbName}'`);
-                await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${dbName}];`);
-
-                console.log(`[Restore] Setting new database '${dbName}' back to multi-user mode.`);
-                await sql.query(`ALTER DATABASE [${dbName}] SET MULTI_USER;`);
+                
+                // Simply rename the temp database to the target name (from env variable)
+                const targetDbName = dbName; // This comes from env variable
+                console.log(`[Restore] Renaming temporary database '${tempDbName}' to '${targetDbName}'`);
+                await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${targetDbName}];`);
+                console.log(`[Restore] Successfully renamed database to '${targetDbName}'`);
                 
                 console.log('[Restore] Database restore completed successfully.');
                 
@@ -441,19 +433,17 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
                     actions: 'restore-database', newValue: originalFileName,
                     descriptions: `Admin ${req.user.fullName} restored the database from ${originalFileName} (${restoreType}).`
                 });
-
+                
                 res.status(200).json({ message: 'Database restored successfully. Application will restart.' });
-
-                // Gracefully shut down to allow the process manager to restart and reconnect.
+                
                 setTimeout(() => process.exit(0), 1000);
-
+                
             } catch (swapError) {
-                console.error(`[Restore] CRITICAL: Failed during database swap: ${swapError.message}`);
+                console.error(`[Restore] CRITICAL: Failed during database rename: ${swapError.message}`);
                 res.status(500).json({
-                    message: 'CRITICAL: Database restore failed during final swap. Manual intervention required.',
-                    error: `The database may be in an inconsistent state. The temporary database '${tempDbName}' may still exist and need to be manually renamed to '${dbName}'. Error: ${swapError.message}`
+                    message: 'CRITICAL: Database restore failed during final rename.',
+                    error: swapError.message
                 });
-                // Gracefully shut down to allow the process manager to restart and reconnect.
                 setTimeout(() => process.exit(1), 1000);
             } finally {
                 if (sql && sql.connected) await sql.close();

@@ -1,37 +1,119 @@
-I've carefully reviewed your conversation with Gemini CLI in the contentv4.txt document and analyzed the console logs. Let me provide you with an assessment:
-Gemini CLI's Assistance: Mixed Quality
-What Gemini CLI Did Well:
+so i decided to choose option 3. What im gonna do is to create a new clean database, change the content of the environment variable "DB_DATABASE" and then run the 
+  restoration logic from the either the local copy or cloud copy. Is that right?
 
-Correctly identified that the error was related to high-availability/replication configurations
-Recognized that your SQL Server tier (GeneralPurpose) doesn't support sys.availability_groups views
-Validated your "ghost availability group" hypothesis - this was accurate
-Eventually provided a reasonable Azure Portal-based solution
+Almost right, but there's a critical issue with your plan. Let me clarify:
 
-Where Gemini CLI Struggled:
+❌ Don't Create a New Clean Database
+If you create a new empty database, you'll have no data - just an empty database. That's not what you want.
 
-Too many failed attempts - It tried multiple incorrect approaches (availability group queries, SET PARTNER OFF, SET HADR OFF) before arriving at the solution
-Should have diagnosed faster - The console logs clearly showed the error pattern early on
-The final solution is correct but incomplete - Creating and deleting a failover group can work, but there's a simpler approach
+✅ Correct Approach:
+Keep your current smartSK database running (don't touch it - this is your live data)
+Change the environment variable DB_DATABASE to a new name (e.g., smartSK_restored)
+Run the restoration logic - it will:
+Create a temporary database (e.g., smartSK_restore_1760xxxxx)
+Import your .bacpac file into it
+Rename it to smartSK_restored (the name in your env variable)
+Restart your application to connect to the new database
+Test thoroughly
+If good: Delete old smartSK via Azure Portal
+If problems: Change env variable back to smartSK, restart
+Step-by-Step:
+1. Update Environment Variable
+Azure Portal → Your App Service → Configuration → Application Settings:
 
-The Real Issue (Based on Console Logs)
-Looking at your console.txt, the key error is:
-The operation cannot be performed on database "smartSK_restore_1760268740730" because it is involved in a database mirroring session or an availability group.
-Combined with:
+Find DB_DATABASE
+Change value from smartSK to smartSK_restored (or any name you prefer)
+Click Save (don't restart yet)
+2. Update backup.js Code
+The current code tries to drop and rename. We need to modify it to just use the env variable name directly:
 
-failoverGroupId: null from Azure CLI
-Error 1468 about database mirroring/availability group
-Your memory of the old GRE-** availability group
+In backend/Admin/backup.js, find the restore section and modify it:
 
-This is indeed a "ghost" replication link - metadata stuck from an old configuration.
-Better Solution Than What Gemini CLI Suggested
-Instead of creating a temporary failover group (which is complex and risky), try this simpler approach first:
-Option 1: Force Drop with T-SQL (Simpler)
-The code should use ALTER DATABASE SET EMERGENCY before attempting the drop:
-javascript// Try to break any stuck replication state
+javascript
+// Around line 420-450, replace the swap logic with:
+console.log(`[Restore] Import to temporary database complete.`);
+
+// Close the main application's connection pool
+console.log('[Restore] Closing application connection pool...');
+const pool = await getConnection();
+await pool.close();
+console.log('[Restore] Connection pool closed.');
+
+let sql;
 try {
-    await sql.query(`ALTER DATABASE [${dbName}] SET EMERGENCY;`);
-    await sql.query(`ALTER DATABASE [${dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
-    await sql.query(`DROP DATABASE [${dbName}];`);
-} catch (error) {
-    console.error('Force drop failed:', error);
+    sql = require('mssql');
+    await sql.connect(masterDbConfig);
+    
+    // Simply rename the temp database to the target name (from env variable)
+    const targetDbName = dbName; // This comes from env variable
+    console.log(`[Restore] Renaming temporary database '${tempDbName}' to '${targetDbName}'`);
+    await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${targetDbName}];`);
+    console.log(`[Restore] Successfully renamed database to '${targetDbName}'`);
+    
+    console.log('[Restore] Database restore completed successfully.');
+    
+    addAuditTrail({
+        actor: 'A', module: 'B', userID: req.user.userId,
+        actions: 'restore-database', newValue: originalFileName,
+        descriptions: `Admin ${req.user.fullName} restored the database from ${originalFileName} (${restoreType}).`
+    });
+    
+    res.status(200).json({ message: 'Database restored successfully. Application will restart.' });
+    
+    setTimeout(() => process.exit(0), 1000);
+    
+} catch (swapError) {
+    console.error(`[Restore] CRITICAL: Failed during database rename: ${swapError.message}`);
+    res.status(500).json({
+        message: 'CRITICAL: Database restore failed during final rename.',
+        error: swapError.message
+    });
+    setTimeout(() => process.exit(1), 1000);
+} finally {
+    if (sql && sql.connected) await sql.close();
+    cleanup();
 }
+3. Run Restoration
+Option A - From Cloud (Safer):
+
+Go to your admin panel
+Navigate to backup/restore section
+Select a .bacpac file from Azure storage
+Click Restore
+Option B - From Local:
+
+Use your local upload feature
+Upload a backup file
+Click Restore
+4. What Will Happen
+The restore will:
+
+Create smartSK_restore_1760xxxxx (temp)
+Import data into it
+Rename it to smartSK_restored (your env variable value)
+Restart the app
+App connects to smartSK_restored (your restored data)
+Old smartSK remains untouched with old data
+5. Verify
+After restart:
+
+Check if app works
+Check if data is correct
+Old smartSK database is still there as backup
+6. Cleanup (Later)
+When you're confident the restore worked:
+
+Go to Azure Portal → SQL Databases
+Delete the old smartSK database
+Important Notes:
+⚠️ Before you start:
+
+Make sure you have a recent backup of current smartSK
+Do this during low-traffic time
+Have Azure Portal open to manually fix if needed
+⚠️ The key difference from your plan:
+
+You're not creating a new empty database
+You're letting the restore logic create and populate it
+The env variable just tells it what name to use for the final database
+Does this make sense? Should I help you modify the backup.js code with this new logic?
