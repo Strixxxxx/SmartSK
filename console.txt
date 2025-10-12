@@ -8,74 +8,7 @@
 
 --Frontend (VSC Terminal)
 
-1:12:52 PM [vite] (client) hmr update /src/components/Client/PredictiveAnalysis/pa.tsx
-1:12:52 PM [vite] Internal server error: Failed to resolve import "react-bootstrap-icons" from "src/components/Client/PredictiveAnalysis/pa.tsx". Does the file exist?
-  Plugin: vite:import-analysis
-  File: D:/Projects/Projects/smartSK/frontend/src/components/Client/PredictiveAnalysis/pa.tsx:3:31
-  18 |  import { useState, useCallback, useEffect, useRef } from "react";
-  19 |  import { Card, Button, Form, Spinner, Alert } from "react-bootstrap";
-  20 |  import { ArrowClockwise } from "react-bootstrap-icons";
-     |                                  ^
-  21 |  import axiosInstance from "../../../backend connection/axiosConfig";
-  22 |  import { toast } from "react-toastify";
-      at TransformPluginContext._formatLog (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31522:43)
-      at TransformPluginContext.error (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31519:14)
-      at normalizeUrl (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:29991:18)
-      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-      at async file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:30049:32
-      at async Promise.all (index 5)
-      at async TransformPluginContext.transform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:30017:4)
-      at async EnvironmentPluginContainer.transform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31320:14)
-      at async loadAndTransform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:26407:26)
-      at async viteTransformMiddleware (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:27492:20)
-1:13:14 PM [vite] (client) hmr update /src/components/Client/PredictiveAnalysis/pa.css
-1:13:35 PM [vite] (client) Pre-transform error: Failed to resolve import "react-bootstrap-icons" from "src/components/Client/PredictiveAnalysis/pa.tsx". Does the file exist?
-  Plugin: vite:import-analysis
-  File: D:/Projects/Projects/smartSK/frontend/src/components/Client/PredictiveAnalysis/pa.tsx:3:31
-  18 |  import { useState, useCallback, useEffect, useRef } from "react";
-  19 |  import { Card, Button, Form, Spinner, Alert } from "react-bootstrap";
-  20 |  import { ArrowClockwise } from "react-bootstrap-icons";
-     |                                  ^
-  21 |  import axiosInstance from "../../../backend connection/axiosConfig";
-  22 |  import { toast } from "react-toastify";
-1:13:35 PM [vite] Internal server error: Failed to resolve import "react-bootstrap-icons" from "src/components/Client/PredictiveAnalysis/pa.tsx". Does the file exist?
-  Plugin: vite:import-analysis
-  File: D:/Projects/Projects/smartSK/frontend/src/components/Client/PredictiveAnalysis/pa.tsx:3:31
-  18 |  import { useState, useCallback, useEffect, useRef } from "react";
-  19 |  import { Card, Button, Form, Spinner, Alert } from "react-bootstrap";
-  20 |  import { ArrowClockwise } from "react-bootstrap-icons";
-     |                                  ^
-  21 |  import axiosInstance from "../../../backend connection/axiosConfig";
-  22 |  import { toast } from "react-toastify";
-      at TransformPluginContext._formatLog (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31522:43)
-      at TransformPluginContext.error (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31519:14)
-      at normalizeUrl (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:29991:18)
-      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-      at async file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:30049:32
-      at async Promise.all (index 5)
-      at async TransformPluginContext.transform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:30017:4)
-      at async EnvironmentPluginContainer.transform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31320:14)
-      at async loadAndTransform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:26407:26)
-      at async viteTransformMiddleware (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:27492:20)
-1:13:47 PM [vite] Internal server error: Failed to resolve import "react-bootstrap-icons" from "src/components/Client/PredictiveAnalysis/pa.tsx". Does the file exist?
-  Plugin: vite:import-analysis
-  File: D:/Projects/Projects/smartSK/frontend/src/components/Client/PredictiveAnalysis/pa.tsx:3:31
-  18 |  import { useState, useCallback, useEffect, useRef } from "react";
-  19 |  import { Card, Button, Form, Spinner, Alert } from "react-bootstrap";
-  20 |  import { ArrowClockwise } from "react-bootstrap-icons";
-     |                                  ^
-  21 |  import axiosInstance from "../../../backend connection/axiosConfig";
-  22 |  import { toast } from "react-toastify";
-      at TransformPluginContext._formatLog (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31522:43)
-      at TransformPluginContext.error (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31519:14)
-      at normalizeUrl (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:29991:18)
-      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-      at async file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:30049:32
-      at async Promise.all (index 5)
-      at async TransformPluginContext.transform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:30017:4)
-      at async EnvironmentPluginContainer.transform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:31320:14)
-      at async loadAndTransform (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:26407:26)
-      at async viteTransformMiddleware (file:///D:/Projects/Projects/smartSK/frontend/node_modules/vite/dist/node/chunks/dep-C6pp_iVS.js:27492:20) (x2)
+
 
 --Backend(VSC Terminal)
 
@@ -87,7 +20,90 @@
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-
+2025-10-12T10:02:48.5386893Z Login successful for user.
+2025-10-12T10:03:55.4784664Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
+2025-10-12T10:03:55.6656068Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] Updated in database to processing: Exporting database using sqlpackage...
+2025-10-12T10:03:55.6656586Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] Executing sqlpackage command...
+2025-10-12T10:03:57.347283Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Connecting to database 'smartSK' on server 'smart-sk.database.windows.net'.
+2025-10-12T10:03:57.3473374Z
+2025-10-12T10:04:00.192471Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Extracting schema
+2025-10-12T10:04:00.1925755Z
+2025-10-12T10:04:00.1996732Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Extracting schema from database
+2025-10-12T10:04:00.1997063Z
+2025-10-12T10:04:13.8557421Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Resolving references in schema model
+2025-10-12T10:04:13.8557989Z
+2025-10-12T10:04:14.1102582Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Validating schema model
+2025-10-12T10:04:14.1265286Z
+2025-10-12T10:04:14.2788735Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Validating schema model for data package
+2025-10-12T10:04:14.2789342Z
+2025-10-12T10:04:14.2890006Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Validating schema
+2025-10-12T10:04:14.2890399Z
+2025-10-12T10:04:14.3866782Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Processing tables for data extraction
+2025-10-12T10:04:14.386731Z
+2025-10-12T10:04:14.9439244Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Exporting data from database
+2025-10-12T10:04:14.9439724Z
+2025-10-12T10:04:14.9633391Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Exporting data
+2025-10-12T10:04:14.9633634Z
+2025-10-12T10:04:15.7924364Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Processing Export.
+2025-10-12T10:04:15.7924937Z
+2025-10-12T10:04:16.2637479Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Processing Table '[dbo].[sessions]'.
+2025-10-12T10:04:16.263778Z
+2025-10-12T10:04:16.2915887Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Processing Table '[dbo].[roles]'.
+2025-10-12T10:04:16.2916721Z Processing Table '[dbo].[audit_trail]'.
+2025-10-12T10:04:16.2916761Z Processing Table '[dbo].[audit trail]'.
+2025-10-12T10:04:16.2916784Z Processing Table '[dbo].[posts]'.
+2025-10-12T10:04:16.2916805Z Processing Table '[dbo].[otpStore]'.
+2025-10-12T10:04:16.2916826Z Processing Table '[dbo].[projects]'.
+2025-10-12T10:04:16.2916848Z Processing Table '[dbo].[postAttachments]'.
+2025-10-12T10:04:16.2916869Z Processing Table '[dbo].[userInfoARC]'.
+2025-10-12T10:04:16.291689Z Processing Table '[dbo].[rawDataDetails]'.
+2025-10-12T10:04:16.2916935Z Processing Table '[dbo].[StatusLookup]'.
+2025-10-12T10:04:16.2916957Z Processing Table '[dbo].[rawData]'.
+2025-10-12T10:04:16.2916978Z Processing Table '[dbo].[barangays]'.
+2025-10-12T10:04:16.2917024Z Processing Table '[dbo].[BackupJobs]'.
+2025-10-12T10:04:16.2917046Z Processing Table '[dbo].[rawDataTrack]'.
+2025-10-12T10:04:16.2917067Z Processing Table '[dbo].[projectsARC]'.
+2025-10-12T10:04:16.2917088Z Processing Table '[dbo].[PostUploadJobs]'.
+2025-10-12T10:04:16.2917109Z Processing Table '[dbo].[userInfo]'.
+2025-10-12T10:04:16.2917135Z
+2025-10-12T10:04:18.6316219Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Successfully exported database and saved it to file '/database_backup/smartSK_2025-10-12_18-03-55.bacpac'.
+2025-10-12T10:04:18.6324635Z
+2025-10-12T10:04:18.6417461Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] sqlpackage stdout: Time elapsed 0:00:21.32
+2025-10-12T10:04:18.6417719Z
+2025-10-12T10:04:18.720295Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] Database export to .bacpac completed.
+2025-10-12T10:04:18.7453601Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] Updated in database to processing: Uploading .bacpac file to Azure Storage...
+2025-10-12T10:04:18.7459628Z Uploading backup file to container: backup
+2025-10-12T10:04:18.835095Z Successfully uploaded smartSK_2025-10-12_18-03-55.bacpac to container backup.
+2025-10-12T10:04:18.8534036Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] Updated in database to completed: Backup complete. Ready for download.
+2025-10-12T10:04:18.8542654Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] Cleaned up local .bacpac file: /database_backup/smartSK_2025-10-12_18-03-55.bacpac
+2025-10-12T10:04:20.491631Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] Downloading smartSK_2025-10-12_18-03-55.bacpac from Azure to /database_backup/temp_smartSK_2025-10-12_18-03-55.bacpac for zipping...
+2025-10-12T10:04:20.5478596Z Successfully downloaded smartSK_2025-10-12_18-03-55.bacpac to /database_backup/temp_smartSK_2025-10-12_18-03-55.bacpac.
+2025-10-12T10:04:20.5642466Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] Download complete.
+2025-10-12T10:04:21.0929984Z [Job 42984cd8-29b3-4a8b-8367-4772ee07eac5] Zip stream finished. Cleaning up temp file: /database_backup/temp_smartSK_2025-10-12_18-03-55.bacpac
+2025-10-12T10:06:16.2992744Z [Restore Cleanup] Searching for orphaned databases matching: smartSK_restore_%
+2025-10-12T10:06:16.5509814Z [Restore Cleanup] Found 1 orphaned database(s): smartSK_restore_1760151799810
+2025-10-12T10:06:16.5510213Z [Restore Cleanup] Attempting to drop orphaned database: smartSK_restore_1760151799810
+2025-10-12T10:06:16.7664825Z [Restore Cleanup] Failed to drop database smartSK_restore_1760151799810. It may require manual deletion. Error: ALTER DATABASE statement failed.
+2025-10-12T10:06:16.776806Z [Restore] Extracting Materials_for_Activities(5).zip...
+2025-10-12T10:06:17.2823945Z [Restore] Process failed: .bacpac file not found in the zip archive.
+2025-10-12T10:06:17.3141032Z (node:9) [DEP0147] DeprecationWarning: In future versions of Node.js, fs.rmdir(path, { recursive: true }) will be removed. Use fs.rm(path, { recursive: true }) instead
+2025-10-12T10:06:17.3141673Z     at emitRecursiveRmdirWarning (node:internal/fs/utils:880:13)
+2025-10-12T10:06:17.3141795Z     at Object.rmdirSync (node:fs:1191:5)
+2025-10-12T10:06:17.3141819Z     at /app/Admin/backup.js:317:58
+2025-10-12T10:06:17.3141839Z     at Array.forEach (<anonymous>)
+2025-10-12T10:06:17.314186Z     at cleanup (/app/Admin/backup.js:317:18)
+2025-10-12T10:06:17.3141881Z     at /app/Admin/backup.js:449:9
+2025-10-12T10:06:17.3141903Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-12T10:06:30.9483475Z [Restore Cleanup] Searching for orphaned databases matching: smartSK_restore_%
+2025-10-12T10:06:31.2013353Z [Restore Cleanup] Found 1 orphaned database(s): smartSK_restore_1760151799810
+2025-10-12T10:06:31.201385Z [Restore Cleanup] Attempting to drop orphaned database: smartSK_restore_1760151799810
+2025-10-12T10:06:31.2214383Z [Restore Cleanup] Failed to drop database smartSK_restore_1760151799810. It may require manual deletion. Error: ALTER DATABASE statement failed.
+2025-10-12T10:06:31.2283236Z [Restore] Extracting smartSK_2025-10-12_18-03-55.zip...
+2025-10-12T10:06:31.3016411Z [Restore] Extracted smartSK_2025-10-12_18-03-55.bacpac.
+2025-10-12T10:06:31.3016927Z [Restore] Starting database import to temporary database 'smartSK_restore_1760263591227'...
+2025-10-12T10:08:32.7217265Z [Restore] Successfully imported to temporary database. Proceeding with swap.
+2025-10-12T10:08:32.9110045Z [Restore] Setting original database 'smartSK' to single-user mode.
+2025-10-12T10:08:33.2777238Z [Restore] CRITICAL: Failed during database swap: ALTER DATABASE statement failed.
 
 --Deployment Container Logs
 

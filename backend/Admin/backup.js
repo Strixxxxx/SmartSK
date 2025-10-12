@@ -10,6 +10,7 @@ const archiver = require('archiver');
 const archiverZipEncrypted = require('archiver-zip-encrypted');
 const multer = require('multer');
 const { createJob, getJob, updateJob } = require('./backupJob');
+const { getConnection } = require('../database/database');
 
 // Register the zip-encrypted format
 archiver.registerFormat('zip-encrypted', archiverZipEncrypted);
@@ -405,6 +406,13 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             }
 
             console.log(`[Restore] Successfully imported to temporary database. Proceeding with swap.`);
+
+            // Close the main application's connection pool before attempting the swap.
+            console.log('[Restore] Closing application connection pool before swap...');
+            const pool = await getConnection();
+            await pool.close();
+            console.log('[Restore] Connection pool closed. The application will restart after the restore completes.');
+
             let sql;
             try {
                 sql = require('mssql');
@@ -430,7 +438,10 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
                     descriptions: `Admin ${req.user.fullName} restored the database from ${originalFileName} (${restoreType}).`
                 });
 
-                res.status(200).json({ message: 'Database restored successfully.' });
+                res.status(200).json({ message: 'Database restored successfully. Application will restart.' });
+
+                // Gracefully shut down to allow the process manager to restart and reconnect.
+                setTimeout(() => process.exit(0), 1000);
 
             } catch (swapError) {
                 console.error(`[Restore] CRITICAL: Failed during database swap: ${swapError.message}`);
@@ -438,6 +449,8 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
                     message: 'CRITICAL: Database restore failed during final swap. Manual intervention required.',
                     error: `The database may be in an inconsistent state. The temporary database '${tempDbName}' may still exist and need to be manually renamed to '${dbName}'. Error: ${swapError.message}`
                 });
+                // Gracefully shut down to allow the process manager to restart and reconnect.
+                setTimeout(() => process.exit(1), 1000);
             } finally {
                 if (sql && sql.connected) await sql.close();
                 cleanup();

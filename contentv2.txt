@@ -1,1 +1,13 @@
-1	PRJ-608962-285	testing blob	testing the functionality of the blob storage	2	9	2025-09-25 16:43:29.003	1758818608758-3de98686-fe4f-4e15-bd30-efb6a18952a0.pdf	04_Laboratory_Exercise_1.pdf	targeted audiences: 3000 people	Jeff Aldreich S. Bontuyan
+-smartSK Database(Main Database)
+
+
+(0 rows affected)
+
+Completion time: 2025-10-12T18:35:22.8749744+08:00
+
+--smartSK Database(Temporary Database)
+
+
+(0 rows affected)
+
+Completion time: 2025-10-12T18:36:04.1775129+08:00
