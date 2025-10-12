@@ -1,13 +1,75 @@
--smartSK Database(Main Database)
-
-
-(0 rows affected)
-
-Completion time: 2025-10-12T18:35:22.8749744+08:00
-
---smartSK Database(Temporary Database)
-
-
-(0 rows affected)
-
-Completion time: 2025-10-12T18:36:04.1775129+08:00
+rui [ ~ ]$ az sql db show --resource-group "Smart_SK" --server "smart-sk" --name "smartSK"
+{
+  "autoPauseDelay": null,
+  "availabilityZone": "NoPreference",
+  "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+  "collation": "SQL_Latin1_General_CP1_CI_AS",
+  "createMode": null,
+  "creationDate": "2025-10-11T03:12:50.030000+00:00",
+  "currentBackupStorageRedundancy": "Geo",
+  "currentServiceObjectiveName": "GP_Gen5_2",
+  "currentSku": {
+    "capacity": 2,
+    "family": "Gen5",
+    "name": "GP_Gen5",
+    "size": null,
+    "tier": "GeneralPurpose"
+  },
+  "databaseId": "415b799c-17ea-4aa2-8c66-ad65879270c0",
+  "defaultSecondaryLocation": "eastasia",
+  "earliestRestoreDate": "2025-10-11T03:16:06+00:00",
+  "edition": "GeneralPurpose",
+  "elasticPoolId": null,
+  "elasticPoolName": null,
+  "encryptionProtector": null,
+  "encryptionProtectorAutoRotation": null,
+  "failoverGroupId": null,
+  "federatedClientId": null,
+  "freeLimitExhaustionBehavior": null,
+  "highAvailabilityReplicaCount": null,
+  "id": "/subscriptions/0b42eb46-0f69-4263-86b9-a408ca348b28/resourceGroups/Smart_SK/providers/Microsoft.Sql/servers/smart-sk/databases/smartSK",
+  "identity": null,
+  "isInfraEncryptionEnabled": false,
+  "keys": null,
+  "kind": "v12.0,user,vcore",
+  "ledgerOn": false,
+  "licenseType": "LicenseIncluded",
+  "location": "southeastasia",
+  "longTermRetentionBackupResourceId": null,
+  "maintenanceConfigurationId": "/subscriptions/0b42eb46-0f69-4263-86b9-a408ca348b28/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
+  "managedBy": null,
+  "manualCutover": null,
+  "maxLogSizeBytes": 193273528320,
+  "maxSizeBytes": 34359738368,
+  "minCapacity": null,
+  "name": "smartSK",
+  "pausedDate": null,
+  "performCutover": null,
+  "preferredEnclaveType": null,
+  "readScale": "Disabled",
+  "recoverableDatabaseId": null,
+  "recoveryServicesRecoveryPointId": null,
+  "requestedBackupStorageRedundancy": "Geo",
+  "requestedServiceObjectiveName": "GP_Gen5_2",
+  "resourceGroup": "Smart_SK",
+  "restorableDroppedDatabaseId": null,
+  "restorePointInTime": null,
+  "resumedDate": null,
+  "sampleName": null,
+  "secondaryType": null,
+  "sku": {
+    "capacity": 2,
+    "family": "Gen5",
+    "name": "GP_Gen5",
+    "size": null,
+    "tier": "GeneralPurpose"
+  },
+  "sourceDatabaseDeletionDate": null,
+  "sourceDatabaseId": null,
+  "sourceResourceId": null,
+  "status": "Online",
+  "tags": null,
+  "type": "Microsoft.Sql/servers/databases",
+  "useFreeLimit": null,
+  "zoneRedundant": false
+}

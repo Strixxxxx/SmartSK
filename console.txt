@@ -20,157 +20,229 @@
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-12T12:26:44.557344Z Login attempt received
-2025-10-12T12:26:47.8856452Z Login successful for user.
-2025-10-12T12:26:59.9841577Z [Restore Cleanup] Searching for orphaned databases matching: smartSK_restore_%
-2025-10-12T12:27:00.8649315Z [Restore Cleanup] Found 2 orphaned database(s): smartSK_restore_1760268740730, smartSK_restore_1760269152350
-2025-10-12T12:27:00.873505Z [Restore Cleanup] Attempting to drop orphaned database: smartSK_restore_1760268740730
-2025-10-12T12:27:01.1917643Z [Restore Cleanup] Failed to drop database smartSK_restore_1760268740730. It may require manual deletion. Full error object: RequestError: ALTER DATABASE statement failed.
-2025-10-12T12:27:01.1917931Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
-2025-10-12T12:27:01.1917964Z     at Connection.emit (node:events:519:28)
-2025-10-12T12:27:01.1917985Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
-2025-10-12T12:27:01.1918026Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
-2025-10-12T12:27:01.1918138Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
-2025-10-12T12:27:01.1918162Z     at Readable.emit (node:events:519:28)
-2025-10-12T12:27:01.1918184Z     at addChunk (node:internal/streams/readable:561:12)
-2025-10-12T12:27:01.1918209Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-2025-10-12T12:27:01.191823Z     at Readable.push (node:internal/streams/readable:393:5)
-2025-10-12T12:27:01.1918251Z     at nextAsync (node:internal/streams/from:194:22) {
-2025-10-12T12:27:01.191827Z   code: 'EREQUEST',
-2025-10-12T12:27:01.1918291Z   originalError: Error: ALTER DATABASE statement failed.
-2025-10-12T12:27:01.1918312Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
-2025-10-12T12:27:01.1918332Z       at Connection.emit (node:events:519:28)
-2025-10-12T12:27:01.1922391Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
-2025-10-12T12:27:01.192255Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
-2025-10-12T12:27:01.1922793Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
-2025-10-12T12:27:01.1922815Z       at Readable.emit (node:events:519:28)
-2025-10-12T12:27:01.1922837Z       at addChunk (node:internal/streams/readable:561:12)
-2025-10-12T12:27:01.1922859Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-2025-10-12T12:27:01.192288Z       at Readable.push (node:internal/streams/readable:393:5)
-2025-10-12T12:27:01.1922901Z       at nextAsync (node:internal/streams/from:194:22) {
-2025-10-12T12:27:01.1922922Z     info: ErrorMessageToken {
-2025-10-12T12:27:01.1922942Z       name: 'ERROR',
-2025-10-12T12:27:01.1922962Z       handlerName: 'onErrorMessage',
-2025-10-12T12:27:01.1923004Z       number: 5069,
-2025-10-12T12:27:01.1923023Z       state: 3,
-2025-10-12T12:27:01.1923042Z       class: 16,
-2025-10-12T12:27:01.1923063Z       message: 'ALTER DATABASE statement failed.',
-2025-10-12T12:27:01.1923083Z       serverName: 'smart-sk',
-2025-10-12T12:27:01.1923103Z       procName: '',
-2025-10-12T12:27:01.1923125Z       lineNumber: 1
-2025-10-12T12:27:01.1923144Z     }
-2025-10-12T12:27:01.1923163Z   },
-2025-10-12T12:27:01.1923182Z   number: 5069,
-2025-10-12T12:27:01.1923222Z   lineNumber: 1,
-2025-10-12T12:27:01.1923241Z   state: 3,
-2025-10-12T12:27:01.192326Z   class: 16,
-2025-10-12T12:27:01.192328Z   serverName: 'smart-sk',
-2025-10-12T12:27:01.19233Z   procName: '',
-2025-10-12T12:27:01.1923319Z   precedingErrors: [
-2025-10-12T12:27:01.1923361Z     RequestError: ODBC error: State: 42000: Error: 1468 Message:'[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The operation cannot be performed on database "smartSK_restore_1760268740730" because it is involved in a database mirroring session or an availability group. Some operations are not allowed on a database that is participating in a database mirroring session or in an availability group.'.
-2025-10-12T12:27:01.1923384Z         at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
-2025-10-12T12:27:01.1923405Z         at Connection.emit (node:events:519:28)
-2025-10-12T12:27:01.1923427Z         at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
-2025-10-12T12:27:01.1923469Z         at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
-2025-10-12T12:27:01.1923492Z         at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
-2025-10-12T12:27:01.1923513Z         at Readable.emit (node:events:519:28)
-2025-10-12T12:27:01.1923534Z         at addChunk (node:internal/streams/readable:561:12)
-2025-10-12T12:27:01.1923557Z         at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-2025-10-12T12:27:01.1923579Z         at Readable.push (node:internal/streams/readable:393:5)
-2025-10-12T12:27:01.19236Z         at nextAsync (node:internal/streams/from:194:22) {
-2025-10-12T12:27:01.192362Z       code: 'EREQUEST',
-2025-10-12T12:27:01.192364Z       originalError: [Error],
-2025-10-12T12:27:01.192366Z       number: 42008,
-2025-10-12T12:27:01.1923699Z       lineNumber: 1,
-2025-10-12T12:27:01.1923719Z       state: 5,
-2025-10-12T12:27:01.1923738Z       class: 16,
-2025-10-12T12:27:01.1923758Z       serverName: 'smart-sk',
-2025-10-12T12:27:01.1923778Z       procName: ''
-2025-10-12T12:27:01.1923797Z     }
-2025-10-12T12:27:01.1923815Z   ]
-2025-10-12T12:27:01.1923834Z }
-2025-10-12T12:27:01.198481Z [Restore Cleanup] Attempting to drop orphaned database: smartSK_restore_1760269152350
-2025-10-12T12:27:01.5122198Z [Restore Cleanup] Failed to drop database smartSK_restore_1760269152350. It may require manual deletion. Full error object: RequestError: ALTER DATABASE statement failed.
-2025-10-12T12:27:01.5122609Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
-2025-10-12T12:27:01.5122638Z     at Connection.emit (node:events:519:28)
-2025-10-12T12:27:01.512266Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
-2025-10-12T12:27:01.5122686Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
-2025-10-12T12:27:01.5122884Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
-2025-10-12T12:27:01.5122907Z     at Readable.emit (node:events:519:28)
-2025-10-12T12:27:01.5122927Z     at addChunk (node:internal/streams/readable:561:12)
-2025-10-12T12:27:01.5122948Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-2025-10-12T12:27:01.5123046Z     at Readable.push (node:internal/streams/readable:393:5)
-2025-10-12T12:27:01.5123068Z     at nextAsync (node:internal/streams/from:194:22) {
-2025-10-12T12:27:01.5123086Z   code: 'EREQUEST',
-2025-10-12T12:27:01.5123107Z   originalError: Error: ALTER DATABASE statement failed.
-2025-10-12T12:27:01.5123128Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
-2025-10-12T12:27:01.5123148Z       at Connection.emit (node:events:519:28)
-2025-10-12T12:27:01.5123168Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
-2025-10-12T12:27:01.512319Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
-2025-10-12T12:27:01.5123211Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
-2025-10-12T12:27:01.512323Z       at Readable.emit (node:events:519:28)
-2025-10-12T12:27:01.512325Z       at addChunk (node:internal/streams/readable:561:12)
-2025-10-12T12:27:01.5123294Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-2025-10-12T12:27:01.5123315Z       at Readable.push (node:internal/streams/readable:393:5)
-2025-10-12T12:27:01.5123336Z       at nextAsync (node:internal/streams/from:194:22) {
-2025-10-12T12:27:01.5123355Z     info: ErrorMessageToken {
-2025-10-12T12:27:01.5123374Z       name: 'ERROR',
-2025-10-12T12:27:01.5123393Z       handlerName: 'onErrorMessage',
-2025-10-12T12:27:01.5123411Z       number: 5069,
-2025-10-12T12:27:01.512343Z       state: 3,
-2025-10-12T12:27:01.5123449Z       class: 16,
-2025-10-12T12:27:01.5123468Z       message: 'ALTER DATABASE statement failed.',
-2025-10-12T12:27:01.5123488Z       serverName: 'smart-sk',
-2025-10-12T12:27:01.5123506Z       procName: '',
-2025-10-12T12:27:01.5123548Z       lineNumber: 1
-2025-10-12T12:27:01.5123567Z     }
-2025-10-12T12:27:01.5123585Z   },
-2025-10-12T12:27:01.5123603Z   number: 5069,
-2025-10-12T12:27:01.5123622Z   lineNumber: 1,
-2025-10-12T12:27:01.512364Z   state: 3,
-2025-10-12T12:27:01.5123659Z   class: 16,
-2025-10-12T12:27:01.5123678Z   serverName: 'smart-sk',
-2025-10-12T12:27:01.5123696Z   procName: '',
-2025-10-12T12:27:01.5123714Z   precedingErrors: [
-2025-10-12T12:27:01.512377Z     RequestError: ODBC error: State: 42000: Error: 1468 Message:'[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The operation cannot be performed on database "smartSK_restore_1760269152350" because it is involved in a database mirroring session or an availability group. Some operations are not allowed on a database that is participating in a database mirroring session or in an availability group.'.
-2025-10-12T12:27:01.5123792Z         at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
-2025-10-12T12:27:01.5123812Z         at Connection.emit (node:events:519:28)
-2025-10-12T12:27:01.5123833Z         at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
-2025-10-12T12:27:01.5123855Z         at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
-2025-10-12T12:27:01.5123876Z         at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
-2025-10-12T12:27:01.5123895Z         at Readable.emit (node:events:519:28)
-2025-10-12T12:27:01.5123915Z         at addChunk (node:internal/streams/readable:561:12)
-2025-10-12T12:27:01.5123936Z         at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-2025-10-12T12:27:01.5123956Z         at Readable.push (node:internal/streams/readable:393:5)
-2025-10-12T12:27:01.5123977Z         at nextAsync (node:internal/streams/from:194:22) {
-2025-10-12T12:27:01.5124016Z       code: 'EREQUEST',
-2025-10-12T12:27:01.5124036Z       originalError: [Error],
-2025-10-12T12:27:01.5124054Z       number: 42008,
-2025-10-12T12:27:01.5124072Z       lineNumber: 1,
-2025-10-12T12:27:01.512409Z       state: 5,
-2025-10-12T12:27:01.5124108Z       class: 16,
-2025-10-12T12:27:01.5124127Z       serverName: 'smart-sk',
-2025-10-12T12:27:01.5124146Z       procName: ''
-2025-10-12T12:27:01.5124163Z     }
-2025-10-12T12:27:01.5124182Z   ]
-2025-10-12T12:27:01.5124245Z }
-2025-10-12T12:27:01.533878Z [Restore] Extracting smartSK_2025-10-12_19-31-27.zip...
-2025-10-12T12:27:03.7683462Z [Restore] Extracted smartSK_2025-10-12_19-31-27.bacpac.
-2025-10-12T12:27:03.7946003Z [Restore] Starting database import to temporary database 'smartSK_restore_1760272021532'...
-2025-10-12T12:28:18.691Z No new trace in the past 1 min(s).
-2025-10-12T12:29:26.2450598Z [Restore] Successfully imported to temporary database. Proceeding with swap.
-2025-10-12T12:29:26.2463575Z [Restore] Closing application connection pool before swap...
-2025-10-12T12:29:26.2525462Z [Restore] Connection pool closed. The application will restart after the restore completes.
-2025-10-12T12:29:26.8679906Z [Restore] Setting original database 'smartSK' to single-user mode.
-2025-10-12T12:29:27.4857376Z [Restore] CRITICAL: Failed during database swap: ALTER DATABASE statement failed.
-2025-10-12T12:29:27.6719711Z (node:8) [DEP0147] DeprecationWarning: In future versions of Node.js, fs.rmdir(path, { recursive: true }) will be removed. Use fs.rm(path, { recursive: true }) instead
-2025-10-12T12:29:27.6720109Z     at emitRecursiveRmdirWarning (node:internal/fs/utils:880:13)
-2025-10-12T12:29:27.6720212Z     at Object.rmdirSync (node:fs:1191:5)
-2025-10-12T12:29:27.6720233Z     at /app/Admin/backup.js:318:58
-2025-10-12T12:29:27.6720254Z     at Array.forEach (<anonymous>)
-2025-10-12T12:29:27.6720274Z     at cleanup (/app/Admin/backup.js:318:18)
-2025-10-12T12:29:27.6720292Z     at /app/Admin/backup.js:456:17
-2025-10-12T12:29:27.6720318Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+2025-10-12T13:05:05.0166027Z Initialized active sessions.
+2025-10-12T13:06:14.6000198Z [Restore Cleanup] Searching for orphaned databases matching: smartSK_restore_%
+2025-10-12T13:06:14.8981924Z [Restore Cleanup] Found 3 orphaned database(s): smartSK_restore_1760268740730, smartSK_restore_1760269152350, smartSK_restore_1760272021532
+2025-10-12T13:06:14.8989869Z [Restore Cleanup] Attempting to drop orphaned database: smartSK_restore_1760268740730
+2025-10-12T13:06:14.9000135Z [Restore Cleanup] Attempting to break replication link for smartSK_restore_1760268740730...
+2025-10-12T13:06:14.921249Z [Restore Cleanup] Info: Could not break replication link for smartSK_restore_1760268740730 (may not exist): Keyword or statement option 'PARTNER' is not supported in this version of SQL Server.
+2025-10-12T13:06:15.1145509Z [Restore Cleanup] Failed to drop database smartSK_restore_1760268740730. It may require manual deletion. Full error object: RequestError: ALTER DATABASE statement failed.
+2025-10-12T13:06:15.1146503Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-12T13:06:15.1146629Z     at Connection.emit (node:events:519:28)
+2025-10-12T13:06:15.1146653Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T13:06:15.1146678Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T13:06:15.114672Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T13:06:15.114674Z     at Readable.emit (node:events:519:28)
+2025-10-12T13:06:15.114676Z     at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T13:06:15.1146781Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T13:06:15.1146804Z     at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T13:06:15.1146824Z     at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T13:06:15.1146842Z   code: 'EREQUEST',
+2025-10-12T13:06:15.1146882Z   originalError: Error: ALTER DATABASE statement failed.
+2025-10-12T13:06:15.1146903Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
+2025-10-12T13:06:15.1146923Z       at Connection.emit (node:events:519:28)
+2025-10-12T13:06:15.1146944Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T13:06:15.1146966Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T13:06:15.1147158Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T13:06:15.1147179Z       at Readable.emit (node:events:519:28)
+2025-10-12T13:06:15.11472Z       at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T13:06:15.1147221Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T13:06:15.1147242Z       at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T13:06:15.1147285Z       at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T13:06:15.1147306Z     info: ErrorMessageToken {
+2025-10-12T13:06:15.1147325Z       name: 'ERROR',
+2025-10-12T13:06:15.1147345Z       handlerName: 'onErrorMessage',
+2025-10-12T13:06:15.1147364Z       number: 5069,
+2025-10-12T13:06:15.1147384Z       state: 3,
+2025-10-12T13:06:15.1147403Z       class: 16,
+2025-10-12T13:06:15.1147423Z       message: 'ALTER DATABASE statement failed.',
+2025-10-12T13:06:15.1147443Z       serverName: 'smart-sk',
+2025-10-12T13:06:15.1147462Z       procName: '',
+2025-10-12T13:06:15.1147482Z       lineNumber: 1
+2025-10-12T13:06:15.1147532Z     }
+2025-10-12T13:06:15.1147551Z   },
+2025-10-12T13:06:15.1147569Z   number: 5069,
+2025-10-12T13:06:15.1147588Z   lineNumber: 1,
+2025-10-12T13:06:15.1147778Z   state: 3,
+2025-10-12T13:06:15.1147798Z   class: 16,
+2025-10-12T13:06:15.1147819Z   serverName: 'smart-sk',
+2025-10-12T13:06:15.1147838Z   procName: '',
+2025-10-12T13:06:15.1147858Z   precedingErrors: [
+2025-10-12T13:06:15.1147938Z     RequestError: ODBC error: State: 42000: Error: 1468 Message:'[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The operation cannot be performed on database "smartSK_restore_1760268740730" because it is involved in a database mirroring session or an availability group. Some operations are not allowed on a database that is participating in a database mirroring session or in an availability group.'.
+2025-10-12T13:06:15.1148138Z         at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-12T13:06:15.1148162Z         at Connection.emit (node:events:519:28)
+2025-10-12T13:06:15.1148184Z         at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T13:06:15.1148208Z         at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T13:06:15.1148232Z         at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T13:06:15.1148253Z         at Readable.emit (node:events:519:28)
+2025-10-12T13:06:15.1148275Z         at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T13:06:15.1148298Z         at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T13:06:15.114832Z         at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T13:06:15.1148342Z         at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T13:06:15.1148384Z       code: 'EREQUEST',
+2025-10-12T13:06:15.1148405Z       originalError: [Error],
+2025-10-12T13:06:15.1148426Z       number: 42008,
+2025-10-12T13:06:15.1148445Z       lineNumber: 1,
+2025-10-12T13:06:15.1148465Z       state: 5,
+2025-10-12T13:06:15.1148485Z       class: 16,
+2025-10-12T13:06:15.1148505Z       serverName: 'smart-sk',
+2025-10-12T13:06:15.1148525Z       procName: ''
+2025-10-12T13:06:15.1148544Z     }
+2025-10-12T13:06:15.1148564Z   ]
+2025-10-12T13:06:15.1148583Z }
+2025-10-12T13:06:15.1233975Z [Restore Cleanup] Attempting to drop orphaned database: smartSK_restore_1760269152350
+2025-10-12T13:06:15.1234094Z [Restore Cleanup] Attempting to break replication link for smartSK_restore_1760269152350...
+2025-10-12T13:06:15.1407Z [Restore Cleanup] Info: Could not break replication link for smartSK_restore_1760269152350 (may not exist): Keyword or statement option 'PARTNER' is not supported in this version of SQL Server.
+2025-10-12T13:06:15.3620618Z [Restore Cleanup] Failed to drop database smartSK_restore_1760269152350. It may require manual deletion. Full error object: RequestError: ALTER DATABASE statement failed.
+2025-10-12T13:06:15.362107Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-12T13:06:15.3621111Z     at Connection.emit (node:events:519:28)
+2025-10-12T13:06:15.3621138Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T13:06:15.3621161Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T13:06:15.3621183Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T13:06:15.3621285Z     at Readable.emit (node:events:519:28)
+2025-10-12T13:06:15.362131Z     at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T13:06:15.3621333Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T13:06:15.3621354Z     at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T13:06:15.3621375Z     at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T13:06:15.3621396Z   code: 'EREQUEST',
+2025-10-12T13:06:15.3621418Z   originalError: Error: ALTER DATABASE statement failed.
+2025-10-12T13:06:15.362144Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
+2025-10-12T13:06:15.362146Z       at Connection.emit (node:events:519:28)
+2025-10-12T13:06:15.3621482Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T13:06:15.3621505Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T13:06:15.3622332Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T13:06:15.3622387Z       at Readable.emit (node:events:519:28)
+2025-10-12T13:06:15.3622411Z       at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T13:06:15.3622434Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T13:06:15.3622457Z       at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T13:06:15.3622478Z       at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T13:06:15.3622499Z     info: ErrorMessageToken {
+2025-10-12T13:06:15.362252Z       name: 'ERROR',
+2025-10-12T13:06:15.3622541Z       handlerName: 'onErrorMessage',
+2025-10-12T13:06:15.3622561Z       number: 5069,
+2025-10-12T13:06:15.3622583Z       state: 3,
+2025-10-12T13:06:15.362263Z       class: 16,
+2025-10-12T13:06:15.3622652Z       message: 'ALTER DATABASE statement failed.',
+2025-10-12T13:06:15.3622673Z       serverName: 'smart-sk',
+2025-10-12T13:06:15.3622693Z       procName: '',
+2025-10-12T13:06:15.3622713Z       lineNumber: 1
+2025-10-12T13:06:15.3622732Z     }
+2025-10-12T13:06:15.3622752Z   },
+2025-10-12T13:06:15.3622772Z   number: 5069,
+2025-10-12T13:06:15.3622792Z   lineNumber: 1,
+2025-10-12T13:06:15.3622812Z   state: 3,
+2025-10-12T13:06:15.3622832Z   class: 16,
+2025-10-12T13:06:15.3622852Z   serverName: 'smart-sk',
+2025-10-12T13:06:15.3622893Z   procName: '',
+2025-10-12T13:06:15.3622912Z   precedingErrors: [
+2025-10-12T13:06:15.3622951Z     RequestError: ODBC error: State: 42000: Error: 1468 Message:'[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The operation cannot be performed on database "smartSK_restore_1760269152350" because it is involved in a database mirroring session or an availability group. Some operations are not allowed on a database that is participating in a database mirroring session or in an availability group.'.
+2025-10-12T13:06:15.3622974Z         at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-12T13:06:15.3622996Z         at Connection.emit (node:events:519:28)
+2025-10-12T13:06:15.3623018Z         at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T13:06:15.3623042Z         at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T13:06:15.3623065Z         at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T13:06:15.3623087Z         at Readable.emit (node:events:519:28)
+2025-10-12T13:06:15.3623128Z         at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T13:06:15.3623152Z         at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T13:06:15.3623176Z         at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T13:06:15.3623197Z         at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T13:06:15.3623217Z       code: 'EREQUEST',
+2025-10-12T13:06:15.3623238Z       originalError: [Error],
+2025-10-12T13:06:15.3623258Z       number: 42008,
+2025-10-12T13:06:15.3623278Z       lineNumber: 1,
+2025-10-12T13:06:15.3623297Z       state: 5,
+2025-10-12T13:06:15.3623316Z       class: 16,
+2025-10-12T13:06:15.3623337Z       serverName: 'smart-sk',
+2025-10-12T13:06:15.3623357Z       procName: ''
+2025-10-12T13:06:15.3623401Z     }
+2025-10-12T13:06:15.362342Z   ]
+2025-10-12T13:06:15.362344Z }
+2025-10-12T13:06:15.3771546Z [Restore Cleanup] Attempting to drop orphaned database: smartSK_restore_1760272021532
+2025-10-12T13:06:15.3771804Z [Restore Cleanup] Attempting to break replication link for smartSK_restore_1760272021532...
+2025-10-12T13:06:15.3969141Z [Restore Cleanup] Info: Could not break replication link for smartSK_restore_1760272021532 (may not exist): Keyword or statement option 'PARTNER' is not supported in this version of SQL Server.
+2025-10-12T13:06:15.5928852Z [Restore Cleanup] Failed to drop database smartSK_restore_1760272021532. It may require manual deletion. Full error object: RequestError: ALTER DATABASE statement failed.
+2025-10-12T13:06:15.5929357Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-12T13:06:15.5929394Z     at Connection.emit (node:events:519:28)
+2025-10-12T13:06:15.5929504Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T13:06:15.5929527Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T13:06:15.592955Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T13:06:15.592957Z     at Readable.emit (node:events:519:28)
+2025-10-12T13:06:15.592959Z     at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T13:06:15.5929611Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T13:06:15.5929631Z     at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T13:06:15.5929651Z     at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T13:06:15.5929669Z   code: 'EREQUEST',
+2025-10-12T13:06:15.5929689Z   originalError: Error: ALTER DATABASE statement failed.
+2025-10-12T13:06:15.592971Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
+2025-10-12T13:06:15.5929759Z       at Connection.emit (node:events:519:28)
+2025-10-12T13:06:15.592978Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T13:06:15.5929802Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T13:06:15.5929824Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T13:06:15.5929844Z       at Readable.emit (node:events:519:28)
+2025-10-12T13:06:15.5929864Z       at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T13:06:15.5929884Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T13:06:15.5929905Z       at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T13:06:15.5929925Z       at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T13:06:15.5929944Z     info: ErrorMessageToken {
+2025-10-12T13:06:15.5929982Z       name: 'ERROR',
+2025-10-12T13:06:15.5930002Z       handlerName: 'onErrorMessage',
+2025-10-12T13:06:15.593002Z       number: 5069,
+2025-10-12T13:06:15.5930038Z       state: 3,
+2025-10-12T13:06:15.5930057Z       class: 16,
+2025-10-12T13:06:15.5930076Z       message: 'ALTER DATABASE statement failed.',
+2025-10-12T13:06:15.5930095Z       serverName: 'smart-sk',
+2025-10-12T13:06:15.5930113Z       procName: '',
+2025-10-12T13:06:15.5930131Z       lineNumber: 1
+2025-10-12T13:06:15.5930149Z     }
+2025-10-12T13:06:15.5930167Z   },
+2025-10-12T13:06:15.5930185Z   number: 5069,
+2025-10-12T13:06:15.5930223Z   lineNumber: 1,
+2025-10-12T13:06:15.5930243Z   state: 3,
+2025-10-12T13:06:15.5930261Z   class: 16,
+2025-10-12T13:06:15.593028Z   serverName: 'smart-sk',
+2025-10-12T13:06:15.5930298Z   procName: '',
+2025-10-12T13:06:15.5930317Z   precedingErrors: [
+2025-10-12T13:06:15.5930353Z     RequestError: ODBC error: State: 42000: Error: 1468 Message:'[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The operation cannot be performed on database "smartSK_restore_1760272021532" because it is involved in a database mirroring session or an availability group. Some operations are not allowed on a database that is participating in a database mirroring session or in an availability group.'.
+2025-10-12T13:06:15.5930373Z         at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-12T13:06:15.5930393Z         at Connection.emit (node:events:519:28)
+2025-10-12T13:06:15.5930413Z         at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T13:06:15.5930451Z         at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T13:06:15.5930474Z         at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T13:06:15.5930493Z         at Readable.emit (node:events:519:28)
+2025-10-12T13:06:15.5930513Z         at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T13:06:15.5930534Z         at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T13:06:15.5930554Z         at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T13:06:15.5930574Z         at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T13:06:15.5930593Z       code: 'EREQUEST',
+2025-10-12T13:06:15.5930612Z       originalError: [Error],
+2025-10-12T13:06:15.593063Z       number: 42008,
+2025-10-12T13:06:15.5930648Z       lineNumber: 1,
+2025-10-12T13:06:15.5930687Z       state: 5,
+2025-10-12T13:06:15.5930706Z       class: 16,
+2025-10-12T13:06:15.5930725Z       serverName: 'smart-sk',
+2025-10-12T13:06:15.5930744Z       procName: ''
+2025-10-12T13:06:15.5930762Z     }
+2025-10-12T13:06:15.5930779Z   ]
+2025-10-12T13:06:15.5930797Z }
+2025-10-12T13:06:15.7725472Z [Restore] Extracting smartSK_2025-10-12_19-31-27.zip...
+2025-10-12T13:06:16.390561Z [Restore] Extracted smartSK_2025-10-12_19-31-27.bacpac.
+2025-10-12T13:06:16.3906124Z [Restore] Starting database import to temporary database 'smartSK_restore_1760274375599'...
+2025-10-12T13:07:51.470Z No new trace in the past 1 min(s).
+2025-10-12T13:08:24.1750452Z [Restore] Successfully imported to temporary database. Proceeding with swap.
+2025-10-12T13:08:24.1751066Z [Restore] Closing application connection pool before swap...
+2025-10-12T13:08:24.1751103Z [Restore] Connection pool closed. The application will restart after the restore completes.
+2025-10-12T13:08:24.3071311Z [Restore] Attempting to break replication link for main database smartSK...
+2025-10-12T13:08:24.4020379Z [Restore] Info: Could not break replication link for smartSK (may not exist): Keyword or statement option 'PARTNER' is not supported in this version of SQL Server.
+2025-10-12T13:08:24.4058372Z [Restore] Setting original database 'smartSK' to single-user mode.
+2025-10-12T13:08:24.5987453Z [Restore] CRITICAL: Failed during database swap: ALTER DATABASE statement failed.
+2025-10-12T13:08:24.692343Z (node:8) [DEP0147] DeprecationWarning: In future versions of Node.js, fs.rmdir(path, { recursive: true }) will be removed. Use fs.rm(path, { recursive: true }) instead
+2025-10-12T13:08:24.6924128Z     at emitRecursiveRmdirWarning (node:internal/fs/utils:880:13)
+2025-10-12T13:08:24.6924164Z     at Object.rmdirSync (node:fs:1191:5)
+2025-10-12T13:08:24.6924187Z     at /app/Admin/backup.js:329:58
+2025-10-12T13:08:24.6924208Z     at Array.forEach (<anonymous>)
+2025-10-12T13:08:24.6924229Z     at cleanup (/app/Admin/backup.js:329:18)
+2025-10-12T13:08:24.6924249Z     at /app/Admin/backup.js:477:17
+2025-10-12T13:08:24.6924272Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
 
 --Deployment Container Logs
 

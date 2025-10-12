@@ -286,7 +286,7 @@ async function cleanupOrphanedRestoreDatabases() {
                 // **FIX**: Break the ghost replication link before any other operation.
                 try {
                     console.log(`[Restore Cleanup] Attempting to break replication link for ${orphanDbName}...`);
-                    await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET PARTNER OFF;`);
+                    await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET HADR OFF;`);
                     console.log(`[Restore Cleanup] Successfully broke replication link for ${orphanDbName}.`);
                 } catch (replicationError) {
                     // Log the error but continue. This error is expected if the DB is not in a mirroring session.
@@ -432,7 +432,7 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
                 // **FIX**: Break the ghost replication link on the main database before the swap.
                 try {
                     console.log(`[Restore] Attempting to break replication link for main database ${dbName}...`);
-                    await sql.query(`ALTER DATABASE [${dbName}] SET PARTNER OFF;`);
+                    await sql.query(`ALTER DATABASE [${dbName}] SET HADR OFF;`);
                     console.log(`[Restore] Successfully broke replication link for ${dbName}.`);
                 } catch (replicationError) {
                     // Log the error but continue. This error is expected if the DB is not in a mirroring session.
