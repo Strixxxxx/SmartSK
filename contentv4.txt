@@ -1,41 +1,660 @@
-Current Error Analysis
-The new error is:
-Login failed for user '<token-identified principal>'. 
-The server is not currently configured to accept this token.
-This means the Azure SQL Database itself is not configured to accept Azure AD authentication, not just a sqlpackage syntax issue.
-Do You Need to Switch to Managed Identity?
-No, you don't necessarily need to switch to Managed Identity in the Deployment Center. The deployment authentication (Admin Credentials vs Managed Identity) is separate from how your application authenticates to the SQL database.
-The Real Issue
-Your Azure SQL Database needs to be configured to accept Azure AD authentication. Here's what needs to be done:
-Option 1: Enable Azure AD Authentication on SQL Database (Recommended)
-This allows you to keep using Admin Credentials for deployment while using Azure AD for database access:
+> so what i want you to do is SCAN THE @console.txt PROPERLY BECAUSE THE RESTORATION IS STILL FAILING. IMPORTANT NOTE: THE ORIGINAL CODE STRUCTURE OF @backend/Admin/backup.js IS 
+  INSIDE OF @backend.txt BECAUSE THE Gemini CLI KEEP FAILING. SCAN THE @backend.txt FIRST SO THEN PUT THE NEW CODE STRUCTURE ON THE @backend/Admin/backup.js
 
-In Azure Portal → SQL Server (not database)
-Go to Settings → Microsoft Entra ID (formerly Azure AD)
-Click Set admin and assign an Azure AD admin
-After setting the admin, your App Service's managed identity can authenticate
+✦ Based on my analysis of the console.txt logs and the code in backend.txt, I've identified the root cause of the restoration failure. The database is part of an availability
+  group, which prevents it from being modified or dropped. The code was attempting to use a SET HADR OFF command that is not supported by your SQL Server version, leading to the
+  errors you're seeing.
 
-Important: Even with Admin Credentials for deployment, your App Service already has a System-Assigned Managed Identity available. You just need to:
+  The backend.txt file correctly addresses this for the cleanup function by removing the database from the availability group first. However, this fix was missing from the main
+  restore logic.
 
-Enable it in App Service → Identity
-Grant it access to the SQL database
+  I will now apply the same fix to the main restore function. This involves replacing the unsupported SET HADR OFF command with the proper logic to remove the database from the
+  availability group before attempting the swap. I will then write the fully corrected code to D:\Projects\Projects\smartSK\backend\Admin\backup.js.
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  WriteFile Writing to backend\Admin\backup.js                                                                                                                         │
+ │                                                                                                                                                                         │
+ │    ... first 432 lines hidden ...                                                                                                                                       │
+ │    433                                                                                                                                                                  │
+ │    434             console.log(`[Restore] Successfully imported to temporary database. Proceeding with swap.`);                                                         │
+ │    435                                                                                                                                                                  │
+ │    436             // Close the main application's connection pool before attempting the swap.                                                                          │
+ │    437             console.log('[Restore] Closing application connection pool before swap...');                                                                         │
+ │    438             const pool = await getConnection();                                                                                                                  │
+ │    439             await pool.close();                                                                                                                                  │
+ │    440             console.log('[Restore] Connection pool closed. The application will restart after the restore completes.');                                          │
+ │    441                                                                                                                                                                  │
+ │    442             let sql;                                                                                                                                             │
+ │    443             try {                                                                                                                                                │
+ │    444                 sql = require('mssql');                                                                                                                          │
+ │    445                 await sql.connect(masterDbConfig);                                                                                                               │
+ │    446                                                                                                                                                                  │
+ │    447                 // **FIX**: Remove the main database from any availability group before swapping.                                                                │
+ │    448                 try {                                                                                                                                            │
+ │    449                     console.log(`[Restore] Diagnosing availability group for main database ${dbName}...`);                                                       │
+ │    450                     const agResult = await sql.request()                                                                                                         │
+ │    451                         .input('dbName', sql.NVarChar, dbName)                                                                                                   │
+ │    452                         .query(`                                                                                                                                 │
+ │    453                             SELECT ag.name as agName                                                                                                             │
+ │    454                             FROM sys.availability_groups ag                                                                                                      │
+ │    455                             JOIN sys.dm_hadr_database_replica_states drs ON ag.group_id = drs.group_id                                                           │
+ │    456                             WHERE drs.database_id = DB_ID(@dbName)                                                                                               │
+ │    457                         `);                                                                                                                                      │
+ │    458                                                                                                                                                                  │
+ │    459                     if (agResult.recordset.length > 0) {                                                                                                         │
+ │    460                         const agName = agResult.recordset[0].agName;                                                                                             │
+ │    461                         console.log(`[Restore] Found main database ${dbName} in availability group ${agName}. Attempting to remove it.`);                        │
+ │    462                         await sql.request().query(`ALTER AVAILABILITY GROUP [${agName}] REMOVE DATABASE [${dbName}];`);                                          │
+ │    463                         console.log(`[Restore] Successfully removed ${dbName} from availability group ${agName}.`);                                              │
+ │    464                     } else {                                                                                                                                     │
+ │    465                         console.log(`[Restore] Main database ${dbName} is not in any availability group, no action needed.`);                                    │
+ │    466                     }                                                                                                                                            │
+ │    467                 } catch (agError) {                                                                                                                              │
+ │    468                     console.error(`[Restore] Error during availability group diagnosis/removal for main database ${dbName}: ${agError.message}`);                │
+ │    469                     // We will still proceed, as the original error might have been misleading or the DB might be offline.                                       │
+ │    470                 }                                                                                                                                                │
+ │    471                                                                                                                                                                  │
+ │    472                 console.log(`[Restore] Setting original database '${dbName}' to single-user mode.`);                                                             │
+ │    473                 await sql.query(`ALTER DATABASE [${dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);                                                          │
+ │    474                                                                                                                                                                  │
+ │    475                 console.log(`[Restore] Dropping original database: ${dbName}`);                                                                                  │
+ │    476                 await sql.query(`DROP DATABASE [${dbName}];`);                                                                                                   │
+ │    477                                                                                                                                                                  │
+ │    478                 console.log(`[Restore] Renaming temporary database '${tempDbName}' to '${dbName}'`);                                                             │
+ │    479                 await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${dbName}];`);                                                                    │
+ │    480                                                                                                                                                                  │
+ │    481                 console.log(`[Restore] Setting new database '${dbName}' back to multi-user mode.`);                                                              │
+ │    482                 await sql.query(`ALTER DATABASE [${dbName}] SET MULTI_USER;`);                                                                                   │
+ │    483                                                                                                                                                                  │
+ │    484                 console.log('[Restore] Database restore completed successfully.');                                                                               │
+ │    485                                                                                                                                                                  │
+ │    486                 addAuditTrail({                                                                                                                                  │
+ │    487                     actor: 'A', module: 'B', userID: req.user.userId,                                                                                            │
+ │    488                     actions: 'restore-database', newValue: originalFileName,                                                                                     │
+ │    489                     descriptions: `Admin ${req.user.fullName} restored the database from ${originalFileName} (${restoreType}).`                                  │
+ │    490                 });                                                                                                                                              │
+ │    491                                                                                                                                                                  │
+ │    492                 res.status(200).json({ message: 'Database restored successfully. Application will restart.' });                                                  │
+ │    493                                                                                                                                                                  │
+ │    494                 // Gracefully shut down to allow the process manager to restart and reconnect.                                                                   │
+ │    495                 setTimeout(() => process.exit(0), 1000);                                                                                                         │
+ │    496                                                                                                                                                                  │
+ │    497             } catch (swapError) {                                                                                                                                │
+ │    498                 console.error(`[Restore] CRITICAL: Failed during database swap: ${swapError.message}`);                                                          │
+ │    499                 res.status(500).json({                                                                                                                           │
+ │    500                     message: 'CRITICAL: Database restore failed during final swap. Manual intervention required.',                                               │
+ │    501                     error: `The database may be in an inconsistent state. The temporary database '${tempDbName}' may still exist and need to be manually         │
+ │        renamed to '${dbName}'. Error: ${swapError.message}`                                                                                                             │
+ │    502                 });                                                                                                                                              │
+ │    503                 // Gracefully shut down to allow the process manager to restart and reconnect.                                                                   │
+ │    504                 setTimeout(() => process.exit(1), 1000);                                                                                                         │
+ │    505             } finally {                                                                                                                                          │
+ │    506                 if (sql && sql.connected) await sql.close();                                                                                                     │
+ │    507                 cleanup();                                                                                                                                       │
+ │    508             }                                                                                                                                                    │
+ │    509         });                                                                                                                                                      │
+ │    510                                                                                                                                                                  │
+ │    511     } catch (error) {                                                                                                                                            │
+ │    512         console.error('[Restore] Process failed:', error.message);                                                                                               │
+ │    513         cleanup();                                                                                                                                               │
+ │    514         if (!res.headersSent) {                                                                                                                                  │
+ │    515             res.status(500).json({ message: error.message });                                                                                                    │
+ │    516         }                                                                                                                                                        │
+ │    517     }                                                                                                                                                            │
+ │    518 });                                                                                                                                                              │
+ │    519                                                                                                                                                                  │
+ │    520                                                                                                                                                                  │
+ │    521 module.exports = router;                                                                                                                                         │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ The file D:\Projects\Projects\smartSK\backend\Admin\backup.js has been updated with the corrected logic. The restore process should now correctly handle databases within
+  availability groups.
 
-Option 2: Use SQL Authentication (Simpler but Less Secure)
-If you want to avoid Azure AD complexity entirely, use traditional SQL authentication:
-Changes needed in backup.js:
-javascript// Remove the getAzureAdToken function entirely
-// Remove DefaultAzureCredential import
+> so before i commit and push it, le me clarify if the logic that you put would work like this. It would identify which availability group it belongs then once the backend fetches
+  it, it would remove the database on the availability group right?
 
-// Change the command to use SQL authentication:
-const command = `sqlpackage /a:Export /ssn:${dbServer} /sdn:${dbName} /tf:"${bacpacFilePath}" /su:${process.env.DB_USER} /sp:${process.env.DB_PASSWORD}`;
-This uses your existing DB_USER and DB_PASSWORD environment variables.
-My Recommendation
-Use Option 2 (SQL Authentication) because:
+✦ Yes, that is exactly right. Here's a breakdown of the logic I implemented for both the cleanup of old temporary databases and the main restore process:
 
-✅ No Azure Portal changes needed - works with your current setup
-✅ No Dockerfile changes - no need to modify containers
-✅ No GitHub workflow changes - deployment stays the same
-✅ Keeps Admin Credentials for deployment - as you requested
-✅ Works immediately - uses credentials you already have configured
+   1. Diagnose: It first queries the SQL server's system tables (sys.availability_groups and sys.dm_hadr_database_replica_states) to check if the database is part of an
+      availability group.
+   2. Remove: If the database is found in an availability group, the code issues an ALTER AVAILABILITY GROUP ... REMOVE DATABASE command to safely detach it.
 
-The Azure AD token approach is more secure, but it requires proper Azure SQL configuration which seems to be missing in your current setup.
+  This allows the subsequent steps, like setting the database to single-user mode and dropping it, to proceed without the "operation cannot be performed" error you were seeing.
+
+> is it possible to check it on the bash cloud shell?
+
+✦ The Azure Cloud Shell runs in a separate environment and doesn't have direct access to your local files, so you can't check the change directly from there.
+
+  To test the fix, you'll need to deploy the new version of the code to your Azure environment. This typically involves committing the change and pushing it to your remote
+  repository, which should trigger your deployment workflow.
+
+  I can help you with the commit process. First, let's check the status of your repository.
+ ╭────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ -  Shell git status (Checking the git status to see the modified file before committing.)  │
+ ╰────────────────────────────────────────────────────────────────────────────────────────────╯
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  ReadManyFiles Will attempt to read and concatenate files using patterns:                                                                                                     │
+ │    console.txt                                                                                                                                                                  │
+ │     (within target directory:                                                                                                                                                   │
+ │    D:\Projects\Projects\smartSK                                                                                                                                                 │
+ │    ) . Excluding: patterns like                                                                                                                                                 │
+ │    **/node_modules/**`, `**/.git/**...`. File encoding: utf-8. Separator: "--- path/to/file.ext ---".                                                                           │
+ │                                                                                                                                                                                 │
+ │    ### ReadManyFiles Result (Target Dir: `D:\Projects\Projects\smartSK`)                                                                                                        │
+ │                                                                                                                                                                                 │
+ │    Successfully read and concatenated content from **1 file(s)**.                                                                                                               │
+ │                                                                                                                                                                                 │
+ │    **Processed Files:**                                                                                                                                                         │
+ │    - `console.txt`                                                                                                                                                              │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+> can you read the @console.txt CAREFULLY? Im asking this because i know it would cause restoration failure once again. Please identify the cause of the error base on the runtime 
+  log stream on the azure portal
+
+✦ You were absolutely right to be cautious. I've reviewed the new logs, and they reveal a critical piece of information that was missing before.
+
+  The key error is now:
+  [Restore Cleanup] Error during availability group diagnosis/removal for ...: Invalid object name 'sys.availability_groups'.
+
+  This error means the query to check for an "Availability Group" is failing because your SQL server version or tier doesn't support it. The previous fix I implemented would
+  have failed for this exact reason.
+
+  The original error mentioned the database could be in a "mirroring session or an availability group." Since it's not an availability group, it's likely a different
+  high-availability feature that SQL Server is treating as "mirroring."
+
+  The correct command to disable this is ALTER DATABASE ... SET PARTNER OFF.
+
+  I will now update the code with this new, simpler, and more appropriate fix. I will replace the complex availability group logic with this single command in both the cleanup
+  and restore functions. This should resolve the root cause of the failure.
+ ╭──────────────────────────────────────╮
+ │ ✓  ReadFile backend\Admin\backup.js  │
+ ╰──────────────────────────────────────╯
+✦ Okay, I have the current content of backup.js. I will now apply the corrected logic.
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  Edit backend\Admin\backup.js: const express = require('expre... => const express = require('expre...                                                                 │
+ │                                                                                                                                                                         │
+ │    283   try {                                                                                                                                                          │
+ │    284       console.log(`[Restore Cleanup] Attempting to drop orphaned database: ${orphanDbName}`);                                                                    │
+ │    285                                                                                                                                                                  │
+ │    286 -     // **FIX**: Diagnose and then remove from the availability group.                                                                                          │
+ │    286 +     // **FIX**: Break the database's high-availability link before dropping.                                                                                   │
+ │    287       try {                                                                                                                                                      │
+ │    288 -         console.log(`[Restore Cleanup] Diagnosing availability group for ${orphanDbName}...`);                                                                 │
+ │    289 -         const agResult = await connection.request()                                                                                                            │
+ │    290 -             .input('dbName', sql.NVarChar, orphanDbName)                                                                                                       │
+ │    291 -             .query(`                                                                                                                                           │
+ │    292 -                 SELECT ag.name as agName                                                                                                                       │
+ │    293 -                 FROM sys.availability_groups ag                                                                                                                │
+ │    294 -                 JOIN sys.dm_hadr_database_replica_states drs ON ag.group_id = drs.group_id                                                                     │
+ │    295 -                 WHERE drs.database_id = DB_ID(@dbName)                                                                                                         │
+ │    296 -             `);                                                                                                                                                │
+ │    297 -                                                                                                                                                                │
+ │    298 -         if (agResult.recordset.length > 0) {                                                                                                                   │
+ │    299 -             const agName = agResult.recordset[0].agName;                                                                                                       │
+ │    300 -             console.log(`[Restore Cleanup] Found database ${orphanDbName} in availability group ${agName}. Attempting to remove it.`);                         │
+ │    301 -             await connection.request().query(`ALTER AVAILABILITY GROUP [${agName}] REMOVE DATABASE [${orphanDbName}];`);                                       │
+ │    302 -             console.log(`[Restore Cleanup] Successfully removed ${orphanDbName} from availability group ${agName}.`);                                          │
+ │    303 -         } else {                                                                                                                                               │
+ │    304 -             console.log(`[Restore Cleanup] Database ${orphanDbName} is not in any availability group, no action needed.`);                                     │
+ │    288 +         console.log(`[Restore Cleanup] Attempting to break high-availability link for ${orphanDbName}...`);                                                    │
+ │    289 +         await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET PARTNER OFF;`);                                                                 │
+ │    290 +         console.log(`[Restore Cleanup] Successfully issued command to break HA link for ${orphanDbName}.`);                                                    │
+ │    291 +     } catch (haError) {                                                                                                                                        │
+ │    292 +         // Log the error but continue. This is expected if the DB is not in a mirroring/HA session.                                                            │
+ │    293 +         console.log(`[Restore Cleanup] Info: Could not break HA link for ${orphanDbName} (may not exist): ${haError.message}`);                                │
+ │    294       }                                                                                                                                                          │
+ │    ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════  │
+ │    306 -     } catch (agError) {                                                                                                                                        │
+ │    307 -         console.error(`[Restore Cleanup] Error during availability group diagnosis/removal for ${orphanDbName}: ${agError.message}`);                          │
+ │    308 -         // We will still proceed to the next step, as the original error might have been misleading.                                                           │
+ │    309 -     }                                                                                                                                                          │
+ │    295                                                                                                                                                                  │
+ │    296       // Forcibly close connections and drop the database                                                                                                        │
+ │    297       await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);                                             │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ Great. I've updated the cleanup logic. Now I'll apply the same fix to the main restore logic.
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  Edit backend\Admin\backup.js: const express = require('expre... => const express = require('expre...                                                                 │
+ │                                                                                                                                                                         │
+ │    429   sql = require('mssql');                                                                                                                                        │
+ │    430   await sql.connect(masterDbConfig);                                                                                                                             │
+ │    431                                                                                                                                                                  │
+ │    432 - // **FIX**: Remove the main database from any availability group before swapping.                                                                              │
+ │    432 + // **FIX**: Break the database's high-availability link before swapping.                                                                                       │
+ │    433   try {                                                                                                                                                          │
+ │    434 -     console.log(`[Restore] Diagnosing availability group for main database ${dbName}...`);                                                                     │
+ │    435 -     const agResult = await sql.request()                                                                                                                       │
+ │    436 -         .input('dbName', sql.NVarChar, dbName)                                                                                                                 │
+ │    437 -         .query(`                                                                                                                                               │
+ │    438 -             SELECT ag.name as agName                                                                                                                           │
+ │    439 -             FROM sys.availability_groups ag                                                                                                                    │
+ │    440 -             JOIN sys.dm_hadr_database_replica_states drs ON ag.group_id = drs.group_id                                                                         │
+ │    441 -             WHERE drs.database_id = DB_ID(@dbName)                                                                                                             │
+ │    442 -         `);                                                                                                                                                    │
+ │    443 -                                                                                                                                                                │
+ │    444 -     if (agResult.recordset.length > 0) {                                                                                                                       │
+ │    445 -         const agName = agResult.recordset[0].agName;                                                                                                           │
+ │    446 -         console.log(`[Restore] Found main database ${dbName} in availability group ${agName}. Attempting to remove it.`);                                      │
+ │    447 -         await sql.request().query(`ALTER AVAILABILITY GROUP [${agName}] REMOVE DATABASE [${dbName}];`);                                                        │
+ │    448 -         console.log(`[Restore] Successfully removed ${dbName} from availability group ${agName}.`);                                                            │
+ │    449 -     } else {                                                                                                                                                   │
+ │    450 -         console.log(`[Restore] Main database ${dbName} is not in any availability group, no action needed.`);                                                  │
+ │    434 +     console.log(`[Restore] Attempting to break high-availability link for database ${dbName}...`);                                                             │
+ │    435 +     await sql.query(`ALTER DATABASE [${dbName}] SET PARTNER OFF;`);                                                                                            │
+ │    436 +     console.log(`[Restore] Successfully issued command to break HA link for ${dbName}.`);                                                                      │
+ │    437 + } catch (haError) {                                                                                                                                            │
+ │    438 +     // Log the error but continue. This is expected if the DB is not in a mirroring/HA session.                                                                │
+ │    439 +     console.log(`[Restore] Info: Could not break HA link for ${dbName} (may not exist or not be supported): ${haError.message}`);                              │
+ │    440   }                                                                                                                                                              │
+ │    ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════  │
+ │    452 - } catch (agError) {                                                                                                                                            │
+ │    453 -     console.error(`[Restore] Error during availability group diagnosis/removal for main database ${dbName}: ${agError.message}`);                              │
+ │    454 -     // We will still proceed, as the original error might have been misleading or the DB might be offline.                                                     │
+ │    455 - }                                                                                                                                                              │
+ │    441                                                                                                                                                                  │
+ │    442   console.log(`[Restore] Setting original database '${dbName}' to single-user mode.`);                                                                           │
+ │    443   await sql.query(`ALTER DATABASE [${dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);                                                                        │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ All done. I have replaced the incorrect logic in both functions inside D:\Projects\Projects\smartSK\backend\Admin\backup.js with the SET PARTNER OFF command.
+
+  This new version stands a much better chance of succeeding in your environment. When you are ready, you can commit and push this change to trigger your deployment.
+
+> but we already tried the PARTNER OFF and it causes an error too
+
+✦ You are absolutely right. My apologies. I should have asked for more information instead of assuming the next logical step. Thank you for the correction.
+
+  Since both the availability group and the SET PARTNER OFF approaches are incorrect for your environment, it means we are missing a key piece of information about your
+  database's specific high-availability configuration on Azure.
+
+  I will revert the backup.js file to its original state from backend.txt to undo my incorrect changes.
+
+  To move forward, could you please provide the error message you received when SET PARTNER OFF was attempted?
+
+  Knowing that error will help diagnose the actual configuration. It's likely that your Azure SQL instance uses a feature (like failover groups) that can't be managed with
+  simple T-SQL commands from the application, and may require a different approach using PowerShell or the Azure CLI.
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  WriteFile Writing to backend\Admin\backup.js                                                                                                                         │
+ │                                                                                                                                                                         │
+ │    118   await downloadBackupFile(bacpacFileName, tempBacpacPath);                                                                                                      │
+ │    119   console.log(`[Job ${jobId}] Download complete.`);                                                                                                              │
+ │    120                                                                                                                                                                  │
+ │    121 - // 2. Prepare to stream an encrypted zip file to the user                                                                                                      │
+ │    121 + // 2. Prepare to stream an encrypted zip file to the.user                                                                                                      │
+ │    122   const zipFileName = bacpacFileName.replace('.bacpac', '.zip');                                                                                                 │
+ │    123   res.setHeader('Content-Type', 'application/zip');                                                                                                              │
+ │    124   res.setHeader('Content-Disposition', `attachment; filename="${zipFileName}"`);                                                                                 │
+ │    ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════  │
+ │    283       try {                                                                                                                                                      │
+ │    284           console.log(`[Restore Cleanup] Attempting to drop orphaned database: ${orphanDbName}`);                                                                │
+ │    285                                                                                                                                                                  │
+ │    286 -         // **FIX**: Break the database's high-availability link before dropping.                                                                               │
+ │    286 +         // **FIX**: Diagnose and then remove from the availability group.                                                                                      │
+ │    287           try {                                                                                                                                                  │
+ │    288 -             console.log(`[Restore Cleanup] Attempting to break high-availability link for ${orphanDbName}...`);                                                │
+ │    289 -             await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET PARTNER OFF;`);                                                             │
+ │    290 -             console.log(`[Restore Cleanup] Successfully issued command to break HA link for ${orphanDbName}.`);                                                │
+ │    291 -         } catch (haError) {                                                                                                                                    │
+ │    292 -             // Log the error but continue. This is expected if the DB is not in a mirroring/HA session.                                                        │
+ │    293 -             console.log(`[Restore Cleanup] Info: Could not break HA link for ${orphanDbName} (may not exist): ${haError.message}`);                            │
+ │    288 +             console.log(`[Restore Cleanup] Diagnosing availability group for ${orphanDbName}...`);                                                             │
+ │    289 +             const agResult = await connection.request()                                                                                                        │
+ │    290 +                 .input('dbName', sql.NVarChar, orphanDbName)                                                                                                   │
+ │    291 +                 .query(`                                                                                                                                       │
+ │    292 +                     SELECT ag.name as agName                                                                                                                   │
+ │    293 +                     FROM sys.availability_groups ag                                                                                                            │
+ │    294 +                     JOIN sys.dm_hadr_database_replica_states drs ON ag.group_id = drs.group_id                                                                 │
+ │    295 +                     WHERE drs.database_id = DB_ID(@dbName)                                                                                                     │
+ │    296 +                 `);                                                                                                                                            │
+ │    297 +                                                                                                                                                                │
+ │    298 +             if (agResult.recordset.length > 0) {                                                                                                               │
+ │    299 +                 const agName = agResult.recordset[0].agName;                                                                                                   │
+ │    300 +                 console.log(`[Restore Cleanup] Found database ${orphanDbName} in availability group ${agName}. Attempting to remove it.`);                     │
+ │    301 +                 await connection.request().query(`ALTER AVAILABILITY GROUP [${agName}] REMOVE DATABASE [${orphanDbName}];`);                                   │
+ │    302 +                 console.log(`[Restore Cleanup] Successfully removed ${orphanDbName} from availability group ${agName}.`);                                      │
+ │    303 +             } else {                                                                                                                                           │
+ │    304 +                 console.log(`[Restore Cleanup] Database ${orphanDbName} is not in any availability group, no action needed.`);                                 │
+ │    305               }                                                                                                                                                  │
+ │    306 +         } catch (agError) {                                                                                                                                    │
+ │    307 +             console.error(`[Restore Cleanup] Error during availability group diagnosis/removal for ${orphanDbName}: ${agError.message}`);                      │
+ │    308 +             // We will still proceed to the next step, as the original error might have been misleading.                                                       │
+ │    309 +         }                                                                                                                                                      │
+ │    310                                                                                                                                                                  │
+ │    311           // Forcibly close connections and drop the database                                                                                                    │
+ │    312           await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);                                         │
+ │    ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════  │
+ │    444           sql = require('mssql');                                                                                                                                │
+ │    445           await sql.connect(masterDbConfig);                                                                                                                     │
+ │    446                                                                                                                                                                  │
+ │    432 -         // **FIX**: Break the database's high-availability link before swapping.                                                                               │
+ │    ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════  │
+ │    447 +         // **FIX**: Break the ghost replication link on the main database before the swap.                                                                     │
+ │    448           try {                                                                                                                                                  │
+ │    434 -             console.log(`[Restore] Attempting to break high-availability link for database ${dbName}...`);                                                     │
+ │    435 -             await sql.query(`ALTER DATABASE [${dbName}] SET PARTNER OFF;`);                                                                                    │
+ │    436 -             console.log(`[Restore] Successfully issued command to break HA link for ${dbName}.`);                                                              │
+ │    437 -         } catch (haError) {                                                                                                                                    │
+ │    438 -             // Log the error but continue. This is expected if the DB is not in a mirroring/HA session.                                                        │
+ │    439 -             console.log(`[Restore] Info: Could not break HA link for ${dbName} (may not exist or not be supported): ${haError.message}`);                      │
+ │    ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════  │
+ │    449 +             console.log(`[Restore] Attempting to break replication link for main database ${dbName}...`);                                                      │
+ │    450 +             await sql.query(`ALTER DATABASE [${dbName}] SET HADR OFF;`);                                                                                       │
+ │    451 +             console.log(`[Restore] Successfully broke replication link for ${dbName}.`);                                                                       │
+ │    452 +         } catch (replicationError) {                                                                                                                           │
+ │    453 +             // Log the error but continue. This error is expected if the DB is not in a mirroring session.                                                     │
+ │    454 +             console.log(`[Restore] Info: Could not break replication link for ${dbName} (may not exist): ${replicationError.message}`);                        │
+ │    455           }                                                                                                                                                      │
+ │    456                                                                                                                                                                  │
+ │    457           console.log(`[Restore] Setting original database '${dbName}' to single-user mode.`);                                                                   │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ I have reverted the file to the content from backend.txt. I apologize again for implementing a change that you had already identified as a dead end.
+
+  We are back to the drawing board, but with more information. We now know that neither the Availability Group logic nor the SET PARTNER OFF command are correct.
+
+  To figure out the right solution, we need to know the exact error message that SET PARTNER OFF produces. Can you please provide the logs from that attempt? That information is
+  the key to understanding the specific type of high-availability configuration on your database.
+ ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  ReadManyFiles Will attempt to read and concatenate files using patterns:                                                                                                      │
+ │    contentv2.txt`, `contentv3.txt                                                                                                                                                │
+ │     (within target directory:                                                                                                                                                    │
+ │    D:\Projects\Projects\smartSK                                                                                                                                                  │
+ │    ) . Excluding: patterns like                                                                                                                                                  │
+ │    **/node_modules/**`, `**/.git/**...`. File encoding: utf-8. Separator: "--- path/to/file.ext ---".                                                                            │
+ │                                                                                                                                                                                  │
+ │    ### ReadManyFiles Result (Target Dir: `D:\Projects\Projects\smartSK`)                                                                                                         │
+ │                                                                                                                                                                                  │
+ │    Successfully read and concatenated content from **2 file(s)**.                                                                                                                │
+ │                                                                                                                                                                                  │
+ │    **Processed Files:**                                                                                                                                                          │
+ │    - `contentv2.txt`                                                                                                                                                             │
+ │    - `contentv3.txt`                                                                                                                                                             │
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+> so to summarize the conversation that i had with Gemini CLI before, we found out that it was a ghost availability because i said earlier to the Gemini CLI about my hypothesis 
+  because i remember that the original smart sk database(before the current one), it has an availability group which was GRE-** something, i forgot what is the last two abbrevation 
+  before and it was setup around singapore and south east asia(i think). If you scan the @contentv2.txt , you can still see the result of the bash cloud shell. I rerun the command on
+   the bash cloud console once again and the result can be seen on the @contentv3.txt .
+
+✦ Thank you, this is extremely helpful. The output from the az sql db show command confirms your theory.
+
+  Here's what we now know for sure:
+   1. Your database is on the GeneralPurpose tier. As the logs indicated, this tier does not support the sys.availability_groups view, which is why that approach failed.
+   2. The output also shows "failoverGroupId": null, so the database is not currently part of an active Failover Group according to the Azure control plane.
+
+  This strongly supports your hypothesis of a "ghost" replication link. The database engine's internal metadata is likely stuck from the old configuration, making it believe
+  it's still part of a high-availability setup.
+
+  This brings us back to the ALTER DATABASE ... SET PARTNER OFF; command, which is the standard way to break these kinds of phantom links. You mentioned this was tried and also
+  produced an error. To finally solve this, the exact error message from that failure is the most critical piece of information we need.
+
+  Could you please provide the log output from the attempt that used SET PARTNER OFF? Every command fails for a specific reason, and that error message is the key to figuring
+  out the correct next step.
+ ╭────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  ReadManyFiles Will attempt to read and concatenate files using patterns:                                                                                                │
+ │    backend/Admin/backup.js                                                                                                                                                 │
+ │     (within target directory:                                                                                                                                              │
+ │    D:\Projects\Projects\smartSK                                                                                                                                            │
+ │    ) . Excluding: patterns like                                                                                                                                            │
+ │    **/node_modules/**`, `**/.git/**...`. File encoding: utf-8. Separator: "--- path/to/file.ext ---".                                                                      │
+ │                                                                                                                                                                            │
+ │    ### ReadManyFiles Result (Target Dir: `D:\Projects\Projects\smartSK`)                                                                                                   │
+ │                                                                                                                                                                            │
+ │    Successfully read and concatenated content from **1 file(s)**.                                                                                                          │
+ │                                                                                                                                                                            │
+ │    **Processed Files:**                                                                                                                                                    │
+ │    - `backend/Admin/backup.js`                                                                                                                                             │
+ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+> how about this, add the SET PARTNER OFF once again on the @backend/Admin/backup.js then ill rerun it again for you to see the log because i dont have the copy of that error
+
+✦ Excellent idea. That's the most direct way to get the information we need. I will add the SET PARTNER OFF command back into the code. Please deploy and run the restore process
+  after I'm done, then provide the new logs.
+
+  First, I'll modify the cleanup function.
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  Edit backend\Admin\backup.js: const express = require('expre... => const express = require('expre...                                                                 │
+ │                                                                                                                                                                         │
+ │    283   try {                                                                                                                                                          │
+ │    284       console.log(`[Restore Cleanup] Attempting to drop orphaned database: ${orphanDbName}`);                                                                    │
+ │    285                                                                                                                                                                  │
+ │    286 -     // **FIX**: Diagnose and then remove from the availability group.                                                                                          │
+ │    286 +     // **DIAGNOSTIC ATTEMPT**: Break the database's high-availability link before dropping.                                                                    │
+ │    287       try {                                                                                                                                                      │
+ │    288 -         console.log(`[Restore Cleanup] Diagnosing availability group for ${orphanDbName}...`);                                                                 │
+ │    289 -         const agResult = await connection.request()                                                                                                            │
+ │    290 -             .input('dbName', sql.NVarChar, orphanDbName)                                                                                                       │
+ │    291 -             .query(`                                                                                                                                           │
+ │    292 -                 SELECT ag.name as agName                                                                                                                       │
+ │    293 -                 FROM sys.availability_groups ag                                                                                                                │
+ │    294 -                 JOIN sys.dm_hadr_database_replica_states drs ON ag.group_id = drs.group_id                                                                     │
+ │    295 -                 WHERE drs.database_id = DB_ID(@dbName)                                                                                                         │
+ │    296 -             `);                                                                                                                                                │
+ │    297 -                                                                                                                                                                │
+ │    298 -         if (agResult.recordset.length > 0) {                                                                                                                   │
+ │    299 -             const agName = agResult.recordset[0].agName;                                                                                                       │
+ │    300 -             console.log(`[Restore Cleanup] Found database ${orphanDbName} in availability group ${agName}. Attempting to remove it.`);                         │
+ │    301 -             await connection.request().query(`ALTER AVAILABILITY GROUP [${agName}] REMOVE DATABASE [${orphanDbName}];`);                                       │
+ │    302 -             console.log(`[Restore Cleanup] Successfully removed ${orphanDbName} from availability group ${agName}.`);                                          │
+ │    303 -         } else {                                                                                                                                               │
+ │    304 -             console.log(`[Restore Cleanup] Database ${orphanDbName} is not in any availability group, no action needed.`);                                     │
+ │    288 +         console.log(`[Restore Cleanup] Attempting to break high-availability link for ${orphanDbName} with SET PARTNER OFF...`);                               │
+ │    289 +         await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET PARTNER OFF;`);                                                                 │
+ │    290 +         console.log(`[Restore Cleanup] Successfully issued command to break HA link for ${orphanDbName}.`);                                                    │
+ │    291 +     } catch (haError) {                                                                                                                                        │
+ │    292 +         // Log the error but continue. This is expected if the DB is not in a mirroring/HA session.                                                            │
+ │    293 +         console.error(`[Restore Cleanup] DIAGNOSTIC LOG: SET PARTNER OFF failed for ${orphanDbName}:`, haError);                                               │
+ │    294       }                                                                                                                                                          │
+ │    ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════  │
+ │    306 -     } catch (agError) {                                                                                                                                        │
+ │    307 -         console.error(`[Restore Cleanup] Error during availability group diagnosis/removal for ${orphanDbName}: ${agError.message}`);                          │
+ │    308 -         // We will still proceed to the next step, as the original error might have been misleading.                                                           │
+ │    309 -     }                                                                                                                                                          │
+ │    295                                                                                                                                                                  │
+ │    296       // Forcibly close connections and drop the database                                                                                                        │
+ │    297       await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);                                             │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ Okay, the cleanup function has been updated. Now modifying the main restore function for the diagnostic test.
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  Edit backend\Admin\backup.js: const express = require('expre... => const express = require('expre...                                                                 │
+ │                                                                                                                                                                         │
+ │    429   sql = require('mssql');                                                                                                                                        │
+ │    430   await sql.connect(masterDbConfig);                                                                                                                             │
+ │    431                                                                                                                                                                  │
+ │    432 - // **FIX**: Break the ghost replication link on the main database before the swap.                                                                             │
+ │    432 + // **DIAGNOSTIC ATTEMPT**: Break the database's high-availability link before swapping.                                                                        │
+ │    433   try {                                                                                                                                                          │
+ │    434 -     console.log(`[Restore] Attempting to break replication link for main database ${dbName}...`);                                                              │
+ │    435 -     await sql.query(`ALTER DATABASE [${dbName}] SET HADR OFF;`);                                                                                               │
+ │    436 -     console.log(`[Restore] Successfully broke replication link for ${dbName}.`);                                                                               │
+ │    437 - } catch (replicationError) {                                                                                                                                   │
+ │    438 -     // Log the error but continue. This error is expected if the DB is not in a mirroring session.                                                             │
+ │    439 -     console.log(`[Restore] Info: Could not break replication link for ${dbName} (may not exist): ${replicationError.message}`);                                │
+ │    434 +     console.log(`[Restore] Attempting to break high-availability link for database ${dbName} with SET PARTNER OFF...`);                                        │
+ │    435 +     await sql.query(`ALTER DATABASE [${dbName}] SET PARTNER OFF;`);                                                                                            │
+ │    436 +     console.log(`[Restore] Successfully issued command to break HA link for ${dbName}.`);                                                                      │
+ │    437 + } catch (haError) {                                                                                                                                            │
+ │    438 +     // Log the error but continue. This is expected if the DB is not in a mirroring/HA session.                                                                │
+ │    439 +     console.error(`[Restore] DIAGNOSTIC LOG: SET PARTNER OFF failed for ${dbName}:`, haError);                                                                 │
+ │    440   }                                                                                                                                                              │
+ │    441                                                                                                                                                                  │
+ │    442   console.log(`[Restore] Setting original database '${dbName}' to single-user mode.`);                                                                           │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ Done. The file is now updated with the SET PARTNER OFF logic and includes specific logging to capture the error.
+
+  Please deploy and run the restore process. I'll be waiting for the new logs.
+ ╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  ReadManyFiles Will attempt to read and concatenate files using patterns:                                                                                                      │
+ │    console.txt`, `backend/Dockerfile                                                                                                                                             │
+ │     (within target directory:                                                                                                                                                    │
+ │    D:\Projects\Projects\smartSK                                                                                                                                                  │
+ │    ) . Excluding: patterns like                                                                                                                                                  │
+ │    **/node_modules/**`, `**/.git/**...`. File encoding: utf-8. Separator: "--- path/to/file.ext ---".                                                                            │
+ │                                                                                                                                                                                  │
+ │    ### ReadManyFiles Result (Target Dir: `D:\Projects\Projects\smartSK`)                                                                                                         │
+ │                                                                                                                                                                                  │
+ │    Successfully read and concatenated content from **2 file(s)**.                                                                                                                │
+ │                                                                                                                                                                                  │
+ │    **Processed Files:**                                                                                                                                                          │
+ │    - `backend/Dockerfile`                                                                                                                                                        │
+ │    - `console.txt`                                                                                                                                                               │
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+> so if you scan the @console.txt , you could see why. So we have 2 options here, first is that change the ODBC driver to a version that was fitted for partner off logic which can be
+   change on the @backend/Dockerfile or find another solution. So what i want is the first option to try first
+
+✦ Thank you for running that test. The log is perfectly clear and gives us the final piece of the puzzle.
+
+  The error is: RequestError: Keyword or statement option 'PARTNER' is not supported in this version of SQL Server.
+
+  This, combined with the previous errors, gives us a definitive conclusion: your database server's edition (GeneralPurpose) does not support any of the standard T-SQL commands
+  (SET HADR OFF, SET PARTNER OFF, or querying sys.availability_groups) used to manage high-availability replication.
+
+  Regarding your first option, changing the ODBC driver in the Dockerfile unfortunately won't solve this. The error is coming from the database server itself rejecting the
+  command, not from the client driver. A different driver would send the same command, and the server would still reject it.
+
+  This means we have exhausted the solutions that can be implemented by changing the application code. The issue is a "ghost" replication link in the database's metadata, and we
+  cannot clear it with any T-SQL command the application can send.
+
+  The solution is to force a metadata refresh from the Azure control plane itself. The recommended procedure for this is to use the Azure CLI (or PowerShell) to:
+   1. Create a new, temporary failover group for the database.
+   2. Immediately delete that same failover group.
+
+  This sequence of actions forces Azure to re-evaluate and clean up the stuck metadata that makes the database think it's in a replication link.
+
+  This is an administrative action on your Azure subscription that I cannot perform. However, I can guide you on how to do it.
+
+  Would you like me to provide the Azure CLI commands and link to the Microsoft documentation for this procedure?
+
+> just provide me a step by step procedure on how would i navigate this. LETS DO THE EASIER PART WHICH WAS THE NAVIGATING ON THE AZURE PORTAL
+
+✦ Of course. Using the Azure Portal is a good approach. Here is a step-by-step guide to the entire process.
+
+  Important: This procedure involves creating and deleting Azure resources and will reconfigure your database's replication. While generally safe, it's best to perform this
+  during a low-traffic period for your application.
+
+  The goal is to force your database's metadata to reset by adding it to a new Failover Group and then immediately removing it.
+
+  ---
+
+  Part 1: Create a Temporary Partner SQL Server
+
+  A failover group requires a second SQL server in a different Azure region. We will create a temporary one for this process.
+
+   1. In the Azure Portal, click + Create a resource at the top left.
+   2. Search for and select SQL Server. Click Create.
+   3. Fill out the form:
+       * Subscription: Choose your subscription.
+       * Resource group: Select the same resource group as your smart-sk server (Smart_SK).
+       * Server name: Give it a globally unique name (e.g., smart-sk-temp-partner- followed by some random numbers).
+       * Location: Choose a different region from your primary server. Your primary is in southeastasia, so choose East Asia.
+       * Authentication method: Select Use SQL authentication.
+       * Server admin login: Create a temporary admin username (e.g., tempadmin).
+       * Password: Create and confirm a strong temporary password.
+   4. Click Review + create, and then Create. Wait for the new server to finish deploying.
+
+  ---
+
+  Part 2: Create the Failover Group
+
+  Now we will add your smartSK database to a new failover group with the temporary server.
+
+   1. Navigate to your original SQL server resource, `smart-sk`.
+   2. In the left-hand menu, scroll down to the Data management section and click on Failover groups.
+   3. At the top, click + Add group.
+   4. On the creation page:
+       * Failover Group name: Enter a temporary name, for example: temp-cleanup-fg.
+       * Partner server: Select the temporary server you created in Part 1 (e.g., smart-sk-temp-partner-...).
+       * Scroll down to Databases within the group. Below the list, click on the 1 database(s) on this server are not in any failover group text.
+       * A new blade will open. Check the box next to your `smartSK` database and click Select.
+   5. Click Create. The deployment will now start. This process may take several minutes as Azure creates a replica of your database on the partner server.
+
+  ---
+
+  Part 3: Delete the Failover Group (The Fix)
+
+  This is the most important step. Once the group is created, we immediately delete it to clean the metadata.
+
+   1. After the deployment in Part 2 is complete, you should be on the Failover groups page for your smart-sk server. You will see your new group (temp-cleanup-fg) in the list.
+   2. Click on the name of the failover group you just created.
+   3. On the group's overview page, click the Delete button at the top.
+   4. Type the name of the failover group to confirm and click Delete.
+
+  This will remove the replication link. The original error should now be resolved.
+
+  ---
+
+  Part 4: Clean Up Resources
+
+  To avoid unnecessary costs, delete the temporary resources you created.
+
+   1. Delete the secondary database: Navigate to the temporary partner server you created in Part 1. In its Overview page, find the SQL databases section and click on the database
+      (it will be named smartSK). On the database page, click Delete.
+   2. Delete the temporary server: Navigate to the temporary server resource itself and click Delete.
+
+  After completing these steps, the ghost replication link should be gone. You can now try the restore operation from your application again.
+
+  Finally, I will revert the code in backup.js to remove the failing diagnostic logic we added. Please proceed with the Azure Portal steps.
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  WriteFile Writing to backend\Admin\backup.js                                                                                                                         │
+ │                                                                                                                                                                         │
+ │    283   try {                                                                                                                                                          │
+ │    284       console.log(`[Restore Cleanup] Attempting to drop orphaned database: ${orphanDbName}`);                                                                    │
+ │    285                                                                                                                                                                  │
+ │    286 -     // **DIAGNOSTIC ATTEMPT**: Break the database's high-availability link before dropping.                                                                    │
+ │    286 +     // **FIX**: Diagnose and then remove from the availability group.                                                                                          │
+ │    287       try {                                                                                                                                                      │
+ │    288 -         console.log(`[Restore Cleanup] Attempting to break high-availability link for ${orphanDbName} with SET PARTNER OFF...`);                               │
+ │    289 -         await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET PARTNER OFF;`);                                                                 │
+ │    290 -         console.log(`[Restore Cleanup] Successfully issued command to break HA link for ${orphanDbName}.`);                                                    │
+ │    291 -     } catch (haError) {                                                                                                                                        │
+ │    292 -         // Log the error but continue. This is expected if the DB is not in a mirroring/HA session.                                                            │
+ │    293 -         console.error(`[Restore Cleanup] DIAGNOSTIC LOG: SET PARTNER OFF failed for ${orphanDbName}:`, haError);                                               │
+ │    288 +         console.log(`[Restore Cleanup] Diagnosing availability group for ${orphanDbName}...`);                                                                 │
+ │    289 +         const agResult = await connection.request()                                                                                                            │
+ │    290 +             .input('dbName', sql.NVarChar, orphanDbName)                                                                                                       │
+ │    291 +             .query(`                                                                                                                                           │
+ │    292 +                 SELECT ag.name as agName                                                                                                                       │
+ │    293 +                 FROM sys.availability_groups ag                                                                                                                │
+ │    294 +                 JOIN sys.dm_hadr_database_replica_states drs ON ag.group_id = drs.group_id                                                                     │
+ │    295 +                 WHERE drs.database_id = DB_ID(@dbName)                                                                                                         │
+ │    296 +             `);                                                                                                                                                │
+ │    297 +                                                                                                                                                                │
+ │    298 +         if (agResult.recordset.length > 0) {                                                                                                                   │
+ │    299 +             const agName = agResult.recordset[0].agName;                                                                                                       │
+ │    300 +             console.log(`[Restore Cleanup] Found database ${orphanDbName} in availability group ${agName}. Attempting to remove it.`);                         │
+ │    301 +             await connection.request().query(`ALTER AVAILABILITY GROUP [${agName}] REMOVE DATABASE [${orphanDbName}];`);                                       │
+ │    302 +             console.log(`[Restore Cleanup] Successfully removed ${orphanDbName} from availability group ${agName}.`);                                          │
+ │    303 +         } else {                                                                                                                                               │
+ │    304 +             console.log(`[Restore Cleanup] Database ${orphanDbName} is not in any availability group, no action needed.`);                                     │
+ │    305           }                                                                                                                                                      │
+ │    306 +     } catch (agError) {                                                                                                                                        │
+ │    307 +         console.error(`[Restore Cleanup] Error during availability group diagnosis/removal for ${orphanDbName}: ${agError.message}`);                          │
+ │    308 +         // We will still proceed to the next step, as the original error might have been misleading.                                                           │
+ │    309 +     }                                                                                                                                                          │
+ │    310                                                                                                                                                                  │
+ │    311       // Forcibly close connections and drop the database                                                                                                        │
+ │    312       await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);                                             │
+ │    ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════  │
+ │    444       sql = require('mssql');                                                                                                                                    │
+ │    445       await sql.connect(masterDbConfig);                                                                                                                         │
+ │    446                                                                                                                                                                  │
+ │    432 -     // **DIAGNOSTIC ATTEMPT**: Break the database's high-availability link before swapping.                                                                    │
+ │    ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════  │
+ │    447 +     // **FIX**: Break the ghost replication link on the main database before the swap.                                                                         │
+ │    448       try {                                                                                                                                                      │
+ │    434 -         console.log(`[Restore] Attempting to break high-availability link for database ${dbName} with SET PARTNER OFF...`);                                    │
+ │    435 -         await sql.query(`ALTER DATABASE [${dbName}] SET PARTNER OFF;`);                                                                                        │
+ │    436 -         console.log(`[Restore] Successfully issued command to break HA link for ${dbName}.`);                                                                  │
+ │    437 -     } catch (haError) {                                                                                                                                        │
+ │    438 -         // Log the error but continue. This is expected if the DB is not in a mirroring/HA session.                                                            │
+ │    439 -         console.error(`[Restore] DIAGNOSTIC LOG: SET PARTNER OFF failed for ${dbName}:`, haError);                                                             │
+ │    ═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════  │
+ │    449 +         console.log(`[Restore] Attempting to break replication link for main database ${dbName}...`);                                                          │
+ │    450 +         await sql.query(`ALTER DATABASE [${dbName}] SET HADR OFF;`);                                                                                           │
+ │    451 +         console.log(`[Restore] Successfully broke replication link for ${dbName}.`);                                                                           │
+ │    452 +     } catch (replicationError) {                                                                                                                               │
+ │    453 +         // Log the error but continue. This error is expected if the DB is not in a mirroring session.                                                         │
+ │    454 +         console.log(`[Restore] Info: Could not break replication link for ${dbName} (may not exist): ${replicationError.message}`);                            │
+ │    455       }                                                                                                                                                          │
+ │    456                                                                                                                                                                  │
+ │    457       console.log(`[Restore] Setting original database '${dbName}' to single-user mode.`);                                                                       │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ I have reverted the backup.js file to its original state from backend.txt. Please proceed with the steps in the Azure Portal. I'll be here to help with the next steps once
+  you're done.

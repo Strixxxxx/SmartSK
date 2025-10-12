@@ -20,7 +20,158 @@
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-
+2025-10-12T14:02:47.5061473Z Login attempt received
+2025-10-12T14:02:48.8411733Z Login successful for user.
+2025-10-12T14:03:00.9687578Z [Restore Cleanup] Searching for orphaned databases matching: smartSK_restore_%
+2025-10-12T14:03:01.1976028Z [Restore Cleanup] Found 6 orphaned database(s): smartSK_restore_1760268740730, smartSK_restore_1760269152350, smartSK_restore_1760272021532, smartSK_restore_1760274375599, smartSK_restore_1760275158899, smartSK_restore_1760276456439
+2025-10-12T14:03:01.1984352Z [Restore Cleanup] Attempting to drop orphaned database: smartSK_restore_1760268740730
+2025-10-12T14:03:01.2061772Z [Restore Cleanup] Attempting to break high-availability link for smartSK_restore_1760268740730 with SET PARTNER OFF...
+2025-10-12T14:03:01.2270214Z [Restore Cleanup] DIAGNOSTIC LOG: SET PARTNER OFF failed for smartSK_restore_1760268740730: RequestError: Keyword or statement option 'PARTNER' is not supported in this version of SQL Server.
+2025-10-12T14:03:01.227112Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-12T14:03:01.2271168Z     at Connection.emit (node:events:519:28)
+2025-10-12T14:03:01.2271191Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T14:03:01.2271215Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T14:03:01.2271265Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T14:03:01.2271288Z     at Readable.emit (node:events:519:28)
+2025-10-12T14:03:01.227131Z     at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T14:03:01.2271333Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T14:03:01.2271363Z     at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T14:03:01.2271385Z     at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T14:03:01.2271444Z   code: 'EREQUEST',
+2025-10-12T14:03:01.227147Z   originalError: Error: Keyword or statement option 'PARTNER' is not supported in this version of SQL Server.
+2025-10-12T14:03:01.2271492Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
+2025-10-12T14:03:01.2271513Z       at Connection.emit (node:events:519:28)
+2025-10-12T14:03:01.2271535Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T14:03:01.2271559Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T14:03:01.2271585Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T14:03:01.2271606Z       at Readable.emit (node:events:519:28)
+2025-10-12T14:03:01.2271628Z       at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T14:03:01.227165Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T14:03:01.2271703Z       at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T14:03:01.2271725Z       at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T14:03:01.2271746Z     info: ErrorMessageToken {
+2025-10-12T14:03:01.2271767Z       name: 'ERROR',
+2025-10-12T14:03:01.2271788Z       handlerName: 'onErrorMessage',
+2025-10-12T14:03:01.2271808Z       number: 40517,
+2025-10-12T14:03:01.2271828Z       state: 1,
+2025-10-12T14:03:01.271114Z       class: 16,
+2025-10-12T14:03:01.2711201Z       message: "Keyword or statement option 'PARTNER' is not supported in this version of SQL Server.",
+2025-10-12T14:03:01.2711232Z       serverName: 'smart-sk',
+2025-10-12T14:03:01.2711255Z       procName: '',
+2025-10-12T14:03:01.2711356Z       lineNumber: 1
+2025-10-12T14:03:01.2711377Z     }
+2025-10-12T14:03:01.2711398Z   },
+2025-10-12T14:03:01.2711419Z   number: 40517,
+2025-10-12T14:03:01.271144Z   lineNumber: 1,
+2025-10-12T14:03:01.271146Z   state: 1,
+2025-10-12T14:03:01.2711479Z   class: 16,
+2025-10-12T14:03:01.2711501Z   serverName: 'smart-sk',
+2025-10-12T14:03:01.2711521Z   procName: '',
+2025-10-12T14:03:01.2711541Z   precedingErrors: []
+2025-10-12T14:03:01.2711561Z }
+2025-10-12T14:03:01.5514114Z [Restore Cleanup] Failed to drop database smartSK_restore_1760268740730. It may require manual deletion. Full error object: RequestError: ALTER DATABASE statement failed.
+2025-10-12T14:03:01.5514634Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-12T14:03:01.5514744Z     at Connection.emit (node:events:519:28)
+2025-10-12T14:03:01.551477Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T14:03:01.5514793Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T14:03:01.5514817Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T14:03:01.5514838Z     at Readable.emit (node:events:519:28)
+2025-10-12T14:03:01.5514861Z     at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T14:03:01.5514884Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T14:03:01.5514907Z     at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T14:03:01.5514959Z     at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T14:03:01.551498Z   code: 'EREQUEST',
+2025-10-12T14:03:01.5515002Z   originalError: Error: ALTER DATABASE statement failed.
+2025-10-12T14:03:01.5515024Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
+2025-10-12T14:03:01.5515046Z       at Connection.emit (node:events:519:28)
+2025-10-12T14:03:01.5515069Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T14:03:01.551529Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T14:03:01.5515325Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T14:03:01.5515348Z       at Readable.emit (node:events:519:28)
+2025-10-12T14:03:01.5515369Z       at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T14:03:01.5515392Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T14:03:01.5515444Z       at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T14:03:01.5515466Z       at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T14:03:01.5515488Z     info: ErrorMessageToken {
+2025-10-12T14:03:01.5515509Z       name: 'ERROR',
+2025-10-12T14:03:01.5515529Z       handlerName: 'onErrorMessage',
+2025-10-12T14:03:01.5515549Z       number: 5069,
+2025-10-12T14:03:01.551557Z       state: 3,
+2025-10-12T14:03:01.551559Z       class: 16,
+2025-10-12T14:03:01.5515611Z       message: 'ALTER DATABASE statement failed.',
+2025-10-12T14:03:01.5515632Z       serverName: 'smart-sk',
+2025-10-12T14:03:01.5515652Z       procName: '',
+2025-10-12T14:03:01.5515671Z       lineNumber: 1
+2025-10-12T14:03:01.5515749Z     }
+2025-10-12T14:03:01.5515769Z   },
+2025-10-12T14:03:01.5515789Z   number: 5069,
+2025-10-12T14:03:01.5515809Z   lineNumber: 1,
+2025-10-12T14:03:01.5515829Z   state: 3,
+2025-10-12T14:03:01.5515848Z   class: 16,
+2025-10-12T14:03:01.5515869Z   serverName: 'smart-sk',
+2025-10-12T14:03:01.5515889Z   procName: '',
+2025-10-12T14:03:01.5515909Z   precedingErrors: [
+2025-10-12T14:03:01.5516Z     RequestError: ODBC error: State: 42000: Error: 1468 Message:'[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The operation cannot be performed on database "smartSK_restore_1760268740730" because it is involved in a database mirroring session or an availability group. Some operations are not allowed on a database that is participating in a database mirroring session or in an availability group.'.
+2025-10-12T14:03:01.5516024Z         at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-12T14:03:01.5516046Z         at Connection.emit (node:events:519:28)
+2025-10-12T14:03:01.5516068Z         at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T14:03:01.5516093Z         at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T14:03:01.5516116Z         at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T14:03:01.5516137Z         at Readable.emit (node:events:519:28)
+2025-10-12T14:03:01.551616Z         at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T14:03:01.5516183Z         at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T14:03:01.5516205Z         at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T14:03:01.5516253Z         at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T14:03:01.5516275Z       code: 'EREQUEST',
+2025-10-12T14:03:01.5516295Z       originalError: [Error],
+2025-10-12T14:03:01.5516315Z       number: 42008,
+2025-10-12T14:03:01.5516335Z       lineNumber: 1,
+2025-10-12T14:03:01.5516354Z       state: 5,
+2025-10-12T14:03:01.5516374Z       class: 16,
+2025-10-12T14:03:01.5516394Z       serverName: 'smart-sk',
+2025-10-12T14:03:01.5516415Z       procName: ''
+2025-10-12T14:03:01.5516434Z     }
+2025-10-12T14:03:01.5516453Z   ]
+2025-10-12T14:03:01.5516472Z }
+2025-10-12T14:03:01.5603942Z [Restore Cleanup] Attempting to drop orphaned database: smartSK_restore_1760269152350
+2025-10-12T14:03:01.5604316Z [Restore Cleanup] Attempting to break high-availability link for smartSK_restore_1760269152350 with SET PARTNER OFF...
+2025-10-12T14:03:01.6175783Z [Restore Cleanup] DIAGNOSTIC LOG: SET PARTNER OFF failed for smartSK_restore_1760269152350: RequestError: Keyword or statement option 'PARTNER' is not supported in this version of SQL Server.
+2025-10-12T14:03:01.6176402Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-12T14:03:01.617644Z     at Connection.emit (node:events:519:28)
+2025-10-12T14:03:01.6176464Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T14:03:01.6176568Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T14:03:01.6176592Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T14:03:01.6176612Z     at Readable.emit (node:events:519:28)
+2025-10-12T14:03:01.6176635Z     at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T14:03:01.6176657Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T14:03:01.6176679Z     at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T14:03:01.6176699Z     at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T14:03:01.617672Z   code: 'EREQUEST',
+2025-10-12T14:03:01.6176743Z   originalError: Error: Keyword or statement option 'PARTNER' is not supported in this version of SQL Server.
+2025-10-12T14:03:01.6176764Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
+2025-10-12T14:03:01.6176784Z       at Connection.emit (node:events:519:28)
+2025-10-12T14:03:01.6176836Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-12T14:03:01.617686Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-12T14:03:01.6176884Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-12T14:03:01.6176904Z       at Readable.emit (node:events:519:28)
+2025-10-12T14:03:01.6176925Z       at addChunk (node:internal/streams/readable:561:12)
+2025-10-12T14:03:01.6176946Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-12T14:03:01.6176967Z       at Readable.push (node:internal/streams/readable:393:5)
+2025-10-12T14:03:01.6176988Z       at nextAsync (node:internal/streams/from:194:22) {
+2025-10-12T14:03:01.6177009Z     info: ErrorMessageToken {
+2025-10-12T14:03:01.6177029Z       name: 'ERROR',
+2025-10-12T14:03:01.6177078Z       handlerName: 'onErrorMessage',
+2025-10-12T14:03:01.6177098Z       number: 40517,
+2025-10-12T14:03:01.6177118Z       state: 1,
+2025-10-12T14:03:01.6177136Z       class: 16,
+2025-10-12T14:03:01.6177159Z       message: "Keyword or statement option 'PARTNER' is not supported in this version of SQL Server.",
+2025-10-12T14:03:01.6177178Z       serverName: 'smart-sk',
+2025-10-12T14:03:01.6177198Z       procName: '',
+2025-10-12T14:03:01.6177217Z       lineNumber: 1
+2025-10-12T14:03:01.6177236Z     }
+2025-10-12T14:03:01.6177255Z   },
+2025-10-12T14:03:01.6177274Z   number: 40517,
+2025-10-12T14:03:01.6177292Z   lineNumber: 1,
 
 --Deployment Container Logs
 

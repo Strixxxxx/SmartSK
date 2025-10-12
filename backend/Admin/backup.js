@@ -281,24 +281,15 @@ async function cleanupOrphanedRestoreDatabases() {
         for (const row of result.recordset) {
             const orphanDbName = row.name;
             try {
-                console.log(`[Restore Cleanup] Attempting to drop orphaned database: ${orphanDbName}`);
-
-                // **DIAGNOSTIC ATTEMPT**: Break the database's high-availability link before dropping.
-                try {
-                    console.log(`[Restore Cleanup] Attempting to break high-availability link for ${orphanDbName} with SET PARTNER OFF...`);
-                    await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET PARTNER OFF;`);
-                    console.log(`[Restore Cleanup] Successfully issued command to break HA link for ${orphanDbName}.`);
-                } catch (haError) {
-                    // Log the error but continue. This is expected if the DB is not in a mirroring/HA session.
-                    console.error(`[Restore Cleanup] DIAGNOSTIC LOG: SET PARTNER OFF failed for ${orphanDbName}:`, haError);
-                }
-
-                // Forcibly close connections and drop the database
+                console.log(`[Restore Cleanup] Attempting to force drop orphaned database: ${orphanDbName}`);
+                await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET EMERGENCY;`);
+                console.log(`[Restore Cleanup] Set ${orphanDbName} to EMERGENCY mode.`);
                 await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
+                console.log(`[Restore Cleanup] Set ${orphanDbName} to SINGLE_USER mode.`);
                 await connection.request().query(`DROP DATABASE [${orphanDbName}];`);
                 console.log(`[Restore Cleanup] Successfully dropped orphaned database: ${orphanDbName}`);
             } catch (dropError) {
-                console.error(`[Restore Cleanup] Failed to drop database ${orphanDbName}. It may require manual deletion. Full error object:`, dropError);
+                console.error(`[Restore Cleanup] Failed to force drop database ${orphanDbName}. It may require manual deletion. Full error object:`, dropError);
             }
         }
     } catch (error) {
@@ -429,21 +420,13 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
                 sql = require('mssql');
                 await sql.connect(masterDbConfig);
 
-                // **DIAGNOSTIC ATTEMPT**: Break the database's high-availability link before swapping.
-                try {
-                    console.log(`[Restore] Attempting to break high-availability link for database ${dbName} with SET PARTNER OFF...`);
-                    await sql.query(`ALTER DATABASE [${dbName}] SET PARTNER OFF;`);
-                    console.log(`[Restore] Successfully issued command to break HA link for ${dbName}.`);
-                } catch (haError) {
-                    // Log the error but continue. This is expected if the DB is not in a mirroring/HA session.
-                    console.error(`[Restore] DIAGNOSTIC LOG: SET PARTNER OFF failed for ${dbName}:`, haError);
-                }
-
-                console.log(`[Restore] Setting original database '${dbName}' to single-user mode.`);
+                console.log(`[Restore] Attempting to force drop original database '${dbName}'...`);
+                await sql.query(`ALTER DATABASE [${dbName}] SET EMERGENCY;`);
+                console.log(`[Restore] Set ${dbName} to EMERGENCY mode.`);
                 await sql.query(`ALTER DATABASE [${dbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
-
-                console.log(`[Restore] Dropping original database: ${dbName}`);
+                console.log(`[Restore] Set ${dbName} to SINGLE_USER mode.`);
                 await sql.query(`DROP DATABASE [${dbName}];`);
+                console.log(`[Restore] Successfully dropped original database: ${dbName}`);
 
                 console.log(`[Restore] Renaming temporary database '${tempDbName}' to '${dbName}'`);
                 await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${dbName}];`);
