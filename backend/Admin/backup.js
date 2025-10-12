@@ -287,7 +287,7 @@ async function cleanupOrphanedRestoreDatabases() {
                 await connection.request().query(`DROP DATABASE [${orphanDbName}];`);
                 console.log(`[Restore Cleanup] Successfully dropped orphaned database: ${orphanDbName}`);
             } catch (dropError) {
-                console.error(`[Restore Cleanup] Failed to drop database ${orphanDbName}. It may require manual deletion. Error: ${dropError.message}`);
+                console.error(`[Restore Cleanup] Failed to drop database ${orphanDbName}. It may require manual deletion. Full error object:`, dropError);
             }
         }
     } catch (error) {
