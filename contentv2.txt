@@ -1,75 +1,249 @@
-rui [ ~ ]$ az sql db show --resource-group "Smart_SK" --server "smart-sk" --name "smartSK"
-{
-  "autoPauseDelay": null,
-  "availabilityZone": "NoPreference",
-  "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
-  "collation": "SQL_Latin1_General_CP1_CI_AS",
-  "createMode": null,
-  "creationDate": "2025-10-11T03:12:50.030000+00:00",
-  "currentBackupStorageRedundancy": "Geo",
-  "currentServiceObjectiveName": "GP_Gen5_2",
-  "currentSku": {
-    "capacity": 2,
-    "family": "Gen5",
-    "name": "GP_Gen5",
-    "size": null,
-    "tier": "GeneralPurpose"
-  },
-  "databaseId": "415b799c-17ea-4aa2-8c66-ad65879270c0",
-  "defaultSecondaryLocation": "eastasia",
-  "earliestRestoreDate": "2025-10-11T03:16:06+00:00",
-  "edition": "GeneralPurpose",
-  "elasticPoolId": null,
-  "elasticPoolName": null,
-  "encryptionProtector": null,
-  "encryptionProtectorAutoRotation": null,
-  "failoverGroupId": null,
-  "federatedClientId": null,
-  "freeLimitExhaustionBehavior": null,
-  "highAvailabilityReplicaCount": null,
-  "id": "/subscriptions/0b42eb46-0f69-4263-86b9-a408ca348b28/resourceGroups/Smart_SK/providers/Microsoft.Sql/servers/smart-sk/databases/smartSK",
-  "identity": null,
-  "isInfraEncryptionEnabled": false,
-  "keys": null,
-  "kind": "v12.0,user,vcore",
-  "ledgerOn": false,
-  "licenseType": "LicenseIncluded",
-  "location": "southeastasia",
-  "longTermRetentionBackupResourceId": null,
-  "maintenanceConfigurationId": "/subscriptions/0b42eb46-0f69-4263-86b9-a408ca348b28/providers/Microsoft.Maintenance/publicMaintenanceConfigurations/SQL_Default",
-  "managedBy": null,
-  "manualCutover": null,
-  "maxLogSizeBytes": 193273528320,
-  "maxSizeBytes": 34359738368,
-  "minCapacity": null,
-  "name": "smartSK",
-  "pausedDate": null,
-  "performCutover": null,
-  "preferredEnclaveType": null,
-  "readScale": "Disabled",
-  "recoverableDatabaseId": null,
-  "recoveryServicesRecoveryPointId": null,
-  "requestedBackupStorageRedundancy": "Geo",
-  "requestedServiceObjectiveName": "GP_Gen5_2",
-  "resourceGroup": "Smart_SK",
-  "restorableDroppedDatabaseId": null,
-  "restorePointInTime": null,
-  "resumedDate": null,
-  "sampleName": null,
-  "secondaryType": null,
-  "sku": {
-    "capacity": 2,
-    "family": "Gen5",
-    "name": "GP_Gen5",
-    "size": null,
-    "tier": "GeneralPurpose"
-  },
-  "sourceDatabaseDeletionDate": null,
-  "sourceDatabaseId": null,
-  "sourceResourceId": null,
-  "status": "Online",
-  "tags": null,
-  "type": "Microsoft.Sql/servers/databases",
-  "useFreeLimit": null,
-  "zoneRedundant": false
-}
+just gonna show you the screenshot okay, so first of all, here is the current database that we thought it would work but still not because it still uses the .bacpac file from the old database(the one with a ghost metadata). Now what im gonna do is to export the database, name it into something TRUE_BACKUP.bacpac or something then goes to the sql server to import the database and name it into Smart-SK so that it would be a clean, non-corrupted bacpac file. Did i understood it right?
+
+YES, you understood it perfectly! 🎯
+
+Let me confirm your plan step-by-step:
+
+Your Plan (100% Correct ✅):
+Current State:
+Smart_SK database = [Your Data] + [Ghost Metadata from old .bacpac] 🐛
+                    ↓
+Still has the glitch because it was restored from corrupted backup
+
+Your Solution:
+1. Export Smart_SK → TRUE_BACKUP.bacpac
+   Azure Portal strips ghost metadata during export ✨
+   
+2. Delete Smart_SK database (the one with glitch)
+
+3. Import TRUE_BACKUP.bacpac → Create new "Smart_SK" 
+   (Note: Name it "Smart_SK" to match your DB_DATABASE env var)
+   
+4. Result: Clean database forever! ✅
+Exact Steps to Follow:
+Step 1: Export Current Database
+Looking at your screenshot:
+
+Click "Export" button (top toolbar)
+Choose storage account or download locally
+Name it: TRUE_BACKUP.bacpac or SmartSK_CLEAN_2025.bacpac
+Wait for export to complete (may take 5-15 minutes depending on size)
+Step 2: Import to Create Clean Database
+Option A: Via Azure Portal (Easier)
+
+Go to SQL Server: smart-sk
+Click "Import database"
+Select TRUE_BACKUP.bacpac
+Database name: Smart_SK (not Smart-SK with hyphen)
+Pricing tier: Basic, 2GB (as you wanted)
+Click Import
+Option B: Via sqlpackage (Your current method)
+
+bash
+sqlpackage /a:Import \
+  /tsn:smart-sk.database.windows.net \
+  /tdn:Smart_SK \
+  /sf:"TRUE_BACKUP.bacpac" \
+  /tu:your_username \
+  /tp:your_password \
+  /p:DatabaseEdition=Basic \
+  /p:DatabaseMaximumSize=2
+Step 3: Verify It's Clean (Optional but Recommended)
+Before deleting the old one, test that the new database is clean:
+
+sql
+-- Connect to master database
+USE master;
+
+-- Try to drop a test database (this should work if clean)
+ALTER DATABASE [Smart_SK] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+-- If this succeeds without the "availability group" error, it's clean! ✅
+
+-- Set it back to multi-user
+ALTER DATABASE [Smart_SK] SET MULTI_USER;
+Step 4: Update Environment Variable & Delete Old
+Azure Portal → App Service → Configuration
+Change DB_DATABASE to Smart_SK (if not already)
+Save and restart app
+Test that app works with new clean database
+Delete the old corrupted database
+Important Naming Clarification:
+Looking at your screenshot, I see the database is named Smart_SK (with underscore), not Smart-SK (with hyphen).
+
+When importing the clean backup, use the EXACT name your app expects:
+
+If DB_DATABASE=Smart_SK → Name it Smart_SK
+If DB_DATABASE=SmartSK → Name it SmartSK
+After This One-Time Cleanup:
+Your restore logic will work perfectly forever:
+
+javascript
+// This will work every time:
+1. Create temp database from backup ✅ (clean backup)
+2. DROP old database ✅ (no more ghost metadata error!)
+3. Rename temp to main ✅
+4. Connect to new database ✅
+
+// All future backups will be clean automatically
+One Small Correction to Your Plan:
+You said: "goes to the sql server to import the database and name it into Smart-SK"
+
+Based on your screenshot showing Smart_SK, I think you meant:
+
+Import and name it: Smart_SK (with underscore, matching existing name)
+Visual Summary:
+BEFORE (Current - Still Corrupted):
+├── Smart_SK database 🐛
+│   └── Data from old corrupted .bacpac
+│   └── Ghost metadata still present
+└── Problem: DROP DATABASE fails
+
+AFTER (Clean - Problem Solved):
+├── Export Smart_SK → TRUE_BACKUP.bacpac ✨
+│   └── Azure strips ghost metadata during export
+├── Import TRUE_BACKUP.bacpac → Smart_SK (new clean database) ✅
+│   └── Same data, no ghost metadata
+└── Result: DROP DATABASE works forever! 🎉
+You got it exactly right! Go ahead with your plan. The export process is the "magic step" that removes the ghost metadata while preserving all your data.
+
+Want me to create a detailed checklist you can follow during the process?
+
+
+so wait are you saying that i could import with the same database even though it contains the ghost metadata? Would it permament remove that?
+
+WAIT - Good catch! Let me clarify this crucial point:
+
+NO, you CANNOT import while the old corrupted database still exists with the same name! ❌
+Let me correct the process:
+
+The Correct Sequence:
+Current State:
+Smart_SK (corrupted) exists on server
+    ↓
+    ❌ CANNOT import TRUE_BACKUP.bacpac as "Smart_SK" 
+    (Name conflict - database already exists!)
+Two Safe Options:
+Option 1: Import with Temporary Name First (SAFEST)
+bash
+Step 1: Export current Smart_SK
+   → Creates TRUE_BACKUP.bacpac ✨ (ghost metadata stripped during export)
+
+Step 2: Import with DIFFERENT name
+   → Import TRUE_BACKUP.bacpac as "Smart_SK_CLEAN"
+   → Now you have TWO databases:
+      - Smart_SK (old, corrupted) 🐛
+      - Smart_SK_CLEAN (new, clean) ✅
+
+Step 3: Test the clean database
+   → Try to DROP Smart_SK_CLEAN temporarily
+   → If it works without error, it's truly clean! ✅
+   → Restore it again from TRUE_BACKUP.bacpac
+
+Step 4: Delete the old corrupted database
+   → Go to Azure Portal
+   → Manually delete "Smart_SK" (the corrupted one)
+
+Step 5: Rename the clean database
+   → Rename "Smart_SK_CLEAN" to "Smart_SK"
+   → Or update DB_DATABASE env var to "Smart_SK_CLEAN"
+Option 2: Delete First, Then Import (RISKIER)
+bash
+Step 1: Export current Smart_SK
+   → Creates TRUE_BACKUP.bacpac ✨
+
+Step 2: Download/verify the backup exists
+   → Make sure TRUE_BACKUP.bacpac is accessible
+   → Maybe even download a local copy as safety
+
+Step 3: Delete the old Smart_SK database
+   → Azure Portal → Delete Smart_SK (corrupted one)
+   → Now the name is available
+
+Step 4: Import with original name
+   → Import TRUE_BACKUP.bacpac as "Smart_SK"
+   → Clean database with original name ✅
+Why Export Removes Ghost Metadata:
+This is the KEY concept:
+
+Azure Portal "Export" Process:
+┌─────────────────────────────────┐
+│ Smart_SK (in Azure)             │
+│ ├── Table data                  │
+│ ├── Schema                      │
+│ ├── Indexes                     │
+│ └── Ghost metadata 🐛           │ ← Hidden in system tables
+└─────────────────────────────────┘
+           ↓
+    Azure Export Tool
+    (Extracts logical data only)
+           ↓
+┌─────────────────────────────────┐
+│ TRUE_BACKUP.bacpac              │
+│ ├── Table data        ✅        │
+│ ├── Schema            ✅        │
+│ ├── Indexes           ✅        │
+│ └── Ghost metadata    ❌ GONE   │ ← Not included in .bacpac!
+└─────────────────────────────────┘
+           ↓
+    Import to new database
+           ↓
+┌─────────────────────────────────┐
+│ Smart_SK_CLEAN (new)            │
+│ ├── Table data        ✅        │
+│ ├── Schema            ✅        │
+│ ├── Indexes           ✅        │
+│ └── No ghost metadata ✅        │ ← Clean database!
+└─────────────────────────────────┘
+The Answer to Your Question:
+"Are you saying I could import with the same database even though it contains the ghost metadata? Would it permanently remove that?"
+
+Answer:
+
+You cannot import with the same name while the old one exists - Azure won't allow duplicate database names
+The export process removes the ghost metadata - The TRUE_BACKUP.bacpac will be clean
+When you import the clean backup, it creates a clean database - Permanently fixed ✅
+My Recommended Process (Safest):
+bash
+# 1. Export (you keep current database running)
+Azure Portal → Smart_SK → Export → TRUE_BACKUP.bacpac
+
+# 2. Import with temporary name (test that it's clean)
+Import TRUE_BACKUP.bacpac → "Smart_SK_Test"
+
+# 3. Verify it's clean (try to drop it)
+ALTER DATABASE [Smart_SK_Test] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+DROP DATABASE [Smart_SK_Test];
+# ✅ If this works, TRUE_BACKUP.bacpac is confirmed clean!
+
+# 4. Import again with final name
+Import TRUE_BACKUP.bacpac → "Smart_SK_Final"
+
+# 5. Update your app
+DB_DATABASE = "Smart_SK_Final"
+# Or keep as "Smart_SK" after deleting the old corrupted one
+
+# 6. Delete old corrupted database
+Azure Portal → Delete "Smart_SK" (old one)
+
+# 7. (Optional) Rename Smart_SK_Final to Smart_SK
+If you want to keep the original name
+Visual Timeline:
+BEFORE:
+[Smart_SK 🐛] ← Only this exists (corrupted)
+
+DURING CLEANUP:
+[Smart_SK 🐛] ← Still exists (corrupted)
+[Smart_SK_CLEAN ✅] ← New clean one imported with different name
+
+AFTER TESTING:
+[Smart_SK 🐛] ← Delete this manually
+[Smart_SK_CLEAN ✅] ← Keep this, maybe rename to Smart_SK
+
+FINAL STATE:
+[Smart_SK ✅] ← Only this exists (clean forever!)
+Important: The Export is the "Cleaning" Step
+The ghost metadata removal happens during the Export, not during import:
+
+✅ Export = Strips ghost metadata, creates clean .bacpac
+✅ Import = Restores clean data to new database
+❌ Just restoring your old .bacpac = Keeps the ghost metadata

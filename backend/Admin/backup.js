@@ -375,7 +375,7 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
         }
 
         console.log(`[Restore] Starting database import to temporary database '${tempDbName}'...`);
-        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${tempDbName} /sf:"${bacpacFilePath}" /tu:${process.env.DB_USER} /tp:${process.env.DB_PASSWORD}`;
+        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${tempDbName} /sf:"${bacpacFilePath}" /tu:${process.env.DB_USER} /tp:${process.env.DB_PASSWORD} /p:DatabaseEdition=Basic /p:DatabaseMaximumSize=2`;
 
         const { exec: execCallback } = require('child_process');
         execCallback(command, async (error, stdout, stderr) => {
@@ -420,11 +420,34 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
                 sql = require('mssql');
                 await sql.connect(masterDbConfig);
                 
-                // Simply rename the temp database to the target name (from env variable)
                 const targetDbName = dbName; // This comes from env variable
+
+                // --- Start: Drop the old database ---
+                console.log(`[Restore] Attempting to drop old database: '${targetDbName}'`);
+                try {
+                    // Forcibly close any existing connections to the target database
+                    await sql.query(`ALTER DATABASE [${targetDbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
+                    console.log(`[Restore] Set old database '${targetDbName}' to single-user mode.`);
+                    
+                    // Drop the database
+                    await sql.query(`DROP DATABASE [${targetDbName}];`);
+                    console.log(`[Restore] Successfully dropped old database: '${targetDbName}'`);
+                } catch (dropError) {
+                    // It's possible the database doesn't exist on a fresh setup, which is not a critical failure.
+                    if (dropError.message.includes("does not exist")) {
+                        console.log(`[Restore] Old database '${targetDbName}' did not exist. Proceeding with rename.`);
+                    } else {
+                        // If another error occurred, throw it to be caught by the main catch block.
+                        throw dropError;
+                    }
+                }
+                // --- End: Drop the old database ---
+
+                // --- Start: Rename the new database ---
                 console.log(`[Restore] Renaming temporary database '${tempDbName}' to '${targetDbName}'`);
                 await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${targetDbName}];`);
                 console.log(`[Restore] Successfully renamed database to '${targetDbName}'`);
+                // --- End: Rename the new database ---
                 
                 console.log('[Restore] Database restore completed successfully.');
                 
