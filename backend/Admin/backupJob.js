@@ -10,18 +10,29 @@ const createJob = async (details = {}) => {
     const jobId = uuidv4();
     const pool = await getConnection();
     
-    await pool.request()
+    const request = pool.request()
         .input('JobID', sql.NVarChar(50), jobId)
         .input('BackupType', sql.NVarChar(20), details.backupType || 'cloud-only')
         .input('Status', sql.NVarChar(20), 'pending')
         .input('Message', sql.NVarChar(500), 'Backup job has been queued.')
         .input('CreatedBy', sql.NVarChar(100), details.initiatedBy || 'System')
         .input('UserID', sql.Int, details.userId || null)
-        .input('ExpiresAt', sql.DateTime2, new Date(Date.now() + 24 * 60 * 60 * 1000)) // Expires in 24 hours
-        .query(`
-            INSERT INTO BackupJobs (JobID, BackupType, Status, Message, CreatedBy, UserID, ExpiresAt, CreatedAt, UpdatedAt)
-            VALUES (@JobID, @BackupType, @Status, @Message, @CreatedBy, @UserID, @ExpiresAt, GETDATE(), GETDATE())
-        `);
+        .input('ExpiresAt', sql.DateTime2, new Date(Date.now() + 24 * 60 * 60 * 1000)); // Expires in 24 hours
+
+    let columns = 'JobID, BackupType, Status, Message, CreatedBy, UserID, ExpiresAt, CreatedAt, UpdatedAt';
+    let values = '@JobID, @BackupType, @Status, @Message, @CreatedBy, @UserID, @ExpiresAt, GETDATE(), GETDATE()';
+
+    // Handle fileName if provided for restore jobs
+    if (details.fileName) {
+        request.input('FileName', sql.NVarChar(255), details.fileName);
+        columns += ', FileName';
+        values += ', @FileName';
+    }
+
+    await request.query(`
+        INSERT INTO BackupJobs (${columns})
+        VALUES (${values})
+    `);
     
     console.log(`[Job ${jobId}] Created in database: ${JSON.stringify(details)}`);
     return jobId;

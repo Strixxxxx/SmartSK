@@ -393,7 +393,7 @@ async function executeRestore(jobId, localFile) {
 
     const cleanup = () => {
         tempFiles.forEach(f => { if (fs.existsSync(f)) fs.unlinkSync(f); });
-        tempDirs.forEach(d => { if (fs.existsSync(d)) fs.rmdirSync(d, { recursive: true }); });
+        tempDirs.forEach(d => { if (fs.existsSync(d)) fs.rmSync(d, { recursive: true }); });
     };
 
     try {
@@ -485,32 +485,69 @@ async function executeRestore(jobId, localFile) {
             const targetDbName = dbName;
 
             // Drop the old database using the retry helper
-            await updateJob(jobId, 'processing', `Dropping old database: ${targetDbName}...`);
+            console.log(`[Job ${jobId}] Dropping old database: ${targetDbName}...`);
             await dropDatabaseWithRetries(sql, targetDbName);
 
             // Rename the new database
-            await updateJob(jobId, 'processing', `Activating new database...`);
+            console.log(`[Job ${jobId}] Activating new database...`);
             console.log(`[Job ${jobId}] Renaming temporary database '${tempDbName}' to '${targetDbName}'`);
             await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${targetDbName}];`);
             console.log(`[Job ${jobId}] Successfully renamed database to '${targetDbName}'`);
             
             const duration = Math.round((Date.now() - startTime) / 1000);
-            await updateJob(jobId, 'completed', 'Database restore completed successfully.', { Duration: duration });
 
-            addAuditTrail({
-                actor: 'A', module: 'B', userID: UserID,
-                actions: 'restore-database', newValue: FileName,
-                descriptions: `Admin ${CreatedBy} restored the database from ${FileName} (${restoreType}).`
-            });
+            // --- Post-Swap Update using a temporary connection ---
+            let tempPool;
+            try {
+                console.log(`[Job ${jobId}] Creating temporary connection to update final status...`);
+                const restoredDbConfig = {
+                    server: process.env.DB_SERVER,
+                    user: process.env.DB_USER,
+                    password: process.env.DB_PASSWORD,
+                    database: targetDbName, // Connect to the NEWLY restored database
+                    options: {
+                        encrypt: process.env.DB_ENCRYPT !== 'false',
+                        trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'
+                    }
+                };
+                tempPool = await new sql.ConnectionPool(restoredDbConfig).connect();
+                
+                // Manually update job status to 'completed'
+                await tempPool.request()
+                    .input('JobID', sql.NVarChar(50), jobId)
+                    .input('Status', sql.NVarChar(20), 'completed')
+                    .input('Message', sql.NVarChar(500), 'Database restore completed successfully.')
+                    .input('Duration', sql.Int, duration)
+                    .input('CompletedAt', sql.DateTime2, new Date())
+                    .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, CompletedAt = @CompletedAt WHERE JobID = @JobID');
+                console.log(`[Job ${jobId}] Final status updated to 'completed'.`);
+
+                // Manually add audit trail
+                await tempPool.request()
+                    .input('actor', sql.VarChar(1), 'A')
+                    .input('module', sql.VarChar(1), 'B')
+                    .input('userID', sql.Int, UserID)
+                    .input('actions', sql.VarChar(50), 'restore-database')
+                    .input('oldValue', sql.NVarChar(sql.MAX), null)
+                    .input('newValue', sql.NVarChar(sql.MAX), FileName)
+                    .input('descriptions', sql.NVarChar(sql.MAX), `Admin ${CreatedBy} restored the database from ${FileName} (${restoreType}).`)
+                    .query("INSERT INTO [audit trail] (actor, module, userID, actions, oldValue, newValue, descriptions, timestamp) VALUES (@actor, @module, @userID, @actions, @oldValue, @newValue, @descriptions, GETDATE())");
+                console.log(`[Job ${jobId}] Audit trail for restore created.`);
+
+            } catch (finalUpdateError) {
+                console.error(`[Job ${jobId}] CRITICAL: Restore was successful, but failed to update final status/audit trail. Error:`, finalUpdateError);
+            } finally {
+                if (tempPool) await tempPool.close();
+            }
+            // --- End of Post-Swap Update ---
 
             // IMPORTANT: The app needs to be restarted manually or by a process manager (like PM2 or Azure App Service)
             // to reconnect to the new database. We no longer call process.exit().
             console.log(`[Job ${jobId}] Restore complete. Application requires a restart to use the new database.`);
 
         } catch (swapError) {
-            const duration = Math.round((Date.now() - startTime) / 1000);
-            await updateJob(jobId, 'failed', `CRITICAL: Restore failed during database swap.`, { ErrorMessage: swapError.stack, Duration: duration });
-            console.error(`[Job ${jobId}] CRITICAL: Failed during database swap:`, swapError);
+            console.error(`[Job ${jobId}] CRITICAL: The restore process failed during the final database swap. Manual intervention may be required.`, swapError);
+            console.error(`[Job ${jobId}] The job status could not be updated to 'failed' due to the indeterminate database state. The status will remain \'processing\' in the database.`);
         } finally {
             if (sql && sql.connected) await sql.close();
             cleanup();

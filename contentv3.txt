@@ -1,4 +1,0 @@
-Successfully dropped old constraint: CK__BackupJob__Backu__2180FB33
-Successfully added new constraint CK_BackupJobs_BackupType.
-
-Completion time: 2025-10-13T16:37:00.5828474+08:00

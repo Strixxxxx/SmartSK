@@ -8,9 +8,21 @@ on:
 permissions:
   id-token: write
   contents: read
+  actions: write
 
 jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old workflow runs
+        uses: actions/delete-workflow-runs@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ${{ github.repository }}
+          keep_minimum_runs: 50
+
   build-and-deploy:
+    needs: cleanup
     runs-on: ubuntu-latest
 
     steps:
