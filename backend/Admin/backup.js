@@ -375,7 +375,7 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
         }
 
         console.log(`[Restore] Starting database import to temporary database '${tempDbName}'...`);
-        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${tempDbName} /sf:"${bacpacFilePath}" /tu:${process.env.DB_USER} /tp:${process.env.DB_PASSWORD} /p:DatabaseEdition=Basic /p:DatabaseMaximumSize=2`;
+        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${tempDbName} /sf:"${bacpacFilePath}" /tu:${process.env.DB_USER} /tp:${process.env.DB_PASSWORD} /p:DatabaseEdition=Basic /p:DatabaseMaximumSize=2 /p:DatabaseBackupStorageRedundancy=Local`;
 
         const { exec: execCallback } = require('child_process');
         execCallback(command, async (error, stdout, stderr) => {

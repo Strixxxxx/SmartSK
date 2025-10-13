@@ -1,7 +1,3 @@
---Database Creation Query
-
-create database smartSK
-
 --Run the Query once the database was created
 
 --Barangays Table
@@ -37,9 +33,9 @@ CREATE TABLE userInfo (
     emailAddress NVARCHAR(50) NOT NULL,
     phoneNumber NVARCHAR(11) NOT NULL,
     isDefaultPassword BIT DEFAULT 1,
-    isArchived BIT NOT NULL DEFAULT 0;
-    CONSTRAINT FK_Role FOREIGN KEY (position) REFERENCES roles(roleID),
-    CONSTRAINT FK_Barangay FOREIGN KEY (barangay) REFERENCES barangays(barangayID)
+    isArchived BIT NOT NULL DEFAULT 0,
+    CONSTRAINT FK_User_Role FOREIGN KEY (position) REFERENCES roles(roleID),
+    CONSTRAINT FK_User_Barangay FOREIGN KEY (barangay) REFERENCES barangays(barangayID)
 );
 
 CREATE INDEX IX_userInfo_isArchived ON userInfo(isArchived);
@@ -362,6 +358,7 @@ BEGIN
         @committeeFilter = @committeeFilter,
         @categoryFilter = @categoryFilter;
 END;
+GO
 
 --Project Archiving
 
