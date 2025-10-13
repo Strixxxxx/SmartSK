@@ -30,10 +30,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     let reconnectInterval: number;
 
     const connect = () => {
-      // Dynamically determine WebSocket protocol and host
-      const protocol = window.location.protocol === 'https' ? 'wss' : 'ws';
-      const host = process.env.NODE_ENV === 'production' ? window.location.host : 'localhost:8080';
-      const wsUrl = `${protocol}://${host}`;
+      // Derive WebSocket URL from the VITE_BACKEND_SERVER environment variable
+      const backendHttpUrl = import.meta.env.VITE_BACKEND_SERVER;
+      if (!backendHttpUrl) {
+        console.error("[WebSocket] Error: VITE_BACKEND_SERVER environment variable not set. WebSocket will not connect.");
+        return; // Do not attempt to connect if the URL is not configured
+      }
+      const wsUrl = backendHttpUrl.replace(/^http/, 'ws');
 
       console.log('[WebSocket] Connecting to', wsUrl);
       ws = new WebSocket(wsUrl);

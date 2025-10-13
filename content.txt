@@ -1,47 +1,7 @@
-##[debug]Evaluating: secrets.GITHUB_TOKEN
-##[debug]Evaluating Index:
-##[debug]..Evaluating secrets:
-##[debug]..=> Object
-##[debug]..Evaluating String:
-##[debug]..=> 'GITHUB_TOKEN'
-##[debug]=> '***'
-##[debug]Result: '***'
-##[debug]Evaluating condition for step: 'Delete old workflow runs'
-##[debug]Evaluating: success()
-##[debug]Evaluating success:
-##[debug]=> true
-##[debug]Result: true
-##[debug]Starting: Delete old workflow runs
-##[debug]Loading inputs
-##[debug]Evaluating: format('gh api repos/{0}/actions/runs --paginate -q ''.workflow_runs[] | .id'' | \
-##[debug]xargs -I {{}} gh api repos/{1}/actions/runs/{{}} -X DELETE --silent || echo "No runs to delete"
-##[debug]', github.repository, github.repository)
-##[debug]Evaluating format:
-##[debug]..Evaluating String:
-##[debug]..=> 'gh api repos/{0}/actions/runs --paginate -q ''.workflow_runs[] | .id'' | \
-##[debug]xargs -I {{}} gh api repos/{1}/actions/runs/{{}} -X DELETE --silent || echo "No runs to delete"
-##[debug]'
-##[debug]..Evaluating Index:
-##[debug]....Evaluating github:
-##[debug]....=> Object
-##[debug]....Evaluating String:
-##[debug]....=> 'repository'
-##[debug]..=> 'Bratnya/SmartSK'
-##[debug]..Evaluating Index:
-##[debug]....Evaluating github:
-##[debug]....=> Object
-##[debug]....Evaluating String:
-##[debug]....=> 'repository'
-##[debug]..=> 'Bratnya/SmartSK'
-##[debug]=> 'gh api repos/Bratnya/SmartSK/actions/runs --paginate -q ''.workflow_runs[] | .id'' | \
-##[debug]xargs -I {} gh api repos/Bratnya/SmartSK/actions/runs/{} -X DELETE --silent || echo "No runs to delete"
-##[debug]'
-##[debug]Result: 'gh api repos/Bratnya/SmartSK/actions/runs --paginate -q ''.workflow_runs[] | .id'' | \
-##[debug]xargs -I {} gh api repos/Bratnya/SmartSK/actions/runs/{} -X DELETE --silent || echo "No runs to delete"
-##[debug]'
-##[debug]Loading env
-Run gh api repos/Bratnya/SmartSK/actions/runs --paginate -q '.workflow_runs[] | .id' | \
-##[debug]/usr/bin/bash -e /home/runner/work/_temp/9b54030b-a5b0-4c64-8826-2224f659923b.sh
-gh: Could not delete the workflow run (HTTP 403)
-No runs to delete
-##[debug]Finishing: Delete old workflow runs
+src/context/WebSocketContext.tsx:35:20 - error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+
+35       const host = process.env.NODE_ENV === 'production' ? window.location.host : 'localhost:8080';
+                      ~~~~~~~
+
+
+Found 1 error.
