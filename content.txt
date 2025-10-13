@@ -1,41 +1,47 @@
-##[debug]Starting: Set up job
-Current runner version: '2.328.0'
-Runner Image Provisioner
-  Hosted Compute Agent
-  Version: 20250912.392
-  Commit: d921fda672a98b64f4f82364647e2f10b2267d0b
-  Build Date: 2025-09-12T15:23:14Z
-Operating System
-  Ubuntu
-  24.04.3
-  LTS
-Runner Image
-  Image: ubuntu-24.04
-  Version: 20250929.60.1
-  Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250929.60/images/ubuntu/Ubuntu2404-Readme.md
-  Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250929.60
-GITHUB_TOKEN Permissions
-  Actions: write
-  Contents: read
-  Metadata: read
-Secret source: Actions
-##[debug]Primary repository: Bratnya/SmartSK
-Prepare workflow directory
-##[debug]Creating pipeline directory: '/home/runner/work/SmartSK'
-##[debug]Creating workspace directory: '/home/runner/work/SmartSK/SmartSK'
-##[debug]Update context data
-##[debug]Evaluating job-level environment variables
-##[debug]Evaluating job container
-##[debug]Evaluating job service containers
-##[debug]Evaluating job defaults
-Prepare all required actions
-Getting action download info
-Error: Unable to resolve action actions/delete-workflow-runs, repository not found
-##[debug]GitHub.DistributedTask.WebApi.UnresolvableActionDownloadInfoException: Unable to resolve action actions/delete-workflow-runs, repository not found
-##[debug]   at GitHub.Services.Launch.Client.LaunchHttpClient.GetResolveActionsDownloadInfoAsyncV2(Guid planId, Guid jobId, ActionReferenceList actionReferenceList, CancellationToken cancellationToken)
-##[debug]   at GitHub.Runner.Worker.ActionManager.GetDownloadInfoAsync(IExecutionContext executionContext, List`1 actions)
-##[debug]   at GitHub.Runner.Worker.ActionManager.GetDownloadInfoAsync(IExecutionContext executionContext, List`1 actions)
-##[debug]   at GitHub.Runner.Worker.ActionManager.PrepareActionsRecursiveAsync(IExecutionContext executionContext, PrepareActionsState state, IEnumerable`1 actions, Int32 depth, Guid parentStepId)
-##[debug]   at GitHub.Runner.Worker.ActionManager.PrepareActionsAsync(IExecutionContext executionContext, IEnumerable`1 steps, Guid rootStepId)
-##[debug]   at GitHub.Runner.Worker.JobExtension.InitializeJob(IExecutionContext jobContext, AgentJobRequestMessage message)
-##[debug]Finishing: Set up job
+##[debug]Evaluating: secrets.GITHUB_TOKEN
+##[debug]Evaluating Index:
+##[debug]..Evaluating secrets:
+##[debug]..=> Object
+##[debug]..Evaluating String:
+##[debug]..=> 'GITHUB_TOKEN'
+##[debug]=> '***'
+##[debug]Result: '***'
+##[debug]Evaluating condition for step: 'Delete old workflow runs'
+##[debug]Evaluating: success()
+##[debug]Evaluating success:
+##[debug]=> true
+##[debug]Result: true
+##[debug]Starting: Delete old workflow runs
+##[debug]Loading inputs
+##[debug]Evaluating: format('gh api repos/{0}/actions/runs --paginate -q ''.workflow_runs[] | .id'' | \
+##[debug]xargs -I {{}} gh api repos/{1}/actions/runs/{{}} -X DELETE --silent || echo "No runs to delete"
+##[debug]', github.repository, github.repository)
+##[debug]Evaluating format:
+##[debug]..Evaluating String:
+##[debug]..=> 'gh api repos/{0}/actions/runs --paginate -q ''.workflow_runs[] | .id'' | \
+##[debug]xargs -I {{}} gh api repos/{1}/actions/runs/{{}} -X DELETE --silent || echo "No runs to delete"
+##[debug]'
+##[debug]..Evaluating Index:
+##[debug]....Evaluating github:
+##[debug]....=> Object
+##[debug]....Evaluating String:
+##[debug]....=> 'repository'
+##[debug]..=> 'Bratnya/SmartSK'
+##[debug]..Evaluating Index:
+##[debug]....Evaluating github:
+##[debug]....=> Object
+##[debug]....Evaluating String:
+##[debug]....=> 'repository'
+##[debug]..=> 'Bratnya/SmartSK'
+##[debug]=> 'gh api repos/Bratnya/SmartSK/actions/runs --paginate -q ''.workflow_runs[] | .id'' | \
+##[debug]xargs -I {} gh api repos/Bratnya/SmartSK/actions/runs/{} -X DELETE --silent || echo "No runs to delete"
+##[debug]'
+##[debug]Result: 'gh api repos/Bratnya/SmartSK/actions/runs --paginate -q ''.workflow_runs[] | .id'' | \
+##[debug]xargs -I {} gh api repos/Bratnya/SmartSK/actions/runs/{} -X DELETE --silent || echo "No runs to delete"
+##[debug]'
+##[debug]Loading env
+Run gh api repos/Bratnya/SmartSK/actions/runs --paginate -q '.workflow_runs[] | .id' | \
+##[debug]/usr/bin/bash -e /home/runner/work/_temp/9b54030b-a5b0-4c64-8826-2224f659923b.sh
+gh: Could not delete the workflow run (HTTP 403)
+No runs to delete
+##[debug]Finishing: Delete old workflow runs

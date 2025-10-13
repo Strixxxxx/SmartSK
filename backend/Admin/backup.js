@@ -467,89 +467,96 @@ async function executeRestore(jobId, localFile) {
         await updateJob(jobId, 'processing', 'Finalizing database swap...');
         console.log(`[Job ${jobId}] Successfully imported to temporary database. Proceeding with swap.`);
 
-        // Close the main application's connection pool
-        console.log(`[Job ${jobId}] Closing application connection pool...`);
+        // --- Start of Critical Section: Database Swap ---
+        // From this point on, the main application pool is closed. All operations must use a temporary connection.
+        console.log(`[Job ${jobId}] Closing application connection pool to begin database swap...`);
         const pool = await getConnection();
         await pool.close();
-        console.log(`[Job ${jobId}] Connection pool closed.`);
+        console.log(`[Job ${jobId}] Main connection pool closed.`);
 
-        let sql;
+        const sql = require('mssql');
+        let masterConnection; // This connection will be used for the entire swap process
+
         try {
-            sql = require('mssql');
+            // 1. Connect to the master database
             const masterDbConfig = {
-                server: dbServer, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: 'master',
-                options: { encrypt: process.env.DB_ENCRYPT !== 'false', trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true' }
+                server: dbServer,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: 'master',
+                options: {
+                    encrypt: process.env.DB_ENCRYPT !== 'false',
+                    trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'
+                }
             };
-            await sql.connect(masterDbConfig);
-            
+            masterConnection = await new sql.ConnectionPool(masterDbConfig).connect();
+            console.log(`[Job ${jobId}] Connected to master database for swap.`);
+
+            // 2. Drop the old database
             const targetDbName = dbName;
-
-            // Drop the old database using the retry helper
             console.log(`[Job ${jobId}] Dropping old database: ${targetDbName}...`);
-            await dropDatabaseWithRetries(sql, targetDbName);
+            await dropDatabaseWithRetries(masterConnection, targetDbName);
 
-            // Rename the new database
-            console.log(`[Job ${jobId}] Activating new database...`);
-            console.log(`[Job ${jobId}] Renaming temporary database '${tempDbName}' to '${targetDbName}'`);
-            await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${targetDbName}];`);
-            console.log(`[Job ${jobId}] Successfully renamed database to '${targetDbName}'`);
-            
+            // 3. Rename the new database
+            console.log(`[Job ${jobId}] Renaming temporary database '${tempDbName}' to '${targetDbName}'...`);
+            await masterConnection.request().query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${targetDbName}];`);
+            console.log(`[Job ${jobId}] Successfully renamed database to '${targetDbName}'.`);
+
+            // 4. Mark the job as completed
             const duration = Math.round((Date.now() - startTime) / 1000);
+            await masterConnection.request()
+                .input('JobID', sql.NVarChar(50), jobId)
+                .input('Status', sql.NVarChar(20), 'completed')
+                .input('Message', sql.NVarChar(500), 'Database restore completed successfully.')
+                .input('Duration', sql.Int, duration)
+                .input('CompletedAt', sql.DateTime2, new Date())
+                .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, CompletedAt = @CompletedAt, processing = 0 WHERE JobID = @JobID');
+            console.log(`[Job ${jobId}] Final status updated to 'completed'.`);
 
-            // --- Post-Swap Update using a temporary connection ---
-            let tempPool;
-            try {
-                console.log(`[Job ${jobId}] Creating temporary connection to update final status...`);
-                const restoredDbConfig = {
-                    server: process.env.DB_SERVER,
-                    user: process.env.DB_USER,
-                    password: process.env.DB_PASSWORD,
-                    database: targetDbName, // Connect to the NEWLY restored database
-                    options: {
-                        encrypt: process.env.DB_ENCRYPT !== 'false',
-                        trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'
-                    }
-                };
-                tempPool = await new sql.ConnectionPool(restoredDbConfig).connect();
-                
-                // Manually update job status to 'completed'
-                await tempPool.request()
-                    .input('JobID', sql.NVarChar(50), jobId)
-                    .input('Status', sql.NVarChar(20), 'completed')
-                    .input('Message', sql.NVarChar(500), 'Database restore completed successfully.')
-                    .input('Duration', sql.Int, duration)
-                    .input('CompletedAt', sql.DateTime2, new Date())
-                    .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, CompletedAt = @CompletedAt WHERE JobID = @JobID');
-                console.log(`[Job ${jobId}] Final status updated to 'completed'.`);
+            // 5. Add audit trail for the successful restore
+            await masterConnection.request()
+                .input('actor', sql.VarChar(1), 'A')
+                .input('module', sql.VarChar(1), 'B')
+                .input('userID', sql.Int, UserID)
+                .input('actions', sql.VarChar(50), 'restore-database')
+                .input('newValue', sql.NVarChar(sql.MAX), FileName)
+                .input('descriptions', sql.NVarChar(sql.MAX), `Admin ${CreatedBy} restored the database from ${FileName} (${restoreType}).`)
+                .query("INSERT INTO [audit trail] (actor, module, userID, actions, oldValue, newValue, descriptions, timestamp) VALUES (@actor, @module, @userID, @actions, NULL, @newValue, @descriptions, GETDATE())");
+            console.log(`[Job ${jobId}] Audit trail for restore created.`);
 
-                // Manually add audit trail
-                await tempPool.request()
-                    .input('actor', sql.VarChar(1), 'A')
-                    .input('module', sql.VarChar(1), 'B')
-                    .input('userID', sql.Int, UserID)
-                    .input('actions', sql.VarChar(50), 'restore-database')
-                    .input('oldValue', sql.NVarChar(sql.MAX), null)
-                    .input('newValue', sql.NVarChar(sql.MAX), FileName)
-                    .input('descriptions', sql.NVarChar(sql.MAX), `Admin ${CreatedBy} restored the database from ${FileName} (${restoreType}).`)
-                    .query("INSERT INTO [audit trail] (actor, module, userID, actions, oldValue, newValue, descriptions, timestamp) VALUES (@actor, @module, @userID, @actions, @oldValue, @newValue, @descriptions, GETDATE())");
-                console.log(`[Job ${jobId}] Audit trail for restore created.`);
-
-            } catch (finalUpdateError) {
-                console.error(`[Job ${jobId}] CRITICAL: Restore was successful, but failed to update final status/audit trail. Error:`, finalUpdateError);
-            } finally {
-                if (tempPool) await tempPool.close();
-            }
-            // --- End of Post-Swap Update ---
-
-            // IMPORTANT: The app needs to be restarted manually or by a process manager (like PM2 or Azure App Service)
-            // to reconnect to the new database. We no longer call process.exit().
             console.log(`[Job ${jobId}] Restore complete. Application requires a restart to use the new database.`);
 
         } catch (swapError) {
-            console.error(`[Job ${jobId}] CRITICAL: The restore process failed during the final database swap. Manual intervention may be required.`, swapError);
-            console.error(`[Job ${jobId}] The job status could not be updated to 'failed' due to the indeterminate database state. The status will remain \'processing\' in the database.`);
+            // --- CRITICAL FAILURE HANDLING ---
+            console.error(`[Job ${jobId}] CRITICAL: The restore process failed during the final database swap.`, swapError);
+
+            if (masterConnection && masterConnection.connected) {
+                // If the swap failed, use the master connection to mark the job as 'failed'
+                const duration = Math.round((Date.now() - startTime) / 1000);
+                try {
+                    await masterConnection.request()
+                        .input('JobID', sql.NVarChar(50), jobId)
+                        .input('Status', sql.NVarChar(20), 'failed')
+                        .input('Message', sql.NVarChar(500), `Restore failed during database swap: ${swapError.message}`)
+                        .input('Duration', sql.Int, duration)
+                        .input('ErrorMessage', sql.NVarChar(sql.MAX), swapError.stack)
+                        .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, ErrorMessage = @ErrorMessage, processing = 0 WHERE JobID = @JobID');
+                    console.log(`[Job ${jobId}] Final status updated to 'failed'.`);
+                } catch (updateError) {
+                    console.error(`[Job ${jobId}] FATAL: Could not update job status to 'failed' even with master connection.`, updateError);
+                }
+            } else {
+                console.error(`[Job ${jobId}] FATAL: Could not update job status to 'failed' because the master connection could not be established.`);
+            }
+            // Manual intervention will be required. The temp DB may still exist.
+            console.error(`[Job ${jobId}] Manual intervention may be required. The temporary database '${tempDbName}' might still exist.`);
+
         } finally {
-            if (sql && sql.connected) await sql.close();
+            // 6. Always close the master connection and clean up files
+            if (masterConnection && masterConnection.connected) {
+                await masterConnection.close();
+                console.log(`[Job ${jobId}] Master connection closed.`);
+            }
             cleanup();
         }
 

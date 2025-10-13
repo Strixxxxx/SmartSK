@@ -18,8 +18,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh api repos/${{ github.repository }}/actions/runs --paginate -q '.workflow_runs[] | .id' | \
-          xargs -I {} gh api repos/${{ github.repository }}/actions/runs/{} -X DELETE --silent || echo "No runs to delete"
+          gh api repos/${{ github.repository }}/actions/runs --paginate -q '.workflow_runs[].id' | \
+          tail -n +51 | \
+          xargs -I {} gh api repos/${{ github.repository }}/actions/runs/{} -X DELETE --silent || echo "No old runs to delete"
 
   build-and-deploy:
     needs: cleanup
