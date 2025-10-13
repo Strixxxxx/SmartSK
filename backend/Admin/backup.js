@@ -409,7 +409,7 @@ async function executeRestore(jobId, localFile) {
             const uploadedZipPath = localFile.path;
             tempFiles.push(uploadedZipPath);
 
-            if (path.extname(FileName).toLowerCase() !== '.zip') {
+            if (path.extname(localFile.originalname).toLowerCase() !== '.zip') {
                 throw new Error('Invalid file type. Please upload a .zip backup file.');
             }
 

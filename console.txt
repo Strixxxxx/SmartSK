@@ -20,96 +20,121 @@
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-13T07:26:40.8725664Z Login attempt received
-2025-10-13T07:26:42.0434767Z Login successful for user.
-2025-10-13T07:27:50.6722611Z [Restore Cleanup] Searching for orphaned databases matching: Smart_SK_FINAL_restore_%
-2025-10-13T07:27:50.9727911Z [Restore Cleanup] Found 1 orphaned database(s): Smart_SK_FINAL_restore_1760338847329
-2025-10-13T07:27:50.9734548Z [Restore Cleanup] Attempting to force drop orphaned database: Smart_SK_FINAL_restore_1760338847329
-2025-10-13T07:27:51.1925375Z [Restore Cleanup] Failed to force drop database Smart_SK_FINAL_restore_1760338847329. It may require manual deletion. Full error object: RequestError: ALTER DATABASE statement failed.
-2025-10-13T07:27:51.1926168Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
-2025-10-13T07:27:51.1926205Z     at Connection.emit (node:events:519:28)
-2025-10-13T07:27:51.1926234Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
-2025-10-13T07:27:51.1926254Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
-2025-10-13T07:27:51.1926381Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
-2025-10-13T07:27:51.1926402Z     at Readable.emit (node:events:519:28)
-2025-10-13T07:27:51.1926421Z     at addChunk (node:internal/streams/readable:561:12)
-2025-10-13T07:27:51.1926442Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-2025-10-13T07:27:51.1926463Z     at Readable.push (node:internal/streams/readable:393:5)
-2025-10-13T07:27:51.1926482Z     at nextAsync (node:internal/streams/from:194:22) {
-2025-10-13T07:27:51.19265Z   code: 'EREQUEST',
-2025-10-13T07:27:51.1926519Z   originalError: Error: ALTER DATABASE statement failed.
-2025-10-13T07:27:51.1926538Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
-2025-10-13T07:27:51.1926557Z       at Connection.emit (node:events:519:28)
-2025-10-13T07:27:51.1926598Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
-2025-10-13T07:27:51.192662Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
-2025-10-13T07:27:51.1926642Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
-2025-10-13T07:27:51.192666Z       at Readable.emit (node:events:519:28)
-2025-10-13T07:27:51.1926679Z       at addChunk (node:internal/streams/readable:561:12)
-2025-10-13T07:27:51.1926698Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-2025-10-13T07:27:51.1926717Z       at Readable.push (node:internal/streams/readable:393:5)
-2025-10-13T07:27:51.1926736Z       at nextAsync (node:internal/streams/from:194:22) {
-2025-10-13T07:27:51.1926754Z     info: ErrorMessageToken {
-2025-10-13T07:27:51.1926771Z       name: 'ERROR',
-2025-10-13T07:27:51.1926789Z       handlerName: 'onErrorMessage',
-2025-10-13T07:27:51.1926832Z       number: 5069,
-2025-10-13T07:27:51.192685Z       state: 3,
-2025-10-13T07:27:51.1926868Z       class: 16,
-2025-10-13T07:27:51.1926886Z       message: 'ALTER DATABASE statement failed.',
-2025-10-13T07:27:51.1926904Z       serverName: 'smart-sk',
-2025-10-13T07:27:51.1926922Z       procName: '',
-2025-10-13T07:27:51.1926939Z       lineNumber: 1
-2025-10-13T07:27:51.1927129Z     }
-2025-10-13T07:27:51.1927148Z   },
-2025-10-13T07:27:51.1927166Z   number: 5069,
-2025-10-13T07:27:51.1927212Z   lineNumber: 1,
-2025-10-13T07:27:51.1927231Z   state: 3,
-2025-10-13T07:27:51.1927249Z   class: 16,
-2025-10-13T07:27:51.1927268Z   serverName: 'smart-sk',
-2025-10-13T07:27:51.1927286Z   procName: '',
-2025-10-13T07:27:51.1927303Z   precedingErrors: [
-2025-10-13T07:27:51.1927343Z     RequestError: ODBC error: State: 42000: Error: 1468 Message:'[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The operation cannot be performed on database "Smart_SK_FINAL_restore_1760338847329" because it is involved in a database mirroring session or an availability group. Some operations are not allowed on a database that is participating in a database mirroring session or in an availability group.'.
-2025-10-13T07:27:51.1927364Z         at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
-2025-10-13T07:27:51.1927384Z         at Connection.emit (node:events:519:28)
-2025-10-13T07:27:51.1927431Z         at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
-2025-10-13T07:27:51.1927453Z         at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
-2025-10-13T07:27:51.1927475Z         at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
-2025-10-13T07:27:51.1927493Z         at Readable.emit (node:events:519:28)
-2025-10-13T07:27:51.1927513Z         at addChunk (node:internal/streams/readable:561:12)
-2025-10-13T07:27:51.1927534Z         at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-2025-10-13T07:27:51.1927553Z         at Readable.push (node:internal/streams/readable:393:5)
-2025-10-13T07:27:51.1927572Z         at nextAsync (node:internal/streams/from:194:22) {
-2025-10-13T07:27:51.1927591Z       code: 'EREQUEST',
-2025-10-13T07:27:51.1927609Z       originalError: [Error],
-2025-10-13T07:27:51.1927627Z       number: 42008,
-2025-10-13T07:27:51.1927666Z       lineNumber: 1,
-2025-10-13T07:27:51.1927684Z       state: 5,
-2025-10-13T07:27:51.1927702Z       class: 16,
-2025-10-13T07:27:51.192772Z       serverName: 'smart-sk',
-2025-10-13T07:27:51.1927738Z       procName: ''
-2025-10-13T07:27:51.1927756Z     }
-2025-10-13T07:27:51.1927774Z   ]
-2025-10-13T07:27:51.1927792Z }
-2025-10-13T07:27:51.2099013Z [Restore] Extracting smartSK_2025-10-13_14-56-09.zip...
-2025-10-13T07:27:51.3002101Z [Restore] Extracted smartSK_2025-10-13_14-56-09.bacpac.
-2025-10-13T07:27:51.3012258Z [Restore] Starting database import to temporary database 'Smart_SK_FINAL_restore_1760340471201'...
-2025-10-13T07:27:53.3703231Z [Restore] sqlpackage import to temp DB failed: Command failed: sqlpackage /a:Import /tsn:smart-sk.database.windows.net /tdn:Smart_SK_FINAL_restore_1760340471201 /sf:"/database_backup/extract_1760340471201/smartSK_2025-10-13_14-56-09.bacpac" /tu:smartSK /tp:Smart-SK2025 /p:DatabaseEdition=Basic /p:DatabaseMaximumSize=2 /p:DatabaseBackupStorageRedundancy=Local
-2025-10-13T07:27:53.3703741Z *** 'DatabaseBackupStorageRedundancy' is not a valid argument for the 'Import' action.
-2025-10-13T07:27:53.3703776Z
-2025-10-13T07:27:53.371146Z [Restore] stderr: *** 'DatabaseBackupStorageRedundancy' is not a valid argument for the 'Import' action.
-2025-10-13T07:27:53.3711642Z
-2025-10-13T07:27:53.3791753Z [Restore] Attempting to clean up failed temporary database: Smart_SK_FINAL_restore_1760340471201
-2025-10-13T07:27:53.3819307Z (node:8) [DEP0147] DeprecationWarning: In future versions of Node.js, fs.rmdir(path, { recursive: true }) will be removed. Use fs.rm(path, { recursive: true }) instead
-2025-10-13T07:27:53.3819528Z     at emitRecursiveRmdirWarning (node:internal/fs/utils:880:13)
-2025-10-13T07:27:53.3819602Z     at Object.rmdirSync (node:fs:1191:5)
-2025-10-13T07:27:53.3819624Z     at /app/Admin/backup.js:320:58
-2025-10-13T07:27:53.3819645Z     at Array.forEach (<anonymous>)
-2025-10-13T07:27:53.3819667Z     at cleanup (/app/Admin/backup.js:320:18)
-2025-10-13T07:27:53.3819688Z     at /app/Admin/backup.js:396:17
-2025-10-13T07:27:53.3819712Z     at ChildProcess.exithandler (node:child_process:424:5)
-2025-10-13T07:27:53.3819733Z     at ChildProcess.emit (node:events:519:28)
-2025-10-13T07:27:53.3819874Z     at maybeClose (node:internal/child_process:1101:16)
-2025-10-13T07:27:53.3819904Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
-2025-10-13T07:28:03.8009842Z [Restore] Successfully cleaned up temporary database: Smart_SK_FINAL_restore_1760340471201
+2025-10-13T09:01:14.4571172Z Initializing active sessions from database...
+2025-10-13T09:01:16.4981852Z Initializing Azure Storage with primary credentials.
+2025-10-13T09:01:21.9768931Z Job management system initialized with database storage.
+2025-10-13T09:01:21.9944327Z Created backup directory at: /database_backup
+2025-10-13T09:01:22.139841Z Post upload job management system initialized.
+2025-10-13T09:01:22.3658225Z Server is running on port 8080
+2025-10-13T09:01:23.5686814Z Initialized active sessions.
+2025-10-13T09:01:34.954871Z Login attempt received
+2025-10-13T09:01:41.7441183Z Login successful for user.
+2025-10-13T09:01:42.3072878Z     __ __          __      __    _ __
+2025-10-13T09:01:42.3077137Z    / //_/_  _ ____/ /_  __/ /   (_) /____
+2025-10-13T09:01:42.3077214Z   / ,< / / / / __  / / / / /   / / __/ _
+2025-10-13T09:01:42.3077251Z  / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
+2025-10-13T09:01:42.3077283Z /_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/
+2025-10-13T09:01:42.3077313Z
+2025-10-13T09:01:42.3077346Z
+2025-10-13T09:01:42.3077423Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
+2025-10-13T09:01:42.3077446Z
+2025-10-13T09:01:42.3077471Z Documentation: http://aka.ms/webapp-linux
+2025-10-13T09:01:42.3077498Z Kudu Version : 20250917.3
+2025-10-13T09:01:42.3077523Z Commit       : 915b72833717358dab58b9a5b15812c44b8842d3
+2025-10-13T09:01:42.3077545Z
+2025-10-13T09:01:43.1539015Z chown: changing ownership of '/temp': Operation not permitted
+2025-10-13T09:01:43.2200103Z chmod: changing permissions of '/temp': Operation not permitted
+2025-10-13T09:01:47.3471005Z Restarting OpenBSD Secure Shell server: sshd.
+2025-10-13T09:01:47.4532719Z node not running, starting node /opt/webssh/index.js
+2025-10-13T09:01:58.6995604Z Mon Oct 13 09:01:58 UTC 2025 running .net core
+2025-10-13T09:02:00.1591851Z Startup : 09.02.00.139383
+2025-10-13T09:02:00.1980054Z Configure Services : 09.02.00.197798
+2025-10-13T09:02:00.6814338Z Configure : 09.02.00.681254
+2025-10-13T09:02:01.9052239Z Setting Up Routes : 09.02.01.904986
+2025-10-13T09:02:02.5543198Z Exiting Configure : 09.02.02.553249
+2025-10-13T09:02:03.4390272Z Hosting environment: Production
+2025-10-13T09:02:03.4551157Z Content root path: /opt/Kudu
+2025-10-13T09:02:03.4562771Z Now listening on: http://0.0.0.0:8181
+2025-10-13T09:02:03.4564997Z Application started. Press Ctrl+C to shut down.
+2025-10-13T09:02:24.2560116Z Raw data request with filters
+2025-10-13T09:02:24.256058Z Stored procedure result count
+2025-10-13T09:02:28.93315Z Raw data request with filters
+2025-10-13T09:02:29.4623771Z Stored procedure result count
+2025-10-13T09:02:38.3723119Z Processing uploaded file
+2025-10-13T09:02:38.4029444Z CSV headers extracted
+2025-10-13T09:02:38.4593584Z Parsed rows from CSV
+2025-10-13T09:02:38.4594647Z Detected years from headers
+2025-10-13T09:02:38.5375362Z User info retrieved
+2025-10-13T09:02:38.7196614Z Starting dataID will be set
+2025-10-13T09:02:38.798896Z Created new rddID
+2025-10-13T09:02:38.9049264Z Created new rddID
+2025-10-13T09:02:39.0584618Z Created new rddID
+2025-10-13T09:02:39.3180413Z Created new rddID
+2025-10-13T09:02:39.5647872Z Created new rddID
+2025-10-13T09:02:39.7349324Z Created new rddID
+2025-10-13T09:02:39.9848489Z Created new rddID
+2025-10-13T09:02:40.1266348Z Created new rddID
+2025-10-13T09:02:40.3456634Z Created new rddID
+2025-10-13T09:02:40.6530673Z Created new rddID
+2025-10-13T09:02:40.9513673Z Created new rddID
+2025-10-13T09:02:41.1495902Z Created new rddID
+2025-10-13T09:02:41.4182098Z Created new rddID
+2025-10-13T09:02:41.607617Z Created new rddID
+2025-10-13T09:02:41.8374749Z Created new rddID
+2025-10-13T09:02:42.0978232Z Created new rddID
+2025-10-13T09:02:42.2408623Z Created new rddID
+2025-10-13T09:02:42.4639862Z Created new rddID
+2025-10-13T09:02:42.6376443Z Created new rddID
+2025-10-13T09:02:42.7423749Z Created new rddID
+2025-10-13T09:02:42.9352695Z Created new rddID
+2025-10-13T09:02:43.0122218Z Created new rddID
+2025-10-13T09:02:43.0614405Z Created new rddID
+2025-10-13T09:02:43.1594694Z Created new rddID
+2025-10-13T09:02:43.2176436Z Created new rddID
+2025-10-13T09:02:43.285598Z Created new rddID
+2025-10-13T09:02:43.4038879Z Created new rddID
+2025-10-13T09:02:43.4474392Z Created new rddID
+2025-10-13T09:02:43.4890371Z Created new rddID
+2025-10-13T09:02:43.5469033Z Created new rddID
+2025-10-13T09:02:43.5731748Z Created new rddID
+2025-10-13T09:02:43.6102784Z Created new rddID
+2025-10-13T09:02:44.1761379Z Created new rddID
+2025-10-13T09:02:44.2122767Z Created new rddID
+2025-10-13T09:02:44.2528805Z Created new rddID
+2025-10-13T09:02:44.2954355Z Created new rddID
+2025-10-13T09:02:44.343226Z Created new rddID
+2025-10-13T09:02:44.38865Z Created new rddID
+2025-10-13T09:02:44.4279779Z Created new rddID
+2025-10-13T09:02:44.4655779Z Created new rddID
+2025-10-13T09:02:44.489257Z Created new rddID
+2025-10-13T09:02:44.5134921Z Created new rddID
+2025-10-13T09:02:44.5368231Z Created new rddID
+2025-10-13T09:02:44.5756687Z Created new rddID
+2025-10-13T09:02:44.610296Z Created new rddID
+2025-10-13T09:02:44.6370945Z Created new rddID
+2025-10-13T09:02:44.736055Z Created new rddID
+2025-10-13T09:02:46.0970927Z Created new rddID
+2025-10-13T09:02:46.0971417Z Created new rddID
+2025-10-13T09:02:46.0971453Z Created new rddID
+2025-10-13T09:02:46.0971475Z Found existing rddID
+2025-10-13T09:02:46.0971495Z Created new rddID
+2025-10-13T09:02:46.097154Z Created new rddID
+2025-10-13T09:02:46.0971562Z Tracking record created
+2025-10-13T09:02:46.0971582Z Upload complete
+2025-10-13T09:02:46.4564491Z Raw data request with filters
+2025-10-13T09:02:46.5403952Z Stored procedure result count
+2025-10-13T09:03:03.135541Z [Job a2a73230-d6a4-4f2e-b174-7006a1f5b5a5] Created in database: {"backupType":"local-restore","initiatedBy":"Luis Albert De Guzman","userId":1,"fileName":"smartSK_2025-10-13_14-56-09.zip"}
+2025-10-13T09:03:03.2190352Z [Job a2a73230-d6a4-4f2e-b174-7006a1f5b5a5] Updated in database to processing: Starting restore process...
+2025-10-13T09:03:03.2274373Z [Restore Cleanup] Searching for orphaned databases matching: Smart_SK_FINAL_restore_%
+2025-10-13T09:03:03.6131478Z [Restore Cleanup] No orphaned databases found.
+2025-10-13T09:03:03.6394918Z [Job a2a73230-d6a4-4f2e-b174-7006a1f5b5a5] Updated in database to processing: Preparing backup file...
+2025-10-13T09:03:03.6572192Z [Job a2a73230-d6a4-4f2e-b174-7006a1f5b5a5] Updated in database to failed: Restore failed: The "path" argument must be of type string. Received null
+2025-10-13T09:03:03.6627835Z [Job a2a73230-d6a4-4f2e-b174-7006a1f5b5a5] Restore process failed: TypeError [ERR_INVALID_ARG_TYPE]: The "path" argument must be of type string. Received null
+2025-10-13T09:03:03.6628125Z     at Object.extname (node:path:1567:5)
+2025-10-13T09:03:03.6628158Z     at executeRestore (/app/Admin/backup.js:412:22)
+2025-10-13T09:03:03.6628182Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5) {
+2025-10-13T09:03:03.6628204Z   code: 'ERR_INVALID_ARG_TYPE'
+2025-10-13T09:03:03.6628223Z }
 
 --Deployment Container Logs
 
