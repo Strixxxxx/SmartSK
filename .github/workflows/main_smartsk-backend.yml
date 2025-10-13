@@ -15,11 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete old workflow runs
-        uses: actions/delete-workflow-runs@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          keep_minimum_runs: 50
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository }}/actions/runs --paginate -q '.workflow_runs[] | .id' | \
+          xargs -I {} gh api repos/${{ github.repository }}/actions/runs/{} -X DELETE --silent || echo "No runs to delete"
 
   build-and-deploy:
     needs: cleanup

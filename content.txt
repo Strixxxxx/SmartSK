@@ -1,9 +1,23 @@
 ##[debug]Starting: Set up job
 Current runner version: '2.328.0'
 Runner Image Provisioner
+  Hosted Compute Agent
+  Version: 20250912.392
+  Commit: d921fda672a98b64f4f82364647e2f10b2267d0b
+  Build Date: 2025-09-12T15:23:14Z
 Operating System
+  Ubuntu
+  24.04.3
+  LTS
 Runner Image
+  Image: ubuntu-24.04
+  Version: 20250929.60.1
+  Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20250929.60/images/ubuntu/Ubuntu2404-Readme.md
+  Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20250929.60
 GITHUB_TOKEN Permissions
+  Actions: write
+  Contents: read
+  Metadata: read
 Secret source: Actions
 ##[debug]Primary repository: Bratnya/SmartSK
 Prepare workflow directory
