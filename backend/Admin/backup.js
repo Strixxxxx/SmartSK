@@ -36,6 +36,35 @@ for (const envVar of requiredEnv) {
 const dbServer = process.env.DB_SERVER;
 const dbName = process.env.DB_DATABASE;
 
+// --- NEW HELPER: Drop Database with Retries (Azure SQL Compatible) ---
+async function dropDatabaseWithRetries(sqlConnection, dbToDrop) {
+    const maxAttempts = 60; // 5 minutes (60 attempts * 5 seconds)
+    const delay = 5000; // 5 seconds
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            console.log(`[Drop DB Attempt ${attempt}/${maxAttempts}] Dropping database: ${dbToDrop}`);
+            await sqlConnection.request().query(`DROP DATABASE [${dbToDrop}];`);
+            console.log(`[Drop DB] Successfully dropped database: ${dbToDrop}`);
+            return; // Success, exit the loop
+        } catch (error) {
+            // Check if the error is the specific "database in use" error
+            if (error.message.includes('because it is currently in use')) {
+                if (attempt === maxAttempts) {
+                    console.error(`[Drop DB] Final attempt failed. Could not drop database ${dbToDrop} as it is still in use.`);
+                    throw error; // Rethrow the last error
+                }
+                console.warn(`[Drop DB Attempt ${attempt}] Failed to drop ${dbToDrop} as it is in use. Retrying in ${delay / 1000}s...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            } else {
+                // If it's a different error, fail immediately
+                throw error;
+            }
+        }
+    }
+}
+
+
 // --- GET / : List available backups from Azure Storage ---
 router.get('/', authMiddleware, async (req, res) => {
     try {
@@ -281,15 +310,10 @@ async function cleanupOrphanedRestoreDatabases() {
         for (const row of result.recordset) {
             const orphanDbName = row.name;
             try {
-                console.log(`[Restore Cleanup] Attempting to force drop orphaned database: ${orphanDbName}`);
-                await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET EMERGENCY;`);
-                console.log(`[Restore Cleanup] Set ${orphanDbName} to EMERGENCY mode.`);
-                await connection.request().query(`ALTER DATABASE [${orphanDbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
-                console.log(`[Restore Cleanup] Set ${orphanDbName} to SINGLE_USER mode.`);
-                await connection.request().query(`DROP DATABASE [${orphanDbName}];`);
-                console.log(`[Restore Cleanup] Successfully dropped orphaned database: ${orphanDbName}`);
+                // Use the new retry logic to drop the database
+                await dropDatabaseWithRetries(connection, orphanDbName);
             } catch (dropError) {
-                console.error(`[Restore Cleanup] Failed to force drop database ${orphanDbName}. It may require manual deletion. Full error object:`, dropError);
+                console.error(`[Restore Cleanup] Failed to drop database ${orphanDbName} after multiple retries. It may require manual deletion. Full error object:`, dropError);
             }
         }
     } catch (error) {
@@ -301,18 +325,70 @@ async function cleanupOrphanedRestoreDatabases() {
     }
 }
 
-// --- POST /restore : Restore a database from a backup ---
+// --- (REFACTORED) POST /restore : ASYNCHRONOUS ---
 router.post('/restore', authMiddleware, upload.single('backupFile'), async (req, res) => {
     const { restoreType, fileName } = req.body; // 'cloud' or 'local'
 
-    // --- Start: Proactive cleanup of orphaned databases ---
-    await cleanupOrphanedRestoreDatabases();
-    // --- End: Proactive cleanup ---
+    try {
+        // --- Input Validation ---
+        if (!restoreType || !['cloud', 'local'].includes(restoreType)) {
+            if (req.file) fs.unlinkSync(req.file.path); // Clean up uploaded file on validation error
+            return res.status(400).json({ message: "Restore type ('cloud' or 'local') is required." });
+        }
+
+        let backupType, jobFileName;
+        if (restoreType === 'local') {
+            if (!req.file) {
+                return res.status(400).json({ message: 'No backup file uploaded for local restore.' });
+            }
+            backupType = 'local-restore';
+            jobFileName = req.file.originalname;
+        } else { // cloud
+            if (!fileName) {
+                return res.status(400).json({ message: 'Backup file name is required for cloud restore.' });
+            }
+            backupType = 'cloud-restore';
+            jobFileName = fileName;
+        }
+
+        // --- Create Job ---
+        const jobId = await createJob({
+            backupType, // 'local-restore' or 'cloud-restore'
+            initiatedBy: req.user.fullName,
+            userId: req.user.userId,
+            fileName: jobFileName
+        });
+
+        // --- Respond Immediately ---
+        res.status(202).json({
+            jobId,
+            message: `Database restore '${jobId}' initiated. You can poll for status.`
+        });
+
+        // --- Run the actual restore process in the background ---
+        executeRestore(jobId, req.file); // Pass local file info if it exists
+
+    } catch (error) {
+        console.error("[Restore] Failed to create restore job:", error);
+        res.status(500).json({ message: "Failed to initiate restore process." });
+    }
+});
+
+// --- (NEW) Asynchronous Restore Execution Logic ---
+async function executeRestore(jobId, localFile) {
+    const startTime = Date.now();
+    const job = await getJob(jobId);
+    if (!job) {
+        console.error(`[Job ${jobId}] Cannot execute non-existent restore job.`);
+        return;
+    }
+
+    const { BackupType, FileName, UserID, CreatedBy } = job;
+    const restoreType = BackupType.includes('local') ? 'local' : 'cloud';
 
     let bacpacFilePath;
     let tempDirs = [];
     let tempFiles = [];
-    let originalFileName;
     const tempDbName = `${dbName}_restore_${Date.now()}`;
 
     const cleanup = () => {
@@ -321,20 +397,19 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
     };
 
     try {
-        if (!restoreType || !['cloud', 'local'].includes(restoreType)) {
-            if (req.file) fs.unlinkSync(req.file.path);
-            return res.status(400).json({ message: "Restore type ('cloud' or 'local') is required." });
-        }
+        await updateJob(jobId, 'processing', 'Starting restore process...', { processing: true });
+
+        // --- Start: Proactive cleanup of OTHER orphaned databases ---
+        await cleanupOrphanedRestoreDatabases();
+        // --- End: Proactive cleanup ---
+
+        await updateJob(jobId, 'processing', 'Preparing backup file...');
 
         if (restoreType === 'local') {
-            if (!req.file) {
-                return res.status(400).json({ message: 'No backup file uploaded for local restore.' });
-            }
-            const uploadedZipPath = req.file.path;
+            const uploadedZipPath = localFile.path;
             tempFiles.push(uploadedZipPath);
-            originalFileName = req.file.originalname;
 
-            if (path.extname(originalFileName).toLowerCase() !== '.zip') {
+            if (path.extname(FileName).toLowerCase() !== '.zip') {
                 throw new Error('Invalid file type. Please upload a .zip backup file.');
             }
 
@@ -342,13 +417,13 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             fs.mkdirSync(tempExtractDir);
             tempDirs.push(tempExtractDir);
 
-            console.log(`[Restore] Extracting ${originalFileName}...`);
+            console.log(`[Job ${jobId}] Extracting ${FileName}...`);
             const unzipCommand = `7z x -o"${tempExtractDir}" -p"${process.env.ZIP_LOCK}" "${uploadedZipPath}"`;
             const { exec: execPromise } = require('child_process');
             await new Promise((resolve, reject) => {
                 execPromise(unzipCommand, (err, stdout, stderr) => {
                     if (err) {
-                        console.error(`[Restore] Unzip failed: ${stderr}`);
+                        console.error(`[Job ${jobId}] Unzip failed: ${stderr}`);
                         return reject(new Error('Failed to extract backup file. Check password or file integrity.'));
                     }
                     resolve(stdout);
@@ -359,129 +434,94 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             const bacpacFile = files.find(f => f.endsWith('.bacpac'));
             if (!bacpacFile) throw new Error('.bacpac file not found in the zip archive.');
             bacpacFilePath = path.join(tempExtractDir, bacpacFile);
-            console.log(`[Restore] Extracted ${bacpacFile}.`);
+            console.log(`[Job ${jobId}] Extracted ${bacpacFile}.`);
 
         } else { // cloud
-            if (!fileName) {
-                return res.status(400).json({ message: 'Backup file name is required for cloud restore.' });
-            }
-            originalFileName = fileName;
-            bacpacFilePath = path.join(backupDir, fileName);
+            bacpacFilePath = path.join(backupDir, FileName);
             tempFiles.push(bacpacFilePath);
 
-            console.log(`[Restore] Downloading ${fileName} from Azure Storage...`);
-            await downloadBackupFile(fileName, bacpacFilePath);
-            console.log(`[Restore] Successfully downloaded backup to ${bacpacFilePath}.`);
+            console.log(`[Job ${jobId}] Downloading ${FileName} from Azure Storage...`);
+            await updateJob(jobId, 'processing', 'Downloading backup from cloud...');
+            await downloadBackupFile(FileName, bacpacFilePath);
+            console.log(`[Job ${jobId}] Successfully downloaded backup to ${bacpacFilePath}.`);
         }
 
-        console.log(`[Restore] Starting database import to temporary database '${tempDbName}'...`);
-        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${tempDbName} /sf:"${bacpacFilePath}" /tu:${process.env.DB_USER} /tp:${process.env.DB_PASSWORD} /p:DatabaseEdition=Basic /p:DatabaseMaximumSize=2 /p:DatabaseBackupStorageRedundancy=Local`;
+        await updateJob(jobId, 'processing', `Importing to temporary database: ${tempDbName}...`);
+        const command = `sqlpackage /a:Import /tsn:${dbServer} /tdn:${tempDbName} /sf:"${bacpacFilePath}" /tu:${process.env.DB_USER} /tp:${process.env.DB_PASSWORD} /p:DatabaseEdition=Basic /p:DatabaseMaximumSize=2`;
 
-        const { exec: execCallback } = require('child_process');
-        execCallback(command, async (error, stdout, stderr) => {
-            const masterDbConfig = {
-                server: dbServer,
-                user: process.env.DB_USER,
-                password: process.env.DB_PASSWORD,
-                database: 'master',
-                options: {
-                    encrypt: process.env.DB_ENCRYPT !== 'false',
-                    trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'
+        await new Promise((resolve, reject) => {
+            const sqlPackageProcess = spawn(command, { shell: true });
+            sqlPackageProcess.stdout.on('data', (data) => console.log(`[Job ${jobId}] sqlpackage stdout: ${data}`));
+            sqlPackageProcess.stderr.on('data', (data) => console.error(`[Job ${jobId}] sqlpackage stderr: ${data}`));
+            sqlPackageProcess.on('close', (code) => {
+                if (code === 0) {
+                    console.log(`[Job ${jobId}] Database import to temp DB completed.`);
+                    resolve();
+                } else {
+                    reject(new Error(`sqlpackage process exited with code ${code}`));
                 }
-            };
-
-            if (error) {
-                console.error(`[Restore] sqlpackage import to temp DB failed: ${error.message}`);
-                console.error(`[Restore] stderr: ${stderr}`);
-                cleanup();
-                try {
-                    console.log(`[Restore] Attempting to clean up failed temporary database: ${tempDbName}`);
-                    const sql = require('mssql');
-                    await sql.connect(masterDbConfig);
-                    await sql.query(`DROP DATABASE IF EXISTS [${tempDbName}]`);
-                    await sql.close();
-                    console.log(`[Restore] Successfully cleaned up temporary database: ${tempDbName}`);
-                } catch (cleanupError) {
-                    console.error(`[Restore] CRITICAL: Failed to clean up temporary database ${tempDbName}. Manual intervention may be required.`, cleanupError.message);
-                }
-                return res.status(500).json({ message: 'Database restore failed during import phase.', error: stderr });
-            }
-
-            console.log(`[Restore] Successfully imported to temporary database. Proceeding with swap.`);
-
-            // Close the main application's connection pool
-            console.log('[Restore] Closing application connection pool...');
-            const pool = await getConnection();
-            await pool.close();
-            console.log('[Restore] Connection pool closed.');
-
-            let sql;
-            try {
-                sql = require('mssql');
-                await sql.connect(masterDbConfig);
-                
-                const targetDbName = dbName; // This comes from env variable
-
-                // --- Start: Drop the old database ---
-                console.log(`[Restore] Attempting to drop old database: '${targetDbName}'`);
-                try {
-                    // Forcibly close any existing connections to the target database
-                    await sql.query(`ALTER DATABASE [${targetDbName}] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;`);
-                    console.log(`[Restore] Set old database '${targetDbName}' to single-user mode.`);
-                    
-                    // Drop the database
-                    await sql.query(`DROP DATABASE [${targetDbName}];`);
-                    console.log(`[Restore] Successfully dropped old database: '${targetDbName}'`);
-                } catch (dropError) {
-                    // It's possible the database doesn't exist on a fresh setup, which is not a critical failure.
-                    if (dropError.message.includes("does not exist")) {
-                        console.log(`[Restore] Old database '${targetDbName}' did not exist. Proceeding with rename.`);
-                    } else {
-                        // If another error occurred, throw it to be caught by the main catch block.
-                        throw dropError;
-                    }
-                }
-                // --- End: Drop the old database ---
-
-                // --- Start: Rename the new database ---
-                console.log(`[Restore] Renaming temporary database '${tempDbName}' to '${targetDbName}'`);
-                await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${targetDbName}];`);
-                console.log(`[Restore] Successfully renamed database to '${targetDbName}'`);
-                // --- End: Rename the new database ---
-                
-                console.log('[Restore] Database restore completed successfully.');
-                
-                addAuditTrail({
-                    actor: 'A', module: 'B', userID: req.user.userId,
-                    actions: 'restore-database', newValue: originalFileName,
-                    descriptions: `Admin ${req.user.fullName} restored the database from ${originalFileName} (${restoreType}).`
-                });
-                
-                res.status(200).json({ message: 'Database restored successfully. Application will restart.' });
-                
-                setTimeout(() => process.exit(0), 1000);
-                
-            } catch (swapError) {
-                console.error(`[Restore] CRITICAL: Failed during database rename: ${swapError.message}`);
-                res.status(500).json({
-                    message: 'CRITICAL: Database restore failed during final rename.',
-                    error: swapError.message
-                });
-                setTimeout(() => process.exit(1), 1000);
-            } finally {
-                if (sql && sql.connected) await sql.close();
-                cleanup();
-            }
+            });
+            sqlPackageProcess.on('error', (err) => reject(err));
         });
 
-    } catch (error) {
-        console.error('[Restore] Process failed:', error.message);
-        cleanup();
-        if (!res.headersSent) {
-            res.status(500).json({ message: error.message });
-        }
-    }
-});
+        await updateJob(jobId, 'processing', 'Finalizing database swap...');
+        console.log(`[Job ${jobId}] Successfully imported to temporary database. Proceeding with swap.`);
 
+        // Close the main application's connection pool
+        console.log(`[Job ${jobId}] Closing application connection pool...`);
+        const pool = await getConnection();
+        await pool.close();
+        console.log(`[Job ${jobId}] Connection pool closed.`);
+
+        let sql;
+        try {
+            sql = require('mssql');
+            const masterDbConfig = {
+                server: dbServer, user: process.env.DB_USER, password: process.env.DB_PASSWORD, database: 'master',
+                options: { encrypt: process.env.DB_ENCRYPT !== 'false', trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true' }
+            };
+            await sql.connect(masterDbConfig);
+            
+            const targetDbName = dbName;
+
+            // Drop the old database using the retry helper
+            await updateJob(jobId, 'processing', `Dropping old database: ${targetDbName}...`);
+            await dropDatabaseWithRetries(sql, targetDbName);
+
+            // Rename the new database
+            await updateJob(jobId, 'processing', `Activating new database...`);
+            console.log(`[Job ${jobId}] Renaming temporary database '${tempDbName}' to '${targetDbName}'`);
+            await sql.query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${targetDbName}];`);
+            console.log(`[Job ${jobId}] Successfully renamed database to '${targetDbName}'`);
+            
+            const duration = Math.round((Date.now() - startTime) / 1000);
+            await updateJob(jobId, 'completed', 'Database restore completed successfully.', { Duration: duration });
+
+            addAuditTrail({
+                actor: 'A', module: 'B', userID: UserID,
+                actions: 'restore-database', newValue: FileName,
+                descriptions: `Admin ${CreatedBy} restored the database from ${FileName} (${restoreType}).`
+            });
+
+            // IMPORTANT: The app needs to be restarted manually or by a process manager (like PM2 or Azure App Service)
+            // to reconnect to the new database. We no longer call process.exit().
+            console.log(`[Job ${jobId}] Restore complete. Application requires a restart to use the new database.`);
+
+        } catch (swapError) {
+            const duration = Math.round((Date.now() - startTime) / 1000);
+            await updateJob(jobId, 'failed', `CRITICAL: Restore failed during database swap.`, { ErrorMessage: swapError.stack, Duration: duration });
+            console.error(`[Job ${jobId}] CRITICAL: Failed during database swap:`, swapError);
+        } finally {
+            if (sql && sql.connected) await sql.close();
+            cleanup();
+        }
+
+    } catch (error) {
+        const duration = Math.round((Date.now() - startTime) / 1000);
+        await updateJob(jobId, 'failed', `Restore failed: ${error.message}`, { ErrorMessage: error.stack, Duration: duration });
+        console.error(`[Job ${jobId}] Restore process failed:`, error);
+        cleanup();
+    }
+}
 
 module.exports = router;

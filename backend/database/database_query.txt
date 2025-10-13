@@ -180,7 +180,7 @@ CONSTRAINT FK_Attachments_Posts FOREIGN KEY (postID)  REFERENCES posts(postID) O
 
 CREATE TABLE BackupJobs (
     JobID NVARCHAR(50) PRIMARY KEY,  -- UUID from the job system
-    BackupType NVARCHAR(20) NOT NULL CHECK (BackupType IN ('hybrid', 'cloud-only')),
+    BackupType NVARCHAR(20) NOT NULL CHECK (BackupType IN ('hybrid', 'cloud-only', 'local-restore', 'cloud-restore')),
     Status NVARCHAR(20) NOT NULL CHECK (Status IN ('pending', 'processing', 'completed', 'failed')),
     Message NVARCHAR(500) NULL,
     ErrorMessage NVARCHAR(MAX) NULL,

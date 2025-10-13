@@ -20,90 +20,96 @@
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-13T06:55:18.1092149Z Login attempt received
-2025-10-13T06:55:25.1274362Z Login successful for user.
-2025-10-13T06:56:09.1376609Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
-2025-10-13T06:56:09.2785944Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] Updated in database to processing: Exporting database using sqlpackage...
-2025-10-13T06:56:09.2796731Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] Executing sqlpackage command...
-2025-10-13T06:56:12.5863604Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Connecting to database 'Smart_SK_FINAL' on server 'smart-sk.database.windows.net'.
-2025-10-13T06:56:12.5864081Z
-2025-10-13T06:56:15.861595Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Extracting schema
-2025-10-13T06:56:15.8616483Z
-2025-10-13T06:56:15.8780335Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Extracting schema from database
-2025-10-13T06:56:15.8780519Z
-2025-10-13T06:57:16.429Z No new trace in the past 1 min(s).
-2025-10-13T06:58:16.429Z No new trace in the past 2 min(s).
-2025-10-13T06:59:16.429Z No new trace in the past 3 min(s).
-2025-10-13T06:59:30.238344Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Resolving references in schema model
-2025-10-13T06:59:30.2383969Z
-2025-10-13T06:59:30.5402626Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Validating schema model
-2025-10-13T06:59:30.5404698Z
-2025-10-13T06:59:31.0680823Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Validating schema model for data package
-2025-10-13T06:59:31.0681295Z Validating schema
-2025-10-13T06:59:31.0681335Z
-2025-10-13T06:59:31.7790596Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Processing tables for data extraction
-2025-10-13T06:59:31.7790809Z
-2025-10-13T06:59:31.7790841Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Exporting data from database
-2025-10-13T06:59:31.7790861Z
-2025-10-13T06:59:31.7790884Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Exporting data
-2025-10-13T06:59:31.7791127Z
-2025-10-13T06:59:32.4047037Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Processing Export.
-2025-10-13T06:59:32.4047321Z
-2025-10-13T06:59:34.198633Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Processing Table '[dbo].[roles]'.
-2025-10-13T06:59:34.198672Z Processing Table '[dbo].[otpStore]'.
-2025-10-13T06:59:34.1986748Z
-2025-10-13T06:59:34.1996189Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Processing Table '[dbo].[StatusLookup]'.
-2025-10-13T06:59:34.1996289Z
-2025-10-13T06:59:34.2069164Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Processing Table '[dbo].[BackupJobs]'.
-2025-10-13T06:59:34.2069266Z
-2025-10-13T06:59:35.4443675Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Processing Table '[dbo].[rawDataDetails]'.
-2025-10-13T06:59:35.4443961Z Processing Table '[dbo].[rawDataTrack]'.
-2025-10-13T06:59:35.4444013Z Processing Table '[dbo].[userInfo]'.
-2025-10-13T06:59:35.4444034Z Processing Table '[dbo].[sessions]'.
-2025-10-13T06:59:35.4444055Z Processing Table '[dbo].[posts]'.
-2025-10-13T06:59:35.4450138Z Processing Table '[dbo].[PostUploadJobs]'.
-2025-10-13T06:59:35.4450242Z Processing Table '[dbo].[projectsARC]'.
-2025-10-13T06:59:35.4450264Z Processing Table '[dbo].[audit trail]'.
-2025-10-13T06:59:35.4450285Z Processing Table '[dbo].[barangays]'.
-2025-10-13T06:59:35.4450307Z Processing Table '[dbo].[projects]'.
-2025-10-13T06:59:35.4450337Z Processing Table '[dbo].[rawData]'.
-2025-10-13T06:59:35.4450359Z Processing Table '[dbo].[postAttachments]'.
-2025-10-13T06:59:35.4450379Z
-2025-10-13T06:59:36.5542098Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Successfully exported database and saved it to file '/database_backup/smartSK_2025-10-13_14-56-09.bacpac'.
-2025-10-13T06:59:36.5542401Z
-2025-10-13T06:59:36.5568782Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] sqlpackage stdout: Time elapsed 0:03:24.03
-2025-10-13T06:59:36.5568889Z
-2025-10-13T06:59:36.7426595Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] Database export to .bacpac completed.
-2025-10-13T06:59:36.767391Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] Updated in database to processing: Uploading .bacpac file to Azure Storage...
-2025-10-13T06:59:36.7674155Z Uploading backup file to container: backup
-2025-10-13T06:59:36.9194125Z Successfully uploaded smartSK_2025-10-13_14-56-09.bacpac to container backup.
-2025-10-13T06:59:36.9589965Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] Updated in database to completed: Backup complete. Ready for download.
-2025-10-13T06:59:36.959673Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] Cleaned up local .bacpac file: /database_backup/smartSK_2025-10-13_14-56-09.bacpac
-2025-10-13T06:59:39.5300422Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] Downloading smartSK_2025-10-13_14-56-09.bacpac from Azure to /database_backup/temp_smartSK_2025-10-13_14-56-09.bacpac for zipping...
-2025-10-13T06:59:39.6862357Z Successfully downloaded smartSK_2025-10-13_14-56-09.bacpac to /database_backup/temp_smartSK_2025-10-13_14-56-09.bacpac.
-2025-10-13T06:59:39.6869812Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] Download complete.
-2025-10-13T06:59:40.3375954Z [Job fcfd3d39-b99f-4f2b-8e4c-545030580b92] Zip stream finished. Cleaning up temp file: /database_backup/temp_smartSK_2025-10-13_14-56-09.bacpac
-2025-10-13T07:00:47.0746374Z [Restore Cleanup] Searching for orphaned databases matching: Smart_SK_FINAL_restore_%
-2025-10-13T07:00:47.3194137Z [Restore Cleanup] No orphaned databases found.
-2025-10-13T07:00:47.3298612Z [Restore] Extracting smartSK_2025-10-13_14-56-09.zip...
-2025-10-13T07:00:47.4284729Z [Restore] Extracted smartSK_2025-10-13_14-56-09.bacpac.
-2025-10-13T07:00:47.4292579Z [Restore] Starting database import to temporary database 'Smart_SK_FINAL_restore_1760338847329'...
-2025-10-13T07:01:49.505Z No new trace in the past 1 min(s).
-2025-10-13T07:02:49.505Z No new trace in the past 2 min(s).
-2025-10-13T07:03:04.4854077Z [Restore] Successfully imported to temporary database. Proceeding with swap.
-2025-10-13T07:03:04.4859292Z [Restore] Closing application connection pool...
-2025-10-13T07:03:04.4863482Z [Restore] Connection pool closed.
-2025-10-13T07:03:04.5852864Z [Restore] Attempting to drop old database: 'Smart_SK_FINAL'
-2025-10-13T07:03:04.8957991Z [Restore] CRITICAL: Failed during database rename: ALTER DATABASE statement failed.
-2025-10-13T07:03:04.9821093Z (node:8) [DEP0147] DeprecationWarning: In future versions of Node.js, fs.rmdir(path, { recursive: true }) will be removed. Use fs.rm(path, { recursive: true }) instead
-2025-10-13T07:03:04.9821594Z     at emitRecursiveRmdirWarning (node:internal/fs/utils:880:13)
-2025-10-13T07:03:04.9821632Z     at Object.rmdirSync (node:fs:1191:5)
-2025-10-13T07:03:04.9821653Z     at /app/Admin/backup.js:320:58
-2025-10-13T07:03:04.9821759Z     at Array.forEach (<anonymous>)
-2025-10-13T07:03:04.982178Z     at cleanup (/app/Admin/backup.js:320:18)
-2025-10-13T07:03:04.9821801Z     at /app/Admin/backup.js:473:17
-2025-10-13T07:03:04.9821823Z     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-
+2025-10-13T07:26:40.8725664Z Login attempt received
+2025-10-13T07:26:42.0434767Z Login successful for user.
+2025-10-13T07:27:50.6722611Z [Restore Cleanup] Searching for orphaned databases matching: Smart_SK_FINAL_restore_%
+2025-10-13T07:27:50.9727911Z [Restore Cleanup] Found 1 orphaned database(s): Smart_SK_FINAL_restore_1760338847329
+2025-10-13T07:27:50.9734548Z [Restore Cleanup] Attempting to force drop orphaned database: Smart_SK_FINAL_restore_1760338847329
+2025-10-13T07:27:51.1925375Z [Restore Cleanup] Failed to force drop database Smart_SK_FINAL_restore_1760338847329. It may require manual deletion. Full error object: RequestError: ALTER DATABASE statement failed.
+2025-10-13T07:27:51.1926168Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-13T07:27:51.1926205Z     at Connection.emit (node:events:519:28)
+2025-10-13T07:27:51.1926234Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-13T07:27:51.1926254Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-13T07:27:51.1926381Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-13T07:27:51.1926402Z     at Readable.emit (node:events:519:28)
+2025-10-13T07:27:51.1926421Z     at addChunk (node:internal/streams/readable:561:12)
+2025-10-13T07:27:51.1926442Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-13T07:27:51.1926463Z     at Readable.push (node:internal/streams/readable:393:5)
+2025-10-13T07:27:51.1926482Z     at nextAsync (node:internal/streams/from:194:22) {
+2025-10-13T07:27:51.19265Z   code: 'EREQUEST',
+2025-10-13T07:27:51.1926519Z   originalError: Error: ALTER DATABASE statement failed.
+2025-10-13T07:27:51.1926538Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
+2025-10-13T07:27:51.1926557Z       at Connection.emit (node:events:519:28)
+2025-10-13T07:27:51.1926598Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-13T07:27:51.192662Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-13T07:27:51.1926642Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-13T07:27:51.192666Z       at Readable.emit (node:events:519:28)
+2025-10-13T07:27:51.1926679Z       at addChunk (node:internal/streams/readable:561:12)
+2025-10-13T07:27:51.1926698Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-13T07:27:51.1926717Z       at Readable.push (node:internal/streams/readable:393:5)
+2025-10-13T07:27:51.1926736Z       at nextAsync (node:internal/streams/from:194:22) {
+2025-10-13T07:27:51.1926754Z     info: ErrorMessageToken {
+2025-10-13T07:27:51.1926771Z       name: 'ERROR',
+2025-10-13T07:27:51.1926789Z       handlerName: 'onErrorMessage',
+2025-10-13T07:27:51.1926832Z       number: 5069,
+2025-10-13T07:27:51.192685Z       state: 3,
+2025-10-13T07:27:51.1926868Z       class: 16,
+2025-10-13T07:27:51.1926886Z       message: 'ALTER DATABASE statement failed.',
+2025-10-13T07:27:51.1926904Z       serverName: 'smart-sk',
+2025-10-13T07:27:51.1926922Z       procName: '',
+2025-10-13T07:27:51.1926939Z       lineNumber: 1
+2025-10-13T07:27:51.1927129Z     }
+2025-10-13T07:27:51.1927148Z   },
+2025-10-13T07:27:51.1927166Z   number: 5069,
+2025-10-13T07:27:51.1927212Z   lineNumber: 1,
+2025-10-13T07:27:51.1927231Z   state: 3,
+2025-10-13T07:27:51.1927249Z   class: 16,
+2025-10-13T07:27:51.1927268Z   serverName: 'smart-sk',
+2025-10-13T07:27:51.1927286Z   procName: '',
+2025-10-13T07:27:51.1927303Z   precedingErrors: [
+2025-10-13T07:27:51.1927343Z     RequestError: ODBC error: State: 42000: Error: 1468 Message:'[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]The operation cannot be performed on database "Smart_SK_FINAL_restore_1760338847329" because it is involved in a database mirroring session or an availability group. Some operations are not allowed on a database that is participating in a database mirroring session or in an availability group.'.
+2025-10-13T07:27:51.1927364Z         at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-13T07:27:51.1927384Z         at Connection.emit (node:events:519:28)
+2025-10-13T07:27:51.1927431Z         at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-13T07:27:51.1927453Z         at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-13T07:27:51.1927475Z         at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-13T07:27:51.1927493Z         at Readable.emit (node:events:519:28)
+2025-10-13T07:27:51.1927513Z         at addChunk (node:internal/streams/readable:561:12)
+2025-10-13T07:27:51.1927534Z         at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-13T07:27:51.1927553Z         at Readable.push (node:internal/streams/readable:393:5)
+2025-10-13T07:27:51.1927572Z         at nextAsync (node:internal/streams/from:194:22) {
+2025-10-13T07:27:51.1927591Z       code: 'EREQUEST',
+2025-10-13T07:27:51.1927609Z       originalError: [Error],
+2025-10-13T07:27:51.1927627Z       number: 42008,
+2025-10-13T07:27:51.1927666Z       lineNumber: 1,
+2025-10-13T07:27:51.1927684Z       state: 5,
+2025-10-13T07:27:51.1927702Z       class: 16,
+2025-10-13T07:27:51.192772Z       serverName: 'smart-sk',
+2025-10-13T07:27:51.1927738Z       procName: ''
+2025-10-13T07:27:51.1927756Z     }
+2025-10-13T07:27:51.1927774Z   ]
+2025-10-13T07:27:51.1927792Z }
+2025-10-13T07:27:51.2099013Z [Restore] Extracting smartSK_2025-10-13_14-56-09.zip...
+2025-10-13T07:27:51.3002101Z [Restore] Extracted smartSK_2025-10-13_14-56-09.bacpac.
+2025-10-13T07:27:51.3012258Z [Restore] Starting database import to temporary database 'Smart_SK_FINAL_restore_1760340471201'...
+2025-10-13T07:27:53.3703231Z [Restore] sqlpackage import to temp DB failed: Command failed: sqlpackage /a:Import /tsn:smart-sk.database.windows.net /tdn:Smart_SK_FINAL_restore_1760340471201 /sf:"/database_backup/extract_1760340471201/smartSK_2025-10-13_14-56-09.bacpac" /tu:smartSK /tp:Smart-SK2025 /p:DatabaseEdition=Basic /p:DatabaseMaximumSize=2 /p:DatabaseBackupStorageRedundancy=Local
+2025-10-13T07:27:53.3703741Z *** 'DatabaseBackupStorageRedundancy' is not a valid argument for the 'Import' action.
+2025-10-13T07:27:53.3703776Z
+2025-10-13T07:27:53.371146Z [Restore] stderr: *** 'DatabaseBackupStorageRedundancy' is not a valid argument for the 'Import' action.
+2025-10-13T07:27:53.3711642Z
+2025-10-13T07:27:53.3791753Z [Restore] Attempting to clean up failed temporary database: Smart_SK_FINAL_restore_1760340471201
+2025-10-13T07:27:53.3819307Z (node:8) [DEP0147] DeprecationWarning: In future versions of Node.js, fs.rmdir(path, { recursive: true }) will be removed. Use fs.rm(path, { recursive: true }) instead
+2025-10-13T07:27:53.3819528Z     at emitRecursiveRmdirWarning (node:internal/fs/utils:880:13)
+2025-10-13T07:27:53.3819602Z     at Object.rmdirSync (node:fs:1191:5)
+2025-10-13T07:27:53.3819624Z     at /app/Admin/backup.js:320:58
+2025-10-13T07:27:53.3819645Z     at Array.forEach (<anonymous>)
+2025-10-13T07:27:53.3819667Z     at cleanup (/app/Admin/backup.js:320:18)
+2025-10-13T07:27:53.3819688Z     at /app/Admin/backup.js:396:17
+2025-10-13T07:27:53.3819712Z     at ChildProcess.exithandler (node:child_process:424:5)
+2025-10-13T07:27:53.3819733Z     at ChildProcess.emit (node:events:519:28)
+2025-10-13T07:27:53.3819874Z     at maybeClose (node:internal/child_process:1101:16)
+2025-10-13T07:27:53.3819904Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+2025-10-13T07:28:03.8009842Z [Restore] Successfully cleaned up temporary database: Smart_SK_FINAL_restore_1760340471201
 
 --Deployment Container Logs
 

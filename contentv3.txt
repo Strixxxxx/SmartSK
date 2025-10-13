@@ -1,39 +1,4 @@
-can you scan the console.txt where it contains runtime log stream on the azure portal because the restoration of the database was failed during the process
+Successfully dropped old constraint: CK__BackupJob__Backu__2180FB33
+Successfully added new constraint CK_BackupJobs_BackupType.
 
-Looking at the Azure Portal Runtime Log Stream, I can identify the issue with your database restoration process:
-
-Problem Analysis
-The restoration failed at the final critical step - the database swap. Here's what happened:
-
-Successful Steps:
-✅ Backup file extraction completed
-✅ Database import to temporary database Smart_SK_FINAL_restore_1760338847329 succeeded
-✅ Application connection pool closed
-Failure Point:
-[Restore] Attempting to drop old database: 'Smart_SK_FINAL'
-[Restore] CRITICAL: Failed during database rename: ALTER DATABASE statement failed.
-Root Cause
-The restoration process failed when trying to swap the databases. The typical swap process is:
-
-Drop (or rename) the old production database
-Rename the temporary restored database to the production name
-The ALTER DATABASE statement failed error typically occurs due to:
-
-Most Likely Causes:
-Active Connections: Despite closing the application connection pool, there may still be:
-Active user sessions
-Open connections from other services
-Azure portal connections
-Monitoring tools connections
-Database Locks: Another process may have locked the database
-Insufficient Permissions: The service principal/connection string may lack permissions to drop/rename databases
-Database in Use: The database is set as the default database for some login
-Recommended Solutions
-Add Connection Termination: Before dropping the database, forcefully terminate all connections:
-sql
-ALTER DATABASE [Smart_SK_FINAL] SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-Implement Retry Logic: Add retry attempts with delays
-Use RENAME Instead of DROP: Consider renaming the old database as a backup before swapping
-Check Permissions: Ensure your connection has dbmanager role or sufficient permissions
-Add Better Error Handling: Capture the specific SQL error details for debugging
-Would you like me to help you modify the restore logic in your backup.js file to implement these fixes?
+Completion time: 2025-10-13T16:37:00.5828474+08:00
