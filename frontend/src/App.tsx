@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
+import { WebSocketProvider } from './context/WebSocketContext'; // Import WebSocketProvider
+import MaintenanceBanner from './components/MaintenanceBanner/MaintenanceBanner'; // Import MaintenanceBanner
 import AppRoutes from './AppRoutes';
 import './App.css';
 import { ToastContainer } from 'react-toastify';
@@ -14,8 +16,11 @@ const App: React.FC = () => {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Router>
         <AuthProvider>
-          <AppRoutes />
-          <ToastContainer />
+          <WebSocketProvider>
+            <MaintenanceBanner />
+            <AppRoutes />
+            <ToastContainer />
+          </WebSocketProvider>
         </AuthProvider>
       </Router>
     </LocalizationProvider>

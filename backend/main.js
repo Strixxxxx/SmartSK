@@ -11,6 +11,7 @@ process.on('unhandledRejection', (reason, promise) => {
 
 // Import the necessary modules
 const express = require('express');
+const http = require('http'); // Import http module
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const path = require('path');
@@ -20,6 +21,9 @@ const pdfParse = require('pdf-parse');
 const { spawn } = require('child_process');
 const os = require('os');
 const dotenv = require('dotenv');
+
+// Import WebSocket Initializer
+const { initializeWebSocketServer } = require('./websockets/websocket');
 
 // Import the other js files
 const routeGuard = require('./routeGuard/routeGuard');
@@ -395,7 +399,19 @@ app.post('/api/predictive-analysis/custom-options', async (req, res) => {
 // Define the port
 const PORT = process.env.PORT;
 
+// Create HTTP server and integrate WebSocket server
+const server = http.createServer(app);
+initializeWebSocketServer(server);
+
+// Check for maintenance flag on startup
+const flagPath = path.join(__dirname, 'maintenance_complete.flag');
+if (fs.existsSync(flagPath)) {
+    console.log('[System] Maintenance flag found. Server has restarted after a restore.');
+    global.maintenanceJustFinished = true;
+    fs.unlinkSync(flagPath); // Delete the flag after acknowledging it
+}
+
 // Start the server
-app.listen(PORT, '0.0.0.0', () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
 });

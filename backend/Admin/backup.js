@@ -11,6 +11,7 @@ const archiverZipEncrypted = require('archiver-zip-encrypted');
 const multer = require('multer');
 const { createJob, getJob, updateJob } = require('./backupJob');
 const { getConnection } = require('../database/database');
+const { broadcast } = require('../websockets/websocket'); // Import broadcast function
 
 // Register the zip-encrypted format
 archiver.registerFormat('zip-encrypted', archiverZipEncrypted);
@@ -468,6 +469,9 @@ async function executeRestore(jobId, localFile) {
         console.log(`[Job ${jobId}] Successfully imported to temporary database. Proceeding with swap.`);
 
         // --- Start of Critical Section: Database Swap ---
+        // Broadcast maintenance message BEFORE closing the pool
+        broadcast({ type: 'maintenance_starting' });
+
         // From this point on, the main application pool is closed. All operations must use a temporary connection.
         console.log(`[Job ${jobId}] Closing application connection pool to begin database swap...`);
         const pool = await getConnection();
@@ -524,6 +528,11 @@ async function executeRestore(jobId, localFile) {
                 .query("INSERT INTO [audit trail] (actor, module, userID, actions, oldValue, newValue, descriptions, timestamp) VALUES (@actor, @module, @userID, @actions, NULL, @newValue, @descriptions, GETDATE())");
             console.log(`[Job ${jobId}] Audit trail for restore created.`);
 
+            // 6. Create flag file for successful restore
+            const flagPath = path.join(__dirname, 'maintenance_complete.flag');
+            fs.writeFileSync(flagPath, 'Restore completed');
+            console.log(`[Job ${jobId}] Maintenance completion flag created.`);
+
             console.log(`[Job ${jobId}] Restore complete. Application requires a restart to use the new database.`);
 
         } catch (swapError) {
@@ -552,7 +561,7 @@ async function executeRestore(jobId, localFile) {
             console.error(`[Job ${jobId}] Manual intervention may be required. The temporary database '${tempDbName}' might still exist.`);
 
         } finally {
-            // 6. Always close the master connection and clean up files
+            // 7. Always close the master connection and clean up files
             if (masterConnection && masterConnection.connected) {
                 await masterConnection.close();
                 console.log(`[Job ${jobId}] Master connection closed.`);
