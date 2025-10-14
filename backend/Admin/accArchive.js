@@ -36,8 +36,6 @@ router.post('/:userId', authMiddleware, async (req, res) => {
     const { userId } = req.params;
     try {
         const pool = await getConnection();
-        const request = pool.request();
-        request.input('userID', sql.Int, userId);
 
         const userToArchive = await pool.request()
             .input('userID', sql.Int, userId)
@@ -48,7 +46,10 @@ router.post('/:userId', authMiddleware, async (req, res) => {
         }
         const { username } = userToArchive.recordset[0];
 
-        await request.execute('accArchived');
+        // Update the isArchived flag instead of calling the stored procedure
+        await pool.request()
+            .input('userID', sql.Int, userId)
+            .query('UPDATE userInfo SET isArchived = 1 WHERE userID = @userID');
 
         addAuditTrail({
             actor: 'A',
@@ -86,10 +87,10 @@ router.post('/restore/:userId', authMiddleware, async (req, res) => {
             return res.status(400).json({ success: false, message: 'User is not archived.' });
         }
 
-        // If user is found and archived, proceed with restoration
-        const request = pool.request();
-        request.input('userID', sql.Int, userId);
-        await request.execute('accReturn');
+        // Update the isArchived flag to restore the user
+        await pool.request()
+            .input('userID', sql.Int, userId)
+            .query('UPDATE userInfo SET isArchived = 0 WHERE userID = @userID');
 
         addAuditTrail({
             actor: 'A',
