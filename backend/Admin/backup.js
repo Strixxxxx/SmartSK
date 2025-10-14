@@ -708,7 +708,7 @@ async function executeRestore(jobId, localFile) {
                 .input('Message', sql.NVarChar(500), 'Database restore completed successfully.')
                 .input('Duration', sql.Int, duration)
                 .input('CompletedAt', sql.DateTime2, new Date())
-                .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, CompletedAt = @CompletedAt, processing = 0 WHERE JobID = @JobID');
+                .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, CompletedAt = @CompletedAt WHERE JobID = @JobID');
             console.log(`[Job ${jobId}] Final status updated to 'completed'.`);
 
             // 7. Add audit trail for the successful restore
@@ -757,7 +757,7 @@ async function executeRestore(jobId, localFile) {
                     .input('Message', sql.NVarChar(500), `Restore failed during database swap: ${swapError.message}`)
                     .input('Duration', sql.Int, duration)
                     .input('ErrorMessage', sql.NVarChar(sql.MAX), swapError.stack)
-                    .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, ErrorMessage = @ErrorMessage, processing = 0 WHERE JobID = @JobID');
+                    .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, ErrorMessage = @ErrorMessage WHERE JobID = @JobID');
                 console.log(`[Job ${jobId}] Successfully updated job status to 'failed' in application DB.`);
             } catch (updateError) {
                 console.error(`[Job ${jobId}] FATAL: Could not update job status to 'failed' in any database.`, updateError);
