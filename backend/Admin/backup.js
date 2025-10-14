@@ -198,6 +198,8 @@ router.get('/download/:jobId', authMiddleware, async (req, res) => {
 });
 
 
+const cron = require('node-cron');
+
 // --- Main Asynchronous Backup Execution Logic ---
 async function executeBackup(jobId) {
     const startTime = Date.now();
@@ -207,12 +209,14 @@ async function executeBackup(jobId) {
         return;
     }
 
-    const { BackupType, UserID, CreatedBy } = job;
+    const { BackupType, UserID, CreatedBy, FileName } = job; // Destructure FileName
     const now = new Date();
     const phTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
     const date = phTime.toISOString().slice(0, 10);
     const time = phTime.toTimeString().slice(0, 8).replace(/:/g, '-');
-    const bacpacFileName = `smartSK_${date}_${time}.bacpac`;
+    
+    // Use the job's FileName if it exists, otherwise generate a new one.
+    const bacpacFileName = FileName ? FileName : `smartSK_${date}_${time}.bacpac`;
     const bacpacFilePath = path.join(backupDir, bacpacFileName);
 
     try {

@@ -1,97 +1,28 @@
-# Database Restore Enhancement Prompt for Gemini CLI
+2. Non-Functional Requirements
 
-## Problem Statement
-During the database restore process, after importing the backup to a temporary database and before swapping it with the main database, we need to synchronize critical system tables to prevent data loss and application crashes.
+The non-functional requirements define the performance, security, usability, and reliability standards of SmartSK.
 
-## Required Changes
+2.1 The system must be accessible through any modern web browser (Chrome, Edge, Firefox, Safari).
+2.2 The system must have a responsive user interface, developed using React + Vite + TypeScript and CSS modules.
+2.3 The system must maintain 99.9% uptime, supported by reliable hosting and MSSQL database management.
+2.4 The system must process and return analytics data within a minute for forecasting and predictive functions.
+2.5 The system must encrypt sensitive data using AES-256 and secure connections via TLS/HTTPS.
+2.6 The system must log all activities and store them securely for monitoring and auditing.
+2.7 The system must support scalability up to 1,000 concurrent users via optimized Node.js + Express.js backend operations.
+2.8 The system must ensure data consistency and integrity during concurrent transactions.
+2.9 The system must allow the interface to be learnable within 10 minutes, prioritizing ease of use.
+2.10 The system must automatically back up project data daily and restore within 15 minutes in case of system failure.
 
-Before dropping the old main database (`Smart_SK_FINAL`) and renaming the temporary database (`Smart_SK_FINAL_restore_*`), implement a synchronization step for the following tables:
+3. Design of Software, System, Product, and/or Processes
 
-1. **BackupJobs**
-2. **sessions** 
-3. **audit trail**
+The design of SmartSK: A Web-Based Project Monitoring System with Budget Forecasting and Predictive Project Analysis follows a structured and modular development process to ensure efficiency, reliability, and data-driven decision-making for Sangguniang Kabataan officials.
 
-## Synchronization Logic
+3.1 Frontend: Built using React + Vite + TypeScript for responsive and modular interface development.
+3.2 Backend: Developed with Node.js + Express.js, providing RESTful APIs for seamless communication.
+3.3 Database: Implemented with Microsoft SQL Server (MSSQL) to ensure secure, scalable, and organized data storage.
+3.4 AI and Forecasting: Powered by Python libraries with integrated with Gemini AI for predictive insights & Budget forecasting.
+3.5 Security: Managed using bcrypt and crypto for password hashing, JWT for authentication, and Nodemailer for email/OTP verification.
+3.6 Utilities: Includes dotenv for secure configuration, Multer for file uploads, fs and uuid for system processes, and Chokidar for automated file conversions.
+3.7 Visualization: Forecasting and analysis outputs are presented through interactive dashboards and charts for intuitive data interpretation.
 
-For each of the three tables listed above:
-
-1. **Compare entries** between the main database and the temporary restored database
-2. **Identify missing entries** in the temporary database that exist in the main database
-3. **Copy the missing entries** from the main database to the temporary database
-4. **Handle primary key conflicts** appropriately (skip duplicates or update based on timestamp)
-
-## Implementation Requirements
-
-### Step 1: After Successful Import
-After the sqlpackage import completes successfully and before initiating the database swap, add a new synchronization phase.
-
-### Step 2: For Each Table (BackupJobs, sessions, audit trail)
-
-```sql
--- Connect to both databases
--- Query the main database: SELECT * FROM [table_name]
--- Query the temp database: SELECT * FROM [table_name]
--- Compare the results by primary key
--- Insert missing rows into the temp database
-```
-
-### Step 3: Specific Handling
-
-#### BackupJobs Table
-- Primary Key: Likely `JobId` or `Id`
-- Critical because: The current restore job must exist in the new database
-- Action: Copy ALL rows from main to temp (merge, don't replace)
-
-#### sessions Table  
-- Primary Key: Likely `SessionId` or `Id`
-- Critical because: Active user sessions must persist after restore
-- Action: Copy rows where session is still valid (not expired)
-
-#### audit trail Table
-- Primary Key: Likely `Id` or composite key
-- Critical because: Recent audit entries should be preserved
-- Action: Copy rows created after the backup timestamp
-
-### Step 4: Error Handling
-
-- If a table doesn't exist in the restored database (old schema), create it first using the schema from the main database
-- If synchronization fails for any table, log a warning but continue (don't fail the entire restore)
-- Log the number of rows copied for each table
-
-### Step 5: Logging
-
-Add detailed logging:
-```
-[Job {jobId}] Starting table synchronization...
-[Job {jobId}] Synchronizing BackupJobs table: {X} rows to copy
-[Job {jobId}] Synchronizing sessions table: {Y} rows to copy  
-[Job {jobId}] Synchronizing audit trail table: {Z} rows to copy
-[Job {jobId}] Table synchronization completed successfully
-```
-
-## Expected Behavior After Implementation
-
-1. Restore process imports backup to temporary database ✓
-2. **NEW**: Synchronize BackupJobs, sessions, and audit trail tables
-3. Drop old main database ✓
-4. Rename temporary database to main ✓
-5. Update job status in BackupJobs (now succeeds because job exists!)
-6. Restore completes without crash ✓
-
-## Success Criteria
-
-- The application no longer crashes with "Invalid object name 'BackupJobs'" error
-- Active user sessions persist after restore
-- Recent audit trail entries are preserved
-- The current restore job can be updated successfully after the swap
-
-## Additional Considerations
-
-- Use transactions where possible to ensure atomicity
-- Consider the timestamp of the backup - only sync data created AFTER that timestamp
-- Optimize for performance - use bulk insert operations
-- Test with both recent and old backup files to ensure compatibility
-
----
-
-Please implement these changes in the database restore process, specifically in the section after the successful sqlpackage import and before the database drop/rename operations.
+This architecture ensures SmartSK delivers a real-time, secure, and intelligent project monitoring environment that promotes transparency, accountability, and collaborative youth governance.
