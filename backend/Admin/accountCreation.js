@@ -103,7 +103,8 @@ router.post('/create-account', authMiddleware, async (req, res) => {
       .query('SELECT userID FROM userInfo WHERE username = @username');
 
     if (userCheck.recordset.length > 0) {
-      return res.status(400).json({
+      console.error('Error creating account: Username already exists');
+      return res.status(409).json({
         success: false,
         message: 'Username already exists'
       });
@@ -115,9 +116,23 @@ router.post('/create-account', authMiddleware, async (req, res) => {
       .query('SELECT userID FROM userInfo WHERE emailAddress = @emailAddress');
 
     if (emailCheck.recordset.length > 0) {
-      return res.status(400).json({
+      console.error('Error creating account: Email address already exists');
+      return res.status(409).json({
         success: false,
         message: 'Email address already exists'
+      });
+    }
+
+    // Check if phone number already exists
+    const phoneCheck = await pool.request()
+      .input('phoneNumber', sql.NVarChar, phoneNumber)
+      .query('SELECT userID FROM userInfo WHERE phoneNumber = @phoneNumber');
+
+    if (phoneCheck.recordset.length > 0) {
+      console.error('Error creating account: Phone number already exists');
+      return res.status(409).json({
+        success: false,
+        message: 'Phone number already exists'
       });
     }
 

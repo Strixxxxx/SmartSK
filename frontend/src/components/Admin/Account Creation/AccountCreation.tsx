@@ -174,7 +174,7 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
         throw new Error(response.data.message || 'Failed to create account');
       }
     } catch (error) {
-      const axiosError = error as AxiosError; // Added type assertion
+      const axiosError = error as AxiosError<{ message: string }>;
       if (axiosError.response?.status === 401) {
         navigate('/home', { replace: true });
         return;
@@ -183,7 +183,21 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
         navigate('/unauthorized', { replace: true });
         return;
       }
-      toast.error(axiosError.message || 'Failed to create account');
+      if (axiosError.response?.status === 409) {
+        const serverMessage = axiosError.response.data.message;
+        let displayMessage = 'A conflict occurred. Please try again.'; // Default
+        if (serverMessage === 'Username already exists') {
+          displayMessage = 'The username already exists, please try again.';
+        } else if (serverMessage === 'Email address already exists') {
+          displayMessage = 'The email address already exists, please try again.';
+        } else if (serverMessage === 'Phone number already exists') {
+          displayMessage = 'The phone number already exists, please try again.';
+        }
+        toast.error(displayMessage);
+      } else {
+        const message = axiosError.response?.data?.message || axiosError.message || 'Failed to create account';
+        toast.error(message);
+      }
     } finally {
       setFormLoading(false);
     }

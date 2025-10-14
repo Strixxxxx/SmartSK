@@ -138,7 +138,7 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
         setProjectDescription('');
         setProjectFile(null);
         setFileError(null);
-        toast.success('Project submitted successfully!');
+        toast.success('Proposal submitted successfully!');
       } else {
         throw new Error(data.message || 'Failed to submit project.');
       }
