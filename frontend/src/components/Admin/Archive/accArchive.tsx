@@ -33,7 +33,7 @@ const AccArchive: React.FC = () => {
   const fetchArchivedAccounts = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get('/api/admin/archive/accounts');
+      const response = await axiosInstance.get('/api/admin/acc-archive');
       if (response.data.success) {
         setArchivedAccounts(response.data.data);
       } else {
@@ -60,7 +60,7 @@ const AccArchive: React.FC = () => {
     if (!userToRestore) return;
 
     try {
-      const response = await axiosInstance.post(`/api/admin/archive/accounts/restore/${userToRestore.userID}`);
+      const response = await axiosInstance.post(`/api/admin/acc-archive/restore/${userToRestore.userID}`);
       if (response.data.success) {
         toast.success('Account restored successfully!');
         setArchivedAccounts(prev => prev.filter(acc => acc.userID !== userToRestore.userID));
