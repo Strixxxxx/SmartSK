@@ -45,6 +45,7 @@ router.get('/users', routeGuard.verifyToken, routeGuard.isAdmin, async (req, res
         FROM userInfo u
         LEFT JOIN roles r ON u.position = r.roleID
         LEFT JOIN barangays b ON u.barangay = b.barangayID
+        WHERE u.isArchived = 0
         ORDER BY u.fullName
       `);
     
