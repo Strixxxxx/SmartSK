@@ -23,7 +23,7 @@ const os = require('os');
 const dotenv = require('dotenv');
 
 // Import WebSocket Initializer
-const { initializeWebSocketServer } = require('./websockets/websocket');
+const { initializeWebSocketServer, broadcast } = require('./websockets/websocket');
 
 // Import the other js files
 const routeGuard = require('./routeGuard/routeGuard');

@@ -1,28 +1,66 @@
-2. Non-Functional Requirements
+Requirements Documentation
 
-The non-functional requirements define the performance, security, usability, and reliability standards of SmartSK.
+The requirements are categorized into functional and non-functional requirements to guide the system’s development and ensure it meets the needs of SK officials, administrators, and youth residents.
 
-2.1 The system must be accessible through any modern web browser (Chrome, Edge, Firefox, Safari).
-2.2 The system must have a responsive user interface, developed using React + Vite + TypeScript and CSS modules.
-2.3 The system must maintain 99.9% uptime, supported by reliable hosting and MSSQL database management.
-2.4 The system must process and return analytics data within a minute for forecasting and predictive functions.
-2.5 The system must encrypt sensitive data using AES-256 and secure connections via TLS/HTTPS.
-2.6 The system must log all activities and store them securely for monitoring and auditing.
-2.7 The system must support scalability up to 1,000 concurrent users via optimized Node.js + Express.js backend operations.
-2.8 The system must ensure data consistency and integrity during concurrent transactions.
-2.9 The system must allow the interface to be learnable within 10 minutes, prioritizing ease of use.
-2.10 The system must automatically back up project data daily and restore within 15 minutes in case of system failure.
+1. Functional Requirements
+1.1 User Registration and Authentication
 
-3. Design of Software, System, Product, and/or Processes
+1.1.1 The system shall allow SK officials and administrators to register using a valid email address and password.
+1.1.2 The system shall validate registration inputs, including name, position, barangay, district, and contact details.
+1.1.3 The system shall implement JWT-based authentication for secure login and session management.
+1.1.4 The system shall allow administrators to manage user roles (Chairperson, SK Official, or Viewer).
 
-The design of SmartSK: A Web-Based Project Monitoring System with Budget Forecasting and Predictive Project Analysis follows a structured and modular development process to ensure efficiency, reliability, and data-driven decision-making for Sangguniang Kabataan officials.
+1.2 Project Proposal Management
 
-3.1 Frontend: Built using React + Vite + TypeScript for responsive and modular interface development.
-3.2 Backend: Developed with Node.js + Express.js, providing RESTful APIs for seamless communication.
-3.3 Database: Implemented with Microsoft SQL Server (MSSQL) to ensure secure, scalable, and organized data storage.
-3.4 AI and Forecasting: Powered by Python libraries with integrated with Gemini AI for predictive insights & Budget forecasting.
-3.5 Security: Managed using bcrypt and crypto for password hashing, JWT for authentication, and Nodemailer for email/OTP verification.
-3.6 Utilities: Includes dotenv for secure configuration, Multer for file uploads, fs and uuid for system processes, and Chokidar for automated file conversions.
-3.7 Visualization: Forecasting and analysis outputs are presented through interactive dashboards and charts for intuitive data interpretation.
+1.2.1 The system shall allow SK officials to create, submit, and track project proposals.
+1.2.2 The system shall allow administrators to approve, reject, or return proposals with comments.
+1.2.3 The system shall automatically assign unique proposal IDs and record submission dates.
+1.2.4 The system shall allow SK officials to upload supporting documents (PDF, images, spreadsheets).
+1.2.5 The system shall notify users via email upon proposal approval, rejection, or feedback submission.
 
-This architecture ensures SmartSK delivers a real-time, secure, and intelligent project monitoring environment that promotes transparency, accountability, and collaborative youth governance.
+1.3 Budget Forecasting
+
+1.3.1 The system shall allow AI models (Prophet/ARIMA) to analyze historical financial data and generate forecasted budget allocations.
+1.3.2 The system shall display visual charts and analytics of project spending trends.
+1.3.3 The system shall allow users to adjust budget variables (duration, cost, materials) and view forecast impacts in real time.
+1.3.4 The system shall provide comparative budget performance among barangays.
+
+1.4 Predictive Project Analysis
+
+1.4.1 The system shall implement AI-driven predictive analytics to evaluate the likelihood of project success using historical and online data.
+1.4.2 The system shall provide automated suggestions and recommendations to improve project outcomes.
+1.4.3 The system shall display predictive results in an intuitive dashboard with success probability metrics.
+1.4.4 The system shall allow users to download predictive reports in PDF or CSV format.
+
+1.5 Multi-Barangay Monitoring
+
+1.5.1 The system shall allow SK officials to monitor and compare project performance across multiple barangays within District 5.
+1.5.2 The system shall display district-level statistics such as project count, total budget, and average success rates.
+1.5.3 The system shall allow district administrators to filter projects by status, barangay, or time period.
+
+1.6 Reports and Data Visualization
+
+1.6.1 The system shall generate automated summary reports of project data, budgets, and forecasts.
+1.6.2 The system shall include an interactive dashboard with graphs and charts powered by data analytics.
+1.6.3 The system shall allow users to export reports in multiple formats (PDF, CSV, Excel).
+1.6.4 The system shall schedule monthly report generation and send them to administrators via email.
+
+1.7 Role-Based Access Control
+
+1.7.1 The system shall provide different access levels:
+  a. Chairperson – Full control over all barangay projects and reports.
+  b. SK Official – Can create, edit, and submit project proposals.
+  c. Administrator – Manages users, oversees system logs, and ensures data integrity.
+1.7.2 The system shall restrict unauthorized access based on assigned user roles.
+
+1.8 Data Backup and Security
+
+1.8.1 The system shall implement automated data backups with mirrored redundancy to prevent data loss.
+1.8.2 The system shall store all sensitive data in encrypted form using AES-256 encryption.
+1.8.3 The system shall maintain an audit trail of all user actions for accountability.
+
+1.9 Notifications and Communication
+
+1.9.1 The system shall send automated email notifications for proposal updates, approvals, and project milestones.
+1.9.2 The system shall include an internal notification dashboard for system alerts and updates.
+1.9.3 The system shall notify users of upcoming deadlines or delayed project submissions.

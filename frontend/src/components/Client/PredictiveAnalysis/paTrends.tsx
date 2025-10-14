@@ -491,12 +491,12 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
               <Typography variant="subtitle2">Select Year:</Typography>
             </Box>
             <FormControl fullWidth>
-              <InputLabel id="forecast-year-label">Forecast Year</InputLabel>
+              <InputLabel id="forecast-year-label">Time Period</InputLabel>
               <Select
                 labelId="forecast-year-label"
                 id="forecast-year"
                 value={selectedYear}
-                label="Forecast Year"
+                label="Time Period"
                 onChange={handleYearChange}
               >
                 {FORECAST_YEARS.map((year) => (

@@ -373,6 +373,9 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             message: `Database restore '${jobId}' initiated. You can poll for status.`
         });
 
+        // Broadcast maintenance message to all clients immediately
+        broadcast({ type: 'maintenance_starting' });
+
         // --- Run the actual restore process in the background ---
         executeRestore(jobId, req.file); // Pass local file info if it exists
 
@@ -733,6 +736,13 @@ async function executeRestore(jobId, localFile) {
             console.log(`[Job ${jobId}] Maintenance completion flag created.`);
 
             console.log(`[Job ${jobId}] Restore complete. Application requires a restart to use the new database.`);
+
+            // Trigger automated restart
+            console.log(`[Restart] Triggering application restart in 3 seconds...`);
+            setTimeout(() => {
+                console.log('[Restart] Exiting process to trigger platform restart.');
+                process.exit(0);
+            }, 3000);
 
         } catch (swapError) {
             // --- CRITICAL FAILURE HANDLING ---
