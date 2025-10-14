@@ -12,6 +12,8 @@ const multer = require('multer');
 const { createJob, getJob, updateJob } = require('./backupJob');
 const { getConnection } = require('../database/database');
 const { broadcast } = require('../websockets/websocket'); // Import broadcast function
+const { randomBytes } = require('crypto');
+const sql = require('mssql');
 
 // Register the zip-encrypted format
 archiver.registerFormat('zip-encrypted', archiverZipEncrypted);
@@ -247,19 +249,21 @@ async function executeBackup(jobId) {
             Duration: Math.round((Date.now() - startTime) / 1000),
         };
 
-        // For hybrid, the job is complete. The zip is created on-demand.
-        // For cloud-only, the job is also complete.
         const message = BackupType === 'hybrid' ? 'Backup complete. Ready for download.' : 'Backup complete. File uploaded to cloud storage.';
         await updateJob(jobId, 'completed', message, finalUpdateData);
 
-        addAuditTrail({
-            actor: 'A',
-            module: 'B',
-            userID: UserID,
-            actions: `backup-database-${BackupType}`,
-            newValue: bacpacFileName,
-            descriptions: `${CreatedBy} initiated a ${BackupType} database backup.`
-        });
+        // Correctly add audit trail record matching the database schema
+        const auditID = randomBytes(8).toString('hex');
+        const pool = await getConnection();
+        await pool.request()
+            .input('auditID', sql.NVarChar(16), auditID)
+            .input('userID', sql.Int, UserID)
+            .input('moduleName', sql.NVarChar(128), 'Backup')
+            .input('actions', sql.NVarChar(50), `backup-database-${BackupType}`)
+            .input('new_value', sql.NVarChar(sql.MAX), bacpacFileName)
+            .input('descriptions', sql.NVarChar(255), `${CreatedBy} initiated a ${BackupType} database backup.`)
+            .query("INSERT INTO [audit trail] (auditID, userID, moduleName, actions, old_value, new_value, descriptions, created_at) VALUES (@auditID, @userID, @moduleName, @actions, NULL, @new_value, @descriptions, GETDATE())");
+        console.log(`[Job ${jobId}] Audit trail for backup created.`);
 
     } catch (error) {
         console.error(`[Job ${jobId}] Backup process failed:`, error.message);
@@ -283,7 +287,6 @@ async function cleanupOrphanedRestoreDatabases() {
     console.log(`[Restore Cleanup] Searching for orphaned databases matching: ${dbToCleanPattern}`);
     let connection;
     try {
-        const sql = require('mssql');
         // Centralized config for master DB connection
         const masterDbConfig = {
             server: dbServer,
@@ -377,7 +380,6 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
 
 async function synchronizeCriticalTables(jobId, tempDbName) {
     console.log(`[Job ${jobId}] Starting table synchronization...`);
-    const sql = require('mssql');
 
     const mainDbConfig = {
         server: dbServer,
@@ -419,24 +421,35 @@ async function synchronizeCriticalTables(jobId, tempDbName) {
             if (missingRows.length > 0) {
                 console.log(`[Job ${jobId}] Copying ${missingRows.length} rows to BackupJobs.`);
                 const table = new sql.Table('BackupJobs');
-                // Assuming schema is known and consistent
+                
                 table.columns.add('JobID', sql.NVarChar(50), { nullable: false, primary: true });
-                table.columns.add('BackupType', sql.NVarChar(50));
-                table.columns.add('Status', sql.NVarChar(20));
-                table.columns.add('Message', sql.NVarChar(500));
-                table.columns.add('FileName', sql.NVarChar(255));
-                table.columns.add('BlobName', sql.NVarChar(255));
-                table.columns.add('BlobURL', sql.NVarChar(500));
-                table.columns.add('FileSize', sql.BigInt);
-                table.columns.add('Duration', sql.Int);
-                table.columns.add('InitiatedBy', sql.NVarChar(255));
-                table.columns.add('UserID', sql.Int);
-                table.columns.add('CreatedAt', sql.DateTime2);
-                table.columns.add('CompletedAt', sql.DateTime2, { nullable: true });
+                table.columns.add('BackupType', sql.NVarChar(20), { nullable: false });
+                table.columns.add('Status', sql.NVarChar(20), { nullable: false });
+                table.columns.add('Message', sql.NVarChar(500), { nullable: true });
                 table.columns.add('ErrorMessage', sql.NVarChar(sql.MAX), { nullable: true });
-                table.columns.add('processing', sql.Bit, { nullable: true });
+                table.columns.add('FileName', sql.NVarChar(255), { nullable: true });
+                table.columns.add('FilePath', sql.NVarChar(500), { nullable: true });
+                table.columns.add('FileSize', sql.BigInt, { nullable: true });
+                table.columns.add('BlobURL', sql.NVarChar(500), { nullable: true });
+                table.columns.add('BlobName', sql.NVarChar(255), { nullable: true });
+                table.columns.add('CreatedAt', sql.DateTime2, { nullable: false });
+                table.columns.add('StartedAt', sql.DateTime2, { nullable: true });
+                table.columns.add('CompletedAt', sql.DateTime2, { nullable: true });
+                table.columns.add('UpdatedAt', sql.DateTime2, { nullable: false });
+                table.columns.add('ExpiresAt', sql.DateTime2, { nullable: true });
+                table.columns.add('CreatedBy', sql.NVarChar(100), { nullable: false });
+                table.columns.add('UserID', sql.Int, { nullable: true });
+                table.columns.add('Duration', sql.Int, { nullable: true });
+                table.columns.add('Progress', sql.Int, { nullable: true });
 
-                missingRows.forEach(row => table.rows.add(...Object.values(row)));
+                missingRows.forEach(row => {
+                    table.rows.add(
+                        row.JobID, row.BackupType, row.Status, row.Message, row.ErrorMessage,
+                        row.FileName, row.FilePath, row.FileSize, row.BlobURL, row.BlobName,
+                        row.CreatedAt, row.StartedAt, row.CompletedAt, row.UpdatedAt, row.ExpiresAt,
+                        row.CreatedBy, row.UserID, row.Duration, row.Progress
+                    );
+                });
 
                 const request = new sql.Request(tempPool);
                 await request.bulk(table);
@@ -448,20 +461,22 @@ async function synchronizeCriticalTables(jobId, tempDbName) {
         // --- Sync Sessions ---
         try {
             console.log(`[Job ${jobId}] Synchronizing sessions table...`);
-            const sourceData = await mainPool.request().query('SELECT * FROM sessions WHERE expiresAt > GETDATE()');
-            const destPks = await tempPool.request().query('SELECT id FROM sessions');
-            const destPkSet = new Set(destPks.recordset.map(r => r.id));
-            const missingRows = sourceData.recordset.filter(row => !destPkSet.has(row.id));
+            const sourceData = await mainPool.request().query('SELECT * FROM sessions WHERE expires_at > GETDATE()');
+            const destPks = await tempPool.request().query('SELECT sessionID FROM sessions');
+            const destPkSet = new Set(destPks.recordset.map(r => r.sessionID));
+            const missingRows = sourceData.recordset.filter(row => !destPkSet.has(row.sessionID));
 
             if (missingRows.length > 0) {
                 console.log(`[Job ${jobId}] Copying ${missingRows.length} active sessions.`);
                 const table = new sql.Table('sessions');
-                table.columns.add('id', sql.NVarChar(255), { nullable: false, primary: true });
-                table.columns.add('userId', sql.Int, { nullable: false });
-                table.columns.add('token', sql.NVarChar(sql.MAX), { nullable: false });
-                table.columns.add('expiresAt', sql.DateTime, { nullable: false });
+                table.columns.add('sessionID', sql.NVarChar(255), { nullable: false, primary: true });
+                table.columns.add('userID', sql.Int, { nullable: true });
+                table.columns.add('created_at', sql.DateTime, { nullable: false });
+                table.columns.add('expires_at', sql.DateTime, { nullable: true });
 
-                missingRows.forEach(row => table.rows.add(row.id, row.userId, row.token, row.expiresAt));
+                missingRows.forEach(row => {
+                    table.rows.add(row.sessionID, row.userID, row.created_at, row.expires_at);
+                });
 
                 const request = new sql.Request(tempPool);
                 await request.bulk(table);
@@ -473,14 +488,14 @@ async function synchronizeCriticalTables(jobId, tempDbName) {
         // --- Sync Audit Trail ---
         try {
             console.log(`[Job ${jobId}] Synchronizing [audit trail] table...`);
-            const maxTimestampResult = await tempPool.request().query('SELECT MAX(timestamp) as max_ts FROM [audit trail]');
+            const maxTimestampResult = await tempPool.request().query('SELECT MAX(created_at) as max_ts FROM [audit trail]');
             const maxTimestamp = maxTimestampResult.recordset[0].max_ts;
 
             let sourceData;
             if (maxTimestamp) {
                 const request = mainPool.request();
-                request.input('max_ts', sql.DateTime2, maxTimestamp);
-                sourceData = await request.query('SELECT * FROM [audit trail] WHERE timestamp > @max_ts');
+                request.input('max_ts', sql.DateTime, maxTimestamp);
+                sourceData = await request.query('SELECT * FROM [audit trail] WHERE created_at > @max_ts');
             } else {
                 sourceData = await mainPool.request().query('SELECT * FROM [audit trail]');
             }
@@ -488,25 +503,33 @@ async function synchronizeCriticalTables(jobId, tempDbName) {
             const missingRows = sourceData.recordset;
 
             if (missingRows.length > 0) {
-                console.log(`[Job ${jobId}] Copying ${missingRows.length} new audit trail entries.`);
+                console.log(`[Job ${jobId}] Bulk inserting ${missingRows.length} new audit trail entries.`);
                 
-                await tempPool.request().query('SET IDENTITY_INSERT [audit trail] ON;');
+                const table = new sql.Table('[audit trail]');
+                table.columns.add('auditID', sql.NVarChar(16), { nullable: false, primary: true });
+                table.columns.add('userID', sql.Int, { nullable: true });
+                table.columns.add('moduleName', sql.NVarChar(128), { nullable: true });
+                table.columns.add('actions', sql.NVarChar(50), { nullable: false });
+                table.columns.add('old_value', sql.NVarChar(sql.MAX), { nullable: true });
+                table.columns.add('new_value', sql.NVarChar(sql.MAX), { nullable: true });
+                table.columns.add('descriptions', sql.NVarChar(255), { nullable: false });
+                table.columns.add('created_at', sql.DateTime, { nullable: false });
 
-                for (const row of missingRows) {
-                    const request = new sql.Request(tempPool);
-                    request.input('id', sql.Int, row.id);
-                    request.input('actor', sql.VarChar(1), row.actor);
-                    request.input('module', sql.VarChar(1), row.module);
-                    request.input('userID', sql.Int, row.userID);
-                    request.input('actions', sql.VarChar(50), row.actions);
-                    request.input('oldValue', sql.NVarChar(sql.MAX), row.oldValue);
-                    request.input('newValue', sql.NVarChar(sql.MAX), row.newValue);
-                    request.input('descriptions', sql.NVarChar(sql.MAX), row.descriptions);
-                    request.input('timestamp', sql.DateTime, row.timestamp);
-                    await request.query('INSERT INTO [audit trail] (id, actor, module, userID, actions, oldValue, newValue, descriptions, timestamp) VALUES (@id, @actor, @module, @userID, @actions, @oldValue, @newValue, @descriptions, @timestamp)');
-                }
+                missingRows.forEach(row => {
+                    table.rows.add(
+                        row.auditID,
+                        row.userID,
+                        row.moduleName,
+                        row.actions,
+                        row.old_value,
+                        row.new_value,
+                        row.descriptions,
+                        row.created_at
+                    );
+                });
 
-                await tempPool.request().query('SET IDENTITY_INSERT [audit trail] OFF;');
+                const request = new sql.Request(tempPool);
+                await request.bulk(table);
             }
         } catch (e) {
             console.warn(`[Job ${jobId}] WARNING: Could not synchronize [audit trail]. ${e.message}`);
@@ -622,16 +645,13 @@ async function executeRestore(jobId, localFile) {
         console.log(`[Job ${jobId}] Successfully imported to temporary database. Proceeding with swap.`);
 
         // --- Start of Critical Section: Database Swap ---
-        // Broadcast maintenance message BEFORE closing the pool
         broadcast({ type: 'maintenance_starting' });
 
-        // From this point on, the main application pool is closed. All operations must use a temporary connection.
         console.log(`[Job ${jobId}] Closing application connection pool to begin database swap...`);
         const pool = await getConnection();
         await pool.close();
         console.log(`[Job ${jobId}] Main connection pool closed.`);
 
-        const sql = require('mssql');
         let masterConnection; // This connection will be used for the entire swap process
 
         try {
@@ -671,14 +691,15 @@ async function executeRestore(jobId, localFile) {
             console.log(`[Job ${jobId}] Final status updated to 'completed'.`);
 
             // 5. Add audit trail for the successful restore
+            const auditID = randomBytes(8).toString('hex');
             await masterConnection.request()
-                .input('actor', sql.VarChar(1), 'A')
-                .input('module', sql.VarChar(1), 'B')
+                .input('auditID', sql.NVarChar(16), auditID)
                 .input('userID', sql.Int, UserID)
-                .input('actions', sql.VarChar(50), 'restore-database')
-                .input('newValue', sql.NVarChar(sql.MAX), FileName)
-                .input('descriptions', sql.NVarChar(sql.MAX), `Admin ${CreatedBy} restored the database from ${FileName} (${restoreType}).`)
-                .query("INSERT INTO [audit trail] (actor, module, userID, actions, oldValue, newValue, descriptions, timestamp) VALUES (@actor, @module, @userID, @actions, NULL, @newValue, @descriptions, GETDATE())");
+                .input('moduleName', sql.NVarChar(128), 'Backup')
+                .input('actions', sql.NVarChar(50), 'restore-database')
+                .input('new_value', sql.NVarChar(sql.MAX), FileName)
+                .input('descriptions', sql.NVarChar(255), `Admin ${CreatedBy} restored the database from ${FileName} (${restoreType}).`)
+                .query("INSERT INTO [audit trail] (auditID, userID, moduleName, actions, old_value, new_value, descriptions, created_at) VALUES (@auditID, @userID, @moduleName, @actions, NULL, @new_value, @descriptions, GETDATE())");
             console.log(`[Job ${jobId}] Audit trail for restore created.`);
 
             // 6. Create flag file for successful restore
@@ -693,7 +714,6 @@ async function executeRestore(jobId, localFile) {
             console.error(`[Job ${jobId}] CRITICAL: The restore process failed during the final database swap.`, swapError);
 
             if (masterConnection && masterConnection.connected) {
-                // If the swap failed, use the master connection to mark the job as 'failed'
                 const duration = Math.round((Date.now() - startTime) / 1000);
                 try {
                     await masterConnection.request()
@@ -710,7 +730,6 @@ async function executeRestore(jobId, localFile) {
             } else {
                 console.error(`[Job ${jobId}] FATAL: Could not update job status to 'failed' because the master connection could not be established.`);
             }
-            // Manual intervention will be required. The temp DB may still exist.
             console.error(`[Job ${jobId}] Manual intervention may be required. The temporary database '${tempDbName}' might still exist.`);
 
         } finally {

@@ -1,18 +1,121 @@
-> so base on the runtime log stream of @console.txt , what just happened?
+> so i asked claude AI to diagnose our conversation which can be read on the @ClaudeAI.txt . Just to make sure, did you scan the @backend/database/database_query.txt which 
+  contains all active schema of the database and properly match to the @backend/Admin/backup.js ? IMPORTANT NOTE: The original code structure of @backend/Admin/backup.js was
+  stored on the @backend.txt because the gemini CLI keeps failing. Make sure to scan the @backend.txt first then paste the whole, modified, completed code structure on
+  @backend/Admin/backup.js
 
-✦ Based on the Azure runtime log, here is a summary of what happened:
+✦ Okay, I understand the task. Based on the analysis from ClaudeAI.txt and the database schema from backend/database/database_query.txt, I will correct the issues in
+  backend/Admin/backup.js. The original code from backend.txt has several mismatches with the database schema, particularly in the synchronizeCriticalTables function and in how
+  audit trail records are created.
 
-   1. Successful Startup: The backend server started normally, initializing all its services, including the WebSocket server.
-   2. Database Restore Initiated: At 15:35:59, a user named "Luis Albert De Guzman" started a database restore from a backup file (smartSK_2025-10-13_19-40-12.zip).
-   3. Maintenance Message Sent: At 15:38:38, just before swapping the database, the server correctly broadcast the { "type": "maintenance_starting" } message over the WebSocket.
-      This indicates the feature we worked on is functioning.
-   4. Critical Failure: The restore process failed catastrophically at 15:38:59. After successfully importing the backup and renaming the database, the application tried to update
-      the status of the restore job. It immediately crashed with the error: RequestError: Invalid object name 'BackupJobs'.
-   5. Application Restart: The crash triggered an automatic restart of your application container. The server was back online and running by 15:41:07.
+  My plan is to:
+   1. Correct the data synchronization logic for the BackupJobs, sessions, and [audit trail] tables within the synchronizeCriticalTables function to align with the schema.
+   2. Fix the column names, data types, and primary key handling for each table.
+   3. Remove the incorrect use of IDENTITY_INSERT for the [audit trail] table.
+   4. Replace the direct calls to addAuditTrail and the manual INSERT for the audit trail with a corrected, direct database query that matches the schema, including generating a
+      unique auditID.
 
-  Conclusion:
+  I will now read the original code to apply these modifications.
+ ╭──────────────────────────╮
+ │ ✓  ReadFile backend.txt  │
+ ╰──────────────────────────╯
+✦ Excellent. I have the original code. I will now apply the necessary corrections based on the schema and write the updated, complete code to
+  D:\Projects\Projects\smartSK\backend\Admin\backup.js.
+ ╭─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+ │ ✓  WriteFile Writing to backend\Admin\backup.js                                                                                                                         │
+ │                                                                                                                                                                         │
+ │    ... first 652 lines hidden ...                                                                                                                                       │
+ │    653                     trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'                                                                   │
+ │    654                 }                                                                                                                                                │
+ │    655             };                                                                                                                                                   │
+ │    656             masterConnection = await new sql.ConnectionPool(masterDbConfig).connect();                                                                           │
+ │    657             console.log(`[Job ${jobId}] Connected to master database for swap.`);                                                                                │
+ │    658                                                                                                                                                                  │
+ │    659             // 2. Drop the old database                                                                                                                          │
+ │    660             const targetDbName = dbName;                                                                                                                         │
+ │    661             console.log(`[Job ${jobId}] Dropping old database: ${targetDbName}...`);                                                                             │
+ │    662             await dropDatabaseWithRetries(masterConnection, targetDbName);                                                                                       │
+ │    663                                                                                                                                                                  │
+ │    664             // 3. Rename the new database                                                                                                                        │
+ │    665             console.log(`[Job ${jobId}] Renaming temporary database '${tempDbName}' to '${targetDbName}'...`);                                                   │
+ │    666             await masterConnection.request().query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${targetDbName}];`);                                           │
+ │    667             console.log(`[Job ${jobId}] Successfully renamed database to '${targetDbName}'.`);                                                                   │
+ │    668                                                                                                                                                                  │
+ │    669             // 4. Mark the job as completed                                                                                                                      │
+ │    670             const duration = Math.round((Date.now() - startTime) / 1000);                                                                                        │
+ │    671             await masterConnection.request()                                                                                                                     │
+ │    672                 .input('JobID', sql.NVarChar(50), jobId)                                                                                                         │
+ │    673                 .input('Status', sql.NVarChar(20), 'completed')                                                                                                  │
+ │    674                 .input('Message', sql.NVarChar(500), 'Database restore completed successfully.')                                                                 │
+ │    675                 .input('Duration', sql.Int, duration)                                                                                                            │
+ │    676                 .input('CompletedAt', sql.DateTime2, new Date())                                                                                                 │
+ │    677                 .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, CompletedAt = @CompletedAt, processing = 0 WHERE       │
+ │        JobID = @JobID');                                                                                                                                                │
+ │    678             console.log(`[Job ${jobId}] Final status updated to 'completed'.`);                                                                                  │
+ │    679                                                                                                                                                                  │
+ │    680             // 5. Add audit trail for the successful restore                                                                                                     │
+ │    681             const auditID = randomBytes(8).toString('hex');                                                                                                      │
+ │    682             await masterConnection.request()                                                                                                                     │
+ │    683                 .input('auditID', sql.NVarChar(16), auditID)                                                                                                     │
+ │    684                 .input('userID', sql.Int, UserID)                                                                                                                │
+ │    685                 .input('moduleName', sql.NVarChar(128), 'Backup')                                                                                                │
+ │    686                 .input('actions', sql.NVarChar(50), 'restore-database')                                                                                          │
+ │    687                 .input('new_value', sql.NVarChar(sql.MAX), FileName)                                                                                             │
+ │    688                 .input('descriptions', sql.NVarChar(255), `Admin ${CreatedBy} restored the database from ${FileName} (${restoreType}).`)                         │
+ │    689                 .query("INSERT INTO [audit trail] (auditID, userID, moduleName, actions, old_value, new_value, descriptions, created_at) VALUES (@auditID,       │
+ │        @userID, @moduleName, @actions, NULL, @new_value, @descriptions, GETDATE())");                                                                                   │
+ │    690             console.log(`[Job ${jobId}] Audit trail for restore created.`);                                                                                      │
+ │    691                                                                                                                                                                  │
+ │    692             // 6. Create flag file for successful restore                                                                                                        │
+ │    693             const flagPath = path.join(__dirname, 'maintenance_complete.flag');                                                                                  │
+ │    694             fs.writeFileSync(flagPath, 'Restore completed');                                                                                                     │
+ │    695             console.log(`[Job ${jobId}] Maintenance completion flag created.`);                                                                                  │
+ │    696                                                                                                                                                                  │
+ │    697             console.log(`[Job ${jobId}] Restore complete. Application requires a restart to use the new database.`);                                             │
+ │    698                                                                                                                                                                  │
+ │    699         } catch (swapError) {                                                                                                                                    │
+ │    700             // --- CRITICAL FAILURE HANDLING ---                                                                                                                 │
+ │    701             console.error(`[Job ${jobId}] CRITICAL: The restore process failed during the final database swap.`, swapError);                                     │
+ │    702                                                                                                                                                                  │
+ │    703             if (masterConnection && masterConnection.connected) {                                                                                                │
+ │    704                 const duration = Math.round((Date.now() - startTime) / 1000);                                                                                    │
+ │    705                 try {                                                                                                                                            │
+ │    706                     await masterConnection.request()                                                                                                             │
+ │    707                         .input('JobID', sql.NVarChar(50), jobId)                                                                                                 │
+ │    708                         .input('Status', sql.NVarChar(20), 'failed')                                                                                             │
+ │    709                         .input('Message', sql.NVarChar(500), `Restore failed during database swap: ${swapError.message}`)                                        │
+ │    710                         .input('Duration', sql.Int, duration)                                                                                                    │
+ │    711                         .input('ErrorMessage', sql.NVarChar(sql.MAX), swapError.stack)                                                                           │
+ │    712                         .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, ErrorMessage = @ErrorMessage, processing = 0   │
+ │        WHERE JobID = @JobID');                                                                                                                                          │
+ │    713                     console.log(`[Job ${jobId}] Final status updated to 'failed'.`);                                                                             │
+ │    714                 } catch (updateError) {                                                                                                                          │
+ │    715                     console.error(`[Job ${jobId}] FATAL: Could not update job status to 'failed' even with master connection.`, updateError);                    │
+ │    716                 }                                                                                                                                                │
+ │    717             } else {                                                                                                                                             │
+ │    718                 console.error(`[Job ${jobId}] FATAL: Could not update job status to 'failed' because the master connection could not be established.`);          │
+ │    719             }                                                                                                                                                    │
+ │    720             console.error(`[Job ${jobId}] Manual intervention may be required. The temporary database '${tempDbName}' might still exist.`);                      │
+ │    721                                                                                                                                                                  │
+ │    722         } finally {                                                                                                                                              │
+ │    723             // 7. Always close the master connection and clean up files                                                                                          │
+ │    724             if (masterConnection && masterConnection.connected) {                                                                                                │
+ │    725                 await masterConnection.close();                                                                                                                  │
+ │    726                 console.log(`[Job ${jobId}] Master connection closed.`);                                                                                         │
+ │    727             }                                                                                                                                                    │
+ │    728             cleanup();                                                                                                                                           │
+ │    729         }                                                                                                                                                        │
+ │    730                                                                                                                                                                  │
+ │    731     } catch (error) {                                                                                                                                            │
+ │    732         const duration = Math.round((Date.now() - startTime) / 1000);                                                                                            │
+ │    733         await updateJob(jobId, 'failed', `Restore failed: ${error.message}`, { ErrorMessage: error.stack, Duration: duration });                                 │
+ │    734         console.error(`[Job ${jobId}] Restore process failed:`, error);                                                                                          │
+ │    735         cleanup();                                                                                                                                               │
+ │    736     }                                                                                                                                                            │
+ │    737 }                                                                                                                                                                │
+ │    738                                                                                                                                                                  │
+ │    739 module.exports = router;                                                                                                                                         │
+ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ I have overwritten D:\Projects\Projects\smartSK\backend\Admin\backup.js with the corrected code. The updated script now aligns with the database schema provided, addressing the
+  synchronization issues for BackupJobs, sessions, and [audit trail] tables, and fixing the audit trail record creation.
 
-  The application crashed because after restoring the database from your backup file, it could not find the BackupJobs table inside the newly restored database.
-
-  This almost certainly means the backup file (.bacpac) you are restoring is from an older version of the database schema that does not contain the `BackupJobs` table. The
-  current application code requires that table to exist to manage the restore process, so when it couldn't find it, a fatal, unrecoverable error occurred.
+  The code should no longer fail due to the previously identified schema mismatches.
