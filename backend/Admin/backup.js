@@ -652,10 +652,11 @@ async function executeRestore(jobId, localFile) {
         await pool.close();
         console.log(`[Job ${jobId}] Main connection pool closed.`);
 
-        let masterConnection; // This connection will be used for the entire swap process
+        let masterConnection;
+        let finalDbConnection;
 
         try {
-            // 1. Connect to the master database
+            // 1. Connect to the master database for administrative tasks
             const masterDbConfig = {
                 server: dbServer,
                 user: process.env.DB_USER,
@@ -679,9 +680,29 @@ async function executeRestore(jobId, localFile) {
             await masterConnection.request().query(`ALTER DATABASE [${tempDbName}] MODIFY NAME = [${targetDbName}];`);
             console.log(`[Job ${jobId}] Successfully renamed database to '${targetDbName}'.`);
 
-            // 4. Mark the job as completed
+            // 4. Disconnect from master; it's no longer needed.
+            await masterConnection.close();
+            masterConnection = null; // Prevent re-closing in finally block
+            console.log(`[Job ${jobId}] Master connection closed.`);
+
+            // 5. Connect to the newly restored database to finalize the job
+            console.log(`[Job ${jobId}] Connecting to new database '${targetDbName}' to finalize job status.`);
+            const finalDbConfig = {
+                server: dbServer,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: targetDbName, // Connect to the renamed, final database
+                options: {
+                    encrypt: process.env.DB_ENCRYPT !== 'false',
+                    trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'
+                }
+            };
+            finalDbConnection = await new sql.ConnectionPool(finalDbConfig).connect();
+            console.log(`[Job ${jobId}] Connected to new database.`);
+
+            // 6. Mark the job as completed using the correct database connection
             const duration = Math.round((Date.now() - startTime) / 1000);
-            await masterConnection.request()
+            await finalDbConnection.request()
                 .input('JobID', sql.NVarChar(50), jobId)
                 .input('Status', sql.NVarChar(20), 'completed')
                 .input('Message', sql.NVarChar(500), 'Database restore completed successfully.')
@@ -690,9 +711,9 @@ async function executeRestore(jobId, localFile) {
                 .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, CompletedAt = @CompletedAt, processing = 0 WHERE JobID = @JobID');
             console.log(`[Job ${jobId}] Final status updated to 'completed'.`);
 
-            // 5. Add audit trail for the successful restore
+            // 7. Add audit trail for the successful restore
             const auditID = randomBytes(8).toString('hex');
-            await masterConnection.request()
+            await finalDbConnection.request()
                 .input('auditID', sql.NVarChar(16), auditID)
                 .input('userID', sql.Int, UserID)
                 .input('moduleName', sql.NVarChar(128), 'Backup')
@@ -702,7 +723,7 @@ async function executeRestore(jobId, localFile) {
                 .query("INSERT INTO [audit trail] (auditID, userID, moduleName, actions, old_value, new_value, descriptions, created_at) VALUES (@auditID, @userID, @moduleName, @actions, NULL, @new_value, @descriptions, GETDATE())");
             console.log(`[Job ${jobId}] Audit trail for restore created.`);
 
-            // 6. Create flag file for successful restore
+            // 8. Create flag file for successful restore
             const flagPath = path.join(__dirname, 'maintenance_complete.flag');
             fs.writeFileSync(flagPath, 'Restore completed');
             console.log(`[Job ${jobId}] Maintenance completion flag created.`);
@@ -713,30 +734,49 @@ async function executeRestore(jobId, localFile) {
             // --- CRITICAL FAILURE HANDLING ---
             console.error(`[Job ${jobId}] CRITICAL: The restore process failed during the final database swap.`, swapError);
 
-            if (masterConnection && masterConnection.connected) {
+            // Attempt to connect to the application DB to mark the job as failed.
+            let errorUpdateConnection;
+            try {
+                console.log(`[Job ${jobId}] Attempting to connect to application DB to mark job as failed...`);
+                const appDbConfig = {
+                    server: dbServer,
+                    user: process.env.DB_USER,
+                    password: process.env.DB_PASSWORD,
+                    database: dbName, // Try to connect to the final DB name
+                    options: {
+                        encrypt: process.env.DB_ENCRYPT !== 'false',
+                        trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'
+                    }
+                };
+                errorUpdateConnection = await new sql.ConnectionPool(appDbConfig).connect();
+
                 const duration = Math.round((Date.now() - startTime) / 1000);
-                try {
-                    await masterConnection.request()
-                        .input('JobID', sql.NVarChar(50), jobId)
-                        .input('Status', sql.NVarChar(20), 'failed')
-                        .input('Message', sql.NVarChar(500), `Restore failed during database swap: ${swapError.message}`)
-                        .input('Duration', sql.Int, duration)
-                        .input('ErrorMessage', sql.NVarChar(sql.MAX), swapError.stack)
-                        .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, ErrorMessage = @ErrorMessage, processing = 0 WHERE JobID = @JobID');
-                    console.log(`[Job ${jobId}] Final status updated to 'failed'.`);
-                } catch (updateError) {
-                    console.error(`[Job ${jobId}] FATAL: Could not update job status to 'failed' even with master connection.`, updateError);
+                await errorUpdateConnection.request()
+                    .input('JobID', sql.NVarChar(50), jobId)
+                    .input('Status', sql.NVarChar(20), 'failed')
+                    .input('Message', sql.NVarChar(500), `Restore failed during database swap: ${swapError.message}`)
+                    .input('Duration', sql.Int, duration)
+                    .input('ErrorMessage', sql.NVarChar(sql.MAX), swapError.stack)
+                    .query('UPDATE BackupJobs SET Status = @Status, Message = @Message, Duration = @Duration, ErrorMessage = @ErrorMessage, processing = 0 WHERE JobID = @JobID');
+                console.log(`[Job ${jobId}] Successfully updated job status to 'failed' in application DB.`);
+            } catch (updateError) {
+                console.error(`[Job ${jobId}] FATAL: Could not update job status to 'failed' in any database.`, updateError);
+            } finally {
+                if (errorUpdateConnection && errorUpdateConnection.connected) {
+                    await errorUpdateConnection.close();
                 }
-            } else {
-                console.error(`[Job ${jobId}] FATAL: Could not update job status to 'failed' because the master connection could not be established.`);
             }
             console.error(`[Job ${jobId}] Manual intervention may be required. The temporary database '${tempDbName}' might still exist.`);
 
         } finally {
-            // 7. Always close the master connection and clean up files
+            // 9. Always close any open connections and clean up files
             if (masterConnection && masterConnection.connected) {
                 await masterConnection.close();
                 console.log(`[Job ${jobId}] Master connection closed.`);
+            }
+            if (finalDbConnection && finalDbConnection.connected) {
+                await finalDbConnection.close();
+                console.log(`[Job ${jobId}] Final DB connection closed.`);
             }
             cleanup();
         }
