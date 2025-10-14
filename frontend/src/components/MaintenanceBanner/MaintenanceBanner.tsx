@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useWebSocket } from '../../context/WebSocketContext';
 import { useAuth } from '../../context/AuthContext';
+import { toast } from 'react-toastify';
 import './MaintenanceBanner.css';
 
 const MaintenanceBanner: React.FC = () => {
@@ -13,6 +14,15 @@ const MaintenanceBanner: React.FC = () => {
     if (maintenanceMessage) {
       setVisible(true);
       if (maintenanceMessage.type === 'maintenance_starting') {
+        toast.warn(`Server is restarting for maintenance. You will be logged out in 10 seconds.`, {
+          position: "top-center",
+          autoClose: 10000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+        });
         setCountdown(10);
         const countdownInterval = setInterval(() => {
           setCountdown(prev => prev - 1);
@@ -26,6 +36,11 @@ const MaintenanceBanner: React.FC = () => {
           clearInterval(countdownInterval);
           clearTimeout(logoutTimer);
         };
+      } else if (maintenanceMessage.type === 'maintenance_ended') {
+        toast.success('Server maintenance is complete. You may log in now.', {
+          position: "top-center",
+          autoClose: 15000,
+        });
       }
     } else {
       setVisible(false);

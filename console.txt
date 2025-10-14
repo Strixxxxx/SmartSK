@@ -8,13 +8,7 @@
 
 --Frontend (VSC Terminal)
 
-src/context/WebSocketContext.tsx:35:20 - error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
 
-35       const host = process.env.NODE_ENV === 'production' ? window.location.host : 'localhost:8080';
-                      ~~~~~~~
-
-
-Found 1 error.
 
 --Backend(VSC Terminal)
 
@@ -26,7 +20,220 @@ Found 1 error.
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-
+Connected!
+2025-10-14T03:22:30.4510481Z [WebSocket] Client connected.
+2025-10-14T03:22:42.804765Z Login attempt received
+2025-10-14T03:22:45.726023Z Login successful for user.
+2025-10-14T03:23:49.3881856Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Created in database: {"backupType":"local-restore","initiatedBy":"Luis Albert De Guzman","userId":1,"fileName":"smartSK_2025-10-13_19-40-12.zip"}
+2025-10-14T03:23:49.4885021Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Updated in database to processing: Starting restore process...
+2025-10-14T03:23:49.4885283Z [Restore Cleanup] Searching for orphaned databases matching: Smart_SK_FINAL_restore_%
+2025-10-14T03:23:49.7353912Z [Restore Cleanup] No orphaned databases found.
+2025-10-14T03:23:49.8206211Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Updated in database to processing: Preparing backup file...
+2025-10-14T03:23:49.8227387Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Extracting smartSK_2025-10-13_19-40-12.zip...
+2025-10-14T03:23:50.0857755Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Extracted smartSK_2025-10-13_19-40-12.bacpac.
+2025-10-14T03:23:50.1033831Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Updated in database to processing: Importing to temporary database: Smart_SK_FINAL_restore_1760412229459...
+2025-10-14T03:23:51.9842924Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Importing to database 'Smart_SK_FINAL_restore_1760412229459' on server 'smart-sk.database.windows.net'.
+2025-10-14T03:23:51.9843537Z
+2025-10-14T03:23:52.6755702Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Creating deployment plan
+2025-10-14T03:23:52.6756686Z
+2025-10-14T03:23:52.6832879Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Initializing deployment
+2025-10-14T03:23:52.6833256Z
+2025-10-14T03:24:00.8694376Z [WebSocket] Client disconnected.
+2025-10-14T03:24:00.9843823Z [WebSocket] Client connected.
+2025-10-14T03:24:17.3527789Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Verifying deployment plan
+2025-10-14T03:24:17.3528553Z
+2025-10-14T03:24:17.3723293Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Analyzing deployment plan
+2025-10-14T03:24:17.3723809Z
+2025-10-14T03:24:17.734996Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Importing package schema and data into database
+2025-10-14T03:24:17.7350232Z
+2025-10-14T03:24:17.7350698Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Updating database
+2025-10-14T03:24:17.7350728Z
+2025-10-14T03:25:19.691Z No new trace in the past 1 min(s).
+2025-10-14T03:26:15.1427167Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Importing data
+2025-10-14T03:26:15.1427646Z
+2025-10-14T03:26:15.2254415Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Import.
+2025-10-14T03:26:15.22554Z
+2025-10-14T03:26:15.2827859Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Disabling indexes.
+2025-10-14T03:26:15.2828342Z
+2025-10-14T03:26:15.2875092Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Disabling index 'IX_BackupJobs_CreatedAt'.
+2025-10-14T03:26:15.2875294Z
+2025-10-14T03:26:15.320648Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Disabling index 'IX_BackupJobs_ExpiresAt'.
+2025-10-14T03:26:15.3206833Z
+2025-10-14T03:26:15.3357717Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Disabling index 'IX_BackupJobs_CreatedBy'.
+2025-10-14T03:26:15.3357918Z
+2025-10-14T03:26:15.3488428Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Disabling index 'IX_BackupJobs_Status'.
+2025-10-14T03:26:15.348891Z
+2025-10-14T03:26:15.3595247Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Disabling index 'UQ__barangay__D961A6392041A0D9'.
+2025-10-14T03:26:15.3595504Z
+2025-10-14T03:26:15.374253Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Disabling index 'UQ__projects__321A0298AE13B83A'.
+2025-10-14T03:26:15.3743689Z
+2025-10-14T03:26:15.3895577Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Disabling index 'UQ__projects__321A0298F5586BA6'.
+2025-10-14T03:26:15.389598Z
+2025-10-14T03:26:15.4056447Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Disabling index 'UQ__roles__B1947861BA32E858'.
+2025-10-14T03:26:15.4056718Z
+2025-10-14T03:26:15.4192742Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Disabling index 'IX_userInfo_isArchived'.
+2025-10-14T03:26:15.4192965Z
+2025-10-14T03:26:15.4299898Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Disabling index 'UQ__userInfo__F3DBC572958ACDCF'.
+2025-10-14T03:26:15.4300095Z
+2025-10-14T03:26:16.1395449Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[audit trail]'.
+2025-10-14T03:26:16.1395772Z
+2025-10-14T03:26:16.1609115Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[BackupJobs]'.
+2025-10-14T03:26:16.1609687Z
+2025-10-14T03:26:16.2241461Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[barangays]'.
+2025-10-14T03:26:16.2242047Z
+2025-10-14T03:26:17.1303954Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[otpStore]'.
+2025-10-14T03:26:17.1304434Z
+2025-10-14T03:26:17.1312735Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[postAttachments]'.
+2025-10-14T03:26:17.131285Z
+2025-10-14T03:26:17.1318096Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[posts]'.
+2025-10-14T03:26:17.1318254Z
+2025-10-14T03:26:17.1387176Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[PostUploadJobs]'.
+2025-10-14T03:26:17.1387391Z
+2025-10-14T03:26:17.1395719Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[projects]'.
+2025-10-14T03:26:17.1395924Z Processing Table '[dbo].[projectsARC]'.
+2025-10-14T03:26:17.139595Z Processing Table '[dbo].[rawData]'.
+2025-10-14T03:26:17.1395971Z
+2025-10-14T03:26:17.1673564Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[rawDataDetails]'.
+2025-10-14T03:26:17.1674079Z
+2025-10-14T03:26:17.1904439Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[rawDataTrack]'.
+2025-10-14T03:26:17.1904917Z
+2025-10-14T03:26:17.2204507Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[roles]'.
+2025-10-14T03:26:17.2204982Z
+2025-10-14T03:26:17.247466Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[sessions]'.
+2025-10-14T03:26:17.2475125Z
+2025-10-14T03:26:17.2700883Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[StatusLookup]'.
+2025-10-14T03:26:17.2702596Z
+2025-10-14T03:26:17.2921548Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Processing Table '[dbo].[userInfo]'.
+2025-10-14T03:26:17.2922173Z
+2025-10-14T03:26:17.3166233Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Enabling indexes.
+2025-10-14T03:26:17.3166971Z
+2025-10-14T03:26:17.3229873Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Enabling index 'IX_BackupJobs_CreatedAt'.
+2025-10-14T03:26:17.3230125Z
+2025-10-14T03:26:17.3941247Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Enabling index 'IX_BackupJobs_ExpiresAt'.
+2025-10-14T03:26:17.3941504Z
+2025-10-14T03:26:17.458051Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Enabling index 'IX_BackupJobs_CreatedBy'.
+2025-10-14T03:26:17.4591961Z
+2025-10-14T03:26:17.4883579Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Enabling index 'IX_BackupJobs_Status'.
+2025-10-14T03:26:17.4883973Z
+2025-10-14T03:26:17.4985448Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Enabling index 'UQ__barangay__D961A6392041A0D9'.
+2025-10-14T03:26:17.49857Z
+2025-10-14T03:26:17.5337787Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Enabling index 'UQ__projects__321A0298AE13B83A'.
+2025-10-14T03:26:17.5338012Z
+2025-10-14T03:26:17.5435667Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Enabling index 'UQ__projects__321A0298F5586BA6'.
+2025-10-14T03:26:17.5437937Z
+2025-10-14T03:26:17.5633773Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Enabling index 'UQ__roles__B1947861BA32E858'.
+2025-10-14T03:26:17.5634252Z
+2025-10-14T03:26:17.5929762Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Enabling index 'IX_userInfo_isArchived'.
+2025-10-14T03:26:17.5930106Z
+2025-10-14T03:26:17.6403143Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Enabling index 'UQ__userInfo__F3DBC572958ACDCF'.
+2025-10-14T03:26:17.6403679Z
+2025-10-14T03:26:18.9917708Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Successfully imported database.
+2025-10-14T03:26:18.9918331Z
+2025-10-14T03:26:19.0012688Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] sqlpackage stdout: Time elapsed 0:02:27.05
+2025-10-14T03:26:19.0012888Z
+2025-10-14T03:26:19.1630519Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Database import to temp DB completed.
+2025-10-14T03:26:19.4229935Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Updated in database to processing: Finalizing database swap...
+2025-10-14T03:26:19.4237542Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Successfully imported to temporary database. Proceeding with swap.
+2025-10-14T03:26:19.4535349Z [WebSocket] Broadcasting message to 1 clients: { type: 'maintenance_starting' }
+2025-10-14T03:26:19.52691Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Closing application connection pool to begin database swap...
+2025-10-14T03:26:19.5377903Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Main connection pool closed.
+2025-10-14T03:26:19.671164Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Connected to master database for swap.
+2025-10-14T03:26:19.671553Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Dropping old database: Smart_SK_FINAL...
+2025-10-14T03:26:19.6744645Z [Drop DB Attempt 1/60] Dropping database: Smart_SK_FINAL
+2025-10-14T03:26:29.8075243Z [WebSocket] Client disconnected.
+2025-10-14T03:26:30.0087204Z [WebSocket] Client connected.
+2025-10-14T03:26:30.2650791Z [Drop DB] Successfully dropped database: Smart_SK_FINAL
+2025-10-14T03:26:30.2654154Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Renaming temporary database 'Smart_SK_FINAL_restore_1760412229459' to 'Smart_SK_FINAL'...
+2025-10-14T03:26:40.4087121Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Successfully renamed database to 'Smart_SK_FINAL'.
+2025-10-14T03:26:40.5003794Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] CRITICAL: The restore process failed during the final database swap. RequestError: Invalid object name 'BackupJobs'.
+2025-10-14T03:26:40.5004505Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-14T03:26:40.5004545Z     at Connection.emit (node:events:519:28)
+2025-10-14T03:26:40.5004655Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-14T03:26:40.5004683Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-14T03:26:40.5004727Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-14T03:26:40.5004747Z     at Readable.emit (node:events:519:28)
+2025-10-14T03:26:40.5004767Z     at addChunk (node:internal/streams/readable:561:12)
+2025-10-14T03:26:40.5004789Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-14T03:26:40.5004814Z     at Readable.push (node:internal/streams/readable:393:5)
+2025-10-14T03:26:40.5004834Z     at nextAsync (node:internal/streams/from:194:22) {
+2025-10-14T03:26:40.5004853Z   code: 'EREQUEST',
+2025-10-14T03:26:40.5004874Z   originalError: Error: Invalid object name 'BackupJobs'.
+2025-10-14T03:26:40.5004916Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
+2025-10-14T03:26:40.5004937Z       at Connection.emit (node:events:519:28)
+2025-10-14T03:26:40.5004958Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-14T03:26:40.500498Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-14T03:26:40.5005005Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-14T03:26:40.5005025Z       at Readable.emit (node:events:519:28)
+2025-10-14T03:26:40.5005045Z       at addChunk (node:internal/streams/readable:561:12)
+2025-10-14T03:26:40.5005066Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-14T03:26:40.5005086Z       at Readable.push (node:internal/streams/readable:393:5)
+2025-10-14T03:26:40.5005106Z       at nextAsync (node:internal/streams/from:194:22) {
+2025-10-14T03:26:40.5005148Z     info: ErrorMessageToken {
+2025-10-14T03:26:40.5005168Z       name: 'ERROR',
+2025-10-14T03:26:40.5005187Z       handlerName: 'onErrorMessage',
+2025-10-14T03:26:40.5005206Z       number: 208,
+2025-10-14T03:26:40.5005224Z       state: 1,
+2025-10-14T03:26:40.5005243Z       class: 16,
+2025-10-14T03:26:40.5005263Z       message: "Invalid object name 'BackupJobs'.",
+2025-10-14T03:26:40.5005282Z       serverName: 'smart-sk',
+2025-10-14T03:26:40.50053Z       procName: '',
+2025-10-14T03:26:40.5005319Z       lineNumber: 1
+2025-10-14T03:26:40.5005357Z     }
+2025-10-14T03:26:40.5005376Z   },
+2025-10-14T03:26:40.5005394Z   number: 208,
+2025-10-14T03:26:40.5005412Z   lineNumber: 1,
+2025-10-14T03:26:40.500543Z   state: 1,
+2025-10-14T03:26:40.5005448Z   class: 16,
+2025-10-14T03:26:40.5005467Z   serverName: 'smart-sk',
+2025-10-14T03:26:40.5005486Z   procName: '',
+2025-10-14T03:26:40.5005504Z   precedingErrors: []
+2025-10-14T03:26:40.5005522Z }
+2025-10-14T03:26:40.5412466Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] FATAL: Could not update job status to 'failed' even with master connection. RequestError: Invalid object name 'BackupJobs'.
+2025-10-14T03:26:40.5413343Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-14T03:26:40.5413625Z     at Connection.emit (node:events:519:28)
+2025-10-14T03:26:40.5413647Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-14T03:26:40.5413671Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-14T03:26:40.5413692Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-14T03:26:40.5413713Z     at Readable.emit (node:events:519:28)
+2025-10-14T03:26:40.5413733Z     at addChunk (node:internal/streams/readable:561:12)
+2025-10-14T03:26:40.5413754Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-14T03:26:40.5413774Z     at Readable.push (node:internal/streams/readable:393:5)
+2025-10-14T03:26:40.5413794Z     at nextAsync (node:internal/streams/from:194:22) {
+2025-10-14T03:26:40.5413812Z   code: 'EREQUEST',
+2025-10-14T03:26:40.5413855Z   originalError: Error: Invalid object name 'BackupJobs'.
+2025-10-14T03:26:40.5413876Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
+2025-10-14T03:26:40.5413899Z       at Connection.emit (node:events:519:28)
+2025-10-14T03:26:40.5413919Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-14T03:26:40.541394Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-14T03:26:40.5413961Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-14T03:26:40.5413981Z       at Readable.emit (node:events:519:28)
+2025-10-14T03:26:40.5414001Z       at addChunk (node:internal/streams/readable:561:12)
+2025-10-14T03:26:40.5414023Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-14T03:26:40.5414044Z       at Readable.push (node:internal/streams/readable:393:5)
+2025-10-14T03:26:40.5414065Z       at nextAsync (node:internal/streams/from:194:22) {
+2025-10-14T03:26:40.5414105Z     info: ErrorMessageToken {
+2025-10-14T03:26:40.5414124Z       name: 'ERROR',
+2025-10-14T03:26:40.5414142Z       handlerName: 'onErrorMessage',
+2025-10-14T03:26:40.541416Z       number: 208,
+2025-10-14T03:26:40.5414179Z       state: 1,
+2025-10-14T03:26:40.5414198Z       class: 16,
+2025-10-14T03:26:40.5414217Z       message: "Invalid object name 'BackupJobs'.",
+2025-10-14T03:26:40.5414237Z       serverName: 'smart-sk',
+2025-10-14T03:26:40.5414255Z       procName: '',
+2025-10-14T03:26:40.5414273Z       lineNumber: 1
+2025-10-14T03:26:40.541429Z     }
+2025-10-14T03:26:40.5414328Z   },
+2025-10-14T03:26:40.5414347Z   number: 208,
+2025-10-14T03:26:40.5414365Z   lineNumber: 1,
+2025-10-14T03:26:40.5415054Z   state: 1,
+2025-10-14T03:26:40.5415097Z   class: 16,
+2025-10-14T03:26:40.5415116Z   serverName: 'smart-sk',
+2025-10-14T03:26:40.5415134Z   procName: '',
+2025-10-14T03:26:40.5415152Z   precedingErrors: []
+2025-10-14T03:26:40.541517Z }
+2025-10-14T03:26:40.5427356Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Manual intervention may be required. The temporary database 'Smart_SK_FINAL_restore_1760412229459' might still exist.
+2025-10-14T03:26:40.5427453Z [Job a09faf4c-0b6d-4ad1-9462-42a7fda0ddad] Master connection closed.
+2025-10-14T03:27:48.628Z No new trace in the past 1 min(s).
 
 --Deployment Container Logs
 

@@ -1,7 +1,97 @@
-src/context/WebSocketContext.tsx:35:20 - error TS2580: Cannot find name 'process'. Do you need to install type definitions for node? Try `npm i --save-dev @types/node`.
+# Database Restore Enhancement Prompt for Gemini CLI
 
-35       const host = process.env.NODE_ENV === 'production' ? window.location.host : 'localhost:8080';
-                      ~~~~~~~
+## Problem Statement
+During the database restore process, after importing the backup to a temporary database and before swapping it with the main database, we need to synchronize critical system tables to prevent data loss and application crashes.
 
+## Required Changes
 
-Found 1 error.
+Before dropping the old main database (`Smart_SK_FINAL`) and renaming the temporary database (`Smart_SK_FINAL_restore_*`), implement a synchronization step for the following tables:
+
+1. **BackupJobs**
+2. **sessions** 
+3. **audit trail**
+
+## Synchronization Logic
+
+For each of the three tables listed above:
+
+1. **Compare entries** between the main database and the temporary restored database
+2. **Identify missing entries** in the temporary database that exist in the main database
+3. **Copy the missing entries** from the main database to the temporary database
+4. **Handle primary key conflicts** appropriately (skip duplicates or update based on timestamp)
+
+## Implementation Requirements
+
+### Step 1: After Successful Import
+After the sqlpackage import completes successfully and before initiating the database swap, add a new synchronization phase.
+
+### Step 2: For Each Table (BackupJobs, sessions, audit trail)
+
+```sql
+-- Connect to both databases
+-- Query the main database: SELECT * FROM [table_name]
+-- Query the temp database: SELECT * FROM [table_name]
+-- Compare the results by primary key
+-- Insert missing rows into the temp database
+```
+
+### Step 3: Specific Handling
+
+#### BackupJobs Table
+- Primary Key: Likely `JobId` or `Id`
+- Critical because: The current restore job must exist in the new database
+- Action: Copy ALL rows from main to temp (merge, don't replace)
+
+#### sessions Table  
+- Primary Key: Likely `SessionId` or `Id`
+- Critical because: Active user sessions must persist after restore
+- Action: Copy rows where session is still valid (not expired)
+
+#### audit trail Table
+- Primary Key: Likely `Id` or composite key
+- Critical because: Recent audit entries should be preserved
+- Action: Copy rows created after the backup timestamp
+
+### Step 4: Error Handling
+
+- If a table doesn't exist in the restored database (old schema), create it first using the schema from the main database
+- If synchronization fails for any table, log a warning but continue (don't fail the entire restore)
+- Log the number of rows copied for each table
+
+### Step 5: Logging
+
+Add detailed logging:
+```
+[Job {jobId}] Starting table synchronization...
+[Job {jobId}] Synchronizing BackupJobs table: {X} rows to copy
+[Job {jobId}] Synchronizing sessions table: {Y} rows to copy  
+[Job {jobId}] Synchronizing audit trail table: {Z} rows to copy
+[Job {jobId}] Table synchronization completed successfully
+```
+
+## Expected Behavior After Implementation
+
+1. Restore process imports backup to temporary database ✓
+2. **NEW**: Synchronize BackupJobs, sessions, and audit trail tables
+3. Drop old main database ✓
+4. Rename temporary database to main ✓
+5. Update job status in BackupJobs (now succeeds because job exists!)
+6. Restore completes without crash ✓
+
+## Success Criteria
+
+- The application no longer crashes with "Invalid object name 'BackupJobs'" error
+- Active user sessions persist after restore
+- Recent audit trail entries are preserved
+- The current restore job can be updated successfully after the swap
+
+## Additional Considerations
+
+- Use transactions where possible to ensure atomicity
+- Consider the timestamp of the backup - only sync data created AFTER that timestamp
+- Optimize for performance - use bulk insert operations
+- Test with both recent and old backup files to ensure compatibility
+
+---
+
+Please implement these changes in the database restore process, specifically in the section after the successful sqlpackage import and before the database drop/rename operations.

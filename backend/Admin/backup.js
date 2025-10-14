@@ -375,6 +375,154 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
     }
 });
 
+async function synchronizeCriticalTables(jobId, tempDbName) {
+    console.log(`[Job ${jobId}] Starting table synchronization...`);
+    const sql = require('mssql');
+
+    const mainDbConfig = {
+        server: dbServer,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: dbName, // The original, main database
+        options: {
+            encrypt: process.env.DB_ENCRYPT !== 'false',
+            trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'
+        }
+    };
+
+    const tempDbConfig = {
+        server: dbServer,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASSWORD,
+        database: tempDbName, // The newly restored temporary database
+        options: {
+            encrypt: process.env.DB_ENCRYPT !== 'false',
+            trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true'
+        }
+    };
+
+    let mainPool, tempPool;
+
+    try {
+        mainPool = await new sql.ConnectionPool(mainDbConfig).connect();
+        tempPool = await new sql.ConnectionPool(tempDbConfig).connect();
+        console.log(`[Job ${jobId}] Connected to both source and destination databases for synchronization.`);
+
+        // --- Sync BackupJobs ---
+        try {
+            console.log(`[Job ${jobId}] Synchronizing BackupJobs table...`);
+            const sourceData = await mainPool.request().query('SELECT * FROM BackupJobs');
+            const destPks = await tempPool.request().query('SELECT JobID FROM BackupJobs');
+            const destPkSet = new Set(destPks.recordset.map(r => r.JobID));
+            const missingRows = sourceData.recordset.filter(row => !destPkSet.has(row.JobID));
+
+            if (missingRows.length > 0) {
+                console.log(`[Job ${jobId}] Copying ${missingRows.length} rows to BackupJobs.`);
+                const table = new sql.Table('BackupJobs');
+                // Assuming schema is known and consistent
+                table.columns.add('JobID', sql.NVarChar(50), { nullable: false, primary: true });
+                table.columns.add('BackupType', sql.NVarChar(50));
+                table.columns.add('Status', sql.NVarChar(20));
+                table.columns.add('Message', sql.NVarChar(500));
+                table.columns.add('FileName', sql.NVarChar(255));
+                table.columns.add('BlobName', sql.NVarChar(255));
+                table.columns.add('BlobURL', sql.NVarChar(500));
+                table.columns.add('FileSize', sql.BigInt);
+                table.columns.add('Duration', sql.Int);
+                table.columns.add('InitiatedBy', sql.NVarChar(255));
+                table.columns.add('UserID', sql.Int);
+                table.columns.add('CreatedAt', sql.DateTime2);
+                table.columns.add('CompletedAt', sql.DateTime2, { nullable: true });
+                table.columns.add('ErrorMessage', sql.NVarChar(sql.MAX), { nullable: true });
+                table.columns.add('processing', sql.Bit, { nullable: true });
+
+                missingRows.forEach(row => table.rows.add(...Object.values(row)));
+
+                const request = new sql.Request(tempPool);
+                await request.bulk(table);
+            }
+        } catch (e) {
+            console.warn(`[Job ${jobId}] WARNING: Could not synchronize BackupJobs. ${e.message}`);
+        }
+
+        // --- Sync Sessions ---
+        try {
+            console.log(`[Job ${jobId}] Synchronizing sessions table...`);
+            const sourceData = await mainPool.request().query('SELECT * FROM sessions WHERE expiresAt > GETDATE()');
+            const destPks = await tempPool.request().query('SELECT id FROM sessions');
+            const destPkSet = new Set(destPks.recordset.map(r => r.id));
+            const missingRows = sourceData.recordset.filter(row => !destPkSet.has(row.id));
+
+            if (missingRows.length > 0) {
+                console.log(`[Job ${jobId}] Copying ${missingRows.length} active sessions.`);
+                const table = new sql.Table('sessions');
+                table.columns.add('id', sql.NVarChar(255), { nullable: false, primary: true });
+                table.columns.add('userId', sql.Int, { nullable: false });
+                table.columns.add('token', sql.NVarChar(sql.MAX), { nullable: false });
+                table.columns.add('expiresAt', sql.DateTime, { nullable: false });
+
+                missingRows.forEach(row => table.rows.add(row.id, row.userId, row.token, row.expiresAt));
+
+                const request = new sql.Request(tempPool);
+                await request.bulk(table);
+            }
+        } catch (e) {
+            console.warn(`[Job ${jobId}] WARNING: Could not synchronize sessions. ${e.message}`);
+        }
+
+        // --- Sync Audit Trail ---
+        try {
+            console.log(`[Job ${jobId}] Synchronizing [audit trail] table...`);
+            const maxTimestampResult = await tempPool.request().query('SELECT MAX(timestamp) as max_ts FROM [audit trail]');
+            const maxTimestamp = maxTimestampResult.recordset[0].max_ts;
+
+            let sourceData;
+            if (maxTimestamp) {
+                const request = mainPool.request();
+                request.input('max_ts', sql.DateTime2, maxTimestamp);
+                sourceData = await request.query('SELECT * FROM [audit trail] WHERE timestamp > @max_ts');
+            } else {
+                sourceData = await mainPool.request().query('SELECT * FROM [audit trail]');
+            }
+
+            const missingRows = sourceData.recordset;
+
+            if (missingRows.length > 0) {
+                console.log(`[Job ${jobId}] Copying ${missingRows.length} new audit trail entries.`);
+                
+                await tempPool.request().query('SET IDENTITY_INSERT [audit trail] ON;');
+
+                for (const row of missingRows) {
+                    const request = new sql.Request(tempPool);
+                    request.input('id', sql.Int, row.id);
+                    request.input('actor', sql.VarChar(1), row.actor);
+                    request.input('module', sql.VarChar(1), row.module);
+                    request.input('userID', sql.Int, row.userID);
+                    request.input('actions', sql.VarChar(50), row.actions);
+                    request.input('oldValue', sql.NVarChar(sql.MAX), row.oldValue);
+                    request.input('newValue', sql.NVarChar(sql.MAX), row.newValue);
+                    request.input('descriptions', sql.NVarChar(sql.MAX), row.descriptions);
+                    request.input('timestamp', sql.DateTime, row.timestamp);
+                    await request.query('INSERT INTO [audit trail] (id, actor, module, userID, actions, oldValue, newValue, descriptions, timestamp) VALUES (@id, @actor, @module, @userID, @actions, @oldValue, @newValue, @descriptions, @timestamp)');
+                }
+
+                await tempPool.request().query('SET IDENTITY_INSERT [audit trail] OFF;');
+            }
+        } catch (e) {
+            console.warn(`[Job ${jobId}] WARNING: Could not synchronize [audit trail]. ${e.message}`);
+        }
+
+        console.log(`[Job ${jobId}] Table synchronization completed successfully.`);
+
+    } catch (error) {
+        console.error(`[Job ${jobId}] CRITICAL: Failed to synchronize critical tables. The restore will continue, but data might be inconsistent. Error: ${error.message}`);
+        throw new Error(`Table synchronization failed: ${error.message}`);
+    } finally {
+        if (mainPool && mainPool.connected) await mainPool.close();
+        if (tempPool && tempPool.connected) await tempPool.close();
+    }
+}
+
 // --- (NEW) Asynchronous Restore Execution Logic ---
 async function executeRestore(jobId, localFile) {
     const startTime = Date.now();
@@ -464,6 +612,11 @@ async function executeRestore(jobId, localFile) {
             });
             sqlPackageProcess.on('error', (err) => reject(err));
         });
+
+        // --- NEW: Synchronize Critical Tables ---
+        await updateJob(jobId, 'processing', 'Synchronizing critical system tables...');
+        await synchronizeCriticalTables(jobId, tempDbName);
+        // --- End of Synchronization ---
 
         await updateJob(jobId, 'processing', 'Finalizing database swap...');
         console.log(`[Job ${jobId}] Successfully imported to temporary database. Proceeding with swap.`);
