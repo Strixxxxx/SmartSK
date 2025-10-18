@@ -38,7 +38,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
       }
       const wsUrl = backendHttpUrl.replace(/^http/, 'ws');
 
-      console.log('[WebSocket] Connecting to', wsUrl);
+      console.log('[WebSocket] Connecting to the Backend Server.');
       ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
