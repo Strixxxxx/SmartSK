@@ -10,6 +10,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './backend connection/axiosConfig'; // Import axios config for interceptors
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import MaintenanceHandler from './components/MaintenanceBanner/MaintenanceHandler';
 
 const App: React.FC = () => {
   return (
@@ -17,9 +18,11 @@ const App: React.FC = () => {
       <Router>
         <AuthProvider>
           <WebSocketProvider>
-            <MaintenanceBanner />
-            <AppRoutes />
-            <ToastContainer />
+            <MaintenanceHandler>
+              <MaintenanceBanner />
+              <AppRoutes />
+              <ToastContainer />
+            </MaintenanceHandler>
           </WebSocketProvider>
         </AuthProvider>
       </Router>

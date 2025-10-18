@@ -118,6 +118,45 @@ app.get('/api/health', (req, res) => {
   res.status(200).send('OK');
 });
 
+app.get('/api/maintenance-status', (req, res) => {
+  const flagPath = path.join(__dirname, 'maintenance.flag');
+  fs.access(flagPath, fs.constants.F_OK, (err) => {
+    res.json({ maintenance: !err });
+  });
+});
+
+// --- POST /api/maintenance-end : End maintenance mode ---
+app.post('/api/maintenance-end', (req, res) => {
+    const maintenanceFlagPath = path.join(__dirname, 'maintenance.flag');
+    
+    try {
+        if (fs.existsSync(maintenanceFlagPath)) {
+            fs.unlinkSync(maintenanceFlagPath);
+            console.log('[System] Maintenance mode ended via API call.');
+            
+            // Broadcast to all connected clients
+            broadcast({ type: 'maintenance_ended' });
+            
+            res.status(200).json({ 
+                success: true, 
+                message: 'Maintenance mode ended successfully' 
+            });
+        } else {
+            res.status(404).json({ 
+                success: false, 
+                message: 'System is not in maintenance mode' 
+            });
+        }
+    } catch (error) {
+        console.error('[System] Failed to end maintenance mode:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to end maintenance mode',
+            error: error.message 
+        });
+    }
+});
+
 app.use('/api/posts', postPublicRouter);
 
 // --- AUTHENTICATION MIDDLEWARE ---
@@ -409,6 +448,19 @@ if (fs.existsSync(flagPath)) {
     console.log('[System] Maintenance flag found. Server has restarted after a restore.');
     global.maintenanceJustFinished = true;
     fs.unlinkSync(flagPath); // Delete the flag after acknowledging it
+
+    // Delete maintenance.flag and broadcast maintenance ended
+    const maintenanceFlagPath = path.join(__dirname, 'maintenance.flag');
+    if (fs.existsSync(maintenanceFlagPath)) {
+        fs.unlinkSync(maintenanceFlagPath);
+        console.log('[System] Maintenance mode flag removed.');
+        
+        // Broadcast maintenance ended after server restart
+        setTimeout(() => {
+            broadcast({ type: 'maintenance_ended' });
+            console.log('[System] Broadcasted maintenance_ended to all clients.');
+        }, 2000); // Wait 2 seconds for WebSocket server to be ready
+    }
 }
 
 // Start the server

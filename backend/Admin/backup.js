@@ -652,6 +652,19 @@ async function executeRestore(jobId, localFile) {
         console.log(`[Job ${jobId}] Successfully imported to temporary database. Proceeding with swap.`);
 
         // --- Start of Critical Section: Database Swap ---
+        // **THIS IS WHERE MAINTENANCE MODE SHOULD START**
+        const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
+        try {
+            fs.writeFileSync(maintenanceFlagPath, JSON.stringify({
+                startedAt: new Date().toISOString(),
+                jobId: jobId,
+                reason: 'database_restore'
+            }));
+            console.log('[Restore] Maintenance mode flag created.');
+        } catch (flagError) {
+            console.error('[Restore] CRITICAL: Failed to create maintenance mode flag.', flagError);
+        }
+
         broadcast({ type: 'maintenance_starting' });
 
         console.log(`[Job ${jobId}] Closing application connection pool to begin database swap...`);
@@ -800,7 +813,42 @@ async function executeRestore(jobId, localFile) {
         await updateJob(jobId, 'failed', `Restore failed: ${error.message}`, { ErrorMessage: error.stack, Duration: duration });
         console.error(`[Job ${jobId}] Restore process failed:`, error);
         cleanup();
+        
+        // Clean up maintenance flag on failure
+        const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
+        if (fs.existsSync(maintenanceFlagPath)) {
+            fs.unlinkSync(maintenanceFlagPath);
+            console.log(`[Job ${jobId}] Maintenance flag removed after restore failure.`);
+        }
     }
 }
+
+// --- POST /maintenance-start : Manually trigger maintenance mode ---
+router.post('/maintenance-start', authMiddleware, async (req, res) => {
+    try {
+        const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
+        fs.writeFileSync(maintenanceFlagPath, JSON.stringify({
+            startedAt: new Date().toISOString(),
+            startedBy: req.user.fullName,
+            userId: req.user.userId
+        }));
+        
+        console.log('[Maintenance] Maintenance mode activated by:', req.user.fullName);
+        
+        // Broadcast to all connected clients
+        broadcast({ type: 'maintenance_starting' });
+        
+        res.status(200).json({ 
+            success: true, 
+            message: 'Maintenance mode activated' 
+        });
+    } catch (error) {
+        console.error('[Maintenance] Failed to activate maintenance mode:', error);
+        res.status(500).json({ 
+            success: false, 
+            message: 'Failed to activate maintenance mode' 
+        });
+    }
+});
 
 module.exports = router;
