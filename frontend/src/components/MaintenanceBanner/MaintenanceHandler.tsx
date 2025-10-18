@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from '../../backend connection/axiosConfig';
+import { publicAxiosInstance } from '../../backend connection/axiosConfig';
 import { useWebSocket } from '../../context/WebSocketContext';
 import Maintenance from './Maintenance';
 
@@ -15,12 +15,8 @@ const MaintenanceHandler: React.FC<MaintenanceHandlerProps> = ({ children }) => 
     useEffect(() => {
         const checkMaintenanceStatus = async () => {
             try {
-                const response = await axiosInstance.get('/api/maintenance-status');
-                if (response.data.maintenance) {
-                    setMaintenanceMode(true);
-                } else {
-                    setMaintenanceMode(false);
-                }
+                const response = await publicAxiosInstance.get('/api/maintenance-status');
+                setMaintenanceMode(response.data.maintenance);
             } catch (error) {
                 console.error('Failed to check maintenance status:', error);
                 setMaintenanceMode(false);
@@ -30,14 +26,13 @@ const MaintenanceHandler: React.FC<MaintenanceHandlerProps> = ({ children }) => 
         };
 
         checkMaintenanceStatus();
-        const interval = setInterval(checkMaintenanceStatus, 30000); // Poll every 30 seconds as a fallback
+        const interval = setInterval(checkMaintenanceStatus, 10000); // Poll every 10 seconds
         return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
         if (maintenanceMessage?.type === 'maintenance_ended') {
             setMaintenanceMode(false);
-            // Reload to clear state and force re-authentication.
             window.location.reload();
         }
         if (maintenanceMessage?.type === 'maintenance_starting') {
@@ -46,7 +41,7 @@ const MaintenanceHandler: React.FC<MaintenanceHandlerProps> = ({ children }) => 
     }, [maintenanceMessage]);
 
     if (checkingMaintenance) {
-        return <div>Loading...</div>; // Or a global spinner
+        return <div>Loading...</div>;
     }
 
     if (maintenanceMode) {

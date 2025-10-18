@@ -1,0 +1,585 @@
+so i had a conversations with 2 AIs which is gemini CLI and claude AI. So what i do is to make sure if the logic that i think of is correct. Ill send you the prompt that i made on the gemini CLI:so i need to update something on the restoration logic on the @backend/ & @frontend/ . Just to have a backup, the current flow of logic on the restoration is like this:
+  1.) Admin selects either local copy or cloud copy on the @frontend/src/components/Admin/Backup/Backup.tsx
+  2.) If there are any abandoned temporary database, it would attempt to delete it
+  3.) If the admin chooses either of 2, it would trigger an asynchronous restoration logic on @backend/Admin/backup.js
+  4.) The WebSocket would send a flash message to all active user that they would automatically logged out after second since the admin triggers a maintenance
+  5.) The @backend/Admin/backup.js starts to create a basic tier database that would be temporary
+  6.) Would disconnects on the main database to connect to the master database
+  7.) Would copy the missing audit trail, session and backupJobs rows from the main database to the temporary database
+  8.) Once the copy the missing rows is success, it would attempt to delete the main database
+  9.) Once the deletion of the main database is success, it would rename the temporary database into the main database
+  10.)After that, it would connect to the new main database to finish the asynchronous job
+  11.) Lastly, it would restart the whole backend server to have a proper database connection pool  What i want you to do is to add an API to the @backend/Admin/backup.js & @backend/main.js which would make all the user aware that a maintenance is happeneing. So what i want is that you would
+  add a page called Maintenance on the @frontend/src/components/MaintenanceBanner/ then on the @backend/Admin/backup.js , you would add an API which would handle a logic that when it was triggered,
+   it would display the maintenance page and once the maintennace is ended and the backend server started properly. It would automatically trigger another API that would sends to the frontend that
+  the maintenance is ended successfully. For the API, the @backend/Admin/backup.js would have an api "/maintenance-start" while on the @backend/main.js would have an api "/maintenance-end" . So the
+   api "/maintenance-start" would be triggered after the successful log out of all active user and the api "maintenance-end" would trigger when the backend server properly restartedNote: Im asking this because i just want to make sure if i did it correctly because there are parts especially on the backup.js and main.js that gemini CLI keeps failing so i manually put the code snippet that the Claude AI provided to meLooking at your implementation and the conversation history, I can confirm that you've correctly implemented the maintenance mode feature! Let me verify the key components:
+✅ What You've Implemented Correctly:
+1. Backend - backup.js
+
+✅ Maintenance flag creation is placed correctly before the database swap (lines 656-666 in your backup.js)
+✅ Cleanup on failure is implemented in the catch block
+✅ /maintenance-start POST endpoint is added at the end of the file
+✅ Broadcasts maintenance_starting message via WebSocket
+
+2. Backend - main.js
+
+✅ /api/maintenance-status GET endpoint for checking maintenance state
+✅ /api/maintenance-end POST endpoint for manually ending maintenance
+✅ Startup logic correctly removes maintenance flag and broadcasts maintenance_ended after server restart (lines 421-432)
+
+3. Frontend Components
+
+✅ Maintenance.tsx - Clean maintenance page component
+✅ Maintenance.css - Proper styling with z-index priority
+✅ MaintenanceHandler.tsx - Handles both polling and WebSocket messages
+✅ App.tsx - Correctly wraps app with MaintenanceHandler
+
+🎯 The Flow is Now Correct:
+
+Before Restore Starts:
+
+Admin initiates restore → Job created → Response sent to frontend
+
+
+During Database Swap (Critical Section):
+
+Maintenance flag created (maintenance.flag)
+WebSocket broadcasts maintenance_starting
+Frontend shows maintenance page
+Users can no longer interact with the system
+
+
+After Successful Restore:
+
+maintenance_complete.flag is created
+Server restarts automatically
+On startup, server detects flag
+Removes maintenance.flag
+Broadcasts maintenance_ended after 2-second delay
+Frontend reloads automatically
+
+
+On Restore Failure:
+
+Catch block removes maintenance.flag
+System returns to normal operation
+
+
+
+📊 Comparison with Your Original Request:
+RequirementStatusLocation/maintenance-start API✅backup.js (line 831-845)/maintenance-end API✅main.js (line 129-153)Maintenance page✅Maintenance.tsxFlag creation timing✅Before database swapCleanup on failure✅backup.js catch blockBroadcast on restart✅main.js startup (line 427-430)
+⚠️ One Minor Observation:
+The /maintenance-start endpoint in backup.js (line 831) is a manual trigger, which is great for testing or manual maintenance. However, in your restore flow, the maintenance mode is automatically triggered at line 656-666 during executeRestore(). This is correct - you have both options:
+
+Automatic: During restore process
+Manual: Via /maintenance-start API call
+
+🎉 Conclusion:
+Your implementation is correct and follows best practices! The only reason Gemini CLI kept failing was likely due to:
+
+Large file size causing regex stack overflow
+Complex pattern matching in the replace operations
+
+By manually applying the changes Claude suggested, you've successfully implemented a robust maintenance mode system.
+Great job solving this by combining both AI assistants' strengths! 🚀Retryconsole.txt278 linestxtbackup.js855 linesjsmain.js470 linesjsRso i notice that the maintenance page doesnt show when it should be. So what happened is that the websocket flash message happened twice, once the admin started the job (1st Screenshot) and around when the runtime log stream(2nd Screenshot) was around this part:2025-10-18T12:11:24.0573008Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Updating database
+2025-10-18T12:11:24.0574922Z
+2025-10-18T12:12:15.570Z No new trace in the past 1 min(s).
+2025-10-18T12:13:15.570Z No new trace in the past 2 min(s).So i need to know on why the maintenance page doesnt show properly when the user automatically logged out and why the websocket global flash message announcement happened twice2 / 2Looking at your logs and implementation, I can identify two critical issues causing the problems you're experiencing:
+
+🔴 Issue #1: Maintenance Page Not Showing After Logout
+Root Cause:
+The maintenance page check happens only on initial page load in MaintenanceHandler.tsx, but when users are logged out, they're likely being redirected by your auth system before the maintenance check completes.
+Current Flow (Problematic):
+
+User is on the page (logged in)
+WebSocket receives maintenance_starting → Shows "Server is restarting..." toast
+User gets logged out automatically (session terminated)
+Auth system redirects to /login
+Maintenance page never renders because the redirect happens first
+
+Evidence from your logs:
+2025-10-18T12:11:08.2818419Z [WebSocket] Client disconnected.
+2025-10-18T12:11:08.6201897Z [WebSocket] Client connected.  // ← Page reloaded after logout
+2025-10-18T12:11:08.9539314Z [WebSocket] Client disconnected.
+2025-10-18T12:11:09.181479Z [WebSocket] Client connected.   // ← Another reconnection
+The clients are reconnecting (page reloading), but they're not seeing the maintenance page.
+
+🔴 Issue #2: Double WebSocket Broadcast
+Why it broadcasts twice:
+Looking at your backup.js:
+javascript// BROADCAST #1 - Line 451 (in POST /restore route)
+res.status(202).json({
+    jobId,
+    message: `Database restore '${jobId}' initiated. You can poll for status.`
+});
+broadcast({ type: 'maintenance_starting' }); // ← FIRST BROADCAST
+
+// BROADCAST #2 - Line 656 (in executeRestore function, before database swap)
+const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
+try {
+    fs.writeFileSync(maintenanceFlagPath, JSON.stringify({
+        startedAt: new Date().toISOString(),
+        jobId: jobId,
+        reason: 'database_restore'
+    }));
+    console.log('[Restore] Maintenance mode flag created.');
+} catch (flagError) {
+    console.error('[Restore] CRITICAL: Failed to create maintenance mode flag.', flagError);
+}
+broadcast({ type: 'maintenance_starting' }); // ← SECOND BROADCAST
+```
+
+### **Timeline from your logs:**
+```
+12:10:57 - [Job created] First broadcast happens immediately
+12:13:57 - [Restore] Maintenance mode flag created. Second broadcast happens
+The first broadcast is too early (before the actual critical section), and the second one is correct (right before database swap).
+
+✅ SOLUTION
+Fix #1: Remove Premature Broadcast
+In backup.js, line ~451, remove the early broadcast:
+javascript// --- (REFACTORED) POST /restore : ASYNCHRONOUS ---
+router.post('/restore', authMiddleware, upload.single('backupFile'), async (req, res) => {
+    const { restoreType, fileName } = req.body;
+
+    try {
+        // ... validation code ...
+
+        // --- Create Job ---
+        const jobId = await createJob({
+            backupType,
+            initiatedBy: req.user.fullName,
+            userId: req.user.userId,
+            fileName: jobFileName
+        });
+
+        // --- Respond Immediately ---
+        res.status(202).json({
+            jobId,
+            message: `Database restore '${jobId}' initiated. You can poll for status.`
+        });
+
+        // ❌ REMOVE THIS LINE - It's too early!
+        // broadcast({ type: 'maintenance_starting' });
+
+        // --- Run the actual restore process in the background ---
+        executeRestore(jobId, req.file);
+
+    } catch (error) {
+        console.error("[Restore] Failed to create restore job:", error);
+        res.status(500).json({ message: "Failed to initiate restore process." });
+    }
+});
+Keep only the broadcast at line 656 (before database swap) - this is the correct timing.
+
+Fix #2: Make Maintenance Check Public & Higher Priority
+Update MaintenanceHandler.tsx to check maintenance status before auth redirects:
+typescriptimport React, { useState, useEffect } from 'react';
+import axios from 'axios'; // Use regular axios, not axiosInstance
+import { useWebSocket } from '../../context/WebSocketContext';
+import Maintenance from './Maintenance';
+
+interface MaintenanceHandlerProps {
+    children: React.ReactNode;
+}
+
+const MaintenanceHandler: React.FC<MaintenanceHandlerProps> = ({ children }) => {
+    const [maintenanceMode, setMaintenanceMode] = useState(false);
+    const [checkingMaintenance, setCheckingMaintenance] = useState(true);
+    const { maintenanceMessage } = useWebSocket();
+
+    useEffect(() => {
+        const checkMaintenanceStatus = async () => {
+            try {
+                // Use direct axios instead of axiosInstance to bypass auth checks
+                const response = await axios.get(`${process.env.REACT_APP_API_URL || ''}/api/maintenance-status`);
+                setMaintenanceMode(response.data.maintenance);
+            } catch (error) {
+                console.error('Failed to check maintenance status:', error);
+                // On error, assume no maintenance to allow normal flow
+                setMaintenanceMode(false);
+            } finally {
+                setCheckingMaintenance(false);
+            }
+        };
+
+        checkMaintenanceStatus();
+        const interval = setInterval(checkMaintenanceStatus, 30000); // Poll every 30 seconds
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        if (maintenanceMessage?.type === 'maintenance_ended') {
+            setMaintenanceMode(false);
+            // Reload to clear state and force re-authentication
+            window.location.reload();
+        }
+        if (maintenanceMessage?.type === 'maintenance_starting') {
+            setMaintenanceMode(true);
+        }
+    }, [maintenanceMessage]);
+
+    // Show loading while checking (optional - you could show nothing)
+    if (checkingMaintenance) {
+        return <div>Loading...</div>;
+    }
+
+    // PRIORITY: Show maintenance page BEFORE any other content
+    if (maintenanceMode) {
+        return <Maintenance />;
+    }
+
+    return <>{children}</>;
+};
+
+export default MaintenanceHandler;
+
+Fix #3: Update App.tsx Structure
+Make sure MaintenanceHandler wraps everything, including AuthProvider:
+typescriptconst App: React.FC = () => {
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Router>
+        <WebSocketProvider>
+          {/* MaintenanceHandler should be at the TOP LEVEL */}
+          <MaintenanceHandler>
+            <AuthProvider>
+              <MaintenanceBanner />
+              <AppRoutes />
+              <ToastContainer />
+            </AuthProvider>
+          </MaintenanceHandler>
+        </WebSocketProvider>
+      </Router>
+    </LocalizationProvider>
+  );
+};
+
+📊 Expected Flow After Fixes:
+Timeline:
+Time    Event                                   User Experience
+T+0s    Admin clicks restore                    Normal page
+T+1s    Job created, response sent              Normal page
+T+180s  Database swap begins → Flag created     Still normal (imports happening)
+T+180s  SINGLE broadcast sent                   Toast: "Server restarting..."
+T+181s  Users logged out                        Maintenance page shows
+T+240s  Server restarts                         Maintenance page persists
+T+242s  maintenance_ended broadcast             Page reloads → Login
+
+🎯 Why This Fixes Both Issues:
+
+Single Broadcast: Removed premature broadcast at job creation
+Maintenance Page Shows:
+
+Uses direct axios (bypasses auth interceptors)
+Checks maintenance status independently
+Renders maintenance page before auth redirects
+
+
+
+
+🧪 Testing Checklist:
+After implementing these fixes:
+
+ Start a restore
+ Verify only ONE "Server is restarting..." message appears
+ Verify maintenance page shows immediately after logout
+ Verify page stays on maintenance screen during entire restore
+ Verify page auto-reloads to login after restore completes
+
+
+Would you like me to provide the complete updated files, or do you need clarification on any part of the solution?RetryClaude does not have the ability to run the code it generates yet.Rso let me clarify this part okay, i want the trigger of websocket global flash message announcement and automatic log out logic once the admin started the backup job logic so i meant the first announcement. The second announcement should be remove since i want to make sure no one can log in and the maintenance page is properly displayed during the entire restoration from the start up until to the finishAh, I understand now! You want to lock down the system immediately when the restore job starts, not wait until the database swap. Let me clarify the correct implementation:
+
+🎯 Your Desired Flow:
+Step    Timing                  Action
+1       Admin clicks restore    Job created
+2       Immediately             WebSocket broadcast → Users see "Server restarting in 10s"
+3       Immediately             maintenance.flag created → Maintenance page activates
+4       After 10s               All users auto-logged out
+5       Entire restore process  System locked, maintenance page shown to everyone
+6       Server restarts         maintenance_ended broadcast → Users can log in again
+
+✅ CORRECTED IMPLEMENTATION
+Fix #1: Move Maintenance Logic to Job Creation (backup.js)
+javascript// --- (REFACTORED) POST /restore : ASYNCHRONOUS ---
+router.post('/restore', authMiddleware, upload.single('backupFile'), async (req, res) => {
+    const { restoreType, fileName } = req.body;
+
+    try {
+        // --- Input Validation ---
+        if (!restoreType || !['cloud', 'local'].includes(restoreType)) {
+            if (req.file) fs.unlinkSync(req.file.path);
+            return res.status(400).json({ message: "Restore type ('cloud' or 'local') is required." });
+        }
+
+        let backupType, jobFileName;
+        if (restoreType === 'local') {
+            if (!req.file) {
+                return res.status(400).json({ message: 'No backup file uploaded for local restore.' });
+            }
+            backupType = 'local-restore';
+            jobFileName = req.file.originalname;
+        } else { // cloud
+            if (!fileName) {
+                return res.status(400).json({ message: 'Backup file name is required for cloud restore.' });
+            }
+            backupType = 'cloud-restore';
+            jobFileName = fileName;
+        }
+
+        // --- Create Job ---
+        const jobId = await createJob({
+            backupType,
+            initiatedBy: req.user.fullName,
+            userId: req.user.userId,
+            fileName: jobFileName
+        });
+
+        // --- ✅ CRITICAL: Create maintenance flag IMMEDIATELY ---
+        const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
+        try {
+            fs.writeFileSync(maintenanceFlagPath, JSON.stringify({
+                startedAt: new Date().toISOString(),
+                jobId: jobId,
+                reason: 'database_restore',
+                initiatedBy: req.user.fullName
+            }));
+            console.log('[Maintenance] Maintenance mode activated for restore job:', jobId);
+        } catch (flagError) {
+            console.error('[Maintenance] CRITICAL: Failed to create maintenance flag.', flagError);
+        }
+
+        // --- ✅ Broadcast maintenance message IMMEDIATELY ---
+        broadcast({ type: 'maintenance_starting' });
+        console.log('[WebSocket] Broadcasted maintenance_starting for job:', jobId);
+
+        // --- Respond Immediately ---
+        res.status(202).json({
+            jobId,
+            message: `Database restore '${jobId}' initiated. System entering maintenance mode.`
+        });
+
+        // --- Run the actual restore process in the background ---
+        executeRestore(jobId, req.file);
+
+    } catch (error) {
+        console.error("[Restore] Failed to create restore job:", error);
+        
+        // Clean up maintenance flag if job creation fails
+        const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
+        if (fs.existsSync(maintenanceFlagPath)) {
+            fs.unlinkSync(maintenanceFlagPath);
+        }
+        
+        res.status(500).json({ message: "Failed to initiate restore process." });
+    }
+});
+
+Fix #2: Remove Duplicate Broadcast from executeRestore (backup.js)
+Find this section around line 656 and REMOVE the duplicate maintenance flag creation and broadcast:
+javascriptasync function executeRestore(jobId, localFile) {
+    // ... existing code ...
+
+    try {
+        await updateJob(jobId, 'processing', 'Starting restore process...', { processing: true });
+
+        // --- Start: Proactive cleanup of OTHER orphaned databases ---
+        await cleanupOrphanedRestoreDatabases();
+        // --- End: Proactive cleanup ---
+
+        // ... file preparation code ...
+        // ... database import code ...
+        // ... synchronization code ...
+
+        await updateJob(jobId, 'processing', 'Finalizing database swap...');
+        console.log(`[Job ${jobId}] Successfully imported to temporary database. Proceeding with swap.`);
+
+        // --- Start of Critical Section: Database Swap ---
+        // ❌ REMOVE THESE LINES (Lines 656-667):
+        // const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
+        // try {
+        //     fs.writeFileSync(maintenanceFlagPath, JSON.stringify({
+        //         startedAt: new Date().toISOString(),
+        //         jobId: jobId,
+        //         reason: 'database_restore'
+        //     }));
+        //     console.log('[Restore] Maintenance mode flag created.');
+        // } catch (flagError) {
+        //     console.error('[Restore] CRITICAL: Failed to create maintenance mode flag.', flagError);
+        // }
+        //
+        // broadcast({ type: 'maintenance_starting' }); // ❌ REMOVE THIS
+
+        console.log(`[Job ${jobId}] Closing application connection pool to begin database swap...`);
+        const pool = await getConnection();
+        await pool.close();
+        console.log(`[Job ${jobId}] Main connection pool closed.`);
+
+        // ... rest of the database swap logic ...
+Replace that section with just:
+javascript        await updateJob(jobId, 'processing', 'Finalizing database swap...');
+        console.log(`[Job ${jobId}] Successfully imported to temporary database. Proceeding with swap.`);
+
+        // --- Start of Critical Section: Database Swap ---
+        console.log(`[Job ${jobId}] Closing application connection pool to begin database swap...`);
+        const pool = await getConnection();
+        await pool.close();
+        console.log(`[Job ${jobId}] Main connection pool closed.`);
+
+Fix #3: Keep Cleanup on Failure
+The cleanup logic in the catch block should remain - this is correct:
+javascript    } catch (error) {
+        const duration = Math.round((Date.now() - startTime) / 1000);
+        await updateJob(jobId, 'failed', `Restore failed: ${error.message}`, { 
+            ErrorMessage: error.stack, 
+            Duration: duration 
+        });
+        console.error(`[Job ${jobId}] Restore process failed:`, error);
+        cleanup();
+        
+        // ✅ KEEP THIS - Clean up maintenance flag on failure
+        const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
+        if (fs.existsSync(maintenanceFlagPath)) {
+            fs.unlinkSync(maintenanceFlagPath);
+            console.log(`[Job ${jobId}] Maintenance flag removed after restore failure.`);
+        }
+    }
+}
+
+Fix #4: Update MaintenanceHandler.tsx (From Previous Response)
+Keep the fix I provided earlier for MaintenanceHandler.tsx - it ensures the maintenance page shows properly:
+typescriptimport React, { useState, useEffect } from 'react';
+import axios from 'axios'; // Use regular axios, not axiosInstance
+import { useWebSocket } from '../../context/WebSocketContext';
+import Maintenance from './Maintenance';
+
+interface MaintenanceHandlerProps {
+    children: React.ReactNode;
+}
+
+const MaintenanceHandler: React.FC<MaintenanceHandlerProps> = ({ children }) => {
+    const [maintenanceMode, setMaintenanceMode] = useState(false);
+    const [checkingMaintenance, setCheckingMaintenance] = useState(true);
+    const { maintenanceMessage } = useWebSocket();
+
+    useEffect(() => {
+        const checkMaintenanceStatus = async () => {
+            try {
+                // Use direct axios to bypass auth interceptors
+                const response = await axios.get(`${process.env.REACT_APP_API_URL || ''}/api/maintenance-status`);
+                setMaintenanceMode(response.data.maintenance);
+            } catch (error) {
+                console.error('Failed to check maintenance status:', error);
+                setMaintenanceMode(false);
+            } finally {
+                setCheckingMaintenance(false);
+            }
+        };
+
+        checkMaintenanceStatus();
+        const interval = setInterval(checkMaintenanceStatus, 10000); // Poll every 10 seconds
+        return () => clearInterval(interval);
+    }, []);
+
+    useEffect(() => {
+        if (maintenanceMessage?.type === 'maintenance_ended') {
+            setMaintenanceMode(false);
+            window.location.reload();
+        }
+        if (maintenanceMessage?.type === 'maintenance_starting') {
+            setMaintenanceMode(true);
+        }
+    }, [maintenanceMessage]);
+
+    if (checkingMaintenance) {
+        return <div>Loading...</div>;
+    }
+
+    if (maintenanceMode) {
+        return <Maintenance />;
+    }
+
+    return <>{children}</>;
+};
+
+export default MaintenanceHandler;
+
+Fix #5: Update App.tsx Structure
+typescriptconst App: React.FC = () => {
+  return (
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Router>
+        <WebSocketProvider>
+          {/* MaintenanceHandler wraps everything */}
+          <MaintenanceHandler>
+            <AuthProvider>
+              <MaintenanceBanner />
+              <AppRoutes />
+              <ToastContainer />
+            </AuthProvider>
+          </MaintenanceHandler>
+        </WebSocketProvider>
+      </Router>
+    </LocalizationProvider>
+  );
+};
+```
+
+---
+
+## 📊 **Expected Flow After Fixes:**
+
+### **New Timeline:**
+```
+12:10:57 ✅ Admin clicks "Restore" button
+         ✅ Job created (03817c74-78f6-442b-97be-a1c91620f169)
+         ✅ maintenance.flag created IMMEDIATELY
+         ✅ WebSocket broadcasts "maintenance_starting" (ONCE)
+         ✅ All users see: "Server is restarting for maintenance. You will be logged out in 10 seconds."
+         
+12:10:58 ✅ Proactive cleanup starts
+         ✅ Users still logged in (countdown running)
+         
+12:11:07 ✅ All users automatically logged out
+         ✅ Maintenance page displays for everyone
+         ✅ New login attempts → Maintenance page shows
+         
+12:11:08 ✅ File extraction begins
+         ✅ System locked (maintenance page active)
+         
+12:13:54 ✅ Database import completes
+         ✅ Table synchronization
+         
+12:13:57 ✅ Database swap begins
+         ⚠️  NO SECOND BROADCAST (already in maintenance)
+         
+12:14:18 ✅ Restore complete
+         ✅ maintenance_complete.flag created
+         ✅ Server triggers restart
+         
+12:14:21 ✅ Process exits
+
+[Server Restart]
+
+12:14:30 ✅ Server starts
+         ✅ Detects maintenance_complete.flag
+         ✅ Deletes both flags
+         ✅ Broadcasts "maintenance_ended"
+         ✅ Users' pages reload → Login screen
+
+🎯 Summary of Changes:
+Location                                Action                                      Why
+backup.js (POST /restore)               ADD maintenance flag creation + broadcast   Lock system immediately when restore starts
+backup.js (executeRestore ~line 656)    REMOVE duplicate flag creation + broadcast  Already handled at job creation
+backup.js (catch block)                 KEEP cleanup logic                          Remove flag if restore fails
+MaintenanceHandler.tsx                  UPDATE to use direct axios                  Bypass auth to show maintenance page    
+App.tsx                                 UPDATE component order                      Maintenance check before auth
+
+✅ What This Achieves:
+
+Single Broadcast ✅ - Only fires when admin starts restore
+Immediate Lockdown ✅ - System locked from the moment restore begins
+Maintenance Page Always Shows ✅ - No login possible during entire restore
+Clean Recovery ✅ - Flag cleanup on failure or success
+Proper Restart Flow ✅ - Users return to login after maintenance ends

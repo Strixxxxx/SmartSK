@@ -367,20 +367,42 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
             fileName: jobFileName
         });
 
+        // --- ✅ CRITICAL: Create maintenance flag IMMEDIATELY ---
+        const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
+        try {
+            fs.writeFileSync(maintenanceFlagPath, JSON.stringify({
+                startedAt: new Date().toISOString(),
+                jobId: jobId,
+                reason: 'database_restore',
+                initiatedBy: req.user.fullName
+            }));
+            console.log('[Maintenance] Maintenance mode activated for restore job:', jobId);
+        } catch (flagError) {
+            console.error('[Maintenance] CRITICAL: Failed to create maintenance flag.', flagError);
+        }
+
+        // --- ✅ Broadcast maintenance message IMMEDIATELY ---
+        broadcast({ type: 'maintenance_starting' });
+        console.log('[WebSocket] Broadcasted maintenance_starting for job:', jobId);
+
         // --- Respond Immediately ---
         res.status(202).json({
             jobId,
-            message: `Database restore '${jobId}' initiated. You can poll for status.`
+            message: `Database restore '${jobId}' initiated. System entering maintenance mode.`
         });
 
-        // Broadcast maintenance message to all clients immediately
-        broadcast({ type: 'maintenance_starting' });
-
         // --- Run the actual restore process in the background ---
-        executeRestore(jobId, req.file); // Pass local file info if it exists
+        executeRestore(jobId, req.file);
 
     } catch (error) {
         console.error("[Restore] Failed to create restore job:", error);
+        
+        // Clean up maintenance flag if job creation fails
+        const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
+        if (fs.existsSync(maintenanceFlagPath)) {
+            fs.unlinkSync(maintenanceFlagPath);
+        }
+        
         res.status(500).json({ message: "Failed to initiate restore process." });
     }
 });
@@ -652,21 +674,6 @@ async function executeRestore(jobId, localFile) {
         console.log(`[Job ${jobId}] Successfully imported to temporary database. Proceeding with swap.`);
 
         // --- Start of Critical Section: Database Swap ---
-        // **THIS IS WHERE MAINTENANCE MODE SHOULD START**
-        const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
-        try {
-            fs.writeFileSync(maintenanceFlagPath, JSON.stringify({
-                startedAt: new Date().toISOString(),
-                jobId: jobId,
-                reason: 'database_restore'
-            }));
-            console.log('[Restore] Maintenance mode flag created.');
-        } catch (flagError) {
-            console.error('[Restore] CRITICAL: Failed to create maintenance mode flag.', flagError);
-        }
-
-        broadcast({ type: 'maintenance_starting' });
-
         console.log(`[Job ${jobId}] Closing application connection pool to begin database swap...`);
         const pool = await getConnection();
         await pool.close();

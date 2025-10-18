@@ -16,15 +16,16 @@ const App: React.FC = () => {
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Router>
-        <AuthProvider>
-          <WebSocketProvider>
-            <MaintenanceHandler>
+        <WebSocketProvider>
+          {/* MaintenanceHandler should be at the TOP LEVEL */}
+          <MaintenanceHandler>
+            <AuthProvider>
               <MaintenanceBanner />
               <AppRoutes />
               <ToastContainer />
-            </MaintenanceHandler>
-          </WebSocketProvider>
-        </AuthProvider>
+            </AuthProvider>
+          </MaintenanceHandler>
+        </WebSocketProvider>
       </Router>
     </LocalizationProvider>
   );

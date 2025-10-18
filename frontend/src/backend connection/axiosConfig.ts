@@ -15,7 +15,16 @@ const getBaseURL = (): string => {
   return backendUrl;
 };
 
-// Create axios instance instead of modifying global defaults
+// Create a public axios instance without interceptors for unauthenticated requests
+export const publicAxiosInstance = axios.create({
+  baseURL: getBaseURL(),
+  timeout: 15000, // 15-second timeout for public checks
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Create the default authenticated axios instance
 const axiosInstance = axios.create({
   baseURL: getBaseURL(),
   withCredentials: true, // Send cookies with requests
@@ -97,7 +106,7 @@ axiosInstance.interceptors.response.use(
         sessionStorage.removeItem('hasLoggedIn');
         // Dispatch custom event for auth errors that components can listen to
         window.dispatchEvent(new CustomEvent('auth-error', { 
-          detail: { status: 401, message: 'Authentication required' }
+          detail: { status: 401, message: 'Authentication required' } 
         }));
       }
       

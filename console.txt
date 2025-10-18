@@ -20,7 +20,258 @@
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-
+2025-10-18T12:05:26.2510552Z     __ __          __      __    _ __
+2025-10-18T12:05:26.2511098Z    / //_/_  _ ____/ /_  __/ /   (_) /____
+2025-10-18T12:05:26.2511142Z   / ,< / / / / __  / / / / /   / / __/ _
+2025-10-18T12:05:26.2511169Z  / /| / /_/ / /_/ / /_/ / /___/ / /_/  __/
+2025-10-18T12:05:26.2514088Z /_/ |_\__,_/\__,_/\__,_/_____/_/\__/\___/
+2025-10-18T12:05:26.2514213Z
+2025-10-18T12:05:26.2514257Z
+2025-10-18T12:05:26.2514389Z DEBUG CONSOLE | AZURE APP SERVICE ON LINUX
+2025-10-18T12:05:26.2514417Z
+2025-10-18T12:05:26.2514447Z Documentation: http://aka.ms/webapp-linux
+2025-10-18T12:05:26.2514476Z Kudu Version : 20250917.3
+2025-10-18T12:05:26.2514505Z Commit       : 915b72833717358dab58b9a5b15812c44b8842d3
+2025-10-18T12:05:26.2780412Z
+2025-10-18T12:05:30.1786746Z Restarting OpenBSD Secure Shell server: sshd.
+2025-10-18T12:05:30.3959257Z node not running, starting node /opt/webssh/index.js
+2025-10-18T12:05:44.0474415Z Sat Oct 18 12:05:44 UTC 2025 running .net core
+2025-10-18T12:05:46.5497226Z Startup : 12.05.46.519862
+2025-10-18T12:05:46.586987Z Configure Services : 12.05.46.586722
+2025-10-18T12:05:47.2818808Z Configure : 12.05.47.281652
+2025-10-18T12:05:47.6779033Z Setting Up Routes : 12.05.47.677700
+2025-10-18T12:05:47.8801359Z Exiting Configure : 12.05.47.879943
+2025-10-18T12:05:48.3319895Z Hosting environment: Production
+2025-10-18T12:05:48.3325892Z Content root path: /opt/Kudu
+2025-10-18T12:05:48.3421565Z Now listening on: http://0.0.0.0:8181
+2025-10-18T12:05:48.3421688Z Application started. Press Ctrl+C to shut down.
+2025-10-18T12:05:53.2619249Z [Job 165e1997-9845-459c-a51e-192b156e0020] Created in database: {"backupType":"hybrid","initiatedBy":"Luis Albert De Guzman","userId":1}
+2025-10-18T12:05:53.4250203Z [Job 165e1997-9845-459c-a51e-192b156e0020] Updated in database to processing: Exporting database using sqlpackage...
+2025-10-18T12:05:53.4414723Z [Job 165e1997-9845-459c-a51e-192b156e0020] Executing sqlpackage command...
+2025-10-18T12:05:57.1242947Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Connecting to database 'Smart_SK_FINAL' on server 'smart-sk.database.windows.net'.
+2025-10-18T12:05:57.1243257Z
+2025-10-18T12:06:03.4347273Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Extracting schema
+2025-10-18T12:06:03.6128223Z
+2025-10-18T12:06:03.6129052Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Extracting schema from database
+2025-10-18T12:06:03.6129164Z
+2025-10-18T12:08:37.956Z No new trace in the past 1 min(s).
+2025-10-18T12:09:37.956Z No new trace in the past 2 min(s).
+2025-10-18T12:10:26.264928Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Resolving references in schema model
+2025-10-18T12:10:26.2653326Z
+2025-10-18T12:10:27.0524555Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Validating schema model
+2025-10-18T12:10:27.0525525Z
+2025-10-18T12:10:27.2649623Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Validating schema model for data package
+2025-10-18T12:10:27.2650346Z Validating schema
+2025-10-18T12:10:27.2650376Z
+2025-10-18T12:10:27.4067059Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing tables for data extraction
+2025-10-18T12:10:27.4067633Z
+2025-10-18T12:10:28.0986953Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Exporting data from database
+2025-10-18T12:10:28.0987301Z
+2025-10-18T12:10:28.1011529Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Exporting data
+2025-10-18T12:10:28.101161Z
+2025-10-18T12:10:28.6888579Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Export.
+2025-10-18T12:10:28.6889114Z
+2025-10-18T12:10:32.6476856Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[rawData]'.
+2025-10-18T12:10:32.6477096Z
+2025-10-18T12:10:32.6477133Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[PostUploadJobs]'.
+2025-10-18T12:10:32.6477154Z
+2025-10-18T12:10:32.6548069Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[otpStore]'.
+2025-10-18T12:10:32.654823Z
+2025-10-18T12:10:32.6643553Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[rawDataDetails]'.
+2025-10-18T12:10:32.664376Z
+2025-10-18T12:10:32.6661328Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[projects]'.
+2025-10-18T12:10:32.6661525Z
+2025-10-18T12:10:32.6805662Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[StatusLookup]'.
+2025-10-18T12:10:32.6806547Z
+2025-10-18T12:10:32.6838445Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[BackupJobs]'.
+2025-10-18T12:10:32.6838536Z
+2025-10-18T12:10:32.6925132Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[postAttachments]'.
+2025-10-18T12:10:32.6925237Z
+2025-10-18T12:10:32.7060947Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[sessions]'.
+2025-10-18T12:10:32.7061173Z
+2025-10-18T12:10:32.7075909Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[barangays]'.
+2025-10-18T12:10:32.7076094Z
+2025-10-18T12:10:32.7127879Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[userInfoARC]'.
+2025-10-18T12:10:32.7128115Z
+2025-10-18T12:10:32.7142212Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[rawDataTrack]'.
+2025-10-18T12:10:32.7142414Z
+2025-10-18T12:10:32.7350457Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[roles]'.
+2025-10-18T12:10:32.7350577Z
+2025-10-18T12:10:32.7517032Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[posts]'.
+2025-10-18T12:10:32.7517151Z
+2025-10-18T12:10:32.7517181Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[audit trail]'.
+2025-10-18T12:10:32.7517201Z
+2025-10-18T12:10:32.7517225Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[userInfo]'.
+2025-10-18T12:10:32.7517287Z
+2025-10-18T12:10:32.7537857Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Processing Table '[dbo].[projectsARC]'.
+2025-10-18T12:10:32.7538055Z
+2025-10-18T12:10:35.923681Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Successfully exported database and saved it to file '/database_backup/smartSK_2025-10-18_20-05-53.bacpac'.
+2025-10-18T12:10:35.923723Z
+2025-10-18T12:10:35.9437035Z [Job 165e1997-9845-459c-a51e-192b156e0020] sqlpackage stdout: Time elapsed 0:04:38.93
+2025-10-18T12:10:35.9437499Z
+2025-10-18T12:10:36.1862742Z [Job 165e1997-9845-459c-a51e-192b156e0020] Database export to .bacpac completed.
+2025-10-18T12:10:36.215502Z [Job 165e1997-9845-459c-a51e-192b156e0020] Updated in database to processing: Uploading .bacpac file to Azure Storage...
+2025-10-18T12:10:36.217573Z Uploading backup file to container: backup
+2025-10-18T12:10:36.3792553Z Successfully uploaded smartSK_2025-10-18_20-05-53.bacpac to container backup.
+2025-10-18T12:10:36.4075327Z [Job 165e1997-9845-459c-a51e-192b156e0020] Updated in database to completed: Backup complete. Ready for download.
+2025-10-18T12:10:36.4220858Z [Job 165e1997-9845-459c-a51e-192b156e0020] Audit trail for backup created.
+2025-10-18T12:10:36.4276033Z [Job 165e1997-9845-459c-a51e-192b156e0020] Cleaned up local .bacpac file: /database_backup/smartSK_2025-10-18_20-05-53.bacpac
+2025-10-18T12:10:38.7401946Z [Job 165e1997-9845-459c-a51e-192b156e0020] Downloading smartSK_2025-10-18_20-05-53.bacpac from Azure to /database_backup/temp_smartSK_2025-10-18_20-05-53.bacpac for zipping...
+2025-10-18T12:10:38.7881325Z Successfully downloaded smartSK_2025-10-18_20-05-53.bacpac to /database_backup/temp_smartSK_2025-10-18_20-05-53.bacpac.
+2025-10-18T12:10:38.7894776Z [Job 165e1997-9845-459c-a51e-192b156e0020] Download complete.
+2025-10-18T12:10:39.1038211Z [Job 165e1997-9845-459c-a51e-192b156e0020] Zip stream finished. Cleaning up temp file: /database_backup/temp_smartSK_2025-10-18_20-05-53.bacpac
+2025-10-18T12:10:57.7335969Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Created in database: {"backupType":"local-restore","initiatedBy":"Luis Albert De Guzman","userId":1,"fileName":"smartSK_2025-10-18_20-05-53.zip"}
+2025-10-18T12:10:57.7921159Z [WebSocket] Broadcasting message to 2 clients: { type: 'maintenance_starting' }
+2025-10-18T12:10:58.0743729Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Updated in database to processing: Starting restore process...
+2025-10-18T12:10:58.0743997Z [Restore Cleanup] Searching for orphaned databases matching: Smart_SK_FINAL_restore_%
+2025-10-18T12:10:58.6960436Z [Restore Cleanup] No orphaned databases found.
+2025-10-18T12:10:58.7819362Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Updated in database to processing: Preparing backup file...
+2025-10-18T12:10:58.781967Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Extracting smartSK_2025-10-18_20-05-53.zip...
+2025-10-18T12:10:59.2413295Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Extracted smartSK_2025-10-18_20-05-53.bacpac.
+2025-10-18T12:10:59.2731259Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Updated in database to processing: Importing to temporary database: Smart_SK_FINAL_restore_1760789458007...
+2025-10-18T12:11:02.5703158Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Importing to database 'Smart_SK_FINAL_restore_1760789458007' on server 'smart-sk.database.windows.net'.
+2025-10-18T12:11:02.5704186Z
+2025-10-18T12:11:03.3985888Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Creating deployment plan
+2025-10-18T12:11:03.3986486Z
+2025-10-18T12:11:03.4081351Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Initializing deployment
+2025-10-18T12:11:03.4081455Z
+2025-10-18T12:11:08.2818419Z [WebSocket] Client disconnected.
+2025-10-18T12:11:08.6201897Z [WebSocket] Client connected.
+2025-10-18T12:11:08.9539314Z [WebSocket] Client disconnected.
+2025-10-18T12:11:09.181479Z [WebSocket] Client connected.
+2025-10-18T12:11:23.8482575Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Verifying deployment plan
+2025-10-18T12:11:23.8482903Z
+2025-10-18T12:11:23.8562456Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Analyzing deployment plan
+2025-10-18T12:11:23.8562656Z
+2025-10-18T12:11:24.0297007Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Importing package schema and data into database
+2025-10-18T12:11:24.0297874Z
+2025-10-18T12:11:24.0573008Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Updating database
+2025-10-18T12:11:24.0574922Z
+2025-10-18T12:12:15.570Z No new trace in the past 1 min(s).
+2025-10-18T12:13:15.570Z No new trace in the past 2 min(s).
+2025-10-18T12:13:50.8155069Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Importing data
+2025-10-18T12:13:50.8155753Z
+2025-10-18T12:13:50.953123Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Import.
+2025-10-18T12:13:50.9531479Z
+2025-10-18T12:13:51.0119712Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Disabling indexes.
+2025-10-18T12:13:51.0120202Z
+2025-10-18T12:13:51.029131Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Disabling index 'IX_BackupJobs_CreatedBy'.
+2025-10-18T12:13:51.0291607Z
+2025-10-18T12:13:51.0625658Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Disabling index 'IX_BackupJobs_CreatedAt'.
+2025-10-18T12:13:51.0626222Z
+2025-10-18T12:13:51.0758707Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Disabling index 'IX_BackupJobs_Status'.
+2025-10-18T12:13:51.0759215Z
+2025-10-18T12:13:51.0880035Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Disabling index 'IX_BackupJobs_ExpiresAt'.
+2025-10-18T12:13:51.088057Z
+2025-10-18T12:13:51.1079707Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Disabling index 'UQ__barangay__D961A639E888F2D6'.
+2025-10-18T12:13:51.1082304Z
+2025-10-18T12:13:51.1165935Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Disabling index 'UQ__projects__321A029848550B12'.
+2025-10-18T12:13:51.1166184Z
+2025-10-18T12:13:51.1290554Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Disabling index 'UQ__projects__321A029819C4D4C0'.
+2025-10-18T12:13:51.1291081Z
+2025-10-18T12:13:51.1398615Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Disabling index 'UQ__roles__B19478610D49A6BA'.
+2025-10-18T12:13:51.139903Z
+2025-10-18T12:13:51.149999Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Disabling index 'IX_userInfo_isArchived'.
+2025-10-18T12:13:51.1500257Z
+2025-10-18T12:13:51.1636864Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Disabling index 'UQ__userInfo__F3DBC572DFA521B9'.
+2025-10-18T12:13:51.1637449Z
+2025-10-18T12:13:51.1816672Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Disabling index 'UQ__userInfo__F3DBC572505C9E59'.
+2025-10-18T12:13:51.1817237Z
+2025-10-18T12:13:51.244812Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[audit trail]'.
+2025-10-18T12:13:51.2448526Z
+2025-10-18T12:13:52.0221442Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[BackupJobs]'.
+2025-10-18T12:13:52.0222351Z
+2025-10-18T12:13:52.0564108Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[barangays]'.
+2025-10-18T12:13:52.0564572Z
+2025-10-18T12:13:52.1230771Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[otpStore]'.
+2025-10-18T12:13:52.1231226Z
+2025-10-18T12:13:52.1258382Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[postAttachments]'.
+2025-10-18T12:13:52.1258611Z
+2025-10-18T12:13:52.1657672Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[posts]'.
+2025-10-18T12:13:52.1658152Z
+2025-10-18T12:13:52.227116Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[PostUploadJobs]'.
+2025-10-18T12:13:52.2271744Z Processing Table '[dbo].[projects]'.
+2025-10-18T12:13:52.2271777Z
+2025-10-18T12:13:52.297266Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[projectsARC]'.
+2025-10-18T12:13:52.2973173Z Processing Table '[dbo].[rawData]'.
+2025-10-18T12:13:52.2973203Z
+2025-10-18T12:13:52.3774714Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[rawDataDetails]'.
+2025-10-18T12:13:52.3774962Z
+2025-10-18T12:13:52.4701477Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[rawDataTrack]'.
+2025-10-18T12:13:52.470205Z
+2025-10-18T12:13:52.5380142Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[roles]'.
+2025-10-18T12:13:52.5381078Z
+2025-10-18T12:13:52.5637608Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[sessions]'.
+2025-10-18T12:13:52.5638203Z
+2025-10-18T12:13:52.6440829Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[StatusLookup]'.
+2025-10-18T12:13:52.6441222Z
+2025-10-18T12:13:52.6917311Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[userInfo]'.
+2025-10-18T12:13:52.6917878Z
+2025-10-18T12:13:52.7516214Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Processing Table '[dbo].[userInfoARC]'.
+2025-10-18T12:13:52.7517179Z
+2025-10-18T12:13:52.7916262Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Enabling indexes.
+2025-10-18T12:13:52.8068737Z Enabling index 'IX_BackupJobs_CreatedBy'.
+2025-10-18T12:13:52.8068845Z
+2025-10-18T12:13:52.8442387Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Enabling index 'IX_BackupJobs_CreatedAt'.
+2025-10-18T12:13:52.8442962Z
+2025-10-18T12:13:52.8593504Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Enabling index 'IX_BackupJobs_Status'.
+2025-10-18T12:13:52.8593937Z
+2025-10-18T12:13:52.8985729Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Enabling index 'IX_BackupJobs_ExpiresAt'.
+2025-10-18T12:13:52.8985965Z
+2025-10-18T12:13:52.9372536Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Enabling index 'UQ__barangay__D961A639E888F2D6'.
+2025-10-18T12:13:52.9373308Z
+2025-10-18T12:13:52.9515702Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Enabling index 'UQ__projects__321A029848550B12'.
+2025-10-18T12:13:52.9516407Z
+2025-10-18T12:13:52.9826898Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Enabling index 'UQ__projects__321A029819C4D4C0'.
+2025-10-18T12:13:52.9827648Z
+2025-10-18T12:13:52.9958936Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Enabling index 'UQ__roles__B19478610D49A6BA'.
+2025-10-18T12:13:52.9959848Z
+2025-10-18T12:13:53.0302868Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Enabling index 'IX_userInfo_isArchived'.
+2025-10-18T12:13:53.0303551Z
+2025-10-18T12:13:53.0608257Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Enabling index 'UQ__userInfo__F3DBC572DFA521B9'.
+2025-10-18T12:13:53.0608873Z
+2025-10-18T12:13:53.1084857Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Enabling index 'UQ__userInfo__F3DBC572505C9E59'.
+2025-10-18T12:13:53.1085532Z
+2025-10-18T12:13:54.5078014Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Successfully imported database.
+2025-10-18T12:13:54.5129224Z
+2025-10-18T12:13:54.5157138Z [Job 03817c74-78f6-442b-97be-a1c91620f169] sqlpackage stdout: Time elapsed 0:02:51.98
+2025-10-18T12:13:54.5157353Z
+2025-10-18T12:13:54.8452207Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Database import to temp DB completed.
+2025-10-18T12:13:55.1249669Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Updated in database to processing: Synchronizing critical system tables...
+2025-10-18T12:13:55.1832239Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Starting table synchronization...
+2025-10-18T12:13:56.738135Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Connected to both source and destination databases for synchronization.
+2025-10-18T12:13:56.7381575Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Synchronizing BackupJobs table...
+2025-10-18T12:13:57.3378658Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Copying 1 rows to BackupJobs.
+2025-10-18T12:13:57.3835678Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Synchronizing sessions table...
+2025-10-18T12:13:57.4091426Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Synchronizing [audit trail] table...
+2025-10-18T12:13:57.4413709Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Bulk inserting 1 new audit trail entries.
+2025-10-18T12:13:57.4608267Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Table synchronization completed successfully.
+2025-10-18T12:13:57.5164389Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Updated in database to processing: Finalizing database swap...
+2025-10-18T12:13:57.5166612Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Successfully imported to temporary database. Proceeding with swap.
+2025-10-18T12:13:57.5242063Z [Restore] Maintenance mode flag created.
+2025-10-18T12:13:57.5249914Z [WebSocket] Broadcasting message to 2 clients: { type: 'maintenance_starting' }
+2025-10-18T12:13:57.5344203Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Closing application connection pool to begin database swap...
+2025-10-18T12:13:57.5435052Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Main connection pool closed.
+2025-10-18T12:13:57.859976Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Connected to master database for swap.
+2025-10-18T12:13:57.8600126Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Dropping old database: Smart_SK_FINAL...
+2025-10-18T12:13:57.8610447Z [Drop DB Attempt 1/60] Dropping database: Smart_SK_FINAL
+2025-10-18T12:14:08.1812954Z [Drop DB] Successfully dropped database: Smart_SK_FINAL
+2025-10-18T12:14:08.1813401Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Renaming temporary database 'Smart_SK_FINAL_restore_1760789458007' to 'Smart_SK_FINAL'...
+2025-10-18T12:14:08.490435Z [WebSocket] Client disconnected.
+2025-10-18T12:14:08.6029409Z [WebSocket] Client disconnected.
+2025-10-18T12:14:08.6637909Z [WebSocket] Client connected.
+2025-10-18T12:14:08.7498317Z [WebSocket] Client connected.
+2025-10-18T12:14:18.3399193Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Successfully renamed database to 'Smart_SK_FINAL'.
+2025-10-18T12:14:18.3399544Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Master connection closed.
+2025-10-18T12:14:18.3399578Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Connecting to new database 'Smart_SK_FINAL' to finalize job status.
+2025-10-18T12:14:18.4328494Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Connected to new database.
+2025-10-18T12:14:18.7537565Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Final status updated to 'completed'.
+2025-10-18T12:14:18.8708695Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Audit trail for restore created.
+2025-10-18T12:14:18.8869053Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Maintenance completion flag created.
+2025-10-18T12:14:18.8869212Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Restore complete. Application requires a restart to use the new database.
+2025-10-18T12:14:18.8869241Z [Restart] Triggering application restart in 3 seconds...
+2025-10-18T12:14:18.897336Z [Job 03817c74-78f6-442b-97be-a1c91620f169] Final DB connection closed.
+2025-10-18T12:14:21.8914459Z [Restart] Exiting process to trigger platform restart.
 
 --Deployment Container Logs
 
