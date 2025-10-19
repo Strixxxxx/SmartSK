@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const { getFileSasUrl } = require('../Storage/storage');
+const { decrypt } = require('../utils/crypto');
 
 // GET /api/posts - Fetch All Posts
 router.get('/', async (req, res) => {
@@ -30,7 +31,7 @@ router.get('/', async (req, res) => {
                     postID: row.postID,
                     title: row.title,
                     description: row.description,
-                    author: row.author,
+                    author: decrypt(row.author), // Decrypt the author's name
                     attachments: []
                 };
             }

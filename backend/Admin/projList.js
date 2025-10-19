@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const { getFileSasUrl } = require('../Storage/storage');
+const { decrypt } = require('../utils/crypto');
 
 // This route fetches projects for the admin's barangay.
 router.get('/', async (req, res) => {
@@ -38,7 +39,15 @@ router.get('/', async (req, res) => {
                     p.submittedDate DESC;
             `);
 
-        res.json({ success: true, projects: result.recordset });
+        const decryptedProjects = result.recordset.map(p => ({
+            ...p,
+            proposerName: decrypt(p.proposerName),
+            title: decrypt(p.title),
+            reviewedBy: decrypt(p.reviewedBy),
+            remarks: decrypt(p.remarks),
+        }));
+
+        res.json({ success: true, projects: decryptedProjects });
 
     } catch (error) {
         console.error('Error fetching projects for admin:', error);

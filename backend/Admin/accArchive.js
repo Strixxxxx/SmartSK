@@ -3,6 +3,7 @@ const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const { addAuditTrail } = require('../audit/auditService');
 const { authMiddleware } = require('../session/session');
+const { decrypt } = require('../utils/crypto');
 
 // GET all archived accounts
 router.get('/', authMiddleware, async (req, res) => {
@@ -24,7 +25,16 @@ router.get('/', authMiddleware, async (req, res) => {
       WHERE u.isArchived = 1
       ORDER BY u.fullName
     `);
-    res.json({ success: true, data: result.recordset });
+
+    const decryptedData = result.recordset.map(user => ({
+        ...user,
+        username: decrypt(user.username),
+        fullName: decrypt(user.fullName),
+        emailAddress: decrypt(user.emailAddress),
+        phoneNumber: decrypt(user.phoneNumber),
+    }));
+
+    res.json({ success: true, data: decryptedData });
   } catch (error) {
     console.error('Error fetching archived accounts:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch archived accounts.' });
@@ -44,7 +54,7 @@ router.post('/:userId', authMiddleware, async (req, res) => {
         if (userToArchive.recordset.length === 0) {
             return res.status(404).json({ success: false, message: 'User not found.' });
         }
-        const { username } = userToArchive.recordset[0];
+        const decryptedUsername = decrypt(userToArchive.recordset[0].username);
 
         // Update the isArchived flag instead of calling the stored procedure
         await pool.request()
@@ -56,7 +66,7 @@ router.post('/:userId', authMiddleware, async (req, res) => {
             module: 'D',
             userID: req.user.userId,
             actions: 'archive-account',
-            descriptions: `Admin ${req.user.fullName} archived account for user: ${username}`
+            descriptions: `Admin ${req.user.fullName} archived account for user: ${decryptedUsername}`
         });
 
         res.json({ success: true, message: 'Account archived successfully.' });
@@ -82,6 +92,7 @@ router.post('/restore/:userId', authMiddleware, async (req, res) => {
         }
 
         const { username, isArchived } = userToRestore.recordset[0];
+        const decryptedUsername = decrypt(username);
 
         if (!isArchived) {
             return res.status(400).json({ success: false, message: 'User is not archived.' });
@@ -97,7 +108,7 @@ router.post('/restore/:userId', authMiddleware, async (req, res) => {
             module: 'D',
             userID: req.user.userId,
             actions: 'restore-account',
-            descriptions: `Admin ${req.user.fullName} restored account for user: ${username}`
+            descriptions: `Admin ${req.user.fullName} restored account for user: ${decryptedUsername}`
         });
 
         res.json({ success: true, message: 'Account restored successfully.' });

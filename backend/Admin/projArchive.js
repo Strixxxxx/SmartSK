@@ -4,6 +4,7 @@ const { getConnection, sql } = require('../database/database');
 const { addAuditTrail } = require('../audit/auditService');
 const { getFileSasUrl } = require('../Storage/storage');
 const { authMiddleware } = require('../session/session');
+const { decrypt } = require('../utils/crypto');
 
 // GET all archived projects
 router.get('/', authMiddleware, async (req, res) => {
@@ -28,7 +29,17 @@ router.get('/', authMiddleware, async (req, res) => {
         LEFT JOIN StatusLookup s ON p.status = s.StatusID
         ORDER BY p.submittedDate DESC
     `);
-    res.json({ success: true, data: result.recordset });
+
+    const decryptedData = result.recordset.map(p => ({
+        ...p,
+        title: decrypt(p.title),
+        description: decrypt(p.description),
+        remarks: decrypt(p.remarks),
+        reviewedBy: decrypt(p.reviewedBy),
+        submittedBy: decrypt(p.submittedBy),
+    }));
+
+    res.json({ success: true, data: decryptedData });
   } catch (error) {
     console.error('Error fetching archived projects:', error);
     res.status(500).json({ success: false, message: 'Failed to fetch archived projects.' });

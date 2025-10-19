@@ -4,154 +4,118 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { getConnection, sql } = require('../database/database');
 const { createSession, logout, validateToken, authMiddleware } = require('../session/session');
-const { addAuditTrail } = require('../audit/auditService')
+const { addAuditTrail } = require('../audit/auditService');
+const { decrypt, generateEmailHash, generateUsernameHash, encrypt } = require('../utils/crypto');
 
 // --- Helper Functions ---
 
-/**
- * Verifies if a string is a valid bcrypt hash.
- * @param {string} hash The string to verify.
- * @returns {boolean}
- */
 function isValidBcryptHash(hash) {
-  return typeof hash === 'string' &&
-         hash.length === 60 &&
-         hash.startsWith('$2b');
+  return typeof hash === 'string' && hash.length === 60 && hash.startsWith('$2b');
 }
 
-/**
- * Sanitizes string input by trimming whitespace.
- * @param {any} input The input to sanitize.
- * @returns {string|any} The trimmed string or original input if not a string.
- */
 function sanitizeInput(input) {
   return typeof input === 'string' ? input.trim() : input;
 }
 
-/**
- * Asynchronously logs an audit trail event with its own isolated error handling
- * to prevent it from crashing the main application flow.
- * @param {object} auditData The data for the audit trail entry.
- */
 async function logAudit(auditData) {
   try {
-    // Ensure all data passed is in a format the audit service expects, especially userID
     const validatedAuditData = {
         ...auditData,
         userID: auditData.userID ? parseInt(auditData.userID, 10) : null,
     };
     await addAuditTrail(validatedAuditData);
   } catch (auditError) {
-    console.error('CRITICAL: Audit trail logging failed.');
+    console.error('CRITICAL: Audit trail logging failed.', auditError);
   }
 }
-
 
 // --- Main Login Route ---
 
 router.post('/', async (req, res) => {
-  let userForAudit = null; // To hold user info for failure auditing
+  let userForAudit = null;
 
   try {
-    const username = sanitizeInput(req.body.username);
-    const password = req.body.password; // Password is not trimmed to allow spaces if intended
+    const identifier = sanitizeInput(req.body.identifier);
+    const password = req.body.password;
     const barangay = sanitizeInput(req.body.barangay);
 
-    console.log('Login attempt received');
-
-    if (!username || !password || !barangay) {
-      return res.status(400).json({ success: false, message: 'Username, password, and barangay are required' });
+    if (!identifier || !password || !barangay) {
+      return res.status(400).json({ success: false, message: 'Identifier, password, and barangay are required' });
     }
 
     const pool = await getConnection();
-    // FIXED: Changed u.userName to u.username to match database schema
-    const result = await pool.request()
-      .input('username', sql.VarChar, username)
-      .query(`
+    const request = pool.request();
+    let userQuery;
+
+    // Determine if identifier is an email or username and build query accordingly
+    if (identifier.includes('@')) {
+      const emailHash = generateEmailHash(identifier);
+      request.input('hash', sql.VarChar, emailHash);
+      userQuery = 'WHERE u.emailHash = @hash';
+    } else {
+      const usernameHash = generateUsernameHash(identifier);
+      request.input('hash', sql.VarChar, usernameHash);
+      userQuery = 'WHERE u.usernameHash = @hash';
+    }
+
+    const result = await request.query(`
         SELECT u.userID, u.username, u.passKey, u.fullName, r.roleName as position, b.barangayName as barangay, u.isDefaultPassword, u.isArchived
         FROM userInfo u
         LEFT JOIN roles r ON u.position = r.roleID
         LEFT JOIN barangays b ON u.barangay = b.barangayID
-        WHERE u.username = @username
+        ${userQuery}
       `);
 
     const user = result.recordset[0];
-    userForAudit = user; // Store user for potential failure log
+    userForAudit = user;
 
     if (!user) {
-      console.log('Login failed: User not found');
-      logAudit({
-        actor: 'S',
-        module: 'L',
-        userID: null,
-        actions: 'login-failure',
-        descriptions: 'Login attempt for non-existent user'
-      });
-      return res.status(401).json({ success: false, message: 'Invalid username or password' });
+      logAudit({ actor: 'S', module: 'L', userID: null, actions: 'login-failure', descriptions: `Login attempt for non-existent user: ${identifier}` });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
+    const decryptedUsername = decrypt(user.username);
+
     if (user.isArchived) {
-      console.log('Login failed: Account is archived');
-      logAudit({
-        actor: 'S',
-        module: 'L',
-        userID: user.userID,
-        actions: 'login-failure',
-        descriptions: 'Login attempt for archived account'
-      });
+      logAudit({ actor: 'S', module: 'L', userID: user.userID, actions: 'login-failure', descriptions: `Login attempt for archived account: ${decryptedUsername}` });
       return res.status(401).json({ success: false, message: 'This account has been archived. Please contact an administrator.' });
     }
 
     if (user.barangay !== barangay) {
-      console.log('Login failed: Incorrect barangay for user.');
-      logAudit({
-        actor: 'S',
-        module: 'L',
-        userID: user.userID,
-        actions: 'login-failure',
-        descriptions: 'Incorrect barangay attempt for user'
-      });
+      logAudit({ actor: 'S', module: 'L', userID: user.userID, actions: 'login-failure', descriptions: `Incorrect barangay attempt for user: ${decryptedUsername}` });
       return res.status(401).json({ success: false, message: 'You are not authorized to log in for this barangay.' });
     }
 
     if (!isValidBcryptHash(user.passKey)) {
-      console.error('Login failed: Invalid hash format in database for user.');
+      console.error(`Login failed: Invalid hash format in database for user ID: ${user.userID}`);
       return res.status(500).json({ success: false, message: 'Server configuration error. Please contact admin.' });
     }
 
     const passwordMatches = await bcrypt.compare(password, user.passKey);
 
     if (!passwordMatches) {
-      console.log('Login failed: Invalid password for user.');
-      logAudit({
-        actor: 'S',
-        module: 'L',
-        userID: user.userID,
-        actions: 'login-failure',
-        descriptions: 'Invalid password attempt for user'
-      });
-      return res.status(401).json({ success: false, message: 'Invalid username or password' });
+      logAudit({ actor: 'S', module: 'L', userID: user.userID, actions: 'login-failure', descriptions: `Invalid password attempt for user: ${decryptedUsername}` });
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
     // --- Login Success Logic ---
-
+    const decryptedFullName = decrypt(user.fullName);
     const sessionID = await createSession(user.userID);
 
     const token = jwt.sign(
-      { userId: user.userID, username: user.username, sessionID: sessionID, position: user.position },
-      process.env.JWT_SECRET_KEY || 'your-secret-key-here',
+      { userId: user.userID, username: decryptedUsername, sessionID: sessionID, position: user.position },
+      process.env.JWT_SECRET_KEY,
       { expiresIn: '24h' }
     );
 
-    // 1. Send success response to the client with token and user data
     res.json({
       success: true,
       message: 'Login successful',
-      token, // Include the token in the response
+      token,
       user: {
-        userId: user.userID, // Use consistent casing
-        username: user.username,
-        fullName: user.fullName,
+        userId: user.userID,
+        username: decryptedUsername,
+        fullName: decryptedFullName,
         position: user.position,
         barangay: user.barangay,
         isDefaultPassword: user.isDefaultPassword,
@@ -159,53 +123,26 @@ router.post('/', async (req, res) => {
       }
     });
 
-    // 2. Log the successful login to the audit trail (this will no longer crash the app)
-    console.log('Login successful for user.');
-    logAudit({
-      actor: user.position === 'MA' || user.position === 'SA' ? 'A' : 'C',
-      module: 'L',
-      userID: user.userID,
-      actions: 'login-success',
-      descriptions: `User: ${user.username} logged in successfully`
-    });
+    logAudit({ actor: user.position === 'MA' || user.position === 'SA' ? 'A' : 'C', module: 'L', userID: user.userID, actions: 'login-success', descriptions: `User: ${decryptedUsername} logged in successfully` });
 
   } catch (error) {
-    console.error('A critical error occurred during the login process.');
-
-    // Log a generic failure to the audit trail if possible
-    logAudit({
-        actor: 'S',
-        module: 'L',
-        userID: userForAudit ? userForAudit.userID : null,
-        actions: 'login-error',
-        descriptions: 'Server error during login attempt'
-    });
-
+    console.error('A critical error occurred during the login process:', error);
+    logAudit({ actor: 'S', module: 'L', userID: userForAudit ? userForAudit.userID : null, actions: 'login-error', descriptions: 'Server error during login attempt' });
     if (!res.headersSent) {
-        return res.status(500).json({
-            success: false,
-            message: 'An error occurred during login'
-        });
+      return res.status(500).json({ success: false, message: 'An error occurred during login' });
     }
   }
 });
-
 
 // --- Other Routes ---
 
 router.post('/logout', authMiddleware, async (req, res) => {
   try {
     const { userId, username, position } = req.user;
-    await logout(req, res); // Let session handler send the response
-    logAudit({
-        actor: position === 'MA' || position === 'SA' ? 'A' : 'C',
-        module: 'L',
-        userID: userId,
-        actions: 'logout',
-        descriptions: `User: ${username} logged out`
-    });
+    await logout(req, res);
+    logAudit({ actor: position === 'MA' || position === 'SA' ? 'A' : 'C', module: 'L', userID: userId, actions: 'logout', descriptions: `User: ${username} logged out` });
   } catch (error) {
-     console.error('Error during logout.');
+     console.error('Error during logout:', error);
      if (!res.headersSent) {
         res.status(500).json({ success: false, message: 'Error during logout' });
      }
@@ -220,58 +157,16 @@ router.post('/change-credentials', authMiddleware, async (req, res) => {
             return res.status(400).json({ success: false, message: 'All fields are required.' });
         }
 
-        // Enhanced authorization check with multiple fallback methods
-        let isAuthorized = false;
-        
-        // Method 1: Direct user ID comparison
-        if (req.user && req.user.userId && String(req.user.userId) === String(userID)) {
-            isAuthorized = true;
-        }
-        
-        // Method 2: Username comparison (for cases where user ID might not match)
-        if (!isAuthorized && req.user && req.user.username && req.user.username === currentUsername) {
-            isAuthorized = true;
-        }
-        
-        // Method 3: Additional check by querying database to verify the user exists and matches the token
-        if (!isAuthorized && req.user && req.user.userId) {
-            try {
-                const pool = await getConnection();
-                const userCheck = await pool.request()
-                    .input('tokenUserId', sql.Int, req.user.userId)
-                    .input('requestUserId', sql.Int, userID)
-                    .input('currentUsername', sql.NVarChar, currentUsername)
-                    .query(`
-                        SELECT userID FROM userInfo 
-                        WHERE (userID = @tokenUserId AND userID = @requestUserId) 
-                           OR (userID = @tokenUserId AND username = @currentUsername)
-                    `);
-                
-                if (userCheck.recordset.length > 0) {
-                    isAuthorized = true;
-                }
-            } catch (dbError) {
-                console.error('Database verification error.');
-                // Continue with existing authorization logic
-            }
-        }
-
+        let isAuthorized = (req.user && String(req.user.userId) === String(userID)) || (req.user && req.user.username === currentUsername);
         if (!isAuthorized) {
-            console.log('Authorization failed - User verification failed');
-            // console.log('Token user:', req.user);
-            // console.log('Request data:', { userID, currentUsername });
             return res.status(403).json({ success: false, message: 'Unauthorized action.' });
         }
 
-        // Validate that the user requesting change actually has default password
         const pool = await getConnection();
+        const usernameHash = generateUsernameHash(currentUsername);
         const userValidation = await pool.request()
-            .input('userID', sql.Int, userID)
-            .input('currentUsername', sql.NVarChar, currentUsername)
-            .query(`
-                SELECT userID, isDefaultPassword FROM userInfo 
-                WHERE userID = @userID AND username = @currentUsername
-            `);
+            .input('usernameHash', sql.VarChar, usernameHash)
+            .query('SELECT userID, isDefaultPassword FROM userInfo WHERE usernameHash = @usernameHash');
 
         if (userValidation.recordset.length === 0) {
             return res.status(400).json({ success: false, message: 'User not found or username mismatch.' });
@@ -282,14 +177,12 @@ router.post('/change-credentials', authMiddleware, async (req, res) => {
             return res.status(400).json({ success: false, message: 'This account does not have default credentials.' });
         }
 
-        // Check if new username already exists (excluding current user)
+        // Check if new username already exists by hashing and checking the hash
+        const newUsernameHash = generateUsernameHash(newUsername);
         const usernameCheck = await pool.request()
-            .input('newUsername', sql.NVarChar, newUsername)
+            .input('newUsernameHash', sql.VarChar, newUsernameHash)
             .input('currentUserID', sql.Int, userID)
-            .query(`
-                SELECT userID FROM userInfo 
-                WHERE username = @newUsername AND userID != @currentUserID
-            `);
+            .query('SELECT userID FROM userInfo WHERE usernameHash = @newUsernameHash AND userID != @currentUserID');
 
         if (usernameCheck.recordset.length > 0) {
             return res.status(400).json({ success: false, message: 'Username already exists.' });
@@ -298,36 +191,30 @@ router.post('/change-credentials', authMiddleware, async (req, res) => {
         const saltRounds = 10;
         const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
 
-        // Update user credentials
+        // Encrypt the new username and update the hash
+        const encryptedNewUsername = encrypt(newUsername);
+
         await pool.request()
             .input('userID', sql.Int, userID)
-            .input('newUsername', sql.NVarChar, newUsername)
+            .input('newUsername', sql.NVarChar, encryptedNewUsername)
+            .input('newUsernameHash', sql.VarChar, newUsernameHash)
             .input('hashedPassword', sql.NVarChar, hashedPassword)
             .query(`
                 UPDATE userInfo 
                 SET 
                     username = @newUsername, 
+                    usernameHash = @newUsernameHash,
                     passKey = @hashedPassword, 
                     isDefaultPassword = 0 
                 WHERE userID = @userID
             `);
 
-        // Log audit trail
-        await logAudit({
-            actor: 'C',
-            module: 'A',
-            userID: userID,
-            actions: 'change-credentials',
-            oldValue: `username: ${currentUsername}`,
-            newValue: `username: ${newUsername}`,
-            descriptions: 'User changed their credentials'
-        });
+        await logAudit({ actor: 'C', module: 'A', userID: userID, actions: 'change-credentials', oldValue: `username: ${currentUsername}`, newValue: `username: ${newUsername}`, descriptions: 'User changed their credentials' });
 
-        console.log('Credentials successfully changed for user.');
         res.json({ success: true, message: 'Credentials changed successfully.' });
 
     } catch (error) {
-        console.error('Error changing credentials.');
+        console.error('Error changing credentials:', error);
         res.status(500).json({ success: false, message: 'An error occurred while changing credentials.' });
     }
 });

@@ -1,0 +1,34 @@
+PS D:\Projects\Projects\smartSK\backend> node existEncrypt.js
+--- Starting Encryption Migration Script ---
+Starting encryption for userInfo table...
+Decryption failed. Data may be corrupt or tampered with. Invalid authentication tag length: 7
+Encrypting data for userID: 1
+Decryption failed. Data may be corrupt or tampered with. Invalid authentication tag length: 7
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Decryption failed. Data may be corrupt or tampered with. Invalid authentication tag length: 7
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Encrypting data for userID: 2
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Encryption for userInfo table complete. 2 records updated.
+Starting encryption for projects table...
+Decryption failed. Data may be corrupt or tampered with. Invalid authentication tag length: 9
+Encrypting data for projectID: 1 in projects
+Decryption failed. Data may be corrupt or tampered with. Invalid authentication tag length: 9
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Decryption failed. Data may be corrupt or tampered with. Invalid authentication tag length: 5
+Encrypting data for projectID: 2 in projects
+Decryption failed. Data may be corrupt or tampered with. Invalid authentication tag length: 5
+Decryption failed. Data may be corrupt or tampered with. Unsupported state or unable to authenticate data
+Encryption for projects table complete. 2 records updated.
+Starting encryption for projectsARC table...
+Encryption for projectsARC table complete. 0 records updated.
+--- Encryption Migration Script Finished Successfully ---
+Database connection closed.

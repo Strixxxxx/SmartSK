@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const sql = require('mssql');
-// Fix the database import path
 const { getConnection } = require('../database/database');
-// Import the email service
 const { sendProjectStatusEmail } = require('../Email/email');
 const { addAuditTrail } = require('../audit/auditService');
 const { authMiddleware } = require('../session/session');
+const { encrypt, decrypt } = require('../utils/crypto');
 
 // Get all projects for review
 router.get('/all', authMiddleware, async (req, res) => {
@@ -34,9 +33,17 @@ router.get('/all', authMiddleware, async (req, res) => {
         ORDER BY p.submittedDate DESC
       `);
     
+    const decryptedProjects = result.recordset.map(p => ({
+        ...p,
+        title: decrypt(p.title),
+        description: decrypt(p.description),
+        remarks: decrypt(p.remarks),
+        proposerName: decrypt(p.proposerName),
+    }));
+
     return res.json({
       success: true,
-      projects: result.recordset
+      projects: decryptedProjects
     });
   } catch (error) {
     console.error('Error fetching projects for review', error);
@@ -53,10 +60,8 @@ router.get('/:id', authMiddleware, async (req, res) => {
   try {
     const { id } = req.params;
     
-    // Get database connection
     const pool = await getConnection();
     
-    // Query to get project details with status name
     const result = await pool.request()
       .input('id', sql.Int, id)
       .query(`
@@ -73,9 +78,18 @@ router.get('/:id', authMiddleware, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
     
-    return res.json({ success: true, project: result.recordset[0] });
+    const project = result.recordset[0];
+    const decryptedProject = {
+        ...project,
+        title: decrypt(project.title),
+        description: decrypt(project.description),
+        remarks: decrypt(project.remarks),
+        username: decrypt(project.username),
+    };
+
+    return res.json({ success: true, project: decryptedProject });
   } catch (error) {
-    console.error('Error fetching project details');
+    console.error('Error fetching project details', error);
     return res.status(500).json({ success: false, message: 'Failed to fetch project details' });
   }
 });
@@ -92,7 +106,6 @@ router.put('/status/:id', authMiddleware, async (req, res) => {
     
     const pool = await getConnection();
 
-    // Get the StatusID from the StatusName provided by the frontend
     const statusResult = await pool.request()
         .input('statusName', sql.NVarChar, status)
         .query('SELECT StatusID FROM StatusLookup WHERE StatusName = @statusName');
@@ -102,31 +115,33 @@ router.put('/status/:id', authMiddleware, async (req, res) => {
     }
     const statusId = statusResult.recordset[0].StatusID;
 
-    // Get project and user info for email notification
-    const projectInfo = await pool.request()
+    const projectInfoResult = await pool.request()
       .input('id', sql.Int, id)
       .query(`
         SELECT p.title, u.emailAddress, p.status as oldStatus FROM projects p
         JOIN userInfo u ON p.userID = u.userID WHERE p.projectID = @id
       `);
     
-    if (projectInfo.recordset.length === 0) {
+    if (projectInfoResult.recordset.length === 0) {
       return res.status(404).json({ success: false, message: 'Project not found' });
     }
-    const oldStatus = projectInfo.recordset[0].oldStatus;
+    const projectInfo = projectInfoResult.recordset[0];
+    const decryptedTitle = decrypt(projectInfo.title);
 
-    // Update the project with the integer status ID
+    // Encrypt remarks and reviewer name before updating
+    const encryptedRemarks = encrypt(remarks || '');
+    const encryptedReviewerName = encrypt(reviewerName || 'Unknown Reviewer');
+
     await pool.request()
       .input('id', sql.Int, id)
       .input('statusId', sql.Int, statusId)
-      .input('remarks', sql.Text, remarks || '')
-      .input('reviewedBy', sql.NVarChar(50), reviewerName || 'Unknown Reviewer')
+      .input('remarks', sql.NVarChar, encryptedRemarks)
+      .input('reviewedBy', sql.NVarChar, encryptedReviewerName)
       .query(`
         UPDATE projects SET status = @statusId, remarks = @remarks, reviewedBy = @reviewedBy
         WHERE projectID = @id;
       `);
 
-    // Get the updated project to return in the response
     const updateResult = await pool.request()
       .input('id', sql.Int, id)
       .query(`
@@ -136,25 +151,31 @@ router.put('/status/:id', authMiddleware, async (req, res) => {
         WHERE p.projectID = @id;
       `);
 
-    // Send email notification
+    // Decrypt for the response
+    const decryptedUpdate = {
+        ...updateResult.recordset[0],
+        title: decrypt(updateResult.recordset[0].title),
+        remarks: decrypt(updateResult.recordset[0].remarks),
+    };
+
     await sendProjectStatusEmail(id, status, remarks);
     addAuditTrail({
         actor: 'C',
         module: 'P',
         userID: req.user.userId,
         actions: 'update-project-status',
-        oldValue: `status: ${oldStatus}`,
+        oldValue: `status: ${projectInfo.oldStatus}`,
         newValue: `status: ${statusId}`,
-        descriptions: `Project '${projectInfo.recordset[0].title}' status updated to '${status}'`
+        descriptions: `Project '${decryptedTitle}' status updated to '${status}'`
     });
       
     return res.json({
       success: true,
       message: 'Project status updated successfully',
-      project: updateResult.recordset[0]
+      project: decryptedUpdate
     });
   } catch (error) {
-    console.error('Error updating project status');
+    console.error('Error updating project status', error);
     return res.status(500).json({
       success: false,
       message: 'Failed to update project status',

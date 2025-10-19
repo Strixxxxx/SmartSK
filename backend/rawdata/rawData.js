@@ -7,6 +7,7 @@ const csv = require('csv-parser');
 const stream = require('stream');
 const jwt = require('jsonwebtoken');
 const { addAuditTrail } = require('../audit/auditService');
+const { decrypt } = require('../utils/crypto');
 
 // Multer setup for CSV file upload
 const storage = multer.memoryStorage();
@@ -72,6 +73,9 @@ const getUserInfoFromToken = async (authHeader, pool) => {
     
     const userInfo = userResult.recordset[0];
     userInfo.userID = decoded.userId; // Add userID to the returned object
+
+    // Decrypt the full name
+    userInfo.fullName = decrypt(userInfo.fullName);
 
     return userInfo;
 };

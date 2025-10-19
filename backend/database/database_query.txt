@@ -484,3 +484,345 @@ BEGIN
     END CATCH
 END
 GO
+
+--IMPORTANT NOTE: RUN THIS CODE AFTER RUNNING THE TABLE CREATION AND STORED PROCEDURE
+
+-- ============================================================================
+-- DATABASE SCHEMA MIGRATION FOR AES-256-GCM ENCRYPTION
+-- ============================================================================
+-- Purpose: Modify userInfo, projects, and projectsARC tables for encryption
+-- Encryption Format: Base64(12-byte IV + Ciphertext + 16-byte AuthTag)
+-- 
+-- CRITICAL: BACKUP YOUR DATABASE BEFORE RUNNING THIS SCRIPT
+-- ============================================================================
+
+-- ============================================================================
+-- STEP 1: Modify userInfo Table
+-- ============================================================================
+-- Columns to encrypt: username, fullName, emailAddress, phoneNumber
+-- Keep unencrypted: userID, passKey, position, barangay, isDefaultPassword, isArchived
+
+PRINT 'Starting userInfo table modifications...';
+
+-- Drop UNIQUE constraint on username
+-- Find the constraint name dynamically
+DECLARE @ConstraintName NVARCHAR(200);
+SELECT @ConstraintName = kc.name
+FROM sys.key_constraints kc
+INNER JOIN sys.tables t ON kc.parent_object_id = t.object_id
+WHERE t.name = 'userInfo' 
+  AND kc.type = 'UQ'
+  AND EXISTS (
+      SELECT 1 
+      FROM sys.index_columns ic
+      INNER JOIN sys.columns c ON ic.object_id = c.object_id AND ic.column_id = c.column_id
+      WHERE ic.object_id = t.object_id 
+        AND c.name = 'username'
+        AND ic.index_id = kc.unique_index_id
+  );
+
+IF @ConstraintName IS NOT NULL
+BEGIN
+    DECLARE @DropConstraintSQL NVARCHAR(500);
+    SET @DropConstraintSQL = 'ALTER TABLE userInfo DROP CONSTRAINT ' + QUOTENAME(@ConstraintName);
+    EXEC sp_executesql @DropConstraintSQL;
+    PRINT 'Dropped UNIQUE constraint on username: ' + @ConstraintName;
+END
+ELSE
+BEGIN
+    PRINT 'No UNIQUE constraint found on username column.';
+END
+GO
+
+-- Alter username column
+ALTER TABLE userInfo 
+    ALTER COLUMN username NVARCHAR(MAX) NOT NULL;
+PRINT 'Modified username column to NVARCHAR(MAX)';
+GO
+
+-- Alter fullName column
+ALTER TABLE userInfo 
+    ALTER COLUMN fullName NVARCHAR(MAX) NOT NULL;
+PRINT 'Modified fullName column to NVARCHAR(MAX)';
+GO
+
+-- Alter emailAddress column
+ALTER TABLE userInfo 
+    ALTER COLUMN emailAddress NVARCHAR(MAX) NOT NULL;
+PRINT 'Modified emailAddress column to NVARCHAR(MAX)';
+GO
+
+-- Alter phoneNumber column
+ALTER TABLE userInfo 
+    ALTER COLUMN phoneNumber NVARCHAR(MAX) NOT NULL;
+PRINT 'Modified phoneNumber column to NVARCHAR(MAX)';
+GO
+
+-- Add emailHash column for lookup functionality
+IF NOT EXISTS (
+    SELECT 1 FROM sys.columns 
+    WHERE object_id = OBJECT_ID('userInfo') 
+    AND name = 'emailHash'
+)
+BEGIN
+    ALTER TABLE userInfo 
+        ADD emailHash VARCHAR(64) NULL;
+    PRINT 'Added emailHash column to userInfo';
+END
+ELSE
+BEGIN
+    PRINT 'emailHash column already exists in userInfo';
+END
+GO
+
+-- Add usernameHash column for lookup functionality
+IF NOT EXISTS (
+    SELECT 1 FROM sys.columns 
+    WHERE object_id = OBJECT_ID('userInfo') 
+    AND name = 'usernameHash'
+)
+BEGIN
+    ALTER TABLE userInfo 
+        ADD usernameHash VARCHAR(64) NULL;
+    PRINT 'Added usernameHash column to userInfo';
+END
+ELSE
+BEGIN
+    PRINT 'usernameHash column already exists in userInfo';
+END
+GO
+
+-- Add encryptionKeyVersion column for future key rotation
+IF NOT EXISTS (
+    SELECT 1 FROM sys.columns 
+    WHERE object_id = OBJECT_ID('userInfo') 
+    AND name = 'encryptionKeyVersion'
+)
+BEGIN
+    ALTER TABLE userInfo 
+        ADD encryptionKeyVersion INT NOT NULL DEFAULT 1;
+    PRINT 'Added encryptionKeyVersion column to userInfo';
+END
+ELSE
+BEGIN
+    PRINT 'encryptionKeyVersion column already exists in userInfo';
+END
+GO
+
+-- Create index on emailHash for faster lookups (for forgotPassword.js)
+IF NOT EXISTS (
+    SELECT 1 FROM sys.indexes 
+    WHERE name = 'IX_UserInfo_EmailHash' 
+    AND object_id = OBJECT_ID('userInfo')
+)
+BEGIN
+    CREATE INDEX IX_UserInfo_EmailHash ON userInfo(emailHash);
+    PRINT 'Created index on emailHash column';
+END
+ELSE
+BEGIN
+    PRINT 'Index on emailHash already exists';
+END
+GO
+
+PRINT 'userInfo table modifications completed successfully.';
+PRINT '';
+
+-- ============================================================================
+-- STEP 2: Modify projects Table
+-- ============================================================================
+-- Columns to encrypt: title, reviewedBy
+-- Already NVARCHAR(MAX): description, remarks
+-- Keep unencrypted: projectID, reference_number, userID, status, dates, file paths
+
+PRINT 'Starting projects table modifications...';
+
+-- Alter title column (currently VARCHAR(255))
+ALTER TABLE projects 
+    ALTER COLUMN title NVARCHAR(MAX) NOT NULL;
+PRINT 'Modified title column to NVARCHAR(MAX)';
+GO
+
+-- Alter reviewedBy column (currently NVARCHAR(50))
+ALTER TABLE projects 
+    ALTER COLUMN reviewedBy NVARCHAR(MAX) NULL;
+PRINT 'Modified reviewedBy column to NVARCHAR(MAX)';
+GO
+
+-- description is already NVARCHAR(MAX) - no change needed
+-- remarks is already NVARCHAR(MAX) - no change needed
+
+-- Add encryptionKeyVersion column
+IF NOT EXISTS (
+    SELECT 1 FROM sys.columns 
+    WHERE object_id = OBJECT_ID('projects') 
+    AND name = 'encryptionKeyVersion'
+)
+BEGIN
+    ALTER TABLE projects 
+        ADD encryptionKeyVersion INT NOT NULL DEFAULT 1;
+    PRINT 'Added encryptionKeyVersion column to projects';
+END
+ELSE
+BEGIN
+    PRINT 'encryptionKeyVersion column already exists in projects';
+END
+GO
+
+PRINT 'projects table modifications completed successfully.';
+PRINT '';
+
+-- ============================================================================
+-- STEP 3: Modify projectsARC Table (Archive Table)
+-- ============================================================================
+-- Apply identical changes to archive table for consistency
+
+PRINT 'Starting projectsARC table modifications...';
+
+-- Alter title column
+ALTER TABLE projectsARC 
+    ALTER COLUMN title NVARCHAR(MAX) NOT NULL;
+PRINT 'Modified title column to NVARCHAR(MAX)';
+GO
+
+-- Alter reviewedBy column
+ALTER TABLE projectsARC 
+    ALTER COLUMN reviewedBy NVARCHAR(MAX) NULL;
+PRINT 'Modified reviewedBy column to NVARCHAR(MAX)';
+GO
+
+-- Add encryptionKeyVersion column
+IF NOT EXISTS (
+    SELECT 1 FROM sys.columns 
+    WHERE object_id = OBJECT_ID('projectsARC') 
+    AND name = 'encryptionKeyVersion'
+)
+BEGIN
+    ALTER TABLE projectsARC 
+        ADD encryptionKeyVersion INT NOT NULL DEFAULT 1;
+    PRINT 'Added encryptionKeyVersion column to projectsARC';
+END
+ELSE
+BEGIN
+    PRINT 'encryptionKeyVersion column already exists in projectsARC';
+END
+GO
+
+PRINT 'projectsARC table modifications completed successfully.';
+PRINT '';
+
+-- ============================================================================
+-- VERIFICATION QUERIES
+-- ============================================================================
+PRINT 'Running verification queries...';
+PRINT '';
+
+-- Verify userInfo column changes
+PRINT '=== userInfo Table Columns ===';
+SELECT 
+    COLUMN_NAME, 
+    DATA_TYPE, 
+    CASE 
+        WHEN CHARACTER_MAXIMUM_LENGTH = -1 THEN 'MAX'
+        ELSE CAST(CHARACTER_MAXIMUM_LENGTH AS VARCHAR(10))
+    END AS MAX_LENGTH,
+    IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS 
+WHERE TABLE_NAME = 'userInfo' 
+    AND COLUMN_NAME IN ('username', 'fullName', 'emailAddress', 'phoneNumber', 'emailHash', 'encryptionKeyVersion')
+ORDER BY 
+    CASE COLUMN_NAME
+        WHEN 'username' THEN 1
+        WHEN 'fullName' THEN 2
+        WHEN 'emailAddress' THEN 3
+        WHEN 'phoneNumber' THEN 4
+        WHEN 'emailHash' THEN 5
+        WHEN 'encryptionKeyVersion' THEN 6
+    END;
+
+PRINT '';
+PRINT '=== projects Table Columns ===';
+SELECT 
+    COLUMN_NAME, 
+    DATA_TYPE, 
+    CASE 
+        WHEN CHARACTER_MAXIMUM_LENGTH = -1 THEN 'MAX'
+        ELSE CAST(CHARACTER_MAXIMUM_LENGTH AS VARCHAR(10))
+    END AS MAX_LENGTH,
+    IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS 
+WHERE TABLE_NAME = 'projects' 
+    AND COLUMN_NAME IN ('title', 'description', 'remarks', 'reviewedBy', 'encryptionKeyVersion')
+ORDER BY 
+    CASE COLUMN_NAME
+        WHEN 'title' THEN 1
+        WHEN 'description' THEN 2
+        WHEN 'remarks' THEN 3
+        WHEN 'reviewedBy' THEN 4
+        WHEN 'encryptionKeyVersion' THEN 5
+    END;
+
+PRINT '';
+PRINT '=== projectsARC Table Columns ===';
+SELECT 
+    COLUMN_NAME, 
+    DATA_TYPE, 
+    CASE 
+        WHEN CHARACTER_MAXIMUM_LENGTH = -1 THEN 'MAX'
+        ELSE CAST(CHARACTER_MAXIMUM_LENGTH AS VARCHAR(10))
+    END AS MAX_LENGTH,
+    IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS 
+WHERE TABLE_NAME = 'projectsARC' 
+    AND COLUMN_NAME IN ('title', 'description', 'remarks', 'reviewedBy', 'encryptionKeyVersion')
+ORDER BY 
+    CASE COLUMN_NAME
+        WHEN 'title' THEN 1
+        WHEN 'description' THEN 2
+        WHEN 'remarks' THEN 3
+        WHEN 'reviewedBy' THEN 4
+        WHEN 'encryptionKeyVersion' THEN 5
+    END;
+
+PRINT '';
+PRINT '=== Verify username UNIQUE constraint removed ===';
+SELECT 
+    kc.name AS ConstraintName,
+    c.name AS ColumnName
+FROM sys.key_constraints kc
+INNER JOIN sys.tables t ON kc.parent_object_id = t.object_id
+INNER JOIN sys.index_columns ic ON kc.parent_object_id = ic.object_id AND kc.unique_index_id = ic.index_id
+INNER JOIN sys.columns c ON ic.object_id = c.object_id AND ic.column_id = c.column_id
+WHERE t.name = 'userInfo' 
+  AND kc.type = 'UQ'
+  AND c.name = 'username';
+
+PRINT '';
+PRINT '=== Verify emailHash index ===';
+SELECT 
+    i.name AS IndexName,
+    c.name AS ColumnName,
+    i.type_desc AS IndexType
+FROM sys.indexes i
+INNER JOIN sys.index_columns ic ON i.object_id = ic.object_id AND i.index_id = ic.index_id
+INNER JOIN sys.columns c ON ic.object_id = c.object_id AND ic.column_id = c.column_id
+WHERE i.object_id = OBJECT_ID('userInfo')
+  AND c.name = 'emailHash';
+
+PRINT '';
+PRINT '============================================================================';
+PRINT 'MIGRATION COMPLETED SUCCESSFULLY';
+PRINT '============================================================================';
+PRINT '';
+PRINT 'NEXT STEPS:';
+PRINT '1. Create backend/utils/crypto.js with encrypt/decrypt functions';
+PRINT '2. Add to .env: ENCRYPTION_KEY=663c320e8f8866e4f9e838095188be1c68ecb5b1c2cdb6e560da68fd817156df809';
+PRINT '3. Modify application files to use encryption:';
+PRINT '   - UserInfo: login.js, accountCreation.js, roles.js, accArchive.js,';
+PRINT '               forgotPassword.js, session.js, sessionlog.js,';
+PRINT '               auditService.js, postPublic.js, rawData.js';
+PRINT '   - Projects: projectSubmission.js, projectReview.js,';
+PRINT '               projList.js, projArchive.js';
+PRINT '4. If you have existing data, create migration script to encrypt it';
+PRINT '5. Test thoroughly in development environment';
+PRINT '============================================================================';

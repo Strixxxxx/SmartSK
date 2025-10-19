@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { getConnection, sql } = require('../database/database');
+const { decrypt } = require('../utils/crypto');
 
 const moduleMapping = {
     'A': 'Authentication',
@@ -95,7 +96,13 @@ router.get('/', async (req, res) => {
             LEFT JOIN userInfo as t2 ON t1.userID = t2.userID
             ORDER BY t1.created_at DESC
         `);
-        res.json(result.recordset);
+
+        const decryptedLogs = result.recordset.map(log => ({
+            ...log,
+            username: log.username ? decrypt(log.username) : '[System]',
+        }));
+
+        res.json(decryptedLogs);
     } catch (error) {
         console.error('Error fetching audit trail:', error);
         res.status(500).json({ message: 'Error fetching audit trail' });

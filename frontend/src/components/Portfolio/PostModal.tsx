@@ -23,6 +23,7 @@ interface PostModalProps {
 
 const PostModal: React.FC<PostModalProps> = ({ post, show, onClose }) => {
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
     useEffect(() => {
         if (show) {
@@ -38,10 +39,11 @@ const PostModal: React.FC<PostModalProps> = ({ post, show, onClose }) => {
                 document.body.style.overflow = 'auto';
             };
         }
-    }, [show, post]);
+    }, [show, post, onClose]);
 
     useEffect(() => {
         setCurrentImageIndex(0);
+        setIsDescriptionExpanded(false);
     }, [post]);
 
     if (!show || !post) {
@@ -56,6 +58,10 @@ const PostModal: React.FC<PostModalProps> = ({ post, show, onClose }) => {
 
     const goToPreviousImage = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex - 1 + attachments.length) % attachments.length);
+    };
+
+    const toggleDescription = () => {
+        setIsDescriptionExpanded(!isDescriptionExpanded);
     };
 
     const renderMedia = (attachment: Attachment) => {
@@ -77,40 +83,82 @@ const PostModal: React.FC<PostModalProps> = ({ post, show, onClose }) => {
         <div className="post-modal-overlay" onClick={onClose}>
             <div className="post-modal-content" onClick={(e) => e.stopPropagation()}>
                 
-                <button className="post-modal-close-btn" onClick={onClose}>&times;</button>
+                <button className="post-modal-close-btn" onClick={onClose} aria-label="Close modal">&times;</button>
 
                 <div className="post-modal-body">
+                    {/* Image/video section - LEFT on desktop, FULL on mobile */}
                     <div className="post-modal-image-section">
                         {attachments.length > 0 && (
                             <>
                                 {renderMedia(attachments[currentImageIndex])}
                                 {attachments.length > 1 && (
                                     <>
-                                        <button className="post-modal-nav left" onClick={goToPreviousImage}>&#10094;</button>
-                                        <button className="post-modal-nav right" onClick={goToNextImage}>&#10095;</button>
+                                        <button 
+                                            className="post-modal-nav left" 
+                                            onClick={goToPreviousImage}
+                                            aria-label="Previous image"
+                                        >
+                                            &#10094;
+                                        </button>
+                                        <button 
+                                            className="post-modal-nav right" 
+                                            onClick={goToNextImage}
+                                            aria-label="Next image"
+                                        >
+                                            &#10095;
+                                        </button>
                                         <div className="image-counter">{`${currentImageIndex + 1} / ${attachments.length}`}</div>
                                     </>
                                 )}
+
+                                {/* MOBILE ONLY: Bottom overlay info (Facebook style) - Hidden on desktop via CSS */}
+                                <div className={`post-modal-bottom-overlay ${isDescriptionExpanded ? 'expanded' : ''}`}>
+                                    <div className="post-modal-bottom-content">
+                                        <div className="post-modal-header-compact">
+                                            <h2 className="post-modal-title-compact">{title}</h2>
+                                            <p className="post-modal-author-compact">By: {author}</p>
+                                        </div>
+                                        
+                                        <div className="post-modal-description-compact">
+                                            <p className="post-modal-description-text-compact">
+                                                {description}
+                                            </p>
+                                        </div>
+
+                                        {/* Toggle button */}
+                                        <button 
+                                            className="post-modal-expand-btn"
+                                            onClick={toggleDescription}
+                                            aria-label={isDescriptionExpanded ? "Collapse" : "Expand"}
+                                        >
+                                            {isDescriptionExpanded ? '▼' : '▲'}
+                                        </button>
+                                    </div>
+                                </div>
                             </>
                         )}
                     </div>
 
+                    {/* DESKTOP ONLY: Info section - RIGHT on desktop, hidden on mobile */}
                     <div className="post-modal-info-section">
+                        {/* Header section at the TOP of info */}
                         <div className="post-modal-header-section">
                             <h2 className="post-modal-title">{title}</h2>
                             <p className="post-modal-author">By: {author}</p>
                         </div>
 
+                        {/* Description section below header */}
                         <div className="post-modal-description-section">
                             <p className="post-modal-description-text">{description}</p>
                         </div>
 
+                        {/* Thumbnails at the bottom of info section */}
                         {attachments.length > 1 && (
                             <div className="thumbnail-strip">
                                 {attachments.map((att, index) => (
                                     <img
                                         key={att.attachmentID}
-                                        src={att.filePath} // Assuming thumbnails are available, otherwise this might need adjustment
+                                        src={att.filePath}
                                         alt={`thumbnail-${index}`}
                                         className={index === currentImageIndex ? 'active' : ''}
                                         onClick={() => setCurrentImageIndex(index)}

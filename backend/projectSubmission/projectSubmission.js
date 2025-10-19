@@ -6,6 +6,7 @@ const { getConnection, sql } = require('../database/database');
 const { authMiddleware } = require('../session/session');
 const { addAuditTrail } = require('../audit/auditService');
 const { uploadFile, getFileSasUrl } = require('../Storage/storage');
+const { encrypt, decrypt } = require('../utils/crypto');
 
 // Multer configuration for in-memory storage
 const storage = multer.memoryStorage();
@@ -37,7 +38,6 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
 
     let filePath = null;
     if (req.file) {
-        // Upload to Azure Blob Storage and get the blob name
         filePath = await uploadFile(req.file);
     }
 
@@ -45,14 +45,17 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
     const pool = await getConnection();
     const userIdInt = parseInt(userId, 10);
 
-    // Insert new project with status ID 1 ('Pending Review')
+    // Encrypt project data
+    const encryptedTitle = encrypt(title);
+    const encryptedDescription = encrypt(description);
+
     const result = await pool.request()
       .input('referenceNumber', sql.VarChar, referenceNumber)
-      .input('title', sql.VarChar, title)
-      .input('description', sql.VarChar, description)
+      .input('title', sql.NVarChar, encryptedTitle)
+      .input('description', sql.NVarChar, encryptedDescription)
       .input('userID', sql.Int, userIdInt)
       .input('status', sql.Int, 1) // Set default status to 'Pending Review'
-      .input('filePath', sql.VarChar, filePath) // This is now the blob name
+      .input('filePath', sql.VarChar, filePath)
       .input('fileName', sql.VarChar, req.file ? req.file.originalname : null)
       .query(`
         INSERT INTO projects (reference_number, title, description, userID, status, submittedDate, file_path, file_name) 
@@ -62,7 +65,6 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
     
     const projectId = result.recordset[0].projectID;
 
-    // Fetch the newly created project with its status name
     const projectResult = await pool.request()
       .input('projectID', sql.Int, projectId)
       .query(`
@@ -75,13 +77,14 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
     const project = {
       id: projectResult.recordset[0].projectID,
       referenceNumber: projectResult.recordset[0].reference_number,
-      title: projectResult.recordset[0].title,
-      description: projectResult.recordset[0].description,
+      title: decrypt(projectResult.recordset[0].title),
+      description: decrypt(projectResult.recordset[0].description),
       status: projectResult.recordset[0].StatusName,
       submittedDate: projectResult.recordset[0].submittedDate,
-      fileUrl: projectResult.recordset[0].file_path, // This is the blob name
+      fileUrl: projectResult.recordset[0].file_path,
       fileName: projectResult.recordset[0].file_name
     };
+
     addAuditTrail({
         actor: 'C',
         module: 'P',
@@ -117,8 +120,16 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
         WHERE p.userID = @userId
         ORDER BY p.submittedDate DESC
       `);
+
+    const decryptedProjects = result.recordset.map(p => ({
+        ...p,
+        title: decrypt(p.title),
+        description: decrypt(p.description),
+        remarks: decrypt(p.remarks),
+        reviewedBy: decrypt(p.reviewedBy),
+    }));
     
-    return res.json({ success: true, projects: result.recordset });
+    return res.json({ success: true, projects: decryptedProjects });
   } catch (error) {
     console.error('Error fetching user projects:', error);
     return res.status(500).json({ success: false, message: 'Failed to fetch projects', error: error.message });
@@ -144,7 +155,6 @@ router.get('/download/:filename', authMiddleware, async (req, res) => {
     const requesterId = req.user.userId;
     const requesterPosition = req.user.position;
 
-    // Authorize download for the owner, SKC, MA, or SA
     if (requesterId !== projectOwnerId && !['SKC', 'MA', 'SA'].includes(requesterPosition)) {
         return res.status(403).json({ success: false, message: 'You are not authorized to download this file.' });
     }
@@ -161,8 +171,7 @@ router.get('/download/:filename', authMiddleware, async (req, res) => {
         descriptions: `User ${req.user.fullName} requested a download link for ${filename}`
     });
 
-    // Return the SAS URL to the client
-    res.json({ success: true, url: sasUrl });
+    return res.json({ success: true, url: sasUrl });
 
   } catch (error) {
     console.error('Error generating SAS URL:', error);

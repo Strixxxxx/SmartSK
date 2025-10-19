@@ -1,16 +1,17 @@
 const express = require('express');
 const { getConnection, sql } = require('../database/database');
 const router = express.Router();
+const { decrypt } = require('../utils/crypto');
 
 // GET all session logs
 router.get('/', async (req, res) => {
   try {
-    const { search, startDate, endDate } = req.query;
+    const { startDate, endDate } = req.query;
     const pool = await getConnection();
     let query = `
       SELECT 
         s.sessionID,
-        u.userName,
+        u.username,
         u.fullName,
         s.created_at,
         s.expires_at
@@ -20,11 +21,6 @@ router.get('/', async (req, res) => {
 
     const conditions = [];
     const request = pool.request();
-
-    if (search) {
-      conditions.push(`(u.userName LIKE @search OR u.fullName LIKE @search)`);
-      request.input('search', sql.NVarChar, `%${search}%`);
-    }
 
     if (startDate && endDate) {
       conditions.push(`s.created_at BETWEEN @startDate AND @endDate`);
@@ -42,9 +38,15 @@ router.get('/', async (req, res) => {
 
     const result = await request.query(query);
 
-    res.json(result.recordset);
+    const decryptedLogs = result.recordset.map(log => ({
+        ...log,
+        userName: decrypt(log.username),
+        fullName: decrypt(log.fullName),
+    }));
+
+    res.json(decryptedLogs);
   } catch (error) {
-    console.error('Error fetching session logs');
+    console.error('Error fetching session logs', error);
     res.status(500).json({ message: 'Error fetching session logs' });
   }
 });

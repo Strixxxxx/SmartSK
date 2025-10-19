@@ -3,39 +3,19 @@ const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const routeGuard = require('../routeGuard/routeGuard');
 const { addAuditTrail } = require('../audit/auditService');
+const { decrypt } = require('../utils/crypto');
 
 // Get all users with their roles
 router.get('/users', routeGuard.verifyToken, routeGuard.isAdmin, async (req, res) => {
   try {
     const pool = await getConnection();
     
-    // First check if the userInfo table exists
-    try {
-      const tableCheck = await pool.request()
-        .query(`
-          SELECT OBJECT_ID('userInfo') AS TableExists
-        `);
-      
-      if (!tableCheck.recordset[0].TableExists) {
-        return res.status(500).json({
-          success: false,
-          message: 'userInfo table does not exist'
-        });
-      }
-    } catch (tableError) {
-      console.error('Error checking table existence');
-      return res.status(500).json({
-        success: false,
-        message: 'Error checking database tables'
-      });
-    }
-    
     // Get all users from userInfo table
     const result = await pool.request()
       .query(`
         SELECT 
           u.userID, 
-          u.userName, 
+          u.username, 
           u.fullName, 
           r.roleName as position, 
           b.barangayName as barangay, 
@@ -48,13 +28,22 @@ router.get('/users', routeGuard.verifyToken, routeGuard.isAdmin, async (req, res
         WHERE u.isArchived = 0
         ORDER BY u.fullName
       `);
+
+    // Decrypt user data before sending
+    const decryptedUsers = result.recordset.map(user => ({
+      ...user,
+      username: decrypt(user.username),
+      fullName: decrypt(user.fullName),
+      emailAddress: decrypt(user.emailAddress),
+      phoneNumber: decrypt(user.phoneNumber),
+    }));
     
     return res.json({
       success: true,
-      users: result.recordset
+      users: decryptedUsers
     });
   } catch (error) {
-    console.error('Error fetching users with roles');
+    console.error('Error fetching users with roles', error);
     return res.status(500).json({
       success: false,
       message: 'An error occurred while fetching users: ' + error.message
@@ -162,7 +151,7 @@ router.post('/assignRole', routeGuard.verifyToken, routeGuard.isAdmin, async (re
     // Check if user exists and get current position and username
     const userCheck = await pool.request()
       .input('userId', sql.Int, userId)
-      .query('SELECT position, userName FROM userInfo WHERE userID = @userId');
+      .query('SELECT position, username FROM userInfo WHERE userID = @userId');
 
     if (userCheck.recordset.length === 0) {
       return res.status(404).json({
@@ -172,7 +161,7 @@ router.post('/assignRole', routeGuard.verifyToken, routeGuard.isAdmin, async (re
     }
 
     const oldPositionId = userCheck.recordset[0].position;
-    const userName = userCheck.recordset[0].userName;
+    const decryptedUsername = decrypt(userCheck.recordset[0].username);
 
     // Get the old role name for audit trail
     const oldRoleResult = await pool.request()
@@ -199,7 +188,7 @@ router.post('/assignRole', routeGuard.verifyToken, routeGuard.isAdmin, async (re
         actions: 'assign-role',
         oldValue: `position: ${oldRoleName}`,
         newValue: `position: ${position}`,
-        descriptions: `Admin ${req.user.fullName} assigned role ${position} to user ${userName}`
+        descriptions: `Admin ${req.user.fullName} assigned role ${position} to user ${decryptedUsername}`
     });
     
     return res.json({
@@ -207,7 +196,7 @@ router.post('/assignRole', routeGuard.verifyToken, routeGuard.isAdmin, async (re
       message: 'Role assigned successfully'
     });
   } catch (error) {
-    console.error('Error assigning role');
+    console.error('Error assigning role', error);
     return res.status(500).json({
       success: false,
       message: 'An error occurred while assigning role: ' + error.message

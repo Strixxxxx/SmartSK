@@ -5,6 +5,7 @@ const { getConnection, sql } = require('../database/database');
 const { authMiddleware } = require('../session/session');
 const { sendAccountCreationEmail } = require('../Email/email');
 const { addAuditTrail } = require('../audit/auditService');
+const { decrypt } = require('../utils/crypto');
 
 // Get all users
 router.get('/', authMiddleware, async (req, res) => {
@@ -34,12 +35,12 @@ router.get('/', authMiddleware, async (req, res) => {
         ORDER BY fullName ASC
       `);
 
-    // Process users to show status
+    // Decrypt user data before sending to client
     const processedUsers = users.recordset.map(user => ({
-      userName: user.userName,
-      fullName: user.fullName,
-      emailAddress: user.emailAddress,
-      phoneNumber: user.phoneNumber,
+      userName: decrypt(user.userName),
+      fullName: decrypt(user.fullName),
+      emailAddress: decrypt(user.emailAddress),
+      phoneNumber: decrypt(user.phoneNumber),
       actualStatus: user.isArchived ? 'inactive' : 'active'
     }));
 
@@ -56,6 +57,8 @@ router.get('/', authMiddleware, async (req, res) => {
     });
   }
 });
+
+const { encrypt, generateEmailHash, generateUsernameHash } = require('../utils/crypto');
 
 // Create new account
 router.post('/create-account', authMiddleware, async (req, res) => {
@@ -97,43 +100,24 @@ router.post('/create-account', authMiddleware, async (req, res) => {
     // Get database connection
     const pool = await getConnection();
 
-    // Check if username already exists
-    const userCheck = await pool.request()
-      .input('username', sql.NVarChar, username)
-      .query('SELECT userID FROM userInfo WHERE username = @username');
+    // Check if email or username already exists using hashes
+    const emailHash = generateEmailHash(emailAddress);
+    const usernameHash = generateUsernameHash(username);
 
-    if (userCheck.recordset.length > 0) {
-      console.error('Error creating account: Username already exists');
-      return res.status(409).json({
-        success: false,
-        message: 'Username already exists'
-      });
-    }
-
-    // Check if email already exists
     const emailCheck = await pool.request()
-      .input('emailAddress', sql.NVarChar, emailAddress)
-      .query('SELECT userID FROM userInfo WHERE emailAddress = @emailAddress');
+      .input('emailHash', sql.VarChar, emailHash)
+      .query('SELECT userID FROM userInfo WHERE emailHash = @emailHash');
 
     if (emailCheck.recordset.length > 0) {
-      console.error('Error creating account: Email address already exists');
-      return res.status(409).json({
-        success: false,
-        message: 'Email address already exists'
-      });
+      return res.status(409).json({ success: false, message: 'Email address already exists' });
     }
 
-    // Check if phone number already exists
-    const phoneCheck = await pool.request()
-      .input('phoneNumber', sql.NVarChar, phoneNumber)
-      .query('SELECT userID FROM userInfo WHERE phoneNumber = @phoneNumber');
+    const usernameCheck = await pool.request()
+      .input('usernameHash', sql.VarChar, usernameHash)
+      .query('SELECT userID FROM userInfo WHERE usernameHash = @usernameHash');
 
-    if (phoneCheck.recordset.length > 0) {
-      console.error('Error creating account: Phone number already exists');
-      return res.status(409).json({
-        success: false,
-        message: 'Phone number already exists'
-      });
+    if (usernameCheck.recordset.length > 0) {
+      return res.status(409).json({ success: false, message: 'Username already exists' });
     }
 
     // Get barangayID from barangay name
@@ -160,15 +144,23 @@ router.post('/create-account', authMiddleware, async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    // Encrypt user data
+    const encryptedUsername = encrypt(username);
+    const encryptedFullName = encrypt(fullName);
+    const encryptedEmail = encrypt(emailAddress);
+    const encryptedPhone = encrypt(phoneNumber);
+
     // Insert new user
     const result = await pool.request()
-      .input('username', sql.NVarChar, username)
-      .input('fullName', sql.NVarChar, fullName)
+      .input('username', sql.NVarChar, encryptedUsername)
+      .input('fullName', sql.NVarChar, encryptedFullName)
       .input('barangayID', sql.Int, barangayID)
-      .input('emailAddress', sql.NVarChar, emailAddress)
-      .input('phoneNumber', sql.NVarChar, phoneNumber)
+      .input('emailAddress', sql.NVarChar, encryptedEmail)
+      .input('phoneNumber', sql.NVarChar, encryptedPhone)
       .input('passKey', sql.NVarChar, hashedPassword)
       .input('positionID', sql.Int, positionID)
+      .input('emailHash', sql.VarChar, emailHash)
+      .input('usernameHash', sql.VarChar, usernameHash)
       .query(`
         INSERT INTO userInfo (
           username,
@@ -178,7 +170,9 @@ router.post('/create-account', authMiddleware, async (req, res) => {
           phoneNumber,
           passKey,
           position,
-          isDefaultPassword
+          isDefaultPassword,
+          emailHash,
+          usernameHash
         )
         VALUES (
           @username,
@@ -188,7 +182,9 @@ router.post('/create-account', authMiddleware, async (req, res) => {
           @phoneNumber,
           @passKey,
           @positionID,
-          1
+          1,
+          @emailHash,
+          @usernameHash
         );
         SELECT SCOPE_IDENTITY() AS userID;
       `);
@@ -200,7 +196,6 @@ router.post('/create-account', authMiddleware, async (req, res) => {
     
     if (!emailResult.success) {
       console.error('Failed to send account creation email');
-      // Note: We don't return here as the account was still created successfully
     }
     addAuditTrail({
         actor: 'A',
@@ -219,7 +214,7 @@ router.post('/create-account', authMiddleware, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error creating account');
+    console.error('Error creating account', error);
     return res.status(500).json({
       success: false,
       message: 'An error occurred while creating the account'

@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
 const uuidv4 = require('uuid4');
-const bcrypt = require('bcrypt');
 const { getConnection, sql } = require('../database/database');
 const path = require('path');
 const dotenv = require('dotenv');
+const { decrypt } = require('../utils/crypto');
 
 // Load environment variables from .env file
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
@@ -41,7 +41,7 @@ async function initializeActiveSessions() {
     }
     console.log('Initialized active sessions.');
   } catch (error) {
-    console.error('Failed to initialize active sessions');
+    console.error('Failed to initialize active sessions', error);
   }
 }
 
@@ -54,7 +54,6 @@ setInterval(async () => {
     for (const [sessionID, sessionData] of activeSessions.entries()) {
       const timeSinceLastSeen = now - sessionData.lastSeen;
       
-      // Changed from 30 seconds to 30 minutes
       if (timeSinceLastSeen > SESSION_TIMEOUT) {
         console.log('Session timed out due to inactivity.');
         
@@ -71,9 +70,9 @@ setInterval(async () => {
       }
     }
   } catch (error) {
-    console.error('Error in session cleanup job');
+    console.error('Error in session cleanup job', error);
   }
-}, 5 * 60 * 1000); // Check every 5 minutes instead of 15 seconds
+}, 5 * 60 * 1000); // Check every 5 minutes
 
 // Create session function
 async function createSession(userID) {
@@ -83,7 +82,6 @@ async function createSession(userID) {
     
     const pool = await getConnection();
     
-    // Expire any existing active sessions for this user
     await pool.request()
       .input('userID', sql.Int, userID)
       .input('currentTime', sql.DateTime2, currentTime)
@@ -91,7 +89,6 @@ async function createSession(userID) {
         UPDATE sessions SET expires_at = @currentTime WHERE userID = @userID AND expires_at IS NULL
       `);
     
-    // Create a new session
     await pool.request()
       .input('sessionID', sql.VarChar, sessionID)
       .input('userID', sql.Int, userID)
@@ -100,17 +97,14 @@ async function createSession(userID) {
         INSERT INTO sessions (sessionID, userID, created_at, expires_at) VALUES (@sessionID, @userID, @created_at, NULL)
       `);
     
-    // Add to active sessions map
     activeSessions.set(sessionID, { lastSeen: currentTime, userID: userID });
     
     return sessionID;
   } catch (error) {
-    console.error('Error creating session');
+    console.error('Error creating session', error);
     throw error;
   }
 }
-
-
 
 // Authentication middleware
 const authMiddleware = async (req, res, next) => {
@@ -145,13 +139,12 @@ const authMiddleware = async (req, res, next) => {
 
     const user = result.recordset[0];
 
-    // Session is valid, update last seen time
     activeSessions.set(decoded.sessionID, { lastSeen: new Date(getPhilippineTime()), userID: user.userID });
 
     req.user = {
       userId: user.userID,
-      username: user.username,
-      fullName: user.fullName,
+      username: decrypt(user.username),
+      fullName: decrypt(user.fullName),
       position: user.position || '',
       barangay: user.barangay,
       sessionID: decoded.sessionID
@@ -159,7 +152,7 @@ const authMiddleware = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error('Auth middleware error');
+    console.error('Auth middleware error:', error);
     res.set('X-Auth-Status', 'invalid');
     const isJwtError = error instanceof jwt.JsonWebTokenError;
     return res.status(isJwtError ? 401 : 500).json({ 
@@ -173,7 +166,8 @@ const getUserInfo = async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ success: false, message: 'User not authenticated' });
   }
-  return res.json({ success: true, userInfo: { userId: req.user.userId, username: req.user.username, fullName: req.user.fullName, position: req.user.position } });
+  // req.user is already decrypted by the middleware
+  return res.json({ success: true, userInfo: req.user });
 };
 
 // Initialize active sessions on startup
