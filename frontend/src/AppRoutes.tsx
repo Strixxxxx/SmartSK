@@ -37,11 +37,11 @@ import Archive from './components/Admin/Archive/Archive';
 
 const AppRoutes: React.FC = () => {
   const { user, isLoading } = useAuth();
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1); //Convert 1 into 1024 for actual mobile detection
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024); //Convert 1 into 1024 for actual mobile detection
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 1); //Convert 1 into 1024 for actual mobile detection
+      setIsMobile(window.innerWidth < 1024); //Convert 1 into 1024 for actual mobile detection
     };
 
     window.addEventListener('resize', handleResize);
