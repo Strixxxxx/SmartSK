@@ -59,7 +59,7 @@ router.post('/', async (req, res) => {
     }
 
     const result = await request.query(`
-        SELECT u.userID, u.username, u.passKey, u.fullName, r.roleName as position, b.barangayName as barangay, u.isDefaultPassword, u.isArchived
+        SELECT u.userID, u.username, u.passKey, u.fullName, r.roleName as position, u.barangay as barangayID, b.barangayName as barangayName, u.isDefaultPassword, u.isArchived
         FROM userInfo u
         LEFT JOIN roles r ON u.position = r.roleID
         LEFT JOIN barangays b ON u.barangay = b.barangayID
@@ -117,7 +117,8 @@ router.post('/', async (req, res) => {
         username: decryptedUsername,
         fullName: decryptedFullName,
         position: user.position,
-        barangay: user.barangay,
+        barangay: user.barangayID,
+        barangayName: user.barangayName,
         isDefaultPassword: user.isDefaultPassword,
         isArchived: user.isArchived
       }

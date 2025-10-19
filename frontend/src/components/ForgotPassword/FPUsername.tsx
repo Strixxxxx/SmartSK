@@ -19,7 +19,7 @@ const FPUsername: React.FC<FPUsernameProps> = ({ onSubmit }) => {
     if (isSubmitting) return;
     
     if (!username.trim()) {
-      setError('Please enter your username');
+      setError('Please enter your username or email');
       return;
     }
     
@@ -46,16 +46,16 @@ const FPUsername: React.FC<FPUsernameProps> = ({ onSubmit }) => {
 
   return (
     <div className="fp-step">
-      <p>Please enter your username to recover your password</p>
+      <p>Please enter your username or email to recover your password</p>
       <form onSubmit={handleSubmit}>
         <div className="fp-form-group">
-          <label htmlFor="username">Username</label>
+          <label htmlFor="username">Username or Email</label>
           <input
             type="text"
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            placeholder="Enter your username"
+            placeholder="Enter your username or email"
             disabled={isSubmitting}
             className={isSubmitting ? "fp-input-disabled" : ""}
           />

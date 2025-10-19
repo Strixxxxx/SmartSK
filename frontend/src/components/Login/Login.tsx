@@ -53,7 +53,7 @@ const Login: React.FC<LoginProps> = ({ open, onClose, barangay }) => {
 
   const validateInput = () => {
     if (!username.trim()) {
-      toast.error('Username is required');
+      toast.error('Username or Email is required');
       return false;
     }
     if (!password.trim()) {
@@ -140,13 +140,13 @@ const Login: React.FC<LoginProps> = ({ open, onClose, barangay }) => {
 
           <form onSubmit={handleSubmit} autoComplete="off">
             <div className="form-group">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username">Username or Email</label>
               <input
                 type="text"
                 id="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="Enter your username"
+                placeholder="Enter your username or email"
                 required
                 autoComplete="off"
               />

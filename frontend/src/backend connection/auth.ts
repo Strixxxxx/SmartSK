@@ -169,7 +169,7 @@ export const login = async (username: string, password: string, barangay: string
     const trimmedPassword = password.trim();
 
     const response = await axiosInstance.post('/api/login', {
-      username: trimmedUsername,
+      identifier: trimmedUsername,
       password: trimmedPassword,
       barangay: barangay
     });
