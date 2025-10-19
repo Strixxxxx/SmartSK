@@ -176,14 +176,35 @@
 
 .filter-bar {
     margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
 }
 
-.filter-bar input {
-    width: 100%;
-    max-width: 400px;
-    padding: 0.5rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
+.filter-btn {
+    background-color: transparent;
+    color: var(--primary);
+    border: 2px solid var(--border);
+    padding: 0.6rem 1.5rem;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.filter-btn:hover {
+    background-color: var(--border-light);
+    border-color: var(--primary);
+}
+
+.filter-btn.active {
+    background-color: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.25);
 }
 
 .project-list {

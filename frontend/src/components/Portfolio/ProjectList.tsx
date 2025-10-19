@@ -13,6 +13,8 @@ const ProjectList: React.FC = () => {
     const [isPortalOpen, setIsPortalOpen] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [selectedBarangay, setSelectedBarangay] = useState('');
+    const [barangays, setBarangays] = useState<string[]>([]);
+    const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
     const [selectedPost, setSelectedPost] = useState<Post | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,9 +37,24 @@ const ProjectList: React.FC = () => {
         };
         createParticles();
 
-        const fetchPosts = async () => {
+        const fetchBarangays = async () => {
             try {
-                const response = await axios.get('/api/posts');
+                const response = await axios.get('/api/posts/barangays');
+                setBarangays(response.data);
+            } catch (err) {
+                console.error('Failed to fetch barangays:', err);
+            }
+        };
+
+        fetchBarangays();
+    }, []);
+
+    useEffect(() => {
+        const fetchPosts = async () => {
+            setLoading(true);
+            try {
+                const url = activeFilter ? `/api/posts?barangay=${encodeURIComponent(activeFilter)}` : '/api/posts';
+                const response = await axios.get(url);
                 setPosts(response.data);
             } catch (err) {
                 setError('Failed to fetch posts.');
@@ -47,12 +64,20 @@ const ProjectList: React.FC = () => {
         };
 
         fetchPosts();
-    }, []);
+    }, [activeFilter]);
 
     const handleBarangaySelect = (barangay: string) => {
         setSelectedBarangay(barangay);
         setIsPortalOpen(false);
         setIsLoginModalOpen(true);
+    };
+
+    const handleFilterClick = (barangay: string) => {
+        if (activeFilter === barangay) {
+            setActiveFilter(null); // Toggle off if already active
+        } else {
+            setActiveFilter(barangay);
+        }
     };
 
     const openModal = (post: Post) => {
@@ -86,7 +111,14 @@ const ProjectList: React.FC = () => {
 
                 <div className="project-list-container">
                     <div className="filter-bar">
-                        <input type="text" placeholder="Filter by Barangay (coming soon)" disabled />
+                        {barangays.map(barangay => (
+                            <button 
+                                key={barangay} 
+                                onClick={() => handleFilterClick(barangay)}
+                                className={`filter-btn ${activeFilter === barangay ? 'active' : ''}`}>
+                                {barangay}
+                            </button>
+                        ))}
                     </div>
                     <div className="project-list">
                         {loading && <div>Loading...</div>}
