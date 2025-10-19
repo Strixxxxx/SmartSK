@@ -4,55 +4,7 @@
 
 --Frontend (Browser's Console)
 
-index-BrwtaOI1.js:78 
- POST https://smartsk-backend-container.azurewebsites.net/api/login 400 (Bad Request)
-(anonymous)	@	index-BrwtaOI1.js:78
-xhr	@	index-BrwtaOI1.js:78
-qS	@	index-BrwtaOI1.js:80
-Promise.then		
-_request	@	index-BrwtaOI1.js:81
-request	@	index-BrwtaOI1.js:80
-(anonymous)	@	index-BrwtaOI1.js:81
-(anonymous)	@	index-BrwtaOI1.js:76
-AO	@	index-BrwtaOI1.js:81
-login	@	index-BrwtaOI1.js:81
-R	@	index-BrwtaOI1.js:292
-I1	@	index-BrwtaOI1.js:48
-(anonymous)	@	index-BrwtaOI1.js:48
-Gb	@	index-BrwtaOI1.js:48
-sg	@	index-BrwtaOI1.js:48
-gg	@	index-BrwtaOI1.js:49
-Ak	@	index-BrwtaOI1.js:49
-
-index-BrwtaOI1.js:81 Client error: 400 
-{success: false, message: 'Identifier, password, and barangay are required'}
-message
-: 
-"Identifier, password, and barangay are required"
-success
-: 
-false
-[[Prototype]]
-: 
-Object
-(anonymous)	@	index-BrwtaOI1.js:81
-Promise.then		
-_request	@	index-BrwtaOI1.js:81
-request	@	index-BrwtaOI1.js:80
-(anonymous)	@	index-BrwtaOI1.js:81
-(anonymous)	@	index-BrwtaOI1.js:76
-AO	@	index-BrwtaOI1.js:81
-login	@	index-BrwtaOI1.js:81
-R	@	index-BrwtaOI1.js:292
-I1	@	index-BrwtaOI1.js:48
-(anonymous)	@	index-BrwtaOI1.js:48
-Gb	@	index-BrwtaOI1.js:48
-sg	@	index-BrwtaOI1.js:48
-gg	@	index-BrwtaOI1.js:49
-Ak	@	index-BrwtaOI1.js:49
-
-﻿
-
+smartsk-backend-container.azurewebsites.net/api/login:1  Failed to load resource: the server responded with a status of 401 ()
 
 --Frontend (VSC Terminal)
 

@@ -81,7 +81,7 @@ router.post('/', async (req, res) => {
       return res.status(401).json({ success: false, message: 'This account has been archived. Please contact an administrator.' });
     }
 
-    if (user.barangay !== barangay) {
+    if (user.barangayName !== barangay) {
       logAudit({ actor: 'S', module: 'L', userID: user.userID, actions: 'login-failure', descriptions: `Incorrect barangay attempt for user: ${decryptedUsername}` });
       return res.status(401).json({ success: false, message: 'You are not authorized to log in for this barangay.' });
     }
