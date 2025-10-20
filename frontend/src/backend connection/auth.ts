@@ -135,7 +135,7 @@ export const fetchUserData = async (skipCache = false): Promise<UserInfo | null>
     
     // Only log unexpected errors (not auth-related ones)
     if (!(axiosError.response?.status === 401)) {
-      console.error('Failed to fetch user data', axiosError.response?.data || axiosError.message);
+      if (import.meta.env.DEV) console.error('Failed to fetch user data', axiosError.response?.data || axiosError.message);
     }
     return null;
   }
@@ -232,7 +232,7 @@ export const logout = async (): Promise<{ success: boolean; message: string }> =
     try {
       await axiosInstance.post('/api/logout');
     } catch (apiError) {
-      console.error('API logout error:', apiError);
+      if (import.meta.env.DEV) console.error('API logout error:', apiError);
       // Continue with client-side logout even if API call fails
     }
     
@@ -246,7 +246,7 @@ export const logout = async (): Promise<{ success: boolean; message: string }> =
       message: 'Logged out successfully' 
     };
   } catch (error) {
-    console.error('Logout error:', error);
+    if (import.meta.env.DEV) console.error('Logout error:', error);
     
     // Always clear client-side state even if there's an error
     setAuthenticationState(false);
@@ -344,7 +344,7 @@ export const checkPotentialSession = async (): Promise<boolean> => {
     const axiosError = error as AxiosError;
     // Don't log 401 errors as they're expected when not logged in
     if (axiosError.response?.status !== 401) {
-      console.error('Session check failed:', axiosError.response?.data || axiosError.message);
+      if (import.meta.env.DEV) console.error('Session check failed:', axiosError.response?.data || axiosError.message);
     }
     setAuthenticationState(false);
     setAuthToken(null);

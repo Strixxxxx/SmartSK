@@ -266,11 +266,13 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
       
       // For custom forecasting, add custom parameters
       if (isCustomRequest) {
-        console.log('Creating custom forecast request with params:', {
-          selectedCategory,
-          selectedYear,
-          otherCategory: selectedCategory === "Others" ? otherCategory : null
-        });
+        if (import.meta.env.DEV) {
+          console.log('Creating custom forecast request with params:', {
+            selectedCategory,
+            selectedYear,
+            otherCategory: selectedCategory === "Others" ? otherCategory : null
+          });
+        }
         
         // For specific category forecasting
         if (selectedCategory) {
@@ -318,7 +320,7 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
         // Check if the response contains an error flag
         if (data.error) {
           const errorMessage = data.message || 'Failed to generate trend forecast';
-          console.error('API returned error:', errorMessage);
+          if (import.meta.env.DEV) console.error('API returned error:', errorMessage);
           if (errorMessage.includes('inappropriate language')) {
               setSnackbarMessage('Inappropriate word detected. Cannot be processed.');
               setSnackbarOpen(true);
@@ -357,11 +359,11 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
             setMetadata(data.metadata);
           }
         } else {
-          console.error('Unexpected API response format:', data);
+          if (import.meta.env.DEV) console.error('Unexpected API response format:', data);
           setError('Unexpected API response format. Expected trends array is missing.');
         }
       } catch (fetchError: any) {
-        console.error('API fetch error:', fetchError);
+        if (import.meta.env.DEV) console.error('API fetch error:', fetchError);
         const errorMessage = fetchError.response?.data?.message || 'Failed to connect to trends forecast API. Please try again later.';
         if (errorMessage && errorMessage.includes('inappropriate language')) {
             setSnackbarMessage('Inappropriate word detected. Cannot be processed.');
@@ -373,7 +375,7 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
       
       setLoading(false);
     } catch (error) {
-      console.error('Error in fetchTrendsData:', error);
+      if (import.meta.env.DEV) console.error('Error in fetchTrendsData:', error);
       setError('An unexpected error occurred while fetching trends data.');
       setLoading(false);
     }

@@ -104,7 +104,7 @@ const RawData: React.FC<RawDataProps> = () => {
             const response = await api.get('/api/rawdata/options');
             setFilterOptions(response.data);
         } catch (error) {
-            console.error('Error fetching filter options:', (error as Error).message);
+            if (import.meta.env.DEV) console.error('Error fetching filter options:', (error as Error).message);
         }
     }, []);
 
@@ -244,7 +244,7 @@ const RawData: React.FC<RawDataProps> = () => {
                     }, 2000);
                 }
                 
-                console.log('Upload Summary:', summary);
+                if (import.meta.env.DEV) console.log('Upload Summary:', summary);
                 
                 setTimeout(async () => {
                     try {
@@ -254,7 +254,7 @@ const RawData: React.FC<RawDataProps> = () => {
                         ]);
                         showFlashMessage('info', 'Data refreshed successfully!', true);
                     } catch (refreshError) {
-                        console.error('Error refreshing data:', refreshError);
+                        if (import.meta.env.DEV) console.error('Error refreshing data:', refreshError);
                         showFlashMessage('warning', 'Upload completed but failed to refresh display. Please reload the page.', true);
                     }
                 }, 1000);
@@ -319,7 +319,7 @@ const RawData: React.FC<RawDataProps> = () => {
             hideFlashMessage();
             showFlashMessage('success', `${format.toUpperCase()} file has been downloaded successfully.`);
         } catch (error: any) {
-            console.error(`Error downloading ${format}:`, error);
+            if (import.meta.env.DEV) console.error(`Error downloading ${format}:`, error);
             const errorMessage = error.response?.data?.message || error.message || `Failed to download ${format} file.`;
             showFlashMessage('error', `Download failed: ${errorMessage}`);
         }

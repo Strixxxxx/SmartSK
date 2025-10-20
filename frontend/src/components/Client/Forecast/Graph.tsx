@@ -60,8 +60,10 @@ const Graph: React.FC<GraphProps> = ({ currentView, onViewChange }) => {
     setError(null);
     try {
       const response = await axios.get<ForecastApiResponse>('/api/forecast');
-      console.log('Received forecast API response (raw):', response);
-      console.log('Received forecast API response (data):', response.data);
+      if (import.meta.env.DEV) {
+        console.log('Received forecast API response (raw):', response);
+        console.log('Received forecast API response (data):', response.data);
+      }
 
       if (!response.data?.by_committee || !response.data?.by_category) {
         throw new Error('Invalid data structure received from server.');

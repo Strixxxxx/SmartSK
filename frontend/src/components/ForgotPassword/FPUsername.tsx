@@ -36,7 +36,7 @@ const FPUsername: React.FC<FPUsernameProps> = ({ onSubmit }) => {
       // Call the onSubmit function passed from parent
       await onSubmit(username);
     } catch (error) {
-      console.error('Error:', error);
+      if (import.meta.env.DEV) console.error('Error:', error);
       setError('An error occurred. Please try again later.');
     } finally {
       // Only reset if we're still mounted (component might navigate away)

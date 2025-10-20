@@ -42,7 +42,7 @@ const ClientSidebar: React.FC<SidebarProps> = ({
       // Then perform the regular logout
       logout();
     } catch (error) {
-      console.error('Error during logout:', error);
+      if (import.meta.env.DEV) console.error('Error during logout:', error);
       // Still perform logout even if the API call fails
       logout();
     }

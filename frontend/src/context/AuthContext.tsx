@@ -74,7 +74,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setIsAuthenticated(false);
         }
       } catch (error) {
-        console.error('Failed to initialize authentication:', error);
+        if (import.meta.env.DEV) console.error('Failed to initialize authentication:', error);
         // Reset auth state on error
         setUser(null);
         setIsAuthenticated(false);
@@ -111,7 +111,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       return result;
     } catch (error) {
-      console.error('Login error:', error);
+      if (import.meta.env.DEV) console.error('Login error:', error);
       return {
         success: false,
         message: 'Login failed. Please try again.'
@@ -132,7 +132,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Redirect to login or home page
       window.location.href = '/';
     } catch (error) {
-      console.error('Logout error:', error);
+      if (import.meta.env.DEV) console.error('Logout error:', error);
       // Still clear local state even if API call fails
       setUser(null);
       setIsAuthenticated(false);
@@ -150,7 +150,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
       }
     } catch (error) {
-      console.error('Failed to refresh user data:', error);
+      if (import.meta.env.DEV) console.error('Failed to refresh user data:', error);
     }
   };
 

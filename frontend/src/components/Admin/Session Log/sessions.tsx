@@ -33,7 +33,7 @@ const Sessions: React.FC<SessionsProps> = () => {
       setSessions(response.data);
     } catch (err) {
       setError('Failed to fetch session logs');
-      console.error(err);
+      if (import.meta.env.DEV) console.error(err);
     }
     setLoading(false);
   };

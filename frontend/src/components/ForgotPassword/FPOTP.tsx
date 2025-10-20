@@ -113,7 +113,7 @@ const FPOTP: React.FC<FPOTPProps> = ({ onSubmit, username }) => {
       
       onSubmit(otp);
     } catch (error) {
-      console.error('Error submitting OTP:', error);
+      if (import.meta.env.DEV) console.error('Error submitting OTP:', error);
       setError('An error occurred. Please try again.');
     }
     finally {
@@ -142,7 +142,7 @@ const FPOTP: React.FC<FPOTPProps> = ({ onSubmit, username }) => {
         setError(response.data.message || 'Failed to resend verification code. Please try again.');
       }
     } catch (error) {
-      console.error('Error resending OTP:', error);
+      if (import.meta.env.DEV) console.error('Error resending OTP:', error);
       const axiosError = error as AxiosError<{ message?: string }>;
       setError(axiosError.response?.data?.message || 'An error occurred. Please try again later.');
     }

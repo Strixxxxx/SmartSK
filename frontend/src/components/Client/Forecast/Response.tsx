@@ -129,10 +129,10 @@ const Response: React.FC<ResponseProps> = ({ filters }) => {
         
       } catch (err: any) {
         if (controller.signal.aborted) {
-          console.log('Request aborted');
+          if (import.meta.env.DEV) console.log('Request aborted');
           return;
         }
-        console.error('Analysis fetch error:', err);
+        if (import.meta.env.DEV) console.error('Analysis fetch error:', err);
         
         let errorMessage = 'Failed to fetch analysis.';
         if (err.code === 'ECONNABORTED' || err.message.includes('timeout')) {

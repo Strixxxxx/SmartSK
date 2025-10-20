@@ -25,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     try {
       logout();
     } catch (error) {
-      console.error('Error during logout:', error);
+      if (import.meta.env.DEV) console.error('Error during logout:', error);
       logout();
     }
   };

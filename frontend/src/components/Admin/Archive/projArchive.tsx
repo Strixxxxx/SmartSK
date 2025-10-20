@@ -101,7 +101,7 @@ const ProjArchive: React.FC = () => {
                 setStatusList(response.data.statuses);
             }
         } catch (error) {
-            console.error('Failed to fetch statuses', error);
+            if (import.meta.env.DEV) console.error('Failed to fetch statuses', error);
         }
     };
     fetchStatuses();
@@ -134,7 +134,7 @@ const ProjArchive: React.FC = () => {
             throw new Error(response.data.message || 'Could not retrieve file URL.');
         }
     } catch (error) {
-        console.error("Error getting file URL:", error);
+        if (import.meta.env.DEV) console.error("Error getting file URL:", error);
         toast.error("Could not retrieve the file. Please try again.");
     } finally {
         setFileLoading(null);
@@ -161,7 +161,7 @@ const ProjArchive: React.FC = () => {
             throw new Error(response.data.message || 'Could not retrieve file URL.');
         }
     } catch (error) {
-        console.error("Error getting file URL:", error);
+        if (import.meta.env.DEV) console.error("Error getting file URL:", error);
         toast.error("Could not retrieve the file. Please try again.");
     } finally {
         setFileLoading(null);
@@ -190,7 +190,7 @@ const ProjArchive: React.FC = () => {
         throw new Error(response.data.message || 'Failed to restore project');
       }
     } catch (error) {
-      console.error('Error restoring project:', error);
+      if (import.meta.env.DEV) console.error('Error restoring project:', error);
       const axiosError = error as AxiosError;
       toast.error((axiosError.response?.data as any)?.message || 'An error occurred while restoring the project.');
     } finally {

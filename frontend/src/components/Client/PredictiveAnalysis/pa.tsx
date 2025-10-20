@@ -109,7 +109,7 @@ const PredictiveAnalysis: React.FC = () => {
         setCategories(response.data.categories);
       }
     } catch (error) {
-      console.error('Error fetching categories:', (error as Error).message);
+      if (import.meta.env.DEV) console.error('Error fetching categories:', (error as Error).message);
     }
   }, []);
 
@@ -161,7 +161,7 @@ const PredictiveAnalysis: React.FC = () => {
         timestamp: new Date().toISOString()
       } as GeneralAnalysisResult); // Cast to General for paResponse
 
-      console.error('Error running general analysis:', err);
+      if (import.meta.env.DEV) console.error('Error running general analysis:', err);
     } finally {
       setLoading(false);
     }
@@ -320,7 +320,7 @@ const PredictiveAnalysis: React.FC = () => {
         message: errorMessage,
       });
 
-      console.error('Error running analysis:', err);
+      if (import.meta.env.DEV) console.error('Error running analysis:', err);
     } finally {
       setLoading(false);
     }

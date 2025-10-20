@@ -28,7 +28,7 @@ const ForgotPassword: React.FC = () => {
         setError(response.data.message || 'Failed to send OTP. Please try again.');
       }
     } catch (err) {
-      console.error('Error requesting password reset:', err);
+      if (import.meta.env.DEV) console.error('Error requesting password reset:', err);
       const axiosError = err as AxiosError<{ message?: string }>;
       setError(axiosError.response?.data?.message || 'An error occurred. Please try again later.');
     }
@@ -46,7 +46,7 @@ const ForgotPassword: React.FC = () => {
         setError(response.data.message || 'Invalid OTP. Please try again.');
       }
     } catch (err) {
-      console.error('Error verifying OTP:', err);
+      if (import.meta.env.DEV) console.error('Error verifying OTP:', err);
       const axiosError = err as AxiosError<{ message?: string }>;
       setError(axiosError.response?.data?.message || 'An error occurred. Please try again later.');
     }
@@ -64,7 +64,7 @@ const ForgotPassword: React.FC = () => {
         setError(response.data.message || 'Failed to reset password. Please try again.');
       }
     } catch (err) {
-      console.error('Error resetting password:', err);
+      if (import.meta.env.DEV) console.error('Error resetting password:', err);
       const axiosError = err as AxiosError<{ message?: string }>;
       setError(axiosError.response?.data?.message || 'An error occurred. Please try again later.');
     }

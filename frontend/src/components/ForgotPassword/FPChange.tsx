@@ -68,7 +68,7 @@ const FPChange: React.FC<FPChangeProps> = ({ onSubmit }) => {
       // Call the onSubmit function passed from parent
       await onSubmit(newPassword);
     } catch (error) {
-      console.error('Error updating password:', error);
+      if (import.meta.env.DEV) console.error('Error updating password:', error);
       setErrors({ ...errors, submit: 'Failed to update password. Please try again.' });
       // Reset loading state on error
       setIsSubmitting(false);

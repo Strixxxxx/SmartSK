@@ -33,16 +33,16 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
       // Derive WebSocket URL from the VITE_BACKEND_SERVER environment variable
       const backendHttpUrl = import.meta.env.VITE_BACKEND_SERVER;
       if (!backendHttpUrl) {
-        console.error("[WebSocket] Error: VITE_BACKEND_SERVER environment variable not set. WebSocket will not connect.");
+        if (import.meta.env.DEV) console.error("[WebSocket] Error: VITE_BACKEND_SERVER environment variable not set. WebSocket will not connect.");
         return; // Do not attempt to connect if the URL is not configured
       }
       const wsUrl = backendHttpUrl.replace(/^http/, 'ws');
 
-      console.log('[WebSocket] Connecting to the Backend Server.');
+      if (import.meta.env.DEV) console.log('[WebSocket] Connecting to the Backend Server.');
       ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
-        console.log('[WebSocket] Connection established.');
+        if (import.meta.env.DEV) console.log('[WebSocket] Connection established.');
         if (reconnectInterval) {
           clearInterval(reconnectInterval);
         }
@@ -51,23 +51,23 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
       ws.onmessage = (event) => {
         try {
           const message = JSON.parse(event.data);
-          console.log('[WebSocket] Message received:', message);
+          if (import.meta.env.DEV) console.log('[WebSocket] Message received:', message);
           if (message.type === 'maintenance_starting' || message.type === 'maintenance_ended') {
             setMaintenanceMessage(message);
           }
         } catch (error) {
-          console.error('[WebSocket] Error parsing message:', error);
+          if (import.meta.env.DEV) console.error('[WebSocket] Error parsing message:', error);
         }
       };
 
       ws.onclose = () => {
-        console.log('[WebSocket] Connection closed. Attempting to reconnect...');
+        if (import.meta.env.DEV) console.log('[WebSocket] Connection closed. Attempting to reconnect...');
         // Simple exponential backoff could be added here
         reconnectInterval = window.setTimeout(connect, 5000); // Try to reconnect every 5 seconds
       };
 
       ws.onerror = (error) => {
-        console.error('[WebSocket] Error:', error);
+        if (import.meta.env.DEV) console.error('[WebSocket] Error:', error);
         ws.close(); // This will trigger the onclose handler to attempt reconnection
       };
     };
