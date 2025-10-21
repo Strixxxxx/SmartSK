@@ -67,9 +67,7 @@ axiosInstance.interceptors.response.use(
     }
     // Handle timeout errors specifically
     if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-      if (import.meta.env.DEV) {
-        console.error('Network timeout - no response received:', error);
-      }
+      console.error('Network timeout - no response received:', error);
       
       // Dispatch custom event for timeout handling
       window.dispatchEvent(new CustomEvent('networkTimeout', {
@@ -94,12 +92,10 @@ axiosInstance.interceptors.response.use(
       
       // Only log non-auth errors to avoid console spam
       if (!isAuthError) {
-        if (import.meta.env.DEV) {
-          if (isServerError) {
-            console.error('Server error:', error.response.status, error.response.data);
-          } else if (isClientError && error.response.status !== 401) {
-            console.error('Client error:', error.response.status, error.response.data);
-          }
+        if (isServerError) {
+          console.error('Server error:', error.response.status, error.response.data);
+        } else if (isClientError && error.response.status !== 401) {
+          console.error('Client error:', error.response.status, error.response.data);
         }
       }
       
@@ -116,14 +112,10 @@ axiosInstance.interceptors.response.use(
       
     } else if (error.request) {
       // Request made but no response received
-      if (import.meta.env.DEV) {
-        console.error('Network error - no response received:', error.request);
-      }
+      console.error('Network error - no response received:', error.request);
     } else {
       // Something else happened in setting up the request
-      if (import.meta.env.DEV) {
-        console.error('Request setup error:', error.message);
-      }
+      console.error('Request setup error:', error.message);
     }
     
     // Always reject with the original error to maintain axios error structure

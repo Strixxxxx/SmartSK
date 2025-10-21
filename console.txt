@@ -4,7 +4,7 @@
 
 --Frontend (Browser's Console)
 
-smartsk-backend-container.azurewebsites.net/api/login:1  Failed to load resource: the server responded with a status of 401 ()
+
 
 --Frontend (VSC Terminal)
 
