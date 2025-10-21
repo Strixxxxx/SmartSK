@@ -103,7 +103,7 @@ router.post('/', async (req, res) => {
     const sessionID = await createSession(user.userID);
 
     const token = jwt.sign(
-      { userId: user.userID, username: decryptedUsername, sessionID: sessionID, position: user.position },
+      { sessionID: sessionID },
       process.env.JWT_SECRET_KEY,
       { expiresIn: '24h' }
     );

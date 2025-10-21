@@ -125,7 +125,7 @@ const authMiddleware = async (req, res, next) => {
     const result = await pool.request()
       .input('sessionID', sql.VarChar, decoded.sessionID)
       .query(`
-        SELECT u.userID, u.username, u.fullName, r.roleName as position, u.isDefaultPassword, u.barangay
+        SELECT u.userID, u.username, u.fullName, r.roleName as position, u.isDefaultPassword, u.barangay, u.emailAddress, u.phoneNumber
         FROM sessions s
         JOIN userInfo u ON s.userID = u.userID
         LEFT JOIN roles r ON u.position = r.roleID
@@ -139,18 +139,33 @@ const authMiddleware = async (req, res, next) => {
 
     const user = result.recordset[0];
 
-    activeSessions.set(decoded.sessionID, { lastSeen: new Date(getPhilippineTime()), userID: user.userID });
+    try {
+      const decryptedUsername = decrypt(user.username);
+      const decryptedFullName = decrypt(user.fullName);
+      
+      activeSessions.set(decoded.sessionID, { lastSeen: new Date(getPhilippineTime()), userID: user.userID });
 
-    req.user = {
-      userId: user.userID,
-      username: decrypt(user.username),
-      fullName: decrypt(user.fullName),
-      position: user.position || '',
-      barangay: user.barangay,
-      sessionID: decoded.sessionID
-    };
+      req.sessionID = decoded.sessionID;
+      
+      req.user = {
+        userID: user.userID,
+        username: decryptedUsername,
+        fullName: decryptedFullName,
+        position: user.position || '',
+        barangay: user.barangay,
+        emailAddress: decrypt(user.emailAddress),
+        phoneNumber: decrypt(user.phoneNumber)
+      };
 
-    next();
+      next();
+    } catch (decryptError) {
+      console.error('❌ DECRYPTION ERROR:', decryptError);
+      res.set('X-Auth-Status', 'invalid');
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Error processing user data'
+      });
+    }
   } catch (error) {
     console.error('Auth middleware error:', error);
     res.set('X-Auth-Status', 'invalid');
@@ -166,7 +181,7 @@ const getUserInfo = async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ success: false, message: 'User not authenticated' });
   }
-  // req.user is already decrypted by the middleware
+  // req.user is already decrypted by the middleware and does NOT contain sessionID
   return res.json({ success: true, userInfo: req.user });
 };
 
@@ -175,7 +190,8 @@ initializeActiveSessions();
 
 async function logout(req, res) {
   try {
-    const sessionID = req.user.sessionID;
+    // Use req.sessionID instead of req.user.sessionID (which no longer exists)
+    const sessionID = req.sessionID;
     if (sessionID) {
       const pool = await getConnection();
       await pool.request()

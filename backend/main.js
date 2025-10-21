@@ -288,24 +288,12 @@ if (rawDataRouter && typeof rawDataRouter === 'function') {
 // Add or update the user-info endpoint
 app.get('/api/user-data', async (req, res) => {
   try {
-    const pool = await getConnection();
-    const userResult = await pool.request()
-      .input('userId', sql.Int, req.user.userId)
-      .query(`
-        SELECT u.userID, u.username, u.fullName, r.roleName as position, b.barangayName as barangay, u.emailAddress, u.phoneNumber 
-        FROM userInfo u
-        LEFT JOIN roles r ON u.position = r.roleID
-        LEFT JOIN barangays b ON u.barangay = b.barangayID
-        WHERE u.userID = @userId
-      `);
-
-    if (userResult.recordset.length === 0) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'User not authenticated' });
     }
-
     return res.json({
       success: true,
-      userInfo: userResult.recordset[0]
+      userInfo: req.user
     });
 
   } catch (error) {

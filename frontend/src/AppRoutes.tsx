@@ -37,11 +37,11 @@ import Archive from './components/Admin/Archive/Archive';
 
 const AppRoutes: React.FC = () => {
   const { user, isLoading } = useAuth();
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 1); //Convert 1 into 1024 for actual mobile detection
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024); // Change to 1024 for actual mobile detection
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 1); //Convert 1 into 1024 for actual mobile detection
+      setIsMobile(window.innerWidth < 1024); // Change to 1024 for actual mobile detection
     };
 
     window.addEventListener('resize', handleResize);
@@ -55,9 +55,18 @@ const AppRoutes: React.FC = () => {
     return <div>Loading...</div>;
   }
 
+  // If mobile, only show home and project-list, everything else shows ComingSoon
   if (isMobile) {
     return (
       <Routes>
+        {/* Root redirects to home on mobile */}
+        <Route path="/" element={<Navigate to="/home" replace />} />
+        
+        {/* Only these two public routes are accessible on mobile */}
+        <Route path="/home" element={<Portfolio />} />
+        <Route path="/project-list" element={<ProjectList />} />
+        
+        {/* All other routes (including login) show ComingSoon on mobile */}
         <Route path="*" element={<ComingSoon />} />
       </Routes>
     );
