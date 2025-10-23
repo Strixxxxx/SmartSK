@@ -6,10 +6,14 @@ const { sendPasswordResetEmail } = require('../Email/email');
 const { addAuditTrail } = require('../audit/auditService');
 const { generateEmailHash, generateUsernameHash, decrypt } = require('../utils/crypto');
 
+function sanitizeInput(input) {
+  return typeof input === 'string' ? input.trim() : input;
+}
+
 // Request password reset
 router.post('/request', async (req, res) => {
   try {
-    const { identifier } = req.body;
+    const identifier = sanitizeInput(req.body.identifier);
     
     if (!identifier) {
       return res.status(400).json({
@@ -42,14 +46,26 @@ router.post('/request', async (req, res) => {
     }
     
     const { userID, username, emailAddress: encryptedEmail } = userResult.recordset[0];
-    const decryptedEmail = decrypt(encryptedEmail);
-
-    if (!decryptedEmail) {
-        console.error('Failed to decrypt email address for password reset.');
-        return res.status(500).json({ success: false, message: 'An internal error occurred.' });
+    
+    let decryptedEmail;
+    try {
+        if (!encryptedEmail) {
+            throw new Error('User email address is missing.');
+        }
+        decryptedEmail = decrypt(encryptedEmail);
+        if (!decryptedEmail) {
+            throw new Error('Decryption resulted in an empty email address.');
+        }
+    } catch (e) {
+        console.error(`Failed to decrypt email for user ID ${userID} during password reset:`, e.message);
+        // We still return a generic success message to not reveal if the user exists or has a corrupted email
+        return res.status(200).json({
+            success: true,
+            message: 'If an account with this identifier exists, a verification code has been sent.'
+        });
     }
 
-    const { otp, success, message } = await sendPasswordResetEmail(decryptedEmail);
+    const { otp, success, message } = await sendPasswordResetEmail(decryptedEmail, userID);
     
     if (!success) {
       return res.status(500).json({ success: false, message: message || 'Failed to send verification code' });
@@ -89,7 +105,8 @@ router.post('/request', async (req, res) => {
 // Verify OTP
 router.post('/verify-otp', async (req, res) => {
   try {
-    const { identifier, otp } = req.body;
+    const identifier = sanitizeInput(req.body.identifier);
+    const otp = sanitizeInput(req.body.otp);
     
     if (!identifier || !otp) {
       return res.status(400).json({ success: false, message: 'Identifier and verification code are required' });
@@ -158,7 +175,9 @@ router.post('/verify-otp', async (req, res) => {
 // Reset password
 router.post('/reset', async (req, res) => {
   try {
-    const { identifier, otp, newPassword } = req.body;
+    const identifier = sanitizeInput(req.body.identifier);
+    const otp = sanitizeInput(req.body.otp);
+    const { newPassword } = req.body;
     
     if (!identifier || !otp || !newPassword) {
       return res.status(400).json({ success: false, message: 'All fields are required' });

@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 interface FPChangeProps {
   onSubmit: (password: string) => void;
@@ -8,69 +9,63 @@ interface FPChangeProps {
 const FPChange: React.FC<FPChangeProps> = ({ onSubmit }) => {
   const [newPassword, setNewPassword] = useState<string>('');
   const [confirmPassword, setConfirmPassword] = useState<string>('');
-  const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
 
   const validatePassword = (password: string): boolean => {
-    const errors: { [key: string]: string } = {};
+    const validationErrors: { [key: string]: string } = {};
     
     if (password.length < 8 || password.length > 16) {
-      errors.length = 'Password must be 8-16 characters long';
+      validationErrors.length = 'Password must be 8-16 characters long';
     }
     
     if (!/[A-Z]/.test(password)) {
-      errors.uppercase = 'Password must contain at least one uppercase letter';
+      validationErrors.uppercase = 'Password must contain at least one uppercase letter';
     }
     
     if (!/[a-z]/.test(password)) {
-      errors.lowercase = 'Password must contain at least one lowercase letter';
+      validationErrors.lowercase = 'Password must contain at least one lowercase letter';
     }
     
     if (!/[0-9]/.test(password)) {
-      errors.number = 'Password must contain at least one number';
+      validationErrors.number = 'Password must contain at least one number';
     }
     
     if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
-      errors.special = 'Password must contain at least one special character';
+      validationErrors.special = 'Password must contain at least one special character';
     }
     
-    setErrors(errors);
-    return Object.keys(errors).length === 0;
+    return Object.keys(validationErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Prevent multiple submissions
     if (isSubmitting) return;
     
     if (!validatePassword(newPassword)) {
+      toast.error('Please ensure your password meets all requirements.');
       return;
     }
     
     if (newPassword !== confirmPassword) {
-      setErrors({ ...errors, match: 'Passwords do not match' });
+      toast.error('Passwords do not match');
       return;
     }
     
-    // Set loading state
     setIsSubmitting(true);
     
-    // Disable the button immediately
     if (submitButtonRef.current) {
       submitButtonRef.current.disabled = true;
     }
     
     try {
-      // Call the onSubmit function passed from parent
       await onSubmit(newPassword);
     } catch (error) {
       if (import.meta.env.DEV) console.error('Error updating password:', error);
-      setErrors({ ...errors, submit: 'Failed to update password. Please try again.' });
-      // Reset loading state on error
+      toast.error('Failed to update password. Please try again.');
       setIsSubmitting(false);
     }
   };
@@ -145,8 +140,6 @@ const FPChange: React.FC<FPChangeProps> = ({ onSubmit }) => {
               {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
             </button>
           </div>
-          {errors.match && <div className="fp-error-message">{errors.match}</div>}
-          {errors.submit && <div className="fp-error-message">{errors.submit}</div>}
         </div>
         <div className="fp-form-actions">
           <button 

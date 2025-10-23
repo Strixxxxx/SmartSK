@@ -38,7 +38,7 @@ const getPHTimestamp = () => {
 // POST /api/create-post - Starts an asynchronous job to create a new post
 router.post('/create-post', authMiddleware, checkRole(['SKC', 'SKO']), upload.array('attachments'), async (req, res) => {
     const { title, description } = req.body;
-    const userID = req.user.userId;
+    const userID = req.user.userID; // Correctly get userID from req.user
 
     if (!title || !description) {
         return res.status(400).json({ success: false, message: 'Title and description are required.' });
@@ -46,12 +46,12 @@ router.post('/create-post', authMiddleware, checkRole(['SKC', 'SKO']), upload.ar
 
     let tempDir;
     try {
-        // 1. Create a job
+        // 1. Create a job with all necessary data
         const jobId = await postJob.createJob({
             title,
             description,
             initiatedBy: req.user.fullName,
-            userId: userID,
+            userID: userID, // Pass the userID into the job payload
         });
 
         // 2. Save files to a temporary location
@@ -73,7 +73,7 @@ router.post('/create-post', authMiddleware, checkRole(['SKC', 'SKO']), upload.ar
         res.status(202).json({ success: true, message: 'Post creation job accepted.', jobId });
 
         // 4. Start background processing (fire and forget)
-        processPostUploadJob(jobId, userID, req.user.fullName, tempFiles, tempDir);
+        processPostUploadJob(jobId, tempFiles, tempDir);
 
     } catch (error) {
         console.error('Error initiating post creation job:', error);
@@ -98,7 +98,7 @@ router.get('/post-status/:jobId', authMiddleware, async (req, res) => {
             return res.status(404).json({ success: false, message: 'Job not found.' });
         }
         // Security check: ensure the user requesting status is the one who created the job
-        if (job.UserID !== req.user.userId) {
+        if (job.UserID !== req.user.userID) { // Corrected to use userID from token
              return res.status(403).json({ success: false, message: 'You are not authorized to view this job status.' });
         }
         res.status(200).json({ success: true, job });
@@ -109,12 +109,12 @@ router.get('/post-status/:jobId', authMiddleware, async (req, res) => {
 });
 
 // Background processing function
-async function processPostUploadJob(jobId, userID, userFullName, tempFiles, tempDir) {
+async function processPostUploadJob(jobId, tempFiles, tempDir) {
     try {
         await postJob.updateJob(jobId, 'processing', 'Processing post and uploading files.');
 
         const job = await postJob.getJob(jobId);
-        const { title, description } = JSON.parse(job.Payload);
+        const { title, description, userID, initiatedBy } = JSON.parse(job.Payload); // Get userID from the job payload
 
         const pool = await getConnection();
         const transaction = new sql.Transaction(pool);
@@ -178,7 +178,7 @@ async function processPostUploadJob(jobId, userID, userFullName, tempFiles, temp
                 actions: 'create-post-async',
                 oldValue: null,
                 newValue: `Reference: ${postReference}`,
-                descriptions: `User ${userFullName} created a new post via async job: ${title}`
+                descriptions: `User ${initiatedBy} created a new post via async job: ${title}`
             });
 
             await postJob.updateJob(jobId, 'completed', 'Post created successfully.', { Result: { postID } });

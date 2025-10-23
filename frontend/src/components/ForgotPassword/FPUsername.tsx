@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 interface FPUsernameProps {
   onSubmit: (username: string) => void;
@@ -7,7 +8,6 @@ interface FPUsernameProps {
 
 const FPUsername: React.FC<FPUsernameProps> = ({ onSubmit }) => {
   const [username, setUsername] = useState<string>('');
-  const [error, setError] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const submitButtonRef = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
@@ -15,31 +15,25 @@ const FPUsername: React.FC<FPUsernameProps> = ({ onSubmit }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Prevent multiple submissions
     if (isSubmitting) return;
     
     if (!username.trim()) {
-      setError('Please enter your username or email');
+      toast.error('Please enter your username or email');
       return;
     }
     
-    // Set loading state
     setIsSubmitting(true);
-    setError('');
     
-    // Disable the button immediately
     if (submitButtonRef.current) {
       submitButtonRef.current.disabled = true;
     }
     
     try {
-      // Call the onSubmit function passed from parent
       await onSubmit(username);
     } catch (error) {
       if (import.meta.env.DEV) console.error('Error:', error);
-      setError('An error occurred. Please try again later.');
+      toast.error('An error occurred. Please try again later.');
     } finally {
-      // Only reset if we're still mounted (component might navigate away)
       setIsSubmitting(false);
     }
   };
@@ -59,7 +53,6 @@ const FPUsername: React.FC<FPUsernameProps> = ({ onSubmit }) => {
             disabled={isSubmitting}
             className={isSubmitting ? "fp-input-disabled" : ""}
           />
-          {error && <div className="fp-error-message">{error}</div>}
         </div>
         <div className="fp-form-actions">
           <button 

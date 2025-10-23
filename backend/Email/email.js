@@ -167,20 +167,10 @@ const generateOTP = () => {
 
 // Sending Emails
 
-const sendPasswordResetEmail = async (email) => {
+const sendPasswordResetEmail = async (email, userID) => {
   try {
     // Generate OTP
     const resetCode = generateOTP();
-    
-    // Get user information from database
-    const pool = await getConnection();
-    const userResult = await pool.request()
-      .input('email', sql.VarChar, email)
-      .query('SELECT * FROM userInfo WHERE emailAddress = @email');
-    
-    if (userResult.recordset.length === 0) {
-      return { success: false, message: 'User not found', otp: null };
-    }
     
     const htmlContent = createPasswordResetEmail(resetCode);
     
@@ -191,11 +181,12 @@ const sendPasswordResetEmail = async (email) => {
       html: htmlContent
     };
     
-    const info = await transporter.sendMail(mailOptions);
+    await transporter.sendMail(mailOptions);
+
     addAuditTrail({
         actor: 'S',
         module: 'E',
-        userID: userResult.recordset[0].userID,
+        userID: userID,
         actions: 'send-password-reset-email',
         oldValue: null,
         newValue: null,
@@ -203,7 +194,7 @@ const sendPasswordResetEmail = async (email) => {
     });
     return { success: true, message: 'Password reset email sent', otp: resetCode };
   } catch (error) {
-    console.error('Error sending password reset email');
+    console.error('Error sending password reset email:', error);
     return { success: false, error: error.message, otp: null };
   }
 };
