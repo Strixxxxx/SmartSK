@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import './rawdata.css';
+import './RawDataList.css';
 import api from '../../../backend connection/axiosConfig';
 
 interface DataRow {
@@ -20,25 +20,13 @@ interface FlashMessage {
     message: string;
 }
 
-interface UploadSummary {
-    totalRows: number;
-    processedRows: number;
-    errorRows: number;
-    totalInserts: number;
-    yearsProcessed: number[];
-    yearRange: string;
-    uploadedBy: string;
-    barangay: string;
-    errors: string[];
-}
-
-interface RawDataProps {}
+interface RawDataListProps {}
 
 interface OutletContextType {
   sidebarCollapsed: boolean;
 }
 
-const RawData: React.FC<RawDataProps> = () => {
+const RawDataList: React.FC<RawDataListProps> = () => {
     const { sidebarCollapsed } = useOutletContext<OutletContextType>();
     const [data, setData] = useState<DataRow[]>([]);
     const [years, setYears] = useState<number[]>([]);
@@ -54,7 +42,6 @@ const RawData: React.FC<RawDataProps> = () => {
         category: ''
     });
     const [flashMessage, setFlashMessage] = useState<FlashMessage | null>(null);
-    const [uploading, setUploading] = useState(false);
 
     const showFlashMessage = (type: 'success' | 'error' | 'info' | 'warning', message: string, autoHide: boolean = true) => {
         setFlashMessage({ type, message });
@@ -68,36 +55,6 @@ const RawData: React.FC<RawDataProps> = () => {
     const hideFlashMessage = () => {
         setFlashMessage(null);
     };
-
-    useEffect(() => {
-        const handleUploadProgress = (event: Event) => {
-            const customEvent = event as CustomEvent;
-            const progress = customEvent.detail.progress;
-            if (uploading) {
-                showFlashMessage('info', 
-                    `Uploading: ${progress}%. Processing may continue after upload completes...`, 
-                    false
-                );
-            }
-        };
-
-        const handleNetworkTimeout = (_event: Event) => {
-            setUploading(false);
-            showFlashMessage('warning', 
-                'Upload is taking longer than expected. The file is likely still being processed in the background. ' +
-                'Please wait a moment and refresh the page to see if the data has been updated.', 
-                false
-            );
-        };
-
-        window.addEventListener('uploadProgress', handleUploadProgress);
-        window.addEventListener('networkTimeout', handleNetworkTimeout);
-
-        return () => {
-            window.removeEventListener('uploadProgress', handleUploadProgress);
-            window.removeEventListener('networkTimeout', handleNetworkTimeout);
-        };
-    }, [uploading]);
 
     const fetchFilterOptions = useCallback(async () => {
         try {
@@ -164,136 +121,7 @@ const RawData: React.FC<RawDataProps> = () => {
         });
     };
 
-    const handleUpdate = async () => {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.csv';
-        fileInput.style.display = 'none';
-        
-        fileInput.onchange = async (e) => {
-            const target = e.target as HTMLInputElement;
-            const file = target.files?.[0];
-            
-            if (!file) {
-                showFlashMessage('error', 'No file selected.');
-                return;
-            }
-
-            if (!file.name.toLowerCase().endsWith('.csv')) {
-                showFlashMessage('error', 'Please select a CSV file.');
-                return;
-            }
-
-            const maxSize = 10 * 1024 * 1024; // 10MB
-            if (file.size > maxSize) {
-                const shouldContinue = window.confirm(
-                    `This file is ${(file.size / 1024 / 1024).toFixed(1)}MB. ` +
-                    'Large files may take several minutes to process. Continue?'
-                );
-                if (!shouldContinue) {
-                    document.body.removeChild(fileInput);
-                    return;
-                }
-            }
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            try {
-                setUploading(true);
-                
-                showFlashMessage('info', 
-                    `Processing ${file.name} (${(file.size / 1024).toFixed(1)}KB). ` +
-                    'This may take several minutes for large files...', 
-                    false
-                );
-                
-                const response = await api.post('/api/rawdata/upload', formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    },
-                    timeout: 600000,
-                    onUploadProgress: (progressEvent) => {
-                        if (progressEvent.total) {
-                            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                            showFlashMessage('info', 
-                                `Uploading: ${percentCompleted}%. Processing may continue after upload completes...`, 
-                                false
-                            );
-                        }
-                    }
-                });
-                
-                hideFlashMessage();
-                
-                const summary: UploadSummary = response.data.summary;
-                let successMessage = `Update Complete! `;
-                successMessage += `Processed ${summary.processedRows} of ${summary.totalRows} rows, `;
-                successMessage += `${summary.totalInserts} data points inserted `;
-                successMessage += `for years ${summary.yearRange}.`;
-                
-                if (summary.errorRows > 0) {
-                    successMessage += ` (${summary.errorRows} rows had errors and were skipped)`;
-                }
-                
-                showFlashMessage('success', successMessage, true);
-                
-                if (response.data.warning) {
-                    setTimeout(() => {
-                        showFlashMessage('warning', response.data.warning, true);
-                    }, 2000);
-                }
-                
-                if (import.meta.env.DEV) console.log('Upload Summary:', summary);
-                
-                setTimeout(async () => {
-                    try {
-                        await Promise.all([
-                            fetchData(),
-                            fetchFilterOptions()
-                        ]);
-                        showFlashMessage('info', 'Data refreshed successfully!', true);
-                    } catch (refreshError) {
-                        if (import.meta.env.DEV) console.error('Error refreshing data:', refreshError);
-                        showFlashMessage('warning', 'Upload completed but failed to refresh display. Please reload the page.', true);
-                    }
-                }, 1000);
-                
-            } catch (error: any) {
-                hideFlashMessage();
-                
-                let errorMessage = 'Upload failed: ';
-                
-                if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
-                    errorMessage = 'Upload timed out. The file might still be processing in the background. ' +
-                                 'Please wait a few minutes and refresh the page to check if the data was updated.';
-                    showFlashMessage('warning', errorMessage, false);
-                } else if (error.response?.data?.message) {
-                    errorMessage += error.response.data.message;
-                    showFlashMessage('error', errorMessage);
-                } else if (error.userMessage) {
-                    showFlashMessage('error', error.userMessage);
-                } else if (error.message) {
-                    errorMessage += error.message;
-                    showFlashMessage('error', errorMessage);
-                } else {
-                    errorMessage += 'Unknown error occurred.';
-                    showFlashMessage('error', errorMessage);
-                }
-                
-            } finally {
-                setUploading(false);
-                if (document.body.contains(fileInput)) {
-                    document.body.removeChild(fileInput);
-                }
-            }
-        };
-
-        document.body.appendChild(fileInput);
-        fileInput.click();
-    };
-
-    const handleDownload = async (format: 'csv') => {
+    const handleDownload = async (format: 'excel' | 'csv') => {
         try {
             showFlashMessage('info', `Preparing ${format.toUpperCase()} download...`);
             
@@ -303,13 +131,13 @@ const RawData: React.FC<RawDataProps> = () => {
             });
 
             const blob = new Blob([response.data], {
-                type: 'text/csv'
+                type: format === 'csv' ? 'text/csv' : 'application/vnd.ms-excel'
             });
             
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = `raw_data_export.csv`;
+            link.download = `raw_data_export.${format === 'excel' ? 'xls' : 'csv'}`;
             
             document.body.appendChild(link);
             link.click();
@@ -340,9 +168,9 @@ const RawData: React.FC<RawDataProps> = () => {
         <div className={`rawdata-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
             <div className="rawdata-content">
                 <div className="rawdata-header">
-                    <h1 className="rawdata-title">Raw Data Management</h1>
+                    <h1 className="rawdata-title">Raw Data Projects</h1>
                     <div className="rawdata-subtitle">
-                        Manage and analyze your project data efficiently
+                        View and analyze project data efficiently
                     </div>
                 </div>
 
@@ -406,13 +234,6 @@ const RawData: React.FC<RawDataProps> = () => {
                                 ×
                             </button>
                         </div>
-                        {flashMessage.type === 'info' && uploading && (
-                            <div className="flash-progress">
-                                <div className="progress-bar">
-                                    <div className="progress-bar-fill"></div>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 )}
 
@@ -438,14 +259,12 @@ const RawData: React.FC<RawDataProps> = () => {
                                     value={filters.ppa}
                                     onChange={handleFilterChange}
                                     className="search-bar"
-                                    disabled={uploading}
                                 />
                                 <select 
                                     name="committee" 
                                     value={filters.committee} 
                                     onChange={handleFilterChange} 
                                     className="combo-box"
-                                    disabled={uploading}
                                 >
                                     <option value="">All Committees</option>
                                     {filterOptions.committees.map(committee => (
@@ -457,7 +276,6 @@ const RawData: React.FC<RawDataProps> = () => {
                                     value={filters.category} 
                                     onChange={handleFilterChange} 
                                     className="combo-box"
-                                    disabled={uploading}
                                 >
                                     <option value="">All Categories</option>
                                     {filterOptions.categories.map(category => (
@@ -467,7 +285,6 @@ const RawData: React.FC<RawDataProps> = () => {
                                 <button 
                                     onClick={handleClearFilters} 
                                     className="clear-filters-btn"
-                                    disabled={uploading}
                                 >
                                     🗑️ Clear Filters
                                 </button>
@@ -475,25 +292,10 @@ const RawData: React.FC<RawDataProps> = () => {
                             
                             <div className="actions">
                                 <button 
-                                    className={`action-button download-btn ${uploading ? 'disabled' : ''}`}
-                                    disabled={uploading}
+                                    className={`action-button download-btn`}
                                     onClick={() => handleDownload('csv')}
                                 >
                                     📥 Download CSV
-                                </button>
-                                <button 
-                                    onClick={handleUpdate} 
-                                    className={`action-button update-button ${uploading ? 'uploading' : ''}`}
-                                    disabled={uploading || loading}
-                                >
-                                    {uploading ? (
-                                        <span className="button-content">
-                                            <span className="spinner"></span>
-                                            Updating...
-                                        </span>
-                                    ) : (
-                                        <>📤 Update Data</>
-                                    )}
                                 </button>
                             </div>
                         </div>
@@ -578,4 +380,4 @@ const RawData: React.FC<RawDataProps> = () => {
     );
 };
 
-export default RawData;
+export default RawDataList;

@@ -82,6 +82,12 @@ const ClientSidebar: React.FC<SidebarProps> = ({
                 </Link>
               </li>
               
+              <li className={isActive('/raw-data-list') ? 'active' : ''}>
+                <Link to="/raw-data-list" title="raw Data Projects">
+                  Raw Data Projects
+                </Link>
+              </li>
+
               <li className={isActive('/predictive-analytics') ? 'active' : ''}>
                 <Link to="/predictive-analytics" title="Predictive Project Analysis">
                   Predictive Project Analysis

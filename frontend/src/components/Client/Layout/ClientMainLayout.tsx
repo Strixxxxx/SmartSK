@@ -23,7 +23,7 @@ const ClientMainLayout: React.FC<ClientMainLayoutProps> = ({ children }) => {
         className={`client-main-content ${collapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}
       >
         {children}
-        <Outlet />
+        <Outlet context={{ sidebarCollapsed: collapsed }} />
       </Box>
     </Box>
   );

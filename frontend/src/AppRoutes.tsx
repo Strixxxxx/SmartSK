@@ -23,6 +23,7 @@ import Dashboard from './components/Client/Dashboard/Dashboard';
 import Projects from './components/Projects/Projects';
 import Forecast from './components/Client/Forecast/Forecast';
 import Predictive from './components/Client/PredictiveAnalysis/pa';
+import RawDataList from './components/Client/RawData/RawDataList';
 
 // Admin Pages
 import DashboardAdmin from './components/Admin/Dashboard/DashboardAdmin';
@@ -100,6 +101,7 @@ const AppRoutes: React.FC = () => {
             <Route index element={<Navigate to="dashboard" />} />
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="projects" element={<Projects />} />
+            <Route path="raw-data-list" element={<RawDataList />} />
             <Route path="forecast" element={<Forecast />} />
             <Route path="predictive-analytics" element={<Predictive />} />
           </>
