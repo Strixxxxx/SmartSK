@@ -282,15 +282,15 @@ const RawDataList: React.FC<RawDataListProps> = () => {
                                         <option key={category} value={category}>{category}</option>
                                     ))}
                                 </select>
-                                <button 
-                                    onClick={handleClearFilters} 
-                                    className="clear-filters-btn"
-                                >
-                                    🗑️ Clear Filters
-                                </button>
                             </div>
                             
                             <div className="actions">
+                                <button 
+                                    onClick={handleClearFilters} 
+                                    className="action-button clear-filters-btn"
+                                >
+                                    🗑️ Clear Filters
+                                </button>
                                 <button 
                                     className={`action-button download-btn`}
                                     onClick={() => handleDownload('csv')}
