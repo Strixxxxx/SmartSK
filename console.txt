@@ -4,27 +4,7 @@
 
 --Frontend (Browser's Console)
 
-RawDataList.tsx:30 Uncaught TypeError: Cannot destructure property 'sidebarCollapsed' of 'useOutletContext(...)' as it is undefined.
-    at RawDataList (RawDataList.tsx:30:13)
-RawDataList	@	RawDataList.tsx:30
-<RawDataList>		
-AppRoutes	@	AppRoutes.tsx:104
-<AppRoutes>		
-App	@	App.tsx:24
-<App>		
-(anonymous)	@	main.tsx:8
-
-AppRoutes.tsx:104 An error occurred in the <RawDataList> component.
-
-Consider adding an error boundary to your tree to customize error handling behavior.
-Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
-<RawDataList>		
-AppRoutes	@	AppRoutes.tsx:104
-<AppRoutes>		
-App	@	App.tsx:24
-<App>		
-(anonymous)	@	main.tsx:8
-
+Failed to load resource: the server responded with a status of 401 (Unauthorized)Understand this error
 
 --Frontend (VSC Terminal)
 
@@ -32,7 +12,17 @@ App	@	App.tsx:24
 
 --Backend(VSC Terminal)
 
-
+PS D:\Projects\Projects\smartSK> cd backend
+PS D:\Projects\Projects\smartSK\backend> node main.js
+Initializing active sessions from database...
+Initializing Azure Storage with primary credentials.
+Job management system initialized with database storage.
+Post upload job management system initialized.
+[WebSocket] Server initialized.
+Server is running on port 8080
+Initialized active sessions.
+[WebSocket] Client connected.
+[WebSocket] Client connected.
 
 --Backend(Azure Portal's Log Stream in Platform)
 

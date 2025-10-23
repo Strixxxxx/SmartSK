@@ -1,387 +1,463 @@
-Data from paTrends.py: {
-  "trends": [
-    {
-      "id": 1,
-      "name": "Enhanced Digital Literacy Programs",
-      "description": "Building upon existing education initiatives like 'Knowledge is Power' [1] and document printing services, there's a growing need to expand digital literacy programs to equip the youth with essential skills for the modern workforce. This includes advanced training beyond basic applications, encompassing data analytics, cybersecurity awareness, and AI literacy. Integrating these skills into existing SK programs will boost youth empowerment.  The Sangguniang Kabataan (SK) aims to empower youth and promote positive community development [2].",
-      "confidence": 0.95,
-      "trend": "up",
-      "category": "EDUCATION",
-      "impact": "high"
-    },
-    {
-      "id": 2,
-      "name": "Sustainable Environmental Projects with Youth Engagement",
-      "description": "The 'Battle of the Bands para sa Kalikasan' demonstrates the potential for engaging youth in environmental causes [3]. Future trends should focus on long-term sustainable projects, such as urban gardening initiatives, renewable energy workshops, and waste management campaigns, incorporating elements of gamification and social media to increase participation. SK projects can highlight impactful youth contributions [4].",
-      "confidence": 0.9,
-      "trend": "up",
-      "category": "ENVIRONMENT",
-      "impact": "high"
-    },
-    {
-      "id": 3,
-      "name": "Mental Health Awareness and Support Systems",
-      "description": "The existing 'Free Mental Health Group Therapy Sessions' [3] indicates a rising awareness of mental health issues among the youth. Future SK projects should focus on creating accessible and sustainable support systems, including peer-to-peer counseling programs, mental health first aid training for SK officials, and partnerships with mental health professionals. These are needed because young people are involved in the local government process [1].",
-      "confidence": 0.92,
-      "trend": "up",
-      "category": "HEALTH",
-      "impact": "high"
-    },
-    {
-      "id": 4,
-      "name": "Entrepreneurship and Livelihood Incubation Programs",
-      "description": "Building on programs like 'Food Processing, Skills Training' and 'Effective Resume and Application Letter Writing Training' [3], SK can create incubator programs that provide young entrepreneurs with resources, mentorship, and access to funding. This fosters economic empowerment and promotes self-sufficiency among the youth.  Local Development Investment Programs are being developed by Sangguniang Kabataan [5].",
-      "confidence": 0.88,
-      "trend": "up",
-      "category": "ECONOMIC EMPOWERMENT",
-      "impact": "high"
-    },
-    {
-      "id": 5,
-      "name": "Youth-Led Governance and Civic Engagement",
-      "description": "The Sangguniang Kabataan is a community council that represents the youth [6]. SK should promote greater youth participation in local governance through initiatives like youth-led policy consultations, participatory budgeting, and leadership development programs. This empowers young people to become active agents of change in their communities and addresses perceptions regarding the power and functions of the SK [3].",
-      "confidence": 0.85,
-      "trend": "up",
-      "category": "GOVERNANCE",
-      "impact": "medium"
-    },
-    {
-      "id": 6,
-      "name": "Sports and Recreational Activities for Holistic Development",
-      "description": "Building upon the 'Defend Your Future: Martial Arts and Drug Prevention' initiative [3], expand sports and recreational programs to cater to diverse interests and promote physical and mental well-being. This can include establishing youth sports leagues, organizing fitness workshops, and creating safe spaces for recreational activities. Mayor Joy gained recognition for youth development [7].",
-      "confidence": 0.82,
-      "trend": "up",
-      "category": "PEACE-BUILDING AND SECURITY",
-      "impact": "medium"
-    },
-    {
-      "id": 7,
-      "name": "Gender Equality and Empowerment Initiatives",
-      "description": "Leveraging the 'EmpowerHer: Basic Self-Defense and Gender Development' program [3], SK can implement broader initiatives to promote gender equality and empower young women. This includes workshops on gender sensitivity, leadership training for young women, and campaigns to address gender-based violence. The SK has a committee on Gender and Development [3].",
-      "confidence": 0.85,
-      "trend": "up",
-      "category": "PEACE-BUILDING AND SECURITY",
-      "impact": "medium"
-    },
-    {
-      "id": 8,
-      "name": "Financial Literacy and Investment Training",
-      "description": "Expanding upon the 'Financial Literacy Training' program [3], SK can offer more comprehensive courses on personal finance management, investment strategies, and entrepreneurship. These programs will equip young people with the knowledge and skills to make informed financial decisions and secure their future. The SK can involve youth in Local Development Investment Programs [5].",
-      "confidence": 0.8,
-      "trend": "up",
-      "category": "EDUCATION",
-      "impact": "medium"
-    },
-    {
-      "id": 9,
-      "name": "Cultural and Arts Programs Promoting Local Heritage",
-      "description": "SK should invest in cultural and arts programs that celebrate local heritage and promote creativity among the youth. This can include organizing traditional dance workshops, art competitions showcasing local talent, and cultural immersion programs that connect young people with their roots. The SK has a committee on Education and Culture [3].",
-      "confidence": 0.75,
-      "trend": "up",
-      "category": "EDUCATION",
-      "impact": "medium"
-    },
-    {
-      "id": 10,
-      "name": "Disaster Preparedness and Climate Change Adaptation Training",
-      "description": "Given the Philippines' vulnerability to natural disasters, SK should prioritize disaster preparedness and climate change adaptation training for the youth. This includes workshops on emergency response, first aid training, and awareness campaigns on climate change mitigation and adaptation strategies. The document outlines a campaign by the Sangguniang Kabataan (SK) in the Philippines [2].",
-      "confidence": 0.78,
-      "trend": "up",
-      "category": "ENVIRONMENT",
-      "impact": "medium"
-    }
-  ],
-  "citations": [
-    {
-      "id": 1,
-      "title": "The Impact of Youth Participation in the Local Government Process",
-      "url": "https://www.researchgate.net/profile/Faye-Balanon/publication/282866168_The_Impact_of_Youth_Participation_in_the_Local_Government_Process/links/5620721a08ae93a5c9243ea9/The-Impact-of-Youth-Participation-in-the-Local-Government-Process.pdf",
-      "snippet": "Philippine Toolkit for. Youth Development. Quezon City, Philippines: National Youth. Commission. references. Page 52. 50 The Sangguniang Kabataan Experience."
-    },
-    {
-      "id": 2,
-      "title": "Sanguniang Kabataan Projects and Activities 2 | PDF | Emergency ...",
-      "url": "https://www.scribd.com/document/701509985/Sanguniang-Kabataan-Projects-and-Activities-2",
-      "snippet": "The document outlines a campaign by the Sangguniang Kabataan (SK) in the Philippines to empower youth and promote positive community development. The SK's ..."
-    },
-    {
-      "id": 3,
-      "title": "Assessing Demographics, Perceptions, and Participation: A Study ...",
-      "url": "https://ijcsrr.org/assessing-demographics-perceptions-and-participation-a-study-on-sangguniang-kabataan-sk-effectiveness-and-improvement-suggestions/",
-      "snippet": "Perceptions of the Youth on the power and functions of the sangguniang Kabataan of BrGy Batasan Hills, Quezon City: an analysis. Groves, R. M., Fowler Jr ..."
-    },
-    {
-      "id": 4,
-      "title": "Quezon'S Most Outstanding SK Project 2019 Guidelines ...",
-      "url": "https://www.scribd.com/document/539344236/Sk-Project-Guidelines",
-      "snippet": "... Project 2019 competition hosted by the Sangguniang Kabataan Provincial Federation in Quezon, Philippines. The competition aims to highlight impactful youth ..."
-    },
-    {
-      "id": 5,
-      "title": "Quezon City Local Development Investment Program (LDIP) 2024 ...",
-      "url": "https://quezoncity.gov.ph/wp-content/uploads/2023/11/Quezon-City-Local-Development-Investment-Program-LDIP-2024-2026.pdf",
-      "snippet": "List of Priority Projects 2024-2026. QUEZON CITY LOCAL DEVELOPMENT INVESTMENT PROGRAM 2024-2026 ... Sangguniang Kabataan, and Civil Society. Organizations."
-    },
-    {
-      "id": 6,
-      "title": "Sangguniang Kabataan - Wikipedia",
-      "url": "https://en.wikipedia.org/wiki/Sangguniang_Kabataan",
-      "snippet": "A Sangguniang Kabataan is a community council that represents the youth in a barangay in the Philippines. Established to provide young people with a ..."
-    },
-    {
-      "id": 7,
-      "title": "Quezon City Annual Report 2023-2024",
-      "url": "https://quezoncity.gov.ph/wp-content/uploads/2024/11/Quezon-City-Local-Government-Annual-Report-2023-2024.pdf",
-      "snippet": "Nov 29, 2024 ... at the 5th Philippine Sangguniang Kabataan. Awards of the Positive Youth Development. Network. As Mayor Joy gained recognition as an effective ..."
-    }
-  ],
-  "forecast_year": 2026,
-  "categories": [
-    "EDUCATION",
-    "ECONOMIC EMPOWERMENT",
-    "ENVIRONMENT",
-    "HEALTH",
-    "PEACE-BUILDING AND SECURITY",
-    "SOCIAL, INCLUSION AND EQUITY",
-    "GOVERNANCE",
-    "ACTIVE CITEZENSHIP"
-  ],
-  "metadata": {
-    "generated_at": "2025-10-24T00:30:38.266161+08:00",
-    "historical_data_available": true,
-    "internet_sources_used": 10,
-    "filters_applied": "none",
-    "forecast_year": 2026,
-    "data_weighting": "70% from Primary Data (Database), 30% from Secondary Data (Internet Sources)"
-  }
-}
-Data from paTrends.py: {
-  "trends": [
-    {
-      "id": 1,
-      "name": "Enhanced Digital Literacy Programs",
-      "description": "Building on the \"Basic Windows Office Application Training\" [1] and \"Effective Resume and Application Letter Writing Training\" initiatives from previous years, there's a trend towards enhanced digital literacy programs. This includes advanced software skills, online safety, and digital entrepreneurship, catering to the evolving demands of the job market. The Sangguniang Kabataan (SK) can leverage digital platforms for wider reach, given the increasing accessibility of technology among the youth. Considering the need for compliance with regulatory requirements [2], these programs should also incorporate modules on responsible digital citizenship and cyber ethics.",
-      "confidence": 0.9,
-      "trend": "up",
-      "category": "ECONOMIC EMPOWERMENT",
-      "impact": "high"
-    },
-    {
-      "id": 2,
-      "name": "Comprehensive Mental Health Support Systems",
-      "description": "Based on the existing \"Free Mental Health Group Therapy Sessions\" [1], there is a growing need for comprehensive mental health support systems for the youth. This trend includes accessible counseling services, mental health awareness campaigns, and peer support groups. This is further emphasized by national recognition of effective youth development networks [3]. Integrating mental health initiatives into broader SK programs can help destigmatize mental health issues and promote overall well-being.",
-      "confidence": 0.9,
-      "trend": "up",
-      "category": "HEALTH",
-      "impact": "high"
-    },
-    {
-      "id": 3,
-      "name": "Environmental Sustainability Projects with Community Engagement",
-      "description": "Building on projects like \"Battle of the Bands para sa Kalikasan\" [1], there's a rising trend towards environmental sustainability projects with strong community engagement. These projects focus on waste reduction, renewable energy, urban gardening, and environmental education, engaging youth in practical solutions for a greener future. Collaboration with civil society organizations [1] can enhance the impact and sustainability of these initiatives.",
-      "confidence": 0.85,
-      "trend": "up",
-      "category": "ENVIRONMENT",
-      "impact": "high"
-    },
-    {
-      "id": 4,
-      "name": "Skills-Based Training for Employment",
-      "description": "Expanding on the existing \"Food Processing, Skills Training\" [1] and other livelihood programs, a significant trend involves providing skills-based training directly linked to employment opportunities. These programs focus on in-demand skills such as coding, digital marketing, and technical trades, equipping youth with the tools to secure meaningful employment or start their own businesses. Partnership with local businesses can provide internships and job placements for program graduates.",
-      "confidence": 0.85,
-      "trend": "up",
-      "category": "ECONOMIC EMPOWERMENT",
-      "impact": "high"
-    },
-    {
-      "id": 5,
-      "name": "Financial Literacy and Entrepreneurship Education",
-      "description": "Building on the \"Financial Literacy Training\" [1] initiative, the focus will be to expand the curriculum to cover entrepreneurship. Such initiatives will empower the youth to make informed financial decisions, start their own ventures, and contribute to the local economy. Such training also aligns with the Quezon City Local Development Investment Program (LDIP) [1], showing a commitment to youth development.",
-      "confidence": 0.8,
-      "trend": "up",
-      "category": "EDUCATION",
-      "impact": "medium"
-    },
-    {
-      "id": 6,
-      "name": "Promoting Youth Participation in Local Governance",
-      "description": "Focusing on the impact of youth participation in local government [4], efforts will increase to promote youth involvement in decision-making processes and local governance. This trend emphasizes youth representation in local boards and committees, ensuring their voices are heard in matters affecting their communities. The Sangguniang Kabataan (SK) plays a crucial role in facilitating youth participation and advocating for their interests [5].",
-      "confidence": 0.8,
-      "trend": "up",
-      "category": "GOVERNANCE",
-      "impact": "medium"
-    },
-    {
-      "id": 7,
-      "name": "Inclusive Sports and Recreation Programs",
-      "description": "Building on existing programs like \"Defend Your Future: Martial Arts and Drug Prevention\" [1], expanding inclusive sports and recreation programs to cater to diverse interests and abilities. These programs promote physical activity, teamwork, and social inclusion, fostering a healthy and supportive environment for youth development. Ensuring accessibility for differently-abled youth and promoting gender equality in sports are key considerations.",
-      "confidence": 0.75,
-      "trend": "up",
-      "category": "PEACE-BUILDING AND SECURITY",
-      "impact": "medium"
-    },
-    {
-      "id": 8,
-      "name": "Substance Abuse Prevention and Awareness Campaigns",
-      "description": "Building on projects like \"Dance Against Drugs\" [1] and \"Get Your Garne on with SKSB\", [1] there is a continuing trend of substance abuse prevention and awareness campaigns, utilizing creative and engaging methods to educate youth about the dangers of drugs and alcohol. Partnering with local health organizations and law enforcement agencies can enhance the effectiveness of these campaigns.",
-      "confidence": 0.75,
-      "trend": "up",
-      "category": "PEACE-BUILDING AND SECURITY",
-      "impact": "medium"
-    },
-    {
-      "id": 9,
-      "name": "Empowerment Programs for Young Women",
-      "description": "Building on the existing \"EmpowerHer: Basic Self-Defense and Gender Development\" [1], there is a trend towards empowerment programs for young women, focusing on leadership development, self-esteem building, and gender equality. These programs aim to equip young women with the skills and confidence to pursue their goals and challenge societal norms.",
-      "confidence": 0.7,
-      "trend": "up",
-      "category": "PEACE-BUILDING AND SECURITY",
-      "impact": "medium"
-    },
-    {
-      "id": 10,
-      "name": "Academic Support and Review Programs",
-      "description": "Building on \"Knowledge is Power\" Handog ng SK; Reviewer niyo! [1] and \"Free Entrance Exam Revlew\" [1], there is a continuing trend toward academic support and review programs to assist students in their studies. This includes providing tutoring services, learning resources, and review sessions for entrance exams and standardized tests, especially for underprivileged youth.",
-      "confidence": 0.7,
-      "trend": "up",
-      "category": "EDUCATION",
-      "impact": "medium"
-    }
-  ],
-  "citations": [
-    {
-      "id": 1,
-      "title": "Quezon City Local Development Investment Program (LDIP) 2024 ...",
-      "url": "https://quezoncity.gov.ph/wp-content/uploads/2023/11/Quezon-City-Local-Development-Investment-Program-LDIP-2024-2026.pdf",
-      "snippet": "List of Priority Projects 2024-2026. QUEZON CITY LOCAL DEVELOPMENT INVESTMENT PROGRAM 2024-2026 ... Sangguniang Kabataan, and Civil Society. Organizations."
-    },
-    {
-      "id": 2,
-      "title": "Karl Rosario - A Registered Psychometrician and an aspiring mental ...",
-      "url": "https://ph.linkedin.com/in/karl-rosario-460b2a202",
-      "snippet": "... youth development frameworks. Key Responsibilities: Monitors Sangguniang Kabataan (SK) projects and ensures compliance with regulatory requirements set by ..."
-    },
-    {
-      "id": 3,
-      "title": "Quezon City Annual Report 2023-2024",
-      "url": "https://quezoncity.gov.ph/wp-content/uploads/2024/11/Quezon-City-Local-Government-Annual-Report-2023-2024.pdf",
-      "snippet": "Nov 29, 2024 ... at the 5th Philippine Sangguniang Kabataan. Awards of the Positive Youth Development. Network. As Mayor Joy gained recognition as an effective ..."
-    },
-    {
-      "id": 4,
-      "title": "The Impact of Youth Participation in the Local Government Process",
-      "url": "https://www.researchgate.net/profile/Faye-Balanon/publication/282866168_The_Impact_of_Youth_Participation_in_the_Local_Government_Process/links/5620721a08ae93a5c9243ea9/The-Impact-of-Youth-Participation-in-the-Local-Government-Process.pdf",
-      "snippet": "Philippine Toolkit for. Youth Development. Quezon City, Philippines: National Youth. Commission. references. Page 52. 50 The Sangguniang Kabataan Experience."
-    },
-    {
-      "id": 5,
-      "title": "Sangguniang Kabataan - Wikipedia",
-      "url": "https://en.wikipedia.org/wiki/Sangguniang_Kabataan",
-      "snippet": "A Sangguniang Kabataan is a community council that represents the youth in a barangay in the Philippines. Established to provide young people with a ..."
-    }
-  ],
-  "forecast_year": 2026,
-  "categories": [
-    "EDUCATION",
-    "ECONOMIC EMPOWERMENT",
-    "ENVIRONMENT",
-    "HEALTH",
-    "PEACE-BUILDING AND SECURITY",
-    "SOCIAL, INCLUSION AND EQUITY",
-    "GOVERNANCE",
-    "ACTIVE CITEZENSHIP"
-  ],
-  "metadata": {
-    "generated_at": "2025-10-24T00:30:39.533003+08:00",
-    "historical_data_available": true,
-    "internet_sources_used": 10,
-    "filters_applied": "none",
-    "forecast_year": 2026,
-    "data_weighting": "70% from Primary Data (Database), 30% from Secondary Data (Internet Sources)"
-  }
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useOutletContext } from 'react-router-dom';
+import './Roles.css';
+import { toast } from 'react-toastify';
+import axiosInstance from '../../../backend connection/axiosConfig';
+import { AxiosError } from 'axios';
+import {
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  FormLabel,
+  Box
+} from '@mui/material';
+
+interface User {
+  userID: number;
+  fullName: string;
+  position: string;
+  barangay: string;
+  roleName?: string;
+  isArchived: boolean;
 }
 
-Data from pa.py: {
-  "summary_report": "This report provides a predictive analysis for Sangguniang Kabataan (SK) initiatives in District 5, Quezon City. The analysis considers historical project data from 2023-2025 and incorporates relevant external factors and trends to forecast potential outcomes and inform future planning. The Philippine government is actively implementing its 8-point socioeconomic agenda and the Philippine Development Plan 2023-2028 to ensure inclusive, resilient, and sustainable development [1].",
-  "success_factors": [
-    "Consistent funding for education initiatives like 'Knowledge is Power' and 'Balik eSKwela' demonstrates a commitment to youth development, potentially boosting academic performance.",
-    "Targeted programs addressing economic empowerment, such as 'Basic Windows Office Application Training' and 'Effective Resume and Application Letter Writing Training', can improve youth employability."
-  ],
-  "recommendations": [
-    "Prioritize initiatives that align with the Philippine Development Plan 2023-2028 [2] to maximize impact and secure sustained support.",
-    "Diversify funding sources to reduce reliance on SK budgets and explore partnerships with local businesses and NGOs to amplify program reach.",
-    "Implement robust monitoring and evaluation frameworks to measure program effectiveness and inform future improvements."
-  ],
-  "risk_mitigation_strategies": [
-    {
-      "risk": "Inadequate budget allocation may hinder the effective implementation of planned initiatives.",
-      "mitigation": "Develop a detailed budget justification, explore alternative funding sources, and prioritize initiatives with the highest potential impact."
-    },
-    {
-      "risk": "Low youth participation rates may undermine the success of SK programs.",
-      "mitigation": "Conduct targeted outreach campaigns, engage youth in program design, and offer incentives to encourage participation."
-    }
-  ],
-  "predicted_trends": [
-    "Increased demand for digital literacy programs due to the growing importance of technology in education and employment [3].",
-    "Rising awareness of mental health issues among youth, leading to greater demand for mental health support services."
-  ],
-  "budget": {
-    "analysis": "The provided data shows variable budgeting across different categories. Some programs have consistent funding (e.g., 'Knowledge is Power'), while others experience fluctuations or lack initial funding (e.g., 'Balik eSKwela' in 2024).",
-    "historical_patterns": "Education initiatives generally receive consistent funding, while environmental and health programs show inconsistent funding patterns in the provided data. Peace-building and security initiatives see varied funding, with some projects funded one year and not the next.",
-    "current_trends": "The trend towards wearable technology suggests potential integration into fitness programs and health initiatives, impacting budget allocations [3].",
-    "recommendations": "Allocate a portion of the 2026 budget to mental health programs and digital literacy initiatives to address emerging youth needs. Consider strategic investments in wearable technology to enhance health and fitness programs. Base budget allocation on program impact and alignment with the Philippine Development Plan 2023-2028 [2]."
-  },
-  "implementation_date": {
-    "analysis": "The best timing for implementation depends on the specific program. Educational programs might align with the start of the school year. Consider implementing programs in alignment with the 8-point socioeconomic agenda and the Philippine Development Plan [1].",
-    "historical_patterns": "No clear pattern can be identified based on the given data because it only provides yearly targets and budgets.",
-    "current_practices": "The Youth, Peace and Security Strategy (2024-2026) suggests aligning program implementation with broader peacebuilding efforts [4].",
-    "seasonal_factors": "Environmental initiatives might be best implemented during the rainy season (for tree planting) or summer (for clean-up drives).",
-    "resource_considerations": "Ensure adequate resources (staff, funding, materials) are available before initiating any program."
-  },
-  "estimated_duration": {
-    "analysis": "The estimated duration of each program should be clearly defined during the planning phase. Some programs might be one-time events, while others are ongoing initiatives [4].",
-    "historical_timeframes": "The historical data provides annual targets, suggesting a yearly timeframe for most programs.",
-    "complexity_factors": "More complex programs, such as those involving multiple stakeholders or requiring extensive training, will likely require longer implementation timeframes.",
-    "current_standards": "DPPA, together with the UN Youth Office and Search for Common Ground, also led the development of the Five-Year Strategic Action Plan for Youth which might influence the duration of some youth programs [4].",
-    "dependencies": "Some programs may be dependent on external factors, such as weather conditions or the availability of partner organizations."
-  },
-  "feedback": "Based on current trends, expected community feedback will likely be positive for programs addressing relevant youth needs, such as education, employment, and mental health [3]. Negative feedback may arise if programs are perceived as ineffective, inaccessible, or misaligned with community values.",
-  "citations": [
-    {
-      "id": 1,
-      "title": "Philippines Overview: Development news, research, data | World Bank",
-      "url": "https://www.worldbank.org/en/country/philippines/overview",
-      "snippet": "The Philippine government is implementing its 8-point socioeconomic agenda and the Philippine Development Plan 2023-2028 to ensure inclusive, resilient, and ..."
-    },
-    {
-      "id": 2,
-      "title": "Philippine Development Plan (PDP) 2023–2028",
-      "url": "https://pdp.depdev.gov.ph/wp-content/uploads/2023/01/PDP-2023-2028.pdf",
-      "snippet": "... Trends. 10. Geopolitical Trends. 11. Environmental Trends. 12. Technology and ... 2026. These will help ensure regional equity and that we have the right ..."
-    },
-    {
-      "id": 3,
-      "title": "ACSM Fitness Trends",
-      "url": "https://acsm.org/education-resources/trending-topics-resources/acsm-fitness-trends/",
-      "snippet": "fitness evolution: Trends shaping 2026 Wearable technology, fitness programs ... The latest trends content from ACSM. 2026 fitness trends, wearable technology ..."
-    },
-    {
-      "id": 4,
-      "title": "YOUTH, PEACE AND SECURITY STRATEGY (2024-2026)",
-      "url": "https://dppa.un.org/sites/default/files/dppa_youth_peace_and_security_strategy_2024-2026.pdf",
-      "snippet": "Jan 16, 2024 ... DPPA, together with the UN Youth Office and Search for Common Ground, also led the development of the Five-Year Strategic Action Plan for Youth ..."
-    }
-  ],
-  "metadata": {
-    "internet_sources_consulted": 10,
-    "data_source": "Database",
-    "total_projects_analyzed": 51,
-    "view_by": "Committee",
-    "gemini_used": true,
-    "timestamp": "2025-10-24T00:29:00.939946+08:00",
-    "filters_applied": {
-      "category": null
-    }
-  }
+interface Role {
+  roleID: number;
+  roleName: string;
+  description: string;
 }
+
+interface RolesProps {}
+
+interface OutletContextType {
+  sidebarCollapsed: boolean;
+}
+
+const Roles: React.FC<RolesProps> = () => {
+  const { sidebarCollapsed } = useOutletContext<OutletContextType>();
+  const [users, setUsers] = useState<User[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [userToEdit, setUserToEdit] = useState<User | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [userToArchive, setUserToArchive] = useState<User | null>(null);
+  const [showArchiveConfirm, setShowArchiveConfirm] = useState<boolean>(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const [usersResponse, rolesResponse] = await Promise.all([
+          axiosInstance.get('/api/roles/users'),
+          axiosInstance.get('/api/roles/all')
+        ]);
+
+        if (usersResponse.data.success) {
+          setUsers(usersResponse.data.users);
+        } else {
+          throw new Error(usersResponse.data.message || 'Failed to fetch users');
+        }
+
+        if (rolesResponse.data.success) {
+          setRoles(rolesResponse.data.roles);
+        } else {
+          throw new Error(rolesResponse.data.message || 'Failed to fetch roles');
+        }
+
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        
+        if (axiosError.response?.status === 401) {
+          toast.error('Authentication failed. Please log in again.');
+          navigate('/home');
+          return;
+        }
+        
+        if (axiosError.response?.status === 403) {
+          toast.error('Access denied. You do not have permission to view this page.');
+          navigate('/unauthorized');
+          return;
+        }
+        
+        toast.error((axiosError.response?.data as any)?.message || axiosError.message || "Failed to fetch data.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [navigate]);
+
+  useEffect(() => {
+    if (userToEdit) {
+      setSelectedRole(userToEdit.position || '');
+    } else {
+      setSelectedRole('');
+    }
+  }, [userToEdit]);
+
+  const handleEditClick = (user: User) => {
+    setUserToEdit(user);
+    setShowModal(true);
+  };
+
+  const handleCancelClick = () => {
+    setUserToEdit(null);
+    setShowModal(false);
+    setSelectedRole('');
+  };
+
+  const handleSave = async () => {
+    if (userToEdit && selectedRole) {
+      setIsLoading(true);
+      try {
+        const response = await axiosInstance.post('/api/roles/assignRole', {
+          userId: userToEdit.userID,
+          position: selectedRole
+        });
+
+        if (response.data.success) {
+          toast.success(`Role successfully assigned.`);
+          const usersResponse = await axiosInstance.get('/api/roles/users');
+          if (usersResponse.data.success) {
+            setUsers(usersResponse.data.users);
+          }
+        } else {
+          throw new Error(response.data.message || 'Failed to assign role');
+        }
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        
+        if (axiosError.response?.status === 401) {
+          toast.error('Authentication failed. Please log in again.');
+          navigate('/home');
+          return;
+        }
+        
+        if (axiosError.response?.status === 403) {
+          toast.error('Access denied. You do not have permission to perform this action.');
+          return;
+        }
+        
+        toast.error((axiosError.response?.data as any)?.message || axiosError.message || 'An error occurred while assigning the role');
+      } finally {
+        setIsLoading(false);
+        handleCancelClick();
+      }
+    }
+  };
+
+  const handleArchiveClick = (user: User) => {
+    setUserToArchive(user);
+    setShowArchiveConfirm(true);
+  };
+
+  const handleCancelArchive = () => {
+    setUserToArchive(null);
+    setShowArchiveConfirm(false);
+  };
+
+  const handleConfirmArchive = async () => {
+    if (userToArchive) {
+      setIsLoading(true);
+      try {
+        const response = await axiosInstance.post(`/api/admin/archive/accounts/${userToArchive.userID}`);
+
+        if (response.data.success) {
+          toast.success(`User ${userToArchive.fullName} archived successfully.`);
+          const usersResponse = await axiosInstance.get('/api/roles/users');
+          if (usersResponse.data.success) {
+            setUsers(usersResponse.data.users);
+          }
+        } else {
+          throw new Error(response.data.message || 'Failed to archive user');
+        }
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        
+        if (axiosError.response?.status === 401) {
+          toast.error('Authentication failed. Please log in again.');
+          navigate('/home');
+          return;
+        }
+        
+        if (axiosError.response?.status === 403) {
+          toast.error('Access denied. You do not have permission to perform this action.');
+          return;
+        }
+        
+        toast.error((axiosError.response?.data as any)?.message || axiosError.message || 'An error occurred while archiving the user.');
+      } finally {
+        setIsLoading(false);
+        handleCancelArchive();
+      }
+    }
+  };
+
+  const activeUsers = users.filter(user => !user.isArchived);
+
+  if (isLoading) {
+    return (
+      <div className={`roles-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
+        <div className="loading">Loading users...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={`roles-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
+      <div className="roles-content">
+        <div className="roles-header">
+          <h1 className="roles-title">User Role Management</h1>
+          <div className="roles-subtitle">
+            Assign and manage user roles in the system
+          </div>
+        </div>
+
+        <div className="roles-summary-grid">
+          <div className="summary-card">
+            <div className="card-icon">👥</div>
+            <div className="card-content">
+              <h3>Total Users</h3>
+              <div className="card-stats">
+                <span className="stat-number">{users.length}</span>
+                <span className="stat-label">Registered Users</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="summary-card">
+            <div className="card-icon">✔️</div>
+            <div className="card-content">
+              <h3>Active Accounts</h3>
+              <div className="card-stats">
+                <span className="stat-number">
+                  {users.filter(user => !user.isArchived).length}
+                </span>
+                <span className="stat-label">Active Users</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="summary-card">
+            <div className="card-icon">🗄️</div>
+            <div className="card-content">
+              <h3>Archived Accounts</h3>
+              <div className="card-stats">
+                <span className="stat-number">
+                  {users.filter(user => user.isArchived).length}
+                </span>
+                <span className="stat-label">Archived Users</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="roles-main-content">
+          <div className="table-card">
+            <div className="table-header">
+              <h3>🏛️ User Management</h3>
+              <p>Manage user roles and permissions</p>
+            </div>
+            
+            <div className="users-table-container">
+              <table className="users-table">
+                <thead>
+                  <tr>
+                    <th>Full Name</th>
+                    <th>Current Role</th>
+                    <th>Barangay</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeUsers.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="no-data">No active users found</td>
+                    </tr>
+                  ) : (
+                    activeUsers.map(user => (
+                      <tr key={user.userID}>
+                        <td>
+                          <div className="user-info">
+                            <div className="user-avatar">
+                              {user.fullName.split(' ').map(name => name[0]).join('')}
+                            </div>
+                            <span className="user-name">{user.fullName}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span className={`role-badge ${user.position ? 'role-assigned' : 'role-unassigned'}`}>
+                            {user.position || 'Not Assigned'}
+                          </span>
+                        </td>
+                        <td>{user.barangay}</td>
+                        <td>
+                          <span className={`status-badge ${user.isArchived ? 'status-inactive' : 'status-active'}`}>
+                            {user.isArchived ? 'Inactive' : 'Active'}
+                          </span>
+                        </td>
+                        <td>
+                          <button 
+                            className={`action-btn ${!user.position || !['MA', 'SA', 'SKC', 'SKO'].includes(user.position) ? 'add-role' : 'change-role'}`}
+                            onClick={() => handleEditClick(user)}
+                          >
+                            {!user.position || !['MA', 'SA', 'SKC', 'SKO'].includes(user.position) ? '➕ Add Role' : '✏️ Change Role'}
+                          </button>
+                          <button
+                            className="action-btn change-role"
+                            onClick={() => handleArchiveClick(user)}
+                            style={{ marginLeft: '8px' }}
+                          >
+                            Archive
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <Dialog 
+          open={showModal} 
+          onClose={handleCancelClick}
+          PaperProps={{
+            style: {
+              borderRadius: '20px',
+              padding: '10px'
+            }
+          }}
+        >
+          <DialogTitle sx={{ 
+            fontSize: '1.5rem', 
+            fontWeight: 600,
+            background: 'linear-gradient(135deg, #646cff, #747bff)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            {userToEdit ? `🎭 Assign Role for ${userToEdit.fullName}` : 'Assign Role'}
+          </DialogTitle>
+          <DialogContent>
+            {userToEdit ? (
+              <Box sx={{ mt: 2 }}>
+                <FormLabel component="legend" sx={{ fontWeight: 600, mb: 2, display: 'block' }}>
+                  Select Role:
+                </FormLabel>
+                <RadioGroup
+                  aria-label="role"
+                  name="roleGroup"
+                  value={selectedRole}
+                  onChange={(e) => setSelectedRole(e.target.value)}
+                  sx={{ gap: 1 }}
+                >
+                  {roles.filter(role => ['MA', 'SA', 'SKC', 'SKO'].includes(role.roleName)).map(role => (
+                    <FormControlLabel
+                      key={role.roleID}
+                      value={role.roleName}
+                      control={<Radio sx={{ color: '#646cff' }} />}
+                      label={
+                        <Box>
+                          <strong>{role.roleName}</strong>
+                          <br />
+                          <span style={{ color: '#64748b', fontSize: '0.9rem' }}>
+                            {role.description}
+                          </span>
+                        </Box>
+                      }
+                      sx={{ 
+                        alignItems: 'flex-start',
+                        mb: 1,
+                        p: 1,
+                        borderRadius: '8px',
+                        '&:hover': {
+                          backgroundColor: 'rgba(100, 108, 255, 0.05)'
+                        }
+                      }}
+                    />
+                  ))}
+                </RadioGroup>
+              </Box>
+            ) : (
+              <DialogContentText>
+                No user selected for role assignment.
+              </DialogContentText>
+            )}
+          </DialogContent>
+          <DialogActions sx={{ p: 3, gap: 1 }}>
+            <Button 
+              onClick={handleCancelClick} 
+              sx={{ 
+                borderRadius: '12px',
+                px: 3,
+                color: '#64748b',
+                border: '1px solid #e2e8f0'
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleSave} 
+              variant="contained"
+              disabled={!selectedRole || !userToEdit}
+              sx={{ 
+                borderRadius: '12px',
+                px: 3,
+                background: 'linear-gradient(135deg, #646cff, #747bff)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #5a63f0, #6b73f0)',
+                  transform: 'translateY(-1px)',
+                  boxShadow: '0 8px 25px rgba(100, 108, 255, 0.4)'
+                }
+              }}
+            >
+              Save Changes
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          open={showArchiveConfirm}
+          onClose={handleCancelArchive}
+          PaperProps={{
+            style: {
+              borderRadius: '20px',
+              padding: '10px'
+            }
+          }}
+        >
+          <DialogTitle sx={{ fontSize: '1.5rem', fontWeight: 600 }}>
+            Archive User
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to archive the user "{userToArchive?.fullName}"?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions sx={{ p: 3, gap: 1 }}>
+            <Button onClick={handleCancelArchive} sx={{ borderRadius: '12px', px: 3, color: '#64748b', border: '1px solid #e2e8f0' }}>
+              Cancel
+            </Button>
+            <Button onClick={handleConfirmArchive} variant="contained" color="error" sx={{ borderRadius: '12px', px: 3 }}>
+              Archive
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+    </div>
+  );
+};
+
+export default Roles;

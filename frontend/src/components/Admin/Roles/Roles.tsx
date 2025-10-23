@@ -363,7 +363,7 @@ const Roles: React.FC<RolesProps> = () => {
                   onChange={(e) => setSelectedRole(e.target.value)}
                   sx={{ gap: 1 }}
                 >
-                  {roles.filter(role => ['MA', 'SA', 'SKC', 'SKO'].includes(role.roleName)).map(role => (
+                  {roles.filter(role => ['SKC', 'SKO'].includes(role.roleName)).map(role => (
                     <FormControlLabel
                       key={role.roleID}
                       value={role.roleName}

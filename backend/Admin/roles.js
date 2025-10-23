@@ -134,7 +134,7 @@ router.get('/:roleId/permissions', async (req, res) => {
 });
 
 // Assign role to user
-router.post('/assignRole', routeGuard.verifyToken, routeGuard.isAdmin, async (req, res) => {
+router.post('/assignRole', authMiddleware, routeGuard.isAdmin, async (req, res) => {
   try {
     const { userId, position } = req.body; // position is the roleName like 'SKC'
 
@@ -197,7 +197,7 @@ router.post('/assignRole', routeGuard.verifyToken, routeGuard.isAdmin, async (re
     addAuditTrail({
         actor: 'A',
         module: 'R',
-        userID: req.user.userId,
+        userID: req.user.userID,
         actions: 'assign-role',
         oldValue: `position: ${oldRoleName}`,
         newValue: `position: ${position}`,
