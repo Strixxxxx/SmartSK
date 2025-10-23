@@ -111,6 +111,10 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
       toast.error(fileError);
       return;
     }
+    if (!projectFile) {
+      toast.error('No attachment detected.Please try again');
+      return;
+    }
     if (!userId) {
         toast.error('Authentication error. Please log in again.');
         return;

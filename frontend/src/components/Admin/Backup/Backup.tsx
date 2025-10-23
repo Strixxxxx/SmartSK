@@ -30,7 +30,6 @@ const Backup: React.FC = () => {
   const { showFlashMessage, sidebarCollapsed } = useOutletContext<OutletContextType>();
   const { logout } = useAuth(); // Get logout function
   const [loading, setLoading] = useState(false);
-  const [status, setStatus] = useState('');
   const [cloudBackups, setCloudBackups] = useState<CloudBackup[]>([]);
   const [restoreModalOpen, setRestoreModalOpen] = useState(false);
   const [cloudRestoreModalOpen, setCloudRestoreModalOpen] = useState(false);
@@ -72,7 +71,6 @@ const Backup: React.FC = () => {
       try {
         const response = await axios.get<Job>(`/api/admin/backup/status/${jobId}`);
         const job = response.data;
-        setStatus(`Status: ${job.Message}`); // Update status message
 
         if (job.Status === 'completed' || job.Status === 'failed') {
           if (pollingIntervalRef.current) {
@@ -122,18 +120,15 @@ const Backup: React.FC = () => {
 
   const handleBackup = async (backupType: 'hybrid' | 'cloud-only') => {
     setLoading(true);
-    setStatus(`Initiating ${backupType} backup...`);
 
     try {
       const response = await axios.post<{ jobId: string }>('/api/admin/backup', { backupType });
       const { jobId } = response.data;
       setActiveJobId(jobId);
-      setStatus('Backup process started. Polling for status updates...');
       showFlashMessage('Backup process initiated. You will be notified upon completion.', 'info');
       pollJobStatus(jobId);
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Failed to initiate backup.';
-      setStatus(`Error: ${errorMessage}`);
       showFlashMessage(errorMessage, 'error');
       setLoading(false);
     }
@@ -141,7 +136,6 @@ const Backup: React.FC = () => {
 
   const handleRestore = async (restoreType: 'cloud' | 'local') => {
     setLoading(true);
-    setStatus(`Starting ${restoreType} restore... This may take several minutes.`);
     showFlashMessage('Restore process initiated. Please do not navigate away.', 'info');
 
     const formData = new FormData();
@@ -165,7 +159,6 @@ const Backup: React.FC = () => {
         timeout: 600000, // 10 minute timeout for restore
       });
       showFlashMessage(response.data.message, 'success');
-      setStatus('Restore completed successfully.');
       showFlashMessage('You will be logged out in 10 seconds for security reasons.', 'info');
       setTimeout(() => {
         logout();
@@ -173,7 +166,6 @@ const Backup: React.FC = () => {
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Restore failed.';
       showFlashMessage(errorMessage, 'error');
-      setStatus(`Error: ${errorMessage}`);
     } finally {
       setLoading(false);
       closeRestoreModal();
@@ -212,7 +204,6 @@ const Backup: React.FC = () => {
     <div className={`backup-page-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
       <div className="backup-container">
         <h2>Database Backup and Restore</h2>
-        <div className="status-box">{status || 'Ready'}</div>
 
         <div className="backup-section">
           <h3>Create Backup</h3>

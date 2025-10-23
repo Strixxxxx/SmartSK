@@ -4,6 +4,44 @@
 
 --Frontend (Browser's Console)
 
+axiosConfig.ts:98 Client error: 404 
+{success: false, message: 'User not found'}
+(anonymous)	@	axiosConfig.ts:98
+Promise.then		
+fetchData	@	Roles.tsx:60
+(anonymous)	@	Roles.tsx:96
+<Roles>		
+AppRoutes	@	AppRoutes.tsx:115
+Roles.tsx:59 
+ GET http://localhost:8080/api/roles/users 404 (Not Found)
+Promise.then		
+fetchData	@	Roles.tsx:59
+(anonymous)	@	Roles.tsx:96
+<Roles>		
+AppRoutes	@	AppRoutes.tsx:115
+axiosConfig.ts:98 Client error: 404 
+{success: false, message: 'User not found'}
+(anonymous)	@	axiosConfig.ts:98
+Promise.then		
+fetchData	@	Roles.tsx:59
+(anonymous)	@	Roles.tsx:96
+<Roles>		
+AppRoutes	@	AppRoutes.tsx:115
+Roles.tsx:60 
+ GET http://localhost:8080/api/roles/all 404 (Not Found)
+Promise.then		
+fetchData	@	Roles.tsx:60
+(anonymous)	@	Roles.tsx:96
+<Roles>		
+AppRoutes	@	AppRoutes.tsx:115
+axiosConfig.ts:98 Client error: 404 
+{success: false, message: 'User not found'}
+(anonymous)	@	axiosConfig.ts:98
+Promise.then		
+fetchData	@	Roles.tsx:60
+(anonymous)	@	Roles.tsx:96
+<Roles>		
+AppRoutes	@	AppRoutes.tsx:115
 
 
 --Frontend (VSC Terminal)
@@ -12,7 +50,20 @@
 
 --Backend(VSC Terminal)
 
-
+PS D:\Projects\Projects\smartSK\backend> node main.js
+Initializing active sessions from database...
+Initializing Azure Storage with primary credentials.
+Job management system initialized with database storage.
+Post upload job management system initialized.
+[WebSocket] Server initialized.
+Server is running on port 8080
+[WebSocket] Client connected.
+Initialized active sessions.
+[WebSocket] Client connected.
+User not found in database
+User not found in database
+User not found in database
+User not found in database
 
 --Backend(Azure Portal's Log Stream in Platform)
 

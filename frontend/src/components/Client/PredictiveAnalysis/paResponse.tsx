@@ -1,8 +1,15 @@
 import React from 'react';
 import { Container, Row, Col, Card, Alert, Table, ListGroup } from 'react-bootstrap';
+import CitationRenderer from './CitationRenderer'; // Import the citation component
 
 // --- UNIFIED TYPE DEFINITIONS ---
-// These types now represent the single, consistent structure for analysis results.
+
+interface Citation {
+  id: number;
+  title: string;
+  url: string;
+  snippet: string;
+}
 
 interface Risk {
   risk: string;
@@ -48,6 +55,7 @@ export interface AnalysisResult {
   implementation_date?: ImplementationDate;
   estimated_duration?: EstimatedDuration;
   feedback?: string | string[];
+  citations?: Citation[]; // NEW: Citations array
   metadata?: Metadata;
   error?: string;
 }
@@ -58,7 +66,7 @@ interface PredictiveAnalysisResponseProps {
 
 // --- REUSABLE SECTION COMPONENT ---
 
-const SectionCard: React.FC<{ title: string; children: React.ReactNode; icon?: string }> = ({ title, children }) => (
+const SectionCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <Card className="mb-4 shadow-sm">
     <Card.Header className="p-3 bg-light bg-gradient border-bottom-0">
       <h4 className="mb-0 fw-normal">{title}</h4>
@@ -75,6 +83,8 @@ const PredictiveAnalysisResponse: React.FC<PredictiveAnalysisResponseProps> = ({
   if (!analysisResult) {
     return null;
   }
+
+  console.log("Analysis Result in paResponse:", analysisResult);
 
   if (analysisResult.error) {
     return (
@@ -98,6 +108,7 @@ const PredictiveAnalysisResponse: React.FC<PredictiveAnalysisResponseProps> = ({
     implementation_date,
     estimated_duration,
     feedback,
+    citations = [], // Default to empty array if not provided
     metadata 
   } = analysisResult;
 
@@ -113,7 +124,9 @@ const PredictiveAnalysisResponse: React.FC<PredictiveAnalysisResponseProps> = ({
             <Card className="mb-4 shadow-sm bg-white">
               <Card.Body className="p-4">
                 <h2 className="mb-3 text-dark">General Analysis Summary</h2>
-                <p className="lead text-body-secondary">{summary_report}</p>
+                <p className="lead text-body-secondary">
+                  <CitationRenderer text={summary_report} citations={citations} />
+                </p>
               </Card.Body>
             </Card>
           )}
@@ -122,7 +135,9 @@ const PredictiveAnalysisResponse: React.FC<PredictiveAnalysisResponseProps> = ({
             <SectionCard title="Success Factors">
               <ListGroup variant="flush">
                 {success_factors.map((item, index) => (
-                  <ListGroup.Item key={index} className="px-0 border-0">{item}</ListGroup.Item>
+                  <ListGroup.Item key={index} className="px-0 border-0">
+                    <CitationRenderer text={item} citations={citations} />
+                  </ListGroup.Item>
                 ))}
               </ListGroup>
             </SectionCard>
@@ -132,7 +147,9 @@ const PredictiveAnalysisResponse: React.FC<PredictiveAnalysisResponseProps> = ({
             <SectionCard title="Recommendations">
               <ListGroup variant="flush">
                 {recommendations.map((item, index) => (
-                  <ListGroup.Item key={index} className="px-0 border-0">{item}</ListGroup.Item>
+                  <ListGroup.Item key={index} className="px-0 border-0">
+                    <CitationRenderer text={item} citations={citations} />
+                  </ListGroup.Item>
                 ))}
               </ListGroup>
             </SectionCard>
@@ -150,8 +167,8 @@ const PredictiveAnalysisResponse: React.FC<PredictiveAnalysisResponseProps> = ({
                 <tbody>
                   {risk_mitigation_strategies.map((item, index) => (
                     <tr key={index}>
-                      <td>{item.risk}</td>
-                      <td>{item.mitigation}</td>
+                      <td><CitationRenderer text={item.risk} citations={citations} /></td>
+                      <td><CitationRenderer text={item.mitigation} citations={citations} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -163,7 +180,9 @@ const PredictiveAnalysisResponse: React.FC<PredictiveAnalysisResponseProps> = ({
             <SectionCard title="Predicted Trends">
               <ListGroup variant="flush">
                 {predicted_trends.map((item, index) => (
-                  <ListGroup.Item key={index} className="px-0 border-0">{item}</ListGroup.Item>
+                  <ListGroup.Item key={index} className="px-0 border-0">
+                    <CitationRenderer text={item} citations={citations} />
+                  </ListGroup.Item>
                 ))}
               </ListGroup>
             </SectionCard>
@@ -171,46 +190,82 @@ const PredictiveAnalysisResponse: React.FC<PredictiveAnalysisResponseProps> = ({
 
           {budget && (
             <SectionCard title="Budget Analysis">
-              <p>{budget.analysis}</p>
+              <p><CitationRenderer text={budget.analysis} citations={citations} /></p>
               <hr />
-              {budget.historical_patterns && <p><strong>Historical Patterns:</strong> {budget.historical_patterns}</p>}
-              {budget.current_trends && <p><strong>Current Trends:</strong> {budget.current_trends}</p>}
-              {budget.recommendations && <p><strong>Recommendations:</strong> {budget.recommendations}</p>}
+              {budget.historical_patterns && (
+                <p><strong>Historical Patterns:</strong> <CitationRenderer text={budget.historical_patterns} citations={citations} /></p>
+              )}
+              {budget.current_trends && (
+                <p><strong>Current Trends:</strong> <CitationRenderer text={budget.current_trends} citations={citations} /></p>
+              )}
+              {budget.recommendations && (
+                <p><strong>Recommendations:</strong> <CitationRenderer text={budget.recommendations} citations={citations} /></p>
+              )}
             </SectionCard>
           )}
 
           {implementation_date && (
             <SectionCard title="Implementation Timeline">
-              <p>{implementation_date.analysis}</p>
+              <p><CitationRenderer text={implementation_date.analysis} citations={citations} /></p>
               <hr />
-              {implementation_date.historical_patterns && <p><strong>Historical Patterns:</strong> {implementation_date.historical_patterns}</p>}
-              {implementation_date.current_practices && <p><strong>Current Practices:</strong> {implementation_date.current_practices}</p>}
-              {implementation_date.seasonal_factors && <p><strong>Seasonal Factors:</strong> {implementation_date.seasonal_factors}</p>}
-              {implementation_date.resource_considerations && <p><strong>Resource Considerations:</strong> {implementation_date.resource_considerations}</p>}
+              {implementation_date.historical_patterns && (
+                <p><strong>Historical Patterns:</strong> <CitationRenderer text={implementation_date.historical_patterns} citations={citations} /></p>
+              )}
+              {implementation_date.current_practices && (
+                <p><strong>Current Practices:</strong> <CitationRenderer text={implementation_date.current_practices} citations={citations} /></p>
+              )}
+              {implementation_date.seasonal_factors && (
+                <p><strong>Seasonal Factors:</strong> <CitationRenderer text={implementation_date.seasonal_factors} citations={citations} /></p>
+              )}
+              {implementation_date.resource_considerations && (
+                <p><strong>Resource Considerations:</strong> <CitationRenderer text={implementation_date.resource_considerations} citations={citations} /></p>
+              )}
             </SectionCard>
           )}
 
           {estimated_duration && (
             <SectionCard title="Project Duration Analysis">
-              <p>{estimated_duration.analysis}</p>
+              <p><CitationRenderer text={estimated_duration.analysis} citations={citations} /></p>
               <hr />
-              {estimated_duration.historical_timeframes && <p><strong>Historical Timeframes:</strong> {estimated_duration.historical_timeframes}</p>}
-              {estimated_duration.complexity_factors && <p><strong>Complexity Factors:</strong> {estimated_duration.complexity_factors}</p>}
-              {estimated_duration.current_standards && <p><strong>Current Standards:</strong> {estimated_duration.current_standards}</p>}
-              {estimated_duration.dependencies && <p><strong>Dependencies:</strong> {estimated_duration.dependencies}</p>}
+              {estimated_duration.historical_timeframes && (
+                <p><strong>Historical Timeframes:</strong> <CitationRenderer text={estimated_duration.historical_timeframes} citations={citations} /></p>
+              )}
+              {estimated_duration.complexity_factors && (
+                <p><strong>Complexity Factors:</strong> <CitationRenderer text={estimated_duration.complexity_factors} citations={citations} /></p>
+              )}
+              {estimated_duration.current_standards && (
+                <p><strong>Current Standards:</strong> <CitationRenderer text={estimated_duration.current_standards} citations={citations} /></p>
+              )}
+              {estimated_duration.dependencies && (
+                <p><strong>Dependencies:</strong> <CitationRenderer text={estimated_duration.dependencies} citations={citations} /></p>
+              )}
             </SectionCard>
           )}
 
           {feedback && (
             <SectionCard title="Expected Community Feedback">
-              {Array.isArray(feedback) ? <ListGroup variant='flush'>{feedback.map((item, index) => <ListGroup.Item key={index} className="px-0 border-0">{item}</ListGroup.Item>)}</ListGroup> : <p>{feedback}</p>}
+              {Array.isArray(feedback) ? (
+                <ListGroup variant='flush'>
+                  {feedback.map((item, index) => (
+                    <ListGroup.Item key={index} className="px-0 border-0">
+                      <CitationRenderer text={item} citations={citations} />
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              ) : (
+                <p><CitationRenderer text={feedback} citations={citations} /></p>
+              )}
             </SectionCard>
           )}
 
+          
           {metadata && (
             <div className="text-center mt-4 text-muted small">
               <p className="mb-1">Analysis generated on {formattedTimestamp}</p>
-              <p className="mb-0">Source: {metadata.data_source} | Internet Sources: {metadata.internet_sources_consulted}</p>
+              <p className="mb-0">
+                Source: {metadata.data_source} | Internet Sources: {metadata.internet_sources_consulted}
+                {citations && citations.length > 0 && ` | Citations: ${citations.length}`}
+              </p>
             </div>
           )}
         </Col>

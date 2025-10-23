@@ -44,60 +44,22 @@ const verifyToken = (req, res, next) => {
 };
 
 // Middleware to check if user is an admin
-// Combining both isAdmin implementations into one comprehensive function
-const isAdmin = async (req, res, next) => {
-  
-  if (!req.user) {
-    console.log('No user found in request');
+const isAdmin = (req, res, next) => {
+  if (!req.user || !req.user.position) {
     return res.status(401).json({
       success: false,
-      message: 'Authentication failed'
+      message: 'Authentication failed: User position not found.'
     });
   }
-  
-  try {
-    // First check if position is directly available in the token
-    if (req.user.position === 'MA' || req.user.position === 'SA') {
-      return next();
-    }
-    
-    // If not, query the database to verify
-    const userId = req.user.userId;
-    
-    const pool = await getConnection();
-    const result = await pool.request()
-      .input('userId', sql.Int, userId)
-      .query(`
-        SELECT r.roleName as position
-        FROM userInfo u
-        JOIN roles r ON u.position = r.roleID
-        WHERE u.userID = @userId
-      `);
-    
-    if (result.recordset.length === 0) {
-      console.log('User not found in database');
-      return res.status(404).json({
-        success: false,
-        message: 'User not found'
-      });
-    }
-    
-    const userPosition = result.recordset[0].position;
-    
-    // Check if position is MA or SA
-    if (userPosition === 'MA' || userPosition === 'SA') {
-      next(); // User is an admin, proceed
-    } else {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. Admin privileges required.'
-      });
-    }
-  } catch (error) {
-    console.error('Error checking admin status');
-    return res.status(500).json({
+
+  const userPosition = req.user.position;
+
+  if (userPosition === 'MA' || userPosition === 'SA') {
+    next(); // User is an admin, proceed
+  } else {
+    return res.status(403).json({
       success: false,
-      message: 'An error occurred while checking admin status'
+      message: 'Access denied. Admin privileges required.'
     });
   }
 };

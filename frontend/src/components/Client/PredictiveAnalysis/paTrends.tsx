@@ -5,18 +5,7 @@ import {
   Box,
   CircularProgress,
   Alert,
-  
-  Chip,
-  Card,
-  CardContent,
   Grid,
-  LinearProgress,
-  List,
-  
-  
-  
-  Avatar,
-  Tooltip,
   IconButton,
   FormControl,
   InputLabel,
@@ -27,26 +16,23 @@ import {
   SelectChangeEvent,
   FormHelperText,
   Snackbar,
+  Tooltip,
 } from '@mui/material';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import TrendingFlatIcon from '@mui/icons-material/TrendingFlat';
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
-import MemoryIcon from '@mui/icons-material/Memory';
-import ConstructionIcon from '@mui/icons-material/Construction';
-import CodeIcon from '@mui/icons-material/Code';
-import LightbulbIcon from '@mui/icons-material/Lightbulb';
-import DevicesIcon from '@mui/icons-material/Devices';
-import CloudIcon from '@mui/icons-material/Cloud';
-import StorageIcon from '@mui/icons-material/Storage';
-import SettingsIcon from '@mui/icons-material/Settings';
-import SecurityIcon from '@mui/icons-material/Security';
 import InfoIcon from '@mui/icons-material/Info';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import CategoryIcon from '@mui/icons-material/Category';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import axiosInstance from '../../../backend connection/axiosConfig';
+import TrendsList from './paTrendsV2';
+
+interface Citation {
+  id: number;
+  title: string;
+  url: string;
+  snippet: string;
+}
 
 interface TrendData {
   id: number;
@@ -55,15 +41,16 @@ interface TrendData {
   confidence: number;
   trend: 'up' | 'down' | 'stable';
   category: string;
-  subcategory?: string;  // For custom trends
+  subcategory?: string;
   impact: 'high' | 'medium' | 'low';
 }
 
 interface TrendsApiResponse {
   trends: TrendData[];
+  citations?: Citation[];
   forecast_year?: number;
-  category?: string;  // For custom trends
-  categories?: string[]; // For dynamic categories
+  category?: string;
+  categories?: string[];
   error?: boolean;
   message?: string;
   metadata?: {
@@ -81,7 +68,7 @@ interface TrendsApiResponse {
     is_custom_category?: boolean;
     custom_category_type?: string;
     user_defined_category?: string;
-    data_weighting?: string;  // Information about data source weighting
+    data_weighting?: string;
   }
 }
 
@@ -94,28 +81,30 @@ interface TrendsProps {
   };
 }
 
-// Generate available forecast years (2025-2050)
 const generateForecastYears = () => {
   const years = [];
   const currentYear = new Date().getFullYear();
-  
-  // First option is always "Next Year" (default)
   years.push({ value: "", label: `Next Year (${currentYear + 1})` });
-  
-  // Add years from 2025 to 2050
   for (let year = 2025; year <= 2050; year++) {
     years.push({ value: year.toString(), label: year.toString() });
   }
-  
   return years;
 };
 
 const FORECAST_YEARS = generateForecastYears();
 
+const inappropriateTerms = [
+  "idiot", "stupid", "dumb", "moron", "ass", "fuck", "shit", "bitch", "damn", 
+  "hell", "bastard", "cunt", "dick", "pussy", "cock", "slut", "whore", "nigger", 
+  "faggot", "retard", "asshole", "jackass", "bullshit", "fag", "sex", "porn", 
+  "nazi", "motherfucker", "wtf", "piss", "crap", "jerk", "nsfw", "xxx"
+];
+
 const Trends: React.FC<TrendsProps> = ({ filters }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [trendsData, setTrendsData] = useState<TrendData[]>([]);
+  const [citations, setCitations] = useState<Citation[]>([]);
   const [metadata, setMetadata] = useState<TrendsApiResponse['metadata']>(undefined);
   const [forecastYear, setForecastYear] = useState<number>(new Date().getFullYear() + 1);
   const [apiErrorMessage, setApiErrorMessage] = useState<string | null>(null);
@@ -125,7 +114,6 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
     { value: "Others", label: "Others (Custom)" }
   ]);
   
-  // Custom forecasting filters
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [selectedYear, setSelectedYear] = useState<string>("");
   const [otherCategory, setOtherCategory] = useState<string>("");
@@ -133,14 +121,6 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
   const [otherCategoryError, setOtherCategoryError] = useState<string | null>(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
-  
-  // List of inappropriate terms to block
-  const inappropriateTerms = [
-    "idiot", "stupid", "dumb", "moron", "ass", "fuck", "shit", "bitch", "damn", 
-    "hell", "bastard", "cunt", "dick", "pussy", "cock", "slut", "whore", "nigger", 
-    "faggot", "retard", "asshole", "jackass", "bullshit", "fag", "sex", "porn", 
-    "nazi", "motherfucker", "wtf", "piss", "crap", "jerk", "nsfw", "xxx"
-  ];
   
   useEffect(() => {
     fetchTrendsData();
@@ -150,8 +130,6 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
     const category = event.target.value;
     setSelectedCategory(category);
     setCustomCategoryVisible(category === "Others");
-    
-    // Clear any existing errors when changing category
     if (category !== "Others") {
       setOtherCategoryError(null);
     }
@@ -165,7 +143,6 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
     const value = event.target.value;
     setOtherCategory(value);
     
-    // Validate the input for inappropriate content
     if (value) {
       const lowerValue = value.toLowerCase();
       for (const term of inappropriateTerms) {
@@ -175,7 +152,6 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
         }
       }
       
-      // List of inherently youth-relevant categories that don't need the "youth" prefix
       const inherentlyRelevantCategories = [
         "livelihood", "entrepreneurship", "education", "training", "skills", 
         "healthcare", "environment", "sports", "culture", "leadership", 
@@ -183,7 +159,6 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
         "volunteering", "empowerment", "mentoring", "learning", "development"
       ];
       
-      // Check if the category contains any of the inherently relevant terms
       let isInherentlyRelevant = false;
       for (const term of inherentlyRelevantCategories) {
         if (lowerValue.includes(term)) {
@@ -192,9 +167,7 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
         }
       }
       
-      // Only check for general youth relevance if not already inherently relevant
       if (!isInherentlyRelevant) {
-        // Check for terms that specifically mention youth
         const youthSpecificTerms = [
           "youth", "young", "teen", "adolescent", "student", "kabataan", 
           "children", "SK", "sangguniang"
@@ -208,14 +181,12 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
           }
         }
         
-        // If neither inherently relevant nor has youth reference, suggest adding "youth"
         if (!hasYouthReference && value.length > 3) {
           setOtherCategoryError("This will be automatically prefixed with 'Youth' if you proceed, or you can add it yourself.");
         } else {
           setOtherCategoryError(null);
         }
       } else {
-        // Category is inherently relevant, so no error
         setOtherCategoryError(null);
       }
     } else {
@@ -224,9 +195,8 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
   };
   
   const handleApplyFilters = () => {
-    // Check for errors before applying filters
     if (selectedCategory === "Others" && otherCategoryError) {
-      return; // Don't proceed if there are validation errors
+      return;
     }
     
     if (selectedCategory === "Others" && !otherCategory.trim()) {
@@ -234,11 +204,9 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
       return;
     }
     
-    // Allow year-only or category-only requests
     const hasCategory = !!selectedCategory;
     const hasYear = !!selectedYear;
     
-    // At least one of category or year must be selected
     if (!hasCategory && !hasYear) {
       alert("Please select at least a category or year to customize your forecast.");
       return;
@@ -254,46 +222,35 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
       setError(null);
       setApiErrorMessage(null);
       
-      // Build query parameters from filters
       const queryParams = new URLSearchParams();
       
-      // Add base filters
       if (filters) {
         if (filters.budget && filters.budget !== 'all') queryParams.append('budget', filters.budget);
         if (filters.startDate) queryParams.append('startDate', filters.startDate);
         if (filters.endDate) queryParams.append('endDate', filters.endDate);
       }
       
-      // For custom forecasting, add custom parameters
       if (isCustomRequest) {
-        if (import.meta.env.DEV) {
-          console.log('Creating custom forecast request with params:', {
-            selectedCategory,
-            selectedYear,
-            otherCategory: selectedCategory === "Others" ? otherCategory : null
-          });
-        }
+        console.log('Creating custom forecast request with params:', {
+          selectedCategory,
+          selectedYear,
+          otherCategory: selectedCategory === "Others" ? otherCategory : null
+        });
         
-        // For specific category forecasting
         if (selectedCategory) {
           queryParams.append('customCategory', selectedCategory);
-          
-          // For "Others" category with custom text input
           if (selectedCategory === "Others" && otherCategory.trim()) {
             queryParams.append('otherCategory', otherCategory.trim());
           }
         }
         
-        // For specific year forecasting
         if (selectedYear) {
           queryParams.append('year', selectedYear);
         }
       } else if (filters?.category && filters.category !== 'all') {
-        // Use category from base filters if not custom request
         queryParams.append('category', filters.category);
       }
       
-      // Add a timestamp to prevent caching issues
       queryParams.append('_t', Date.now().toString());
       
       const url = isCustomRequest ? '/api/custom-project-trends' : '/api/project-trends';
@@ -301,6 +258,10 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
       try {
         const response = await axiosInstance.get(url, { params: queryParams });
         const data: TrendsApiResponse = response.data;
+
+        console.log("Trends data received:", JSON.stringify(data, null, 2));
+        console.log("Citations in response:", data.citations);
+        console.log("Metadata:", data.metadata);
 
         if (data.categories && !isCustomRequest) {
           const formattedCategories = data.categories.map((cat: string) => ({
@@ -314,21 +275,20 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
           ]);
         }
         
-        // Set next year as forecast year
         const nextYear = new Date().getFullYear() + 1;
         
-        // Check if the response contains an error flag
         if (data.error) {
           const errorMessage = data.message || 'Failed to generate trend forecast';
-          if (import.meta.env.DEV) console.error('API returned error:', errorMessage);
+          console.error('API returned error:', errorMessage);
           if (errorMessage.includes('inappropriate language')) {
               setSnackbarMessage('Inappropriate word detected. Cannot be processed.');
               setSnackbarOpen(true);
-              setApiErrorMessage(null); // Don't show the main error box
+              setApiErrorMessage(null);
           } else {
               setApiErrorMessage(errorMessage);
           }
           setTrendsData([]);
+          setCitations([]);
           if (data.forecast_year) {
             setForecastYear(data.forecast_year);
           } else {
@@ -341,17 +301,15 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
           return;
         }
         
-        // Check if the response has the expected structure
         if (data && data.trends && Array.isArray(data.trends)) {
           setTrendsData(data.trends);
+          setCitations(data.citations || []);
           
-          // Set forecast year from response or fallback to next year
           if (data.forecast_year) {
             setForecastYear(data.forecast_year);
           } else if (data.metadata?.forecast_year) {
             setForecastYear(data.metadata.forecast_year);
-          }
-          else {
+          } else {
             setForecastYear(nextYear);
           }
           
@@ -359,11 +317,11 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
             setMetadata(data.metadata);
           }
         } else {
-          if (import.meta.env.DEV) console.error('Unexpected API response format:', data);
+          console.error('Unexpected API response format:', data);
           setError('Unexpected API response format. Expected trends array is missing.');
         }
       } catch (fetchError: any) {
-        if (import.meta.env.DEV) console.error('API fetch error:', fetchError);
+        console.error('API fetch error:', fetchError);
         const errorMessage = fetchError.response?.data?.message || 'Failed to connect to trends forecast API. Please try again later.';
         if (errorMessage && errorMessage.includes('inappropriate language')) {
             setSnackbarMessage('Inappropriate word detected. Cannot be processed.');
@@ -375,65 +333,9 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
       
       setLoading(false);
     } catch (error) {
-      if (import.meta.env.DEV) console.error('Error in fetchTrendsData:', error);
+      console.error('Error in fetchTrendsData:', error);
       setError('An unexpected error occurred while fetching trends data.');
       setLoading(false);
-    }
-  };
-
-  const getCategoryIcon = (category: string) => {
-    // If category is undefined or null, return default icon
-    if (!category) {
-      return <SettingsIcon />;
-    }
-    
-    switch(category.toLowerCase()) {
-      case 'education':
-        return <LightbulbIcon />;
-      case 'environment':
-        return <CloudIcon />;
-      case 'sports':
-        return <ConstructionIcon />;
-      case 'technology':
-        return <DevicesIcon />;
-      case 'healthcare':
-        return <SecurityIcon />;
-      case 'culture':
-        return <MemoryIcon />;
-      case 'livelihood':
-        return <CodeIcon />;
-      case 'security':
-        return <StorageIcon />;
-      case 'training':
-        return <MemoryIcon />;
-      default:
-        return <SettingsIcon />;
-    }
-  };
-
-  const getTrendIcon = (trend: string) => {
-    switch(trend) {
-      case 'up':
-        return <TrendingUpIcon sx={{ color: 'success.main' }} />;
-      case 'down':
-        return <TrendingDownIcon sx={{ color: 'error.main' }} />;
-      case 'stable':
-        return <TrendingFlatIcon sx={{ color: 'info.main' }} />;
-      default:
-        return <TrendingFlatIcon sx={{ color: 'info.main' }} />;
-    }
-  };
-
-  const getImpactColor = (impact: string) => {
-    switch(impact) {
-      case 'high':
-        return 'error.main';
-      case 'medium':
-        return 'warning.main';
-      case 'low':
-        return 'info.main';
-      default:
-        return 'info.main';
     }
   };
 
@@ -451,7 +353,6 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
       </Snackbar>
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       
-      {/* Custom Forecast Options Panel */}
       <Paper elevation={3} className="trends-paper" sx={{ p: 3, mb: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
           <Typography variant="h5" component="h2" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 0 }}>
@@ -543,7 +444,6 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
         </Box>
       </Paper>
       
-      {/* Trends Forecast Results Panel */}
       <Paper elevation={3} className="trends-paper" sx={{ p: 3 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
           <Typography variant="h5" component="h2" gutterBottom sx={{ display: 'flex', alignItems: 'center', mb: 0 }}>
@@ -553,7 +453,7 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
                 `${metadata.category} Trends Forecast for ${forecastYear}` : 
                 `SK Predictive Project Trends for ${forecastYear}`
             )}
-            {!isCustomForecasting && `SK Predictive Project Trends fo ${forecastYear}`}
+            {!isCustomForecasting && `SK Predictive Project Trends for ${forecastYear}`}
           </Typography>
           
           {metadata && (
@@ -565,8 +465,6 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
                 {metadata.category && <Typography variant="body2">Category: {metadata.category}</Typography>}
                 
                 <Typography variant="body2" sx={{ fontWeight: 'bold', mt: 1.5, mb: 0.5 }}>Data Sources:</Typography>
-                
-                {/* Primary Data Source Information */}
                 <Typography variant="body2" sx={{ fontWeight: '500', mt: 1, color: 'primary.main' }}>
                   Primary Data (Database):
                 </Typography>
@@ -576,13 +474,18 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
                   </Typography>
                 )}
                 
-                {/* Secondary Data Source Information */}
                 <Typography variant="body2" sx={{ fontWeight: '500', mt: 1, color: 'primary.main' }}>
                   Secondary Data (Internet):
                 </Typography>
                 <Typography variant="body2" sx={{ ml: 1 }}>
                   Sources: {metadata.internet_sources_used || 0}
                 </Typography>
+                
+                {citations && citations.length > 0 && (
+                  <Typography variant="body2" sx={{ ml: 1 }}>
+                    Citations: {citations.length}
+                  </Typography>
+                )}
                 
                 {metadata.note && (
                   <Typography variant="body2" sx={{ mt: 1 }}>Note: {metadata.note}</Typography>
@@ -666,79 +569,14 @@ const Trends: React.FC<TrendsProps> = ({ filters }) => {
             )}
           </Box>
         ) : (
-          <List>
-            {trendsData.map((trend, index) => (
-              <Card key={trend.id} sx={{ mb: 2, borderLeft: 6, borderColor: getImpactColor(trend.impact) }}>
-                <CardContent>
-                  <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'left', md: 'center' }, minWidth: { md: '60px' } }}>
-                      <Avatar sx={{ bgcolor: 'primary.main' }}>
-                        {index + 1}
-                      </Avatar>
-                    </Box>
-                    
-                    <Box sx={{ flex: 1 }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap' }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                          <Typography variant="h6" component="h3">
-                            {trend.name}
-                          </Typography>
-                          {getTrendIcon(trend.trend)}
-                        </Box>
-                        
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                          {trend.subcategory && trend.subcategory !== trend.category && (
-                            <Chip 
-                              label={trend.subcategory} 
-                              size="small" 
-                              variant="outlined"
-                              sx={{ textTransform: 'capitalize' }}
-                            />
-                          )}
-                          <Chip 
-                            icon={getCategoryIcon(trend.category)} 
-                            label={trend.category} 
-                            size="small" 
-                            sx={{ textTransform: 'capitalize' }}
-                          />
-                        </Box>
-                      </Box>
-                      
-                      <Typography variant="body1" paragraph color="text.secondary">
-                        {trend.description}
-                      </Typography>
-                      
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Typography variant="body2" sx={{ width: '140px' }}>
-                          Confidence: {Math.round(trend.confidence * 100)}%
-                        </Typography>
-                        <LinearProgress 
-                          variant="determinate" 
-                          value={trend.confidence * 100} 
-                          sx={{ 
-                            flexGrow: 1, 
-                            height: 8, 
-                            borderRadius: 1,
-                            bgcolor: 'rgba(0,0,0,0.05)',
-                            '& .MuiLinearProgress-bar': {
-                              backgroundColor: trend.confidence > 0.9 ? 'success.main' : 
-                                               trend.confidence > 0.8 ? 'primary.main' : 'warning.main'
-                            }
-                          }} 
-                        />
-                      </Box>
-                    </Box>
-                  </Box>
-                </CardContent>
-              </Card>
-            ))}
-          </List>
+          <TrendsList trendsData={trendsData} citations={citations} />
         )}
         
         {!apiErrorMessage && trendsData.length > 0 && (
           <Box mt={3} p={2} bgcolor="rgba(240, 248, 255, 0.6)" borderRadius={1}>
             <Typography variant="caption" color="text.secondary">
               <strong>Note:</strong> The forecast is based 70% on primary data (Database) and 30% on secondary data (Internet Sources).
+              {citations && citations.length > 0 && ` This analysis includes ${citations.length} cited sources.`}
             </Typography>
           </Box>
         )}

@@ -1,7 +1,15 @@
 import React from 'react';
 import { Container, Row, Col, Card, Alert, Table, ListGroup, Spinner } from 'react-bootstrap';
+import CitationRenderer from './CitationRenderer';
 
 // --- UNIFIED TYPE DEFINITIONS (similar to paResponse.tsx) ---
+
+interface Citation {
+  id: number;
+  title: string;
+  url: string;
+  snippet: string;
+}
 
 interface Risk {
   risk: string;
@@ -52,6 +60,7 @@ export interface PaCstmApiResponse {
   implementation_date?: ImplementationDate;
   estimated_duration?: EstimatedDuration;
   feedback?: string | string[];
+  citations?: Citation[];
   metadata?: Metadata;
   error?: string; // For top-level errors
   message?: string; // Often comes with 'error'
@@ -93,6 +102,8 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
     return <Alert variant="secondary" className="mt-4">No customized analysis results to display.</Alert>;
   }
 
+  console.log("Analysis Result in paCstmResponse:", analysisResult);
+
   // Handle errors returned from the backend
   if (analysisResult.error || analysisResult.message) {
     return (
@@ -116,6 +127,7 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
     implementation_date,
     estimated_duration,
     feedback,
+    citations = [],
     metadata
   } = analysisResult;
 
@@ -138,7 +150,7 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
             <Card.Body className="p-4">
               <h2 className="mb-3 text-dark">Customized Analysis</h2>
               {summary_report ? (
-                <p className="lead text-body-secondary">{summary_report}</p>
+                <p className="lead text-body-secondary"><CitationRenderer text={summary_report} citations={citations} /></p>
               ) : (
                 <p className="lead text-muted">An executive summary was not generated for this customized report.</p>
               )}
@@ -149,7 +161,7 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
             <SectionCard title="Success Factors">
               <ListGroup variant="flush">
                 {success_factors.map((item, index) => (
-                  <ListGroup.Item key={index} className="px-0 border-0">{item}</ListGroup.Item>
+                  <ListGroup.Item key={index} className="px-0 border-0"><CitationRenderer text={item} citations={citations} /></ListGroup.Item>
                 ))}
               </ListGroup>
             </SectionCard>
@@ -159,7 +171,7 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
             <SectionCard title="Recommendations">
               <ListGroup variant="flush">
                 {recommendations.map((item, index) => (
-                  <ListGroup.Item key={index} className="px-0 border-0">{item}</ListGroup.Item>
+                  <ListGroup.Item key={index} className="px-0 border-0"><CitationRenderer text={item} citations={citations} /></ListGroup.Item>
                 ))}
               </ListGroup>
             </SectionCard>
@@ -177,8 +189,8 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
                 <tbody>
                   {risk_mitigation_strategies.map((item, index) => (
                     <tr key={index}>
-                      <td>{item.risk}</td>
-                      <td>{item.mitigation}</td>
+                      <td><CitationRenderer text={item.risk} citations={citations} /></td>
+                      <td><CitationRenderer text={item.mitigation} citations={citations} /></td>
                     </tr>
                   ))}
                 </tbody>
@@ -190,7 +202,7 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
             <SectionCard title="Predicted Trends">
               <ListGroup variant="flush">
                 {predicted_trends.map((item, index) => (
-                  <ListGroup.Item key={index} className="px-0 border-0">{item}</ListGroup.Item>
+                  <ListGroup.Item key={index} className="px-0 border-0"><CitationRenderer text={item} citations={citations} /></ListGroup.Item>
                 ))}
               </ListGroup>
             </SectionCard>
@@ -198,38 +210,40 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
 
           {budget && (
             <SectionCard title="Budget Analysis">
-              <p>{budget.analysis}</p>
-              {budget.historical_patterns && <><hr /><p><strong>Historical Patterns:</strong> {budget.historical_patterns}</p></>}
-              {budget.current_trends && <p><strong>Current Trends:</strong> {budget.current_trends}</p>}
-              {budget.recommendations && <p><strong>Recommendations:</strong> {budget.recommendations}</p>}
+              <p><CitationRenderer text={budget.analysis} citations={citations} /></p>
+              {budget.historical_patterns && <><hr /><p><strong>Historical Patterns:</strong> <CitationRenderer text={budget.historical_patterns} citations={citations} /></p></>}
+              {budget.current_trends && <p><strong>Current Trends:</strong> <CitationRenderer text={budget.current_trends} citations={citations} /></p>}
+              {budget.recommendations && <p><strong>Recommendations:</strong> <CitationRenderer text={budget.recommendations} citations={citations} /></p>}
             </SectionCard>
           )}
 
           {implementation_date && (
             <SectionCard title="Implementation Timeline">
-              <p>{implementation_date.analysis}</p>
-              {implementation_date.historical_patterns && <><hr /><p><strong>Historical Patterns:</strong> {implementation_date.historical_patterns}</p></>}
-              {implementation_date.current_practices && <p><strong>Current Practices:</strong> {implementation_date.current_practices}</p>}
-              {implementation_date.seasonal_factors && <p><strong>Seasonal Factors:</strong> {implementation_date.seasonal_factors}</p>}
-              {implementation_date.resource_considerations && <p><strong>Resource Considerations:</strong> {implementation_date.resource_considerations}</p>}
+              <p><CitationRenderer text={implementation_date.analysis} citations={citations} /></p>
+              {implementation_date.historical_patterns && <><hr /><p><strong>Historical Patterns:</strong> <CitationRenderer text={implementation_date.historical_patterns} citations={citations} /></p></>}
+              {implementation_date.current_practices && <p><strong>Current Practices:</strong> <CitationRenderer text={implementation_date.current_practices} citations={citations} /></p>}
+              {implementation_date.seasonal_factors && <p><strong>Seasonal Factors:</strong> <CitationRenderer text={implementation_date.seasonal_factors} citations={citations} /></p>}
+              {implementation_date.resource_considerations && <p><strong>Resource Considerations:</strong> <CitationRenderer text={implementation_date.resource_considerations} citations={citations} /></p>}
             </SectionCard>
           )}
 
           {estimated_duration && (
             <SectionCard title="Project Duration Analysis">
-              <p>{estimated_duration.analysis}</p>
-              {estimated_duration.historical_timeframes && <><hr /><p><strong>Historical Timeframes:</strong> {estimated_duration.historical_timeframes}</p></>}
-              {estimated_duration.complexity_factors && <p><strong>Complexity Factors:</strong> {estimated_duration.complexity_factors}</p>}
-              {estimated_duration.current_standards && <p><strong>Current Standards:</strong> {estimated_duration.current_standards}</p>}
-              {estimated_duration.dependencies && <p><strong>Dependencies:</strong> {estimated_duration.dependencies}</p>}
+              <p><CitationRenderer text={estimated_duration.analysis} citations={citations} /></p>
+              {estimated_duration.historical_timeframes && <><hr /><p><strong>Historical Timeframes:</strong> <CitationRenderer text={estimated_duration.historical_timeframes} citations={citations} /></p></>}
+              {estimated_duration.complexity_factors && <p><strong>Complexity Factors:</strong> <CitationRenderer text={estimated_duration.complexity_factors} citations={citations} /></p>}
+              {estimated_duration.current_standards && <p><strong>Current Standards:</strong> <CitationRenderer text={estimated_duration.current_standards} citations={citations} /></p>}
+              {estimated_duration.dependencies && <p><strong>Dependencies:</strong> <CitationRenderer text={estimated_duration.dependencies} citations={citations} /></p>}
             </SectionCard>
           )}
 
           {feedback && (
             <SectionCard title="Expected Community Feedback">
-              {Array.isArray(feedback) ? <ListGroup variant='flush'>{feedback.map((item, index) => <ListGroup.Item key={index} className="px-0 border-0">{item}</ListGroup.Item>)}</ListGroup> : <p>{feedback}</p>}
+              {Array.isArray(feedback) ? <ListGroup variant='flush'>{feedback.map((item, index) => <ListGroup.Item key={index} className="px-0 border-0"><CitationRenderer text={item} citations={citations} /></ListGroup.Item>)}</ListGroup> : <p><CitationRenderer text={feedback} citations={citations} /></p>}
             </SectionCard>
           )}
+
+
 
           {metadata && (
             <div className="text-center mt-4 text-muted small">

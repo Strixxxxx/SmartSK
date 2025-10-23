@@ -67,6 +67,140 @@ spanish_bad_words = [
 profanity.add_censor_words(filipino_bad_words)
 profanity.add_censor_words(spanish_bad_words)
 
+def reorder_citations(analysis_result):
+    """
+    Reorders citations based on their first appearance in the 'trends' list.
+    Ensures citation numbers are sequential and correctly mapped for trend analysis.
+    """
+    if not analysis_result or 'citations' not in analysis_result or 'trends' not in analysis_result:
+        return analysis_result
+
+    # Step 1: Build a single string by concatenating description content from the trends list
+    full_text = ""
+    if isinstance(analysis_result.get('trends'), list):
+        for trend in analysis_result['trends']:
+            if isinstance(trend, dict) and isinstance(trend.get('description'), str):
+                full_text += trend['description'] + " "
+
+    # Step 2: Create a mapping from old ID to new ID based on appearance order
+    ordered_citation_ids = []
+    old_to_new_id_map = {}
+    new_id_counter = 1
+    
+    original_citations = analysis_result.get('citations', [])
+    for match in re.finditer(r'\[(\d+)\]', full_text):
+        old_id = int(match.group(1))
+        if old_id not in old_to_new_id_map:
+            if any(c['id'] == old_id for c in original_citations):
+                old_to_new_id_map[old_id] = new_id_counter
+                ordered_citation_ids.append(old_id)
+                new_id_counter += 1
+
+    if not old_to_new_id_map:
+        # Strip markers and empty citations if no valid ones are found
+        if isinstance(analysis_result.get('trends'), list):
+            for trend in analysis_result['trends']:
+                if isinstance(trend, dict) and 'description' in trend:
+                    trend['description'] = re.sub(r'\[\d+\]', '', trend['description']).strip()
+        analysis_result['citations'] = []
+        return analysis_result
+
+    # Step 3: Update the description fields in the trends list with new citation numbers
+    if isinstance(analysis_result.get('trends'), list):
+        for trend in analysis_result['trends']:
+            if isinstance(trend, dict) and 'description' in trend:
+                def replace_func(match):
+                    old_id = int(match.group(1))
+                    return f"[{old_to_new_id_map[old_id]}]" if old_id in old_to_new_id_map else ""
+                trend['description'] = re.sub(r'\[(\d+)\]', replace_func, trend['description'])
+
+    # Step 4: Re-create and sort the citations array
+    original_citations_map = {c['id']: c for c in original_citations}
+    new_citations_list = []
+    for old_id in ordered_citation_ids:
+        if old_id in original_citations_map:
+            citation = original_citations_map[old_id]
+            new_id = old_to_new_id_map[old_id]
+            new_citations_list.append({
+                'id': new_id,
+                'title': citation.get('title', 'No Title'),
+                'url': citation.get('url', 'No Link'),
+                'snippet': citation.get('snippet', 'No Snippet')
+            })
+
+    analysis_result['citations'] = new_citations_list
+    return analysis_result
+
+def validate_citations(analysis_result):
+    """
+    Validates that citations contain real URLs, not placeholders.
+    Logs warnings for suspicious citations.
+    """
+    if not analysis_result or 'citations' not in analysis_result:
+        return analysis_result
+    
+    suspicious_domains = ['example.com', 'invalid', 'placeholder', 'test.com', 'sample.com']
+    valid_citations = []
+    
+    for citation in analysis_result.get('citations', []):
+        url = citation.get('url', '')
+        is_suspicious = any(domain in url.lower() for domain in suspicious_domains)
+        
+        if is_suspicious:
+            logger.warning(f"SUSPICIOUS CITATION DETECTED: ID {citation.get('id')} has placeholder URL: {url}")
+            logger.warning("The AI generated a fake URL instead of using web search results")
+        else:
+            valid_citations.append(citation)
+    
+    if len(valid_citations) < len(analysis_result.get('citations', [])):
+        logger.warning(f"Removed {len(analysis_result['citations']) - len(valid_citations)} fake citations")
+    
+    analysis_result['citations'] = valid_citations
+    return analysis_result
+
+def verify_and_fix_citations(analysis_result, web_search_results):
+    """
+    Attempts to match hallucinated citations with actual web search results
+    and fix them if possible.
+    """
+    if not analysis_result or 'citations' not in analysis_result:
+        return analysis_result
+    
+    if not web_search_results:
+        return analysis_result
+    
+    # Parse web search results to extract actual URLs
+    actual_urls = []
+    for line in web_search_results.split('\n'):
+        if line.startswith('Link: '):
+            actual_urls.append(line.replace('Link: ', '').strip())
+    
+    if not actual_urls:
+        return analysis_result
+    
+    # Try to find a matching actual URL based on title similarity
+    # (simple approach: use the citation ID to map to search result order)
+    fixed_citations = []
+    for citation in analysis_result.get('citations', []):
+        url = citation.get('url', '')
+        
+        # Check if it's a suspicious URL
+        if any(domain in url.lower() for domain in ['example.com', 'invalid', 'placeholder']):
+            logger.warning(f"Attempting to fix suspicious citation ID {citation.get('id')}: {url}")
+            
+            # Try to find a matching actual URL based on title similarity
+            # (simple approach: use the citation ID to map to search result order)
+            citation_id = citation.get('id', 0)
+            if 0 < citation_id <= len(actual_urls):
+                original_url = url
+                citation['url'] = actual_urls[citation_id - 1]
+                logger.info(f"Fixed citation {citation_id}: {original_url} -> {citation['url']}")
+        
+        fixed_citations.append(citation)
+    
+    analysis_result['citations'] = fixed_citations
+    return analysis_result
+
 # ==============================================================================
 # Data Fetching and Processing
 # ==============================================================================
@@ -74,7 +208,7 @@ profanity.add_censor_words(spanish_bad_words)
 def search_internet_for_trends(search_query):
     """Performs a web search using Google Programmable Search Engine."""
     if not all([PSE_API_KEY, PSE_ENGINE_ID]):
-        logger.warning("PSE API Key or CX ID not configured. Skipping web search.")
+        logger.error("PSE not configured! Citations will not work.")
         return []
     
     try:
@@ -84,8 +218,13 @@ def search_internet_for_trends(search_query):
         response.raise_for_status()
         data = response.json()
         
-        results = [{"title": item.get('title', ''), "snippet": item.get('snippet', '')} for item in data.get('items', [])]
-        logger.info(f"Successfully fetched {len(results)} web search results.")
+        results = [{"title": item.get('title', ''), "snippet": item.get('snippet', ''), "link": item.get('link', '')} for item in data.get('items', [])]
+        if results:
+            logger.info(f"✓ Found {len(results)} real web results")
+            for i, result in enumerate(results[:3], 1):
+                logger.info(f"  Result {i}: {result.get('link', 'NO LINK')}")
+        else:
+            logger.warning("✗ Web search returned 0 results")
         return results
     except requests.exceptions.RequestException as e:
         logger.error(f"Web search request failed: {e}")
@@ -105,42 +244,81 @@ def generate_trends_prompt(primary_data, secondary_data, category, forecast_year
     All trend ideas must belong to this category. Do not include trends from other categories, even if they appear in the historical data.
     """
 
+    web_search_results = ""
+    if secondary_data:
+        for i, result in enumerate(secondary_data, 1):
+            title = result.get('title', 'No Title')
+            link = result.get('link', 'No Link')
+            snippet = result.get('snippet', 'No Snippet').replace('\n', ' ')
+            web_search_results += f"""
+===== SOURCE {i} =====
+TITLE: {title}
+**EXACT URL TO USE IN CITATION {i}**: {link}
+SNIPPET: {snippet}
+==================
+
+"""
+
     prompt = f"""
     You are a specialized project trends analyst for Sangguniang Kabataan (SK) in District 5, Quezon City, Philippines.
-    Your task is to identify the top 10 project trend ideas for SK councils for the year {forecast_year}, based on the data provided.
-    {category_instruction}
 
-    DATA SOURCE WEIGHTING:
-    - PRIMARY DATA (70%): Historical project data from the local database. This reflects past priorities and community needs.
-    - SECONDARY DATA (30%): Real-time trends from internet search results. This provides external context.
+    **CRITICAL CITATION REQUIREMENTS - READ THIS TWICE:**
 
-    INSTRUCTIONS:
-    1.  Analyze both data sources.
-    2.  Generate a list of 10 trend ideas.
-    3.  Approximately 7 trends should be directly inspired by the PRIMARY DATA.
-    4.  Approximately 3 trends should be inspired by the SECONDARY DATA.
-    5.  For each trend, provide a name, description, confidence score, trend direction, a relevant SK category, and impact level.
-    6.  The final output must be a single JSON object with no other text or markdown.
+    BEFORE YOU START WRITING, UNDERSTAND THIS:
+    - Below you will see "SOURCE 1", "SOURCE 2", etc.
+    - Each source has "**EXACT URL TO USE IN CITATION X**"
+    - When you write citation [1], you MUST copy the EXACT URL from SOURCE 1
+    - When you write citation [2], you MUST copy the EXACT URL from SOURCE 2
+    - DO NOT invent URLs like "https://example.com" - these will be REJECTED
+    - DO NOT modify the URLs in any way
 
-    ---
-    PRIMARY DATA (Database Records):
-    {primary_data.to_string() if primary_data is not None and not primary_data.empty else "No historical data available."}
-    ---
-    SECONDARY DATA (Internet Search Results):
-    {json.dumps(secondary_data, indent=2) if secondary_data else "No internet data available."}
-    ---
+    **EXAMPLE OF CORRECT CITATION:**
+    If SOURCE 1 has:
+    **EXACT URL TO USE IN CITATION 1**: https://www.philstar.com/youth-programs-2026
 
-    Provide your response in the following JSON format:
+    Then your citations array should have:
+    {{
+      "id": 1,
+      "title": "(exact title from SOURCE 1)",
+      "url": "https://www.philstar.com/youth-programs-2026",  <-- COPIED EXACTLY
+      "snippet": "(relevant text from SOURCE 1)"
+    }}
+
+    **WRONG EXAMPLE (DO NOT DO THIS):**
+    {{
+      "id": 1,
+      "url": "https://example.com/youth-2026"  <-- THIS IS FAKE, THIS WILL BE REJECTED
+    }}
+
+    Now, here are your web search results:
+
+    {web_search_results}
+
+    **YOUR TASK:**
+    Generate 10 trend ideas for {forecast_year}. When you cite a claim from the web search results:
+    1. Add [1], [2], etc. after the claim
+    2. In your "citations" array, use the EXACT URL shown as "**EXACT URL TO USE IN CITATION X**" from that source
+    3. Copy the URL character-by-character without changes
+
+    Provide your response in JSON format:
     {{
       "trends": [
         {{
           "id": 1,
-          "name": "Trend Idea Name",
-          "description": "Detailed description of the trend idea and its relevance for SK in {forecast_year}. All aspects of this trend must relate to the '{category}' category.",
-          "confidence": 0.95,
-          "trend": "up" or "down" or "stable",
+          "name": "Trend Name",
+          "description": "Description with citation [1] using exact URL from SOURCE 1",
+          "confidence": 0.9,
+          "trend": "up",
           "category": "{category}",
-          "impact": "high" or "medium" or "low"
+          "impact": "high"
+        }}
+      ],
+      "citations": [
+        {{
+          "id": 1,
+          "title": "Exact title from SOURCE 1",
+          "url": "EXACT URL copied from SOURCE 1",
+          "snippet": "Relevant text from SOURCE 1"
         }}
       ],
       "forecast_year": {forecast_year},
@@ -155,13 +333,30 @@ def get_ai_response(prompt):
         raise ConnectionError("Gemini AI is not configured. Please set the GEMINI_API_KEY.")
     try:
         response = model.generate_content(prompt)
-        cleaned_response = re.search(r'```json\n(.*?)\n```', response.text, re.DOTALL)
-        if cleaned_response:
-            json_text = cleaned_response.group(1)
+        # Look for JSON within markdown fences first
+        json_match = re.search(r'```json\n(.*?)\n```', response.text, re.DOTALL)
+        if json_match:
+            json_str = json_match.group(1)
         else:
-            json_text = response.text
+            # Fallback to finding the first and last curly brace
+            brace_match = re.search(r'({[\s\S]*})', response.text)
+            if brace_match:
+                json_str = brace_match.group(1)
+            else:
+                raise ValueError("Unable to extract JSON from Gemini response.")
+
+        # Clean up the extracted string
+        json_str = json_str.strip().replace('\\n', '\n')
         
-        return json.loads(json_text)
+        data = json.loads(json_str)
+
+        if 'citations' not in data:
+            logger.warning("Gemini response missing citations array, adding empty array")
+            data['citations'] = []
+        return data
+    except json.JSONDecodeError as e:
+        logger.error(f"Error decoding JSON from Gemini response: {e}")
+        raise ValueError(f"Invalid JSON format received from AI: {e}")
     except Exception as e:
         logger.error(f"Error generating or parsing AI response: {e}")
         raise
@@ -213,6 +408,12 @@ def main(custom_category, other_category, forecast_year):
         prompt = generate_trends_prompt(primary_data, secondary_data, display_category, target_year)
 
         result = get_ai_response(prompt)
+
+        # Reorder citations after initial processing
+        result = reorder_citations(result)
+
+        # NEW: Validate citations to catch fake URLs
+        result = validate_citations(result)
 
         ph_tz = timezone(timedelta(hours=8))
         result['metadata'] = {

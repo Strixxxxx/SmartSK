@@ -4,9 +4,10 @@ const { getConnection, sql } = require('../database/database');
 const routeGuard = require('../routeGuard/routeGuard');
 const { addAuditTrail } = require('../audit/auditService');
 const { decrypt } = require('../utils/crypto');
+const { authMiddleware } = require('../session/session');
 
 // Get all users with their roles
-router.get('/users', routeGuard.verifyToken, routeGuard.isAdmin, async (req, res) => {
+router.get('/users', authMiddleware, routeGuard.isAdmin, async (req, res) => {
   try {
     const pool = await getConnection();
     
@@ -30,13 +31,25 @@ router.get('/users', routeGuard.verifyToken, routeGuard.isAdmin, async (req, res
       `);
 
     // Decrypt user data before sending
-    const decryptedUsers = result.recordset.map(user => ({
-      ...user,
-      username: decrypt(user.username),
-      fullName: decrypt(user.fullName),
-      emailAddress: decrypt(user.emailAddress),
-      phoneNumber: decrypt(user.phoneNumber),
-    }));
+    const decryptedUsers = result.recordset.map(user => {
+      const safeDecrypt = (data) => {
+        if (!data) return data; // Return null/undefined/empty string as is
+        try {
+          return decrypt(data);
+        } catch (e) {
+          console.error(`Decryption failed for a field for user ID ${user.userID}. Returning raw data for that field.`, e);
+          return data; // Return original (encrypted) data on failure
+        }
+      };
+
+      return {
+        ...user,
+        username: safeDecrypt(user.username),
+        fullName: safeDecrypt(user.fullName),
+        emailAddress: safeDecrypt(user.emailAddress),
+        phoneNumber: safeDecrypt(user.phoneNumber),
+      };
+    });
     
     return res.json({
       success: true,
@@ -52,7 +65,7 @@ router.get('/users', routeGuard.verifyToken, routeGuard.isAdmin, async (req, res
 });
 
 // Get all available roles - FIXED VERSION
-router.get('/all', routeGuard.verifyToken, routeGuard.isAdmin, async (req, res) => {
+router.get('/all', authMiddleware, routeGuard.isAdmin, async (req, res) => {
   try {
     // Return static roles that match what the frontend expects
     const roles = [

@@ -203,6 +203,7 @@ class PyBridgePA {
                 if (jsonMatches && jsonMatches.length > 0) {
                     const lastJsonObject = jsonMatches[jsonMatches.length - 1];
                     const result = JSON.parse(lastJsonObject);
+                    console.log("Data from paCstmTrends.py:", JSON.stringify(result, null, 2));
                     
                     // If the parsed object is a structured error (e.g., profanity, no data),
                     // or even a success response, resolve with it and we're done.
@@ -496,6 +497,7 @@ class PyBridgePA {
             
             try {
               const result = JSON.parse(lastJsonObject);
+              console.log("Data from paTrends.py:", JSON.stringify(result, null, 2));
               
               // Check if the result is an error response
               if (result.error) {
@@ -580,124 +582,63 @@ class PyBridgePA {
    * @param {Object} options - Configuration options for the predictive analysis
    * @returns {Promise} - Promise that resolves with analysis data
    */
-  static runPredictiveAnalysis(options = {}) {
-    return new Promise((resolve, reject) => {
-      // Path to the Python script
-      const scriptPath = path.join(__dirname, '..', 'AI', 'pa.py');
-
-      // Set up environment variables - add AI directory to PYTHONPATH
-      const aiDirPath = path.join(__dirname, '..', 'AI');
-      const env = Object.assign({}, process.env);
-      
-      // Set PYTHONPATH to include our AI directory for module imports
-      if (env.PYTHONPATH) {
-        env.PYTHONPATH = `${aiDirPath}${path.delimiter}${env.PYTHONPATH}`;
-      } else {
-        env.PYTHONPATH = aiDirPath;
-      }
-      
-      // Spawn the Python process with the enhanced environment
-      const pythonProcess = spawn(PYTHON_EXECUTABLE, [scriptPath, JSON.stringify(options)], { env });
-      
-      let dataString = '';
-      let errorString = '';
-      
-      // Collect data from stdout
-      pythonProcess.stdout.on('data', (data) => {
-        dataString += data.toString();
-      });
-      
-      // Collect any errors
-      pythonProcess.stderr.on('data', (data) => {
-        errorString += data.toString();
-      });
-      
-      // Handle process completion
-      pythonProcess.on('close', (code) => {
-        if (code !== 0) {
-          console.error(`Python process exited with code ${code}`);
-          console.error(`Error: ${errorString}`);
-          reject(new Error(`Python process failed with code ${code}: ${errorString}`));
-          return;
+    static runPredictiveAnalysis(options = {}) {
+      return new Promise((resolve, reject) => {
+        // Path to the Python script
+        const scriptPath = path.join(__dirname, '..', 'AI', 'pa.py');
+  
+        // Set up environment variables - add AI directory to PYTHONPATH
+        const aiDirPath = path.join(__dirname, '..', 'AI');
+        const env = Object.assign({}, process.env);
+        
+        // Set PYTHONPATH to include our AI directory for module imports
+        if (env.PYTHONPATH) {
+          env.PYTHONPATH = `${aiDirPath}${path.delimiter}${env.PYTHONPATH}`;
+        } else {
+          env.PYTHONPATH = aiDirPath;
         }
         
-        try {
-          // Improved JSON parsing with better error handling
-          const trimmedData = dataString.trim();
-          
-          // Try to parse the entire output as JSON first
-          try {
-            const result = JSON.parse(trimmedData);
-            resolve(result);
+        // Spawn the Python process with the enhanced environment
+        const pythonProcess = spawn(PYTHON_EXECUTABLE, [scriptPath, JSON.stringify(options)], { env });
+        
+        let dataString = '';
+        let errorString = '';
+        
+        // Collect data from stdout
+        pythonProcess.stdout.on('data', (data) => {
+          dataString += data.toString();
+        });
+        
+        // Collect any errors
+        pythonProcess.stderr.on('data', (data) => {
+          errorString += data.toString();
+        });
+        
+        // Handle process completion
+        pythonProcess.on('close', (code) => {
+          if (code !== 0) {
+            console.error(`Python process exited with code ${code}`);
+            console.error(`Error: ${errorString}`);
+            reject(new Error(`Python process failed with code ${code}: ${errorString}`));
             return;
-          } catch (e) {
-            console.log("Couldn't parse entire output as JSON, trying to extract JSON portion");
           }
           
-          // Extract JSON using regex to find valid JSON objects
-          const jsonRegex = /\{[\s\S]*?\}/g;
-          const jsonMatches = trimmedData.match(jsonRegex);
-          
-          if (jsonMatches && jsonMatches.length > 0) {
-            for (const match of jsonMatches) {
-              try {
-                const result = JSON.parse(match);
-                resolve(result);
-                return;
-              } catch (jsonError) {
-                console.log(`Failed to parse JSON match: ${jsonError.message}`);
-              }
-            }
+          try {
+            const result = JSON.parse(dataString.trim());
+            resolve(result);
+          } catch (error) {
+            console.error('Error processing Python output:', error);
+            reject(error);
           }
-          
-          // Extracts the largest JSON-like structure
-          const jsonStartIndex = trimmedData.indexOf('{');
-          const jsonEndIndex = trimmedData.lastIndexOf('}') + 1;
-          
-          if (jsonStartIndex >= 0 && jsonEndIndex > jsonStartIndex) {
-            // Clean the JSON string - remove any non-JSON content
-            let jsonContent = trimmedData.substring(jsonStartIndex, jsonEndIndex);
-            
-            // Try to clean up common issues in the JSON string
-            try {
-              // Replace single quotes with double quotes (Python often uses single quotes)
-              jsonContent = jsonContent.replace(/'/g, '"');
-              
-              // Fix unquoted property names
-              jsonContent = jsonContent.replace(/([{,]\s*)(\w+)(\s*:)/g, '$1"$2"$3');
-              
-              const result = JSON.parse(jsonContent);
-              resolve(result);
-              return;
-            } catch (jsonError) {
-              console.error('Error parsing cleaned JSON:', jsonError);
-            }
-          }
-          
-          // Return a properly formatted JSON object with the raw output
-          resolve({
-            success: false,
-            rawOutput: trimmedData,
-            message: 'Predictive analysis completed but JSON parsing failed',
-            data: {
-              analysis_type: options.analysis_type || 'general',
-              timestamp: new Date().toISOString(),
-              error: 'JSON parsing failed'
-            }
-          });
-        } catch (error) {
-          console.error('Error processing Python output:', error);
+        });
+        
+        // Handle process errors
+        pythonProcess.on('error', (error) => {
+          console.error('Failed to start Python process:', error);
           reject(error);
-        }
+        });
       });
-      
-      // Handle process errors
-      pythonProcess.on('error', (error) => {
-        console.error('Failed to start Python process:', error);
-        reject(error);
-      });
-    });
-  }
+    }
 
   /**
    * Express middleware for handling predictive analysis requests
@@ -811,6 +752,7 @@ class PyBridgePA {
         try {
           // Attempt to parse the entire received string as JSON
           const result = JSON.parse(dataString.trim());
+          console.log("Data from paCstm.py:", JSON.stringify(result, null, 2));
           resolve(result);
         } catch (error) {
           console.error('Node.js failed to parse JSON output from paCstm.py:', error);
