@@ -3,7 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 
 /**
  * Creates a new job in the database.
- * @param {object} details - Job details (backupType, initiatedBy, userId).
+ * @param {object} details - Job details (backupType, initiatedBy, userID).
  * @returns {Promise<string>} The newly created job ID.
  */
 const createJob = async (details = {}) => {
@@ -16,7 +16,7 @@ const createJob = async (details = {}) => {
         .input('Status', sql.NVarChar(20), 'pending')
         .input('Message', sql.NVarChar(500), 'Backup job has been queued.')
         .input('CreatedBy', sql.NVarChar(100), details.initiatedBy || 'System')
-        .input('UserID', sql.Int, details.userId || null)
+        .input('UserID', sql.Int, details.userID || null) // Corrected to userID
         .input('ExpiresAt', sql.DateTime2, new Date(Date.now() + 24 * 60 * 60 * 1000)); // Expires in 24 hours
 
     let columns = 'JobID, BackupType, Status, Message, CreatedBy, UserID, ExpiresAt, CreatedAt, UpdatedAt';

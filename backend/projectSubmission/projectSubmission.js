@@ -30,10 +30,11 @@ const upload = multer({
 // Submit a new project
 router.post('/submit', authMiddleware, upload.single('projectFile'), async (req, res) => {
   try {
-    const { title, description, userId } = req.body;
+    const { title, description } = req.body;
+    const userIdInt = req.user.userID; // Use secure user ID from session
     
-    if (!title || !description || !userId) {
-      return res.status(400).json({ success: false, message: 'Missing required fields' });
+    if (!title || !description || !userIdInt) {
+      return res.status(400).json({ success: false, message: 'Missing required fields or user authentication' });
     }
 
     let filePath = null;
@@ -43,7 +44,6 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
 
     const referenceNumber = `PRJ-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000)}`;
     const pool = await getConnection();
-    const userIdInt = parseInt(userId, 10);
 
     // Encrypt project data
     const encryptedTitle = encrypt(title);
@@ -152,7 +152,7 @@ router.get('/download/:filename', authMiddleware, async (req, res) => {
     }
 
     const projectOwnerId = projectResult.recordset[0].userID;
-    const requesterId = req.user.userId;
+    const requesterId = req.user.userID;
     const requesterPosition = req.user.position;
 
     if (requesterId !== projectOwnerId && !['SKC', 'MA', 'SA'].includes(requesterPosition)) {
@@ -164,7 +164,7 @@ router.get('/download/:filename', authMiddleware, async (req, res) => {
     addAuditTrail({
         actor: 'C',
         module: 'P',
-        userID: req.user.userId,
+        userID: req.user.userID,
         actions: 'download-project-file',
         oldValue: null,
         newValue: `filename: ${filename}`,

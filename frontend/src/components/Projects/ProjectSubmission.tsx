@@ -123,7 +123,6 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
     const formData = new FormData();
     formData.append('title', projectTitle);
     formData.append('description', projectDescription);
-    formData.append('userId', String(userId));
     if (projectFile) {
       formData.append('projectFile', projectFile);
     }

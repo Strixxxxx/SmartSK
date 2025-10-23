@@ -162,7 +162,7 @@ router.put('/status/:id', authMiddleware, async (req, res) => {
     addAuditTrail({
         actor: 'C',
         module: 'P',
-        userID: req.user.userId,
+        userID: req.user.userID,
         actions: 'update-project-status',
         oldValue: `status: ${projectInfo.oldStatus}`,
         newValue: `status: ${statusId}`,

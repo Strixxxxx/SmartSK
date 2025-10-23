@@ -91,7 +91,7 @@ router.post('/', authMiddleware, async (req, res) => {
         const jobId = await createJob({
             backupType,
             initiatedBy: req.user.fullName,
-            userId: req.user.userId
+            userID: req.user.userID // Corrected casing
         });
 
         res.status(202).json({

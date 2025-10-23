@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './Portfolio.css';
 import logoUrl from '../../assets/logo.gif';
+import nnLogo from '../../assets/NN_LOGO.jpg';
+import sbLogo from '../../assets/SB_LOGO.jpg';
 import Portal from '../Portal/portal';
 import Login from '../Login/Login';
 
@@ -8,6 +10,7 @@ const Portfolio: React.FC = () => {
   const [isPortalOpen, setIsPortalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [selectedBarangay, setSelectedBarangay] = useState('');
+  const [teamView, setTeamView] = useState(0); // 0 = team, 1 = collaboration
 
   useEffect(() => {
     // Create animated particles
@@ -66,6 +69,14 @@ const Portfolio: React.FC = () => {
     setSelectedBarangay(barangay);
     setIsPortalOpen(false);
     setIsLoginModalOpen(true);
+  };
+
+  const handlePrevView = () => {
+    setTeamView((prev) => (prev === 0 ? 1 : 0));
+  };
+
+  const handleNextView = () => {
+    setTeamView((prev) => (prev === 1 ? 0 : 1));
   };
   
   return (
@@ -156,7 +167,7 @@ const Portfolio: React.FC = () => {
                   <p>Leverage Google Gemini AI for intelligent insights, recommendations, and strategic guidance based on comprehensive data analysis.</p>
               </div>
               <div className="feature-card">
-                  <div className="feature-icon">🔐</div>
+                  <div className="feature-icon">🔒</div>
                   <h3>Secure Authentication</h3>
                   <p>Enterprise-grade security with JWT-based authentication, role-based access control, and comprehensive audit trails.</p>
               </div>
@@ -180,30 +191,89 @@ const Portfolio: React.FC = () => {
 
         <section id="team" className="animate-on-scroll">
           <div className="section-header">
-            <h2 className="section-title">Development Team</h2>
-            <p className="section-subtitle">Meet the innovators behind Smart SK</p>
+            <h2 className="section-title">
+              {teamView === 0 ? 'Development Team' : 'Our Partners'}
+            </h2>
+            <p className="section-subtitle">
+              {teamView === 0 ? 'Meet the innovators behind Smart SK' : 'Building stronger communities together'}
+            </p>
           </div>
-          <div className="team-grid">
-              <div className="team-card">
-                  <div className="team-avatar">JB</div>
-                  <h3 className="team-name">Jeff Aldreich S. Bontuyan</h3>
-                  <p className="team-role">Project Manager</p>
-              </div>
-              <div className="team-card">
-                  <div className="team-avatar">LA</div>
-                  <h3 className="team-name">Luis Albert A. De Guzman</h3>
-                  <p className="team-role">Lead Programmer</p>
-              </div>
-              <div className="team-card">
-                  <div className="team-avatar">RB</div>
-                  <h3 className="team-name">Reign Kerstine A. Balagtas</h3>
-                  <p className="team-role">System Analyst</p>
-              </div>
-              <div className="team-card">
-                  <div className="team-avatar">YA</div>
-                  <h3 className="team-name">Yasmien M. Ando</h3>
-                  <p className="team-role">Quality Assurance</p>
-              </div>
+
+          <div className="team-section-wrapper">
+            <button 
+              className="section-nav-btn section-nav-left" 
+              onClick={handlePrevView}
+              aria-label="Previous section"
+            >
+              &#8249;
+            </button>
+
+            <div className="team-content">
+              {teamView === 0 ? (
+                <div className="team-grid">
+                  <div className="team-card">
+                    <div className="team-avatar">JB</div>
+                    <h3 className="team-name">Jeff Aldreich S. Bontuyan</h3>
+                    <p className="team-role">Project Manager</p>
+                  </div>
+                  <div className="team-card">
+                    <div className="team-avatar">LA</div>
+                    <h3 className="team-name">Luis Albert A. De Guzman</h3>
+                    <p className="team-role">Lead Programmer</p>
+                  </div>
+                  <div className="team-card">
+                    <div className="team-avatar">RB</div>
+                    <h3 className="team-name">Reign Kerstine A. Balagtas</h3>
+                    <p className="team-role">System Analyst</p>
+                  </div>
+                  <div className="team-card">
+                    <div className="team-avatar">YA</div>
+                    <h3 className="team-name">Yasmien M. Ando</h3>
+                    <p className="team-role">Quality Assurance</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="collaboration-view">
+                  <div className="collaboration-header">
+                    <h3>In Proud Collaboration With</h3>
+                    <p>Partnering with local government units to empower youth governance and community development</p>
+                  </div>
+                  <div className="collaboration-logos">
+                    <div className="partner-card">
+                      <img src={nnLogo} alt="Barangay Nagkaisang Nayon Logo" className="partner-logo" />
+                      <h4>Barangay Nagkaisang Nayon</h4>
+                      <p>District 5, Quezon City</p>
+                    </div>
+                    <div className="partner-card">
+                      <img src={sbLogo} alt="Barangay San Bartolome Logo" className="partner-logo" />
+                      <h4>Barangay San Bartolome</h4>
+                      <p>District 5, Quezon City</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <button 
+              className="section-nav-btn section-nav-right" 
+              onClick={handleNextView}
+              aria-label="Next section"
+            >
+              &#8250;
+            </button>
+          </div>
+
+          <div className="section-indicators">
+            <button
+              className={`section-indicator ${teamView === 0 ? 'active' : ''}`}
+              onClick={() => setTeamView(0)}
+              aria-label="View development team"
+            />
+            <button
+              className={`section-indicator ${teamView === 1 ? 'active' : ''}`}
+              onClick={() => setTeamView(1)}
+              aria-label="View collaboration partners"
+            />
           </div>
         </section>
 
