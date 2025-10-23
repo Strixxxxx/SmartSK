@@ -114,7 +114,8 @@ async function processPostUploadJob(jobId, tempFiles, tempDir) {
         await postJob.updateJob(jobId, 'processing', 'Processing post and uploading files.');
 
         const job = await postJob.getJob(jobId);
-        const { title, description, userID, initiatedBy } = JSON.parse(job.Payload); // Get userID from the job payload
+        const { title, description, initiatedBy } = JSON.parse(job.Payload);
+        const userID = job.UserID; // Get userID from the job's own column
 
         const pool = await getConnection();
         const transaction = new sql.Transaction(pool);

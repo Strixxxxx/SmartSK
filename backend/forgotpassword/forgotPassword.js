@@ -6,12 +6,30 @@ const { sendPasswordResetEmail } = require('../Email/email');
 const { addAuditTrail } = require('../audit/auditService');
 const { generateEmailHash, generateUsernameHash, decrypt } = require('../utils/crypto');
 
+const failedAttempts = new Map(); // ip -> { count: number, lockUntil: Date }
+const MAX_ATTEMPTS = 3;
+const LOCKOUT_DURATION = 15 * 60 * 1000; // 15 minutes
+
 function sanitizeInput(input) {
   return typeof input === 'string' ? input.trim() : input;
 }
 
 // Request password reset
 router.post('/request', async (req, res) => {
+  const ip = req.ip;
+  const now = Date.now();
+
+  if (failedAttempts.has(ip)) {
+      const attempt = failedAttempts.get(ip);
+      if (attempt.lockUntil && attempt.lockUntil > now) {
+          const timeLeft = Math.ceil((attempt.lockUntil - now) / 1000 / 60);
+          return res.status(429).json({
+              success: false,
+              message: `Too many attempts. Please try again in ${timeLeft} minutes.`
+          });
+      }
+  }
+
   try {
     const identifier = sanitizeInput(req.body.identifier);
     
@@ -39,10 +57,26 @@ router.post('/request', async (req, res) => {
     const userResult = await request.query(`SELECT userID, username, emailAddress FROM userInfo ${userQuery}`);
     
     if (userResult.recordset.length === 0) {
-      return res.status(200).json({
-        success: true,
-        message: 'If an account with this identifier exists, a verification code has been sent.'
-      });
+        let attempt = failedAttempts.get(ip) || { count: 0, lockUntil: null };
+        attempt.count++;
+
+        if (attempt.count >= MAX_ATTEMPTS) {
+            attempt.lockUntil = now + LOCKOUT_DURATION;
+            setTimeout(() => {
+                failedAttempts.delete(ip);
+            }, LOCKOUT_DURATION);
+        }
+        
+        failedAttempts.set(ip, attempt);
+
+        return res.status(404).json({
+            success: false,
+            message: 'User not found'
+        });
+    }
+
+    if (failedAttempts.has(ip)) {
+        failedAttempts.delete(ip);
     }
     
     const { userID, username, emailAddress: encryptedEmail } = userResult.recordset[0];
@@ -58,7 +92,6 @@ router.post('/request', async (req, res) => {
         }
     } catch (e) {
         console.error(`Failed to decrypt email for user ID ${userID} during password reset:`, e.message);
-        // We still return a generic success message to not reveal if the user exists or has a corrupted email
         return res.status(200).json({
             success: true,
             message: 'If an account with this identifier exists, a verification code has been sent.'

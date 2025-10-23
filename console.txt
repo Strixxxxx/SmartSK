@@ -4,7 +4,8 @@
 
 --Frontend (Browser's Console)
 
-
+Failed to load resource: the server responded with a status of 403 (Forbidden)Understand this error
+axiosConfig.ts:98 Client error: 403 Object
 
 --Frontend (VSC Terminal)
 
@@ -20,52 +21,52 @@
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-2025-10-23T20:59:17.0104415Z [Job a0c84868-fbf2-4b5d-a387-e1ca9afe4f25] Created in database for PostUpload: {"title":"𝐓𝐫𝐢𝐜𝐤 𝐨𝐫 𝐓𝐨𝐮𝐫𝐧𝐚𝐦𝐞𝐧𝐭? 👻","description":"Handog ng Sangguniang Kabataan Nagkaisang Nayon ang tagisan ng totoong hero sa 𝘓𝘢𝘯𝘥 𝘰𝘧 𝘋𝘢𝘸𝘯. Sino ang magiging tunay na 𝐋𝐞𝐠𝐞𝐧𝐝𝐚𝐫𝐲 ngayong Halloween? 🎃\r\n📅 𝘊𝘰𝘮𝘪𝘯𝘨 𝘵𝘩𝘪𝘴 𝘖𝘤𝘵𝘰𝘣𝘦𝘳 𝘧𝘰𝘳 𝘏𝘢𝘭𝘭𝘰𝘸𝘦𝘦𝘯 𝘌-𝘚𝘱𝘰𝘳𝘵𝘴 𝘔𝘓 𝘛𝘰𝘶𝘳𝘯𝘢𝘮𝘦𝘯𝘵!\r\n💥 𝘐-𝘳𝘦𝘢𝘥𝘺 𝘯𝘺𝘰 𝘯𝘢 𝘢𝘯𝘨 𝘵𝘦𝘢𝘮 𝘯𝘺𝘰 ✨𝘳𝘦𝘨𝘪𝘴𝘵𝘳𝘢𝘵𝘪𝘰𝘯 𝘸𝘪𝘭𝘭 𝘰𝘱𝘦𝘯 𝘴𝘰𝘰𝘯!\r\n#SKNagkaisangNayon\r\n#SangguniangKabataanNagkaisangNayon2025\r\n#MLTournament\r\n#ESports ","initiatedBy":"Jeff Aldreich Bontuyan"}
-2025-10-23T20:59:17.2708307Z [Job a0c84868-fbf2-4b5d-a387-e1ca9afe4f25] Updated in database to processing: Processing post and uploading files.
-2025-10-23T20:59:17.4039977Z [Job a0c84868-fbf2-4b5d-a387-e1ca9afe4f25] Failed to process post upload: RequestError: Cannot insert the value NULL into column 'userID', table 'Smart_SK_FINAL.dbo.posts'; column does not allow nulls. INSERT fails.
-2025-10-23T20:59:17.4040603Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
-2025-10-23T20:59:17.4040627Z     at Connection.emit (node:events:519:28)
-2025-10-23T20:59:17.4040644Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
-2025-10-23T20:59:17.4040662Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
-2025-10-23T20:59:17.4040701Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
-2025-10-23T20:59:17.4040724Z     at Readable.emit (node:events:519:28)
-2025-10-23T20:59:17.404074Z     at addChunk (node:internal/streams/readable:561:12)
-2025-10-23T20:59:17.4040757Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-2025-10-23T20:59:17.4040859Z     at Readable.push (node:internal/streams/readable:393:5)
-2025-10-23T20:59:17.4040876Z     at nextAsync (node:internal/streams/from:194:22) {
-2025-10-23T20:59:17.4040891Z   code: 'EREQUEST',
-2025-10-23T20:59:17.4040911Z   originalError: Error: Cannot insert the value NULL into column 'userID', table 'Smart_SK_FINAL.dbo.posts'; column does not allow nulls. INSERT fails.
-2025-10-23T20:59:17.4040927Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
-2025-10-23T20:59:17.4040942Z       at Connection.emit (node:events:519:28)
-2025-10-23T20:59:17.4040959Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
-2025-10-23T20:59:17.4040976Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
-2025-10-23T20:59:17.4040996Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
-2025-10-23T20:59:17.4041011Z       at Readable.emit (node:events:519:28)
-2025-10-23T20:59:17.4041045Z       at addChunk (node:internal/streams/readable:561:12)
-2025-10-23T20:59:17.4041062Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-2025-10-23T20:59:17.4041078Z       at Readable.push (node:internal/streams/readable:393:5)
-2025-10-23T20:59:17.4041093Z       at nextAsync (node:internal/streams/from:194:22) {
-2025-10-23T20:59:17.4041108Z     info: ErrorMessageToken {
-2025-10-23T20:59:17.4041122Z       name: 'ERROR',
-2025-10-23T20:59:17.4041137Z       handlerName: 'onErrorMessage',
-2025-10-23T20:59:17.4041151Z       number: 515,
-2025-10-23T20:59:17.4041165Z       state: 2,
-2025-10-23T20:59:17.4041179Z       class: 16,
-2025-10-23T20:59:17.4041199Z       message: "Cannot insert the value NULL into column 'userID', table 'Smart_SK_FINAL.dbo.posts'; column does not allow nulls. INSERT fails.",
-2025-10-23T20:59:17.4041227Z       serverName: 'smart-sk',
-2025-10-23T20:59:17.4041241Z       procName: '',
-2025-10-23T20:59:17.4041254Z       lineNumber: 2
-2025-10-23T20:59:17.404127Z     }
-2025-10-23T20:59:17.4041283Z   },
-2025-10-23T20:59:17.4041298Z   number: 515,
-2025-10-23T20:59:17.4041312Z   lineNumber: 2,
-2025-10-23T20:59:17.4041326Z   state: 2,
-2025-10-23T20:59:17.4041339Z   class: 16,
-2025-10-23T20:59:17.4041354Z   serverName: 'smart-sk',
-2025-10-23T20:59:17.4041367Z   procName: '',
-2025-10-23T20:59:17.4041396Z   precedingErrors: []
-2025-10-23T20:59:17.4041409Z }
-2025-10-23T20:59:17.4258703Z [Job a0c84868-fbf2-4b5d-a387-e1ca9afe4f25] Updated in database to failed: Failed to create post.
+[Job 676ae907-bdf9-41f8-861d-93b9980ecedb] Created in database for PostUpload: {"title":"𝐓𝐫𝐢𝐜𝐤 𝐨𝐫 𝐓𝐨𝐮𝐫𝐧𝐚𝐦𝐞𝐧𝐭? 👻","description":"Handog ng Sangguniang Kabataan Nagkaisang Nayon ang tagisan ng totoong hero sa 𝘓𝘢𝘯𝘥 𝘰𝘧 𝘋𝘢𝘸𝘯. Sino ang magiging tunay na 𝐋𝐞𝐠𝐞𝐧𝐝𝐚𝐫𝐲 ngayong Halloween? 🎃\r\n📅 𝘊𝘰𝘮𝘪𝘯𝘨 𝘵𝘩𝘪𝘴 𝘖𝘤𝘵𝘰𝘣𝘦𝘳 𝘧𝘰𝘳 𝘏𝘢𝘭𝘭𝘰𝘸𝘦𝘦𝘯 𝘌-𝘚𝘱𝘰𝘳𝘵𝘴 𝘔𝘓 𝘛𝘰𝘶𝘳𝘯𝘢𝘮𝘦𝘯𝘵!\r\n💥 𝘐-𝘳𝘦𝘢𝘥𝘺 𝘯𝘺𝘰 𝘯𝘢 𝘢𝘯𝘨 𝘵𝘦𝘢𝘮 𝘯𝘺𝘰 ✨𝘳𝘦𝘨𝘪𝘴𝘵𝘳𝘢𝘵𝘪𝘰𝘯 𝘸𝘪𝘭𝘭 𝘰𝘱𝘦𝘯 𝘴𝘰𝘰𝘯!\r\n#SKNagkaisangNayon\r\n#SangguniangKabataanNagkaisangNayon2025\r\n#MLTournament\r\n#ESports","initiatedBy":"Jeff Aldreich Bontuyan","userID":4}
+[Job 676ae907-bdf9-41f8-861d-93b9980ecedb] Updated in database to processing: Processing post and uploading files.
+[Job 676ae907-bdf9-41f8-861d-93b9980ecedb] Failed to process post upload: RequestError: Cannot insert the value NULL into column 'userID', table 'Smart_SK_FINAL.dbo.posts'; column does not allow nulls. INSERT fails.
+    at handleError (D:\Projects\Projects\smartSK\backend\node_modules\mssql\lib\tedious\request.js:384:15)
+    at Connection.emit (node:events:519:28)
+    at Connection.emit (D:\Projects\Projects\smartSK\backend\node_modules\tedious\lib\connection.js:970:18)
+    at RequestTokenHandler.onErrorMessage (D:\Projects\Projects\smartSK\backend\node_modules\tedious\lib\token\handler.js:284:21)
+    at Readable.<anonymous> (D:\Projects\Projects\smartSK\backend\node_modules\tedious\lib\token\token-stream-parser.js:19:33)
+    at Readable.emit (node:events:519:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+    at Readable.push (node:internal/streams/readable:393:5)
+    at nextAsync (node:internal/streams/from:194:22) {
+  code: 'EREQUEST',
+  originalError: Error: Cannot insert the value NULL into column 'userID', table 'Smart_SK_FINAL.dbo.posts'; column does not allow nulls. INSERT fails.
+      at handleError (D:\Projects\Projects\smartSK\backend\node_modules\mssql\lib\tedious\request.js:382:19)
+      at Connection.emit (node:events:519:28)
+      at Connection.emit (D:\Projects\Projects\smartSK\backend\node_modules\tedious\lib\connection.js:970:18)
+      at RequestTokenHandler.onErrorMessage (D:\Projects\Projects\smartSK\backend\node_modules\tedious\lib\token\handler.js:284:21)
+      at Readable.<anonymous> (D:\Projects\Projects\smartSK\backend\node_modules\tedious\lib\token\token-stream-parser.js:19:33)
+      at Readable.emit (node:events:519:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22) {
+    info: ErrorMessageToken {
+      name: 'ERROR',
+      handlerName: 'onErrorMessage',
+      number: 515,
+      state: 2,
+      class: 16,
+      message: "Cannot insert the value NULL into column 'userID', table 'Smart_SK_FINAL.dbo.posts'; column does not allow nulls. INSERT fails.",
+      serverName: 'smart-sk',
+      procName: '',
+      lineNumber: 2
+    }
+  },
+  number: 515,
+  lineNumber: 2,
+  state: 2,
+  class: 16,
+  serverName: 'smart-sk',
+  procName: '',
+  precedingErrors: []
+}
+[Job 676ae907-bdf9-41f8-861d-93b9980ecedb] Updated in database to failed: Failed to create post.
 
 --Deployment Container Logs
 

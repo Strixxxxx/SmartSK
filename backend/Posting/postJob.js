@@ -3,21 +3,29 @@ const { v4: uuidv4 } = require('uuid');
 
 /**
  * Creates a new post upload job in the database.
- * @param {object} details - Job details (title, description, initiatedBy, userId).
+ * @param {object} details - Job details (title, description, initiatedBy, userID).
  * @returns {Promise<string>} The newly created job ID.
  */
 const createJob = async (details = {}) => {
     const jobId = uuidv4();
     const pool = await getConnection();
     
+    // The payload should contain all necessary data for the job to run independently.
+    const payload = {
+        title: details.title,
+        description: details.description,
+        initiatedBy: details.initiatedBy,
+        userID: details.userID // Ensure userID is in the payload
+    };
+
     await pool.request()
         .input('JobID', sql.NVarChar(50), jobId)
         .input('JobType', sql.NVarChar(20), 'PostUpload')
         .input('Status', sql.NVarChar(20), 'pending')
         .input('Message', sql.NVarChar(500), 'Post creation job has been queued.')
-        .input('Payload', sql.NVarChar(sql.MAX), JSON.stringify({ title: details.title, description: details.description }))
+        .input('Payload', sql.NVarChar(sql.MAX), JSON.stringify(payload))
         .input('CreatedBy', sql.NVarChar(100), details.initiatedBy || 'System')
-        .input('UserID', sql.Int, details.userId || null)
+        .input('UserID', sql.Int, details.userID || null) // Corrected to use details.userID
         .input('ExpiresAt', sql.DateTime2, new Date(Date.now() + 24 * 60 * 60 * 1000)) // Expires in 24 hours
         .query(`
             INSERT INTO PostUploadJobs (JobID, JobType, Status, Message, Payload, CreatedBy, UserID, ExpiresAt, CreatedAt, UpdatedAt)
