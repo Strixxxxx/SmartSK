@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import './rawdata.css';
 import api from '../../../backend connection/axiosConfig';
+import { toast } from 'react-toastify';
 
 interface DataRow {
     ppa: string;
@@ -13,11 +14,6 @@ interface DataRow {
 interface FilterOptions {
     committees: string[];
     categories: string[];
-}
-
-interface FlashMessage {
-    type: 'success' | 'error' | 'info' | 'warning';
-    message: string;
 }
 
 interface UploadSummary {
@@ -43,7 +39,6 @@ const RawData: React.FC<RawDataProps> = () => {
     const [data, setData] = useState<DataRow[]>([]);
     const [years, setYears] = useState<number[]>([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const [filterOptions, setFilterOptions] = useState<FilterOptions>({
         committees: [],
         categories: []
@@ -53,71 +48,25 @@ const RawData: React.FC<RawDataProps> = () => {
         committee: '',
         category: ''
     });
-    const [flashMessage, setFlashMessage] = useState<FlashMessage | null>(null);
     const [uploading, setUploading] = useState(false);
-
-    const showFlashMessage = (type: 'success' | 'error' | 'info' | 'warning', message: string, autoHide: boolean = true) => {
-        setFlashMessage({ type, message });
-        if (autoHide) {
-            setTimeout(() => {
-                setFlashMessage(null);
-            }, 8000);
-        }
-    };
-
-    const hideFlashMessage = () => {
-        setFlashMessage(null);
-    };
-
-    useEffect(() => {
-        const handleUploadProgress = (event: Event) => {
-            const customEvent = event as CustomEvent;
-            const progress = customEvent.detail.progress;
-            if (uploading) {
-                showFlashMessage('info', 
-                    `Uploading: ${progress}%. Processing may continue after upload completes...`, 
-                    false
-                );
-            }
-        };
-
-        const handleNetworkTimeout = (_event: Event) => {
-            setUploading(false);
-            showFlashMessage('warning', 
-                'Upload is taking longer than expected. The file is likely still being processed in the background. ' +
-                'Please wait a moment and refresh the page to see if the data has been updated.', 
-                false
-            );
-        };
-
-        window.addEventListener('uploadProgress', handleUploadProgress);
-        window.addEventListener('networkTimeout', handleNetworkTimeout);
-
-        return () => {
-            window.removeEventListener('uploadProgress', handleUploadProgress);
-            window.removeEventListener('networkTimeout', handleNetworkTimeout);
-        };
-    }, [uploading]);
 
     const fetchFilterOptions = useCallback(async () => {
         try {
             const response = await api.get('/api/rawdata/options');
             setFilterOptions(response.data);
         } catch (error) {
-            if (import.meta.env.DEV) console.error('Error fetching filter options:', (error as Error).message);
+            console.error('Error fetching filter options:', (error as Error).message);
         }
     }, []);
 
     const fetchData = useCallback(async () => {
         setLoading(true);
-        setError(null);
-        
         try {
             const response = await api.get('/api/rawdata', { params: filters });
             setData(response.data.data || []);
             setYears(response.data.years || []);
         } catch (error: any) {
-            setError(`Failed to fetch data: ${error.message}`);
+            toast.error(`Failed to fetch data: ${error.message}`);
         } finally {
             setLoading(false);
         }
@@ -175,12 +124,12 @@ const RawData: React.FC<RawDataProps> = () => {
             const file = target.files?.[0];
             
             if (!file) {
-                showFlashMessage('error', 'No file selected.');
+                toast.error('No file selected.');
                 return;
             }
 
             if (!file.name.toLowerCase().endsWith('.csv')) {
-                showFlashMessage('error', 'Please select a CSV file.');
+                toast.error('Please select a CSV file.');
                 return;
             }
 
@@ -198,15 +147,10 @@ const RawData: React.FC<RawDataProps> = () => {
 
             const formData = new FormData();
             formData.append('file', file);
+            const toastId = toast.loading(`Processing ${file.name}... This may take several minutes.`);
 
             try {
                 setUploading(true);
-                
-                showFlashMessage('info', 
-                    `Processing ${file.name} (${(file.size / 1024).toFixed(1)}KB). ` +
-                    'This may take several minutes for large files...', 
-                    false
-                );
                 
                 const response = await api.post('/api/rawdata/upload', formData, {
                     headers: {
@@ -216,35 +160,21 @@ const RawData: React.FC<RawDataProps> = () => {
                     onUploadProgress: (progressEvent) => {
                         if (progressEvent.total) {
                             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                            showFlashMessage('info', 
-                                `Uploading: ${percentCompleted}%. Processing may continue after upload completes...`, 
-                                false
-                            );
+                            toast.update(toastId, { render: `Uploading: ${percentCompleted}%. Please wait...` });
                         }
                     }
                 });
                 
-                hideFlashMessage();
-                
                 const summary: UploadSummary = response.data.summary;
-                let successMessage = `Update Complete! `;
-                successMessage += `Processed ${summary.processedRows} of ${summary.totalRows} rows, `;
-                successMessage += `${summary.totalInserts} data points inserted `;
-                successMessage += `for years ${summary.yearRange}.`;
+                let successMessage = `Update Complete! Processed ${summary.processedRows}/${summary.totalRows} rows.`;
                 
-                if (summary.errorRows > 0) {
-                    successMessage += ` (${summary.errorRows} rows had errors and were skipped)`;
-                }
-                
-                showFlashMessage('success', successMessage, true);
-                
+                toast.update(toastId, { render: successMessage, type: 'success', isLoading: false, autoClose: 8000 });
+
                 if (response.data.warning) {
                     setTimeout(() => {
-                        showFlashMessage('warning', response.data.warning, true);
+                        toast.warning(response.data.warning, { autoClose: 8000 });
                     }, 2000);
                 }
-                
-                if (import.meta.env.DEV) console.log('Upload Summary:', summary);
                 
                 setTimeout(async () => {
                     try {
@@ -252,33 +182,20 @@ const RawData: React.FC<RawDataProps> = () => {
                             fetchData(),
                             fetchFilterOptions()
                         ]);
-                        showFlashMessage('info', 'Data refreshed successfully!', true);
+                        toast.info('Data refreshed successfully!', { autoClose: 3000 });
                     } catch (refreshError) {
-                        if (import.meta.env.DEV) console.error('Error refreshing data:', refreshError);
-                        showFlashMessage('warning', 'Upload completed but failed to refresh display. Please reload the page.', true);
+                        toast.warning('Upload completed but failed to refresh display. Please reload the page.', { autoClose: 8000 });
                     }
                 }, 1000);
                 
             } catch (error: any) {
-                hideFlashMessage();
-                
                 let errorMessage = 'Upload failed: ';
-                
                 if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
-                    errorMessage = 'Upload timed out. The file might still be processing in the background. ' +
-                                 'Please wait a few minutes and refresh the page to check if the data was updated.';
-                    showFlashMessage('warning', errorMessage, false);
-                } else if (error.response?.data?.message) {
-                    errorMessage += error.response.data.message;
-                    showFlashMessage('error', errorMessage);
-                } else if (error.userMessage) {
-                    showFlashMessage('error', error.userMessage);
-                } else if (error.message) {
-                    errorMessage += error.message;
-                    showFlashMessage('error', errorMessage);
+                    errorMessage = 'Upload timed out. The file may still be processing. Please refresh in a few minutes.';
+                    toast.update(toastId, { render: errorMessage, type: 'warning', isLoading: false, autoClose: 10000 });
                 } else {
-                    errorMessage += 'Unknown error occurred.';
-                    showFlashMessage('error', errorMessage);
+                    errorMessage += error.response?.data?.message || error.message || 'Unknown error occurred.';
+                    toast.update(toastId, { render: errorMessage, type: 'error', isLoading: false, autoClose: 10000 });
                 }
                 
             } finally {
@@ -294,9 +211,8 @@ const RawData: React.FC<RawDataProps> = () => {
     };
 
     const handleDownload = async (format: 'csv') => {
+        const toastId = toast.loading(`Preparing ${format.toUpperCase()} download...`);
         try {
-            showFlashMessage('info', `Preparing ${format.toUpperCase()} download...`);
-            
             const response = await api.get('/api/rawdata/download', {
                 params: { format },
                 responseType: 'blob'
@@ -316,12 +232,10 @@ const RawData: React.FC<RawDataProps> = () => {
             document.body.removeChild(link);
             window.URL.revokeObjectURL(url);
             
-            hideFlashMessage();
-            showFlashMessage('success', `${format.toUpperCase()} file has been downloaded successfully.`);
+            toast.update(toastId, { render: `${format.toUpperCase()} file downloaded successfully.`, type: 'success', isLoading: false, autoClose: 5000 });
         } catch (error: any) {
-            if (import.meta.env.DEV) console.error(`Error downloading ${format}:`, error);
             const errorMessage = error.response?.data?.message || error.message || `Failed to download ${format} file.`;
-            showFlashMessage('error', `Download failed: ${errorMessage}`);
+            toast.update(toastId, { render: `Download failed: ${errorMessage}`, type: 'error', isLoading: false, autoClose: 5000 });
         }
     };
 
@@ -394,34 +308,6 @@ const RawData: React.FC<RawDataProps> = () => {
                     </div>
                 </div>
 
-                {flashMessage && (
-                    <div className={`flash-message flash-${flashMessage.type}`}>
-                        <div className="flash-content">
-                            <span className="flash-text">{flashMessage.message}</span>
-                            <button 
-                                className="flash-close" 
-                                onClick={hideFlashMessage}
-                                type="button"
-                            >
-                                ×
-                            </button>
-                        </div>
-                        {flashMessage.type === 'info' && uploading && (
-                            <div className="flash-progress">
-                                <div className="progress-bar">
-                                    <div className="progress-bar-fill"></div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {error && (
-                    <div className="error-message">
-                        <strong>Notice:</strong> {error}
-                    </div>
-                )}
-
                 <div className="rawdata-main-content">
                     <div className="controls-card">
                         <div className="controls-header">
@@ -464,16 +350,16 @@ const RawData: React.FC<RawDataProps> = () => {
                                         <option key={category} value={category}>{category}</option>
                                     ))}
                                 </select>
+                            </div>
+                            
+                            <div className="actions">
                                 <button 
                                     onClick={handleClearFilters} 
-                                    className="clear-filters-btn"
+                                    className="action-button clear-filters-btn"
                                     disabled={uploading}
                                 >
                                     🗑️ Clear Filters
                                 </button>
-                            </div>
-                            
-                            <div className="actions">
                                 <button 
                                     className={`action-button download-btn ${uploading ? 'disabled' : ''}`}
                                     disabled={uploading}

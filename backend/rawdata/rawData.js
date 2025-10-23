@@ -5,9 +5,8 @@ const { getConnection, sql } = require('../database/database');
 const multer = require('multer');
 const csv = require('csv-parser');
 const stream = require('stream');
-const jwt = require('jsonwebtoken');
+const { authMiddleware } = require('../session/session'); // Import authMiddleware
 const { addAuditTrail } = require('../audit/auditService');
-const { decrypt } = require('../utils/crypto');
 
 // Multer setup for CSV file upload
 const storage = multer.memoryStorage();
@@ -43,55 +42,16 @@ const extractYearsFromHeaders = (headers) => {
 };
 
 /**
- * Helper function to get user info from JWT token
- */
-const getUserInfoFromToken = async (authHeader, pool) => {
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        throw new Error('No valid authorization token provided');
-    }
-    
-    const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    
-    const userResult = await pool.request()
-        .input('userId', sql.Int, decoded.userId)
-        .query(`
-            SELECT
-                ui.fullName,
-                b.barangayName as barangay
-            FROM
-                userInfo ui
-            JOIN
-                barangays b ON ui.barangay = b.barangayID
-            WHERE
-                ui.userID = @userId
-        `);
-    
-    if (userResult.recordset.length === 0) {
-        throw new Error('User not found or user has no assigned barangay');
-    }
-    
-    const userInfo = userResult.recordset[0];
-    userInfo.userID = decoded.userId; // Add userID to the returned object
-
-    // Decrypt the full name
-    userInfo.fullName = decrypt(userInfo.fullName);
-
-    return userInfo;
-};
-
-/**
  * Helper function to get next available dataID range
  */
-const getNextDataIDRange = async (pool, expectedInserts) => {
-    const result = await pool.request()
+const getNextDataIDRange = async (transaction) => {
+    const result = await transaction.request()
         .query('SELECT ISNULL(MAX(dataID), 0) as maxID FROM rawData');
     
     const currentMaxID = result.recordset[0].maxID;
     const dataIDStart = currentMaxID + 1;
-    const dataIDEnd = dataIDStart + expectedInserts - 1;
     
-    return { dataIDStart, dataIDEnd };
+    return { dataIDStart };
 };
 
 /**
@@ -177,7 +137,7 @@ router.get('/', async (req, res) => {
  * @desc    Upload and process CSV file to update rawData with proper tracking
  * @access  Private
  */
-router.post('/upload', (req, res) => {
+router.post('/upload', authMiddleware, (req, res) => { // Added authMiddleware
     upload(req, res, async (err) => {
         if (err) {
             console.error('Multer error');
@@ -240,20 +200,22 @@ router.post('/upload', (req, res) => {
                 const yearStart = Math.min(...detectedYears);
                 const yearEnd = Math.max(...detectedYears);
 
-                let userInfo;
+                let transaction;
                 try {
                     const pool = await getConnection();
                     
-                    // Get user information from token
-                    userInfo = await getUserInfoFromToken(req.headers.authorization, pool);
-                    console.log('User info retrieved');
+                    const userInfo = {
+                        userID: req.user.userID,
+                        fullName: req.user.fullName,
+                        barangay: req.user.barangayName
+                    };
+                    console.log('User info retrieved from auth middleware');
 
-                    // Validate user's portal/barangay
                     if (!userInfo || !userInfo.barangay) {
                         throw new Error('User has no assigned barangay/portal. Cannot process upload.');
                     }
 
-                    const transaction = new sql.Transaction(pool);
+                    transaction = new sql.Transaction(pool);
                     await transaction.begin();
 
                     let processedCount = 0;
@@ -261,174 +223,116 @@ router.post('/upload', (req, res) => {
                     let totalInserts = 0;
                     const errors = [];
 
-                    try {
-                        // Calculate expected number of inserts for tracking
-                        const expectedInsertsPerRow = detectedYears.length;
-                        const maxPossibleInserts = results.length * expectedInsertsPerRow;
+                    const { dataIDStart } = await getNextDataIDRange(transaction);
+                    console.log('Starting dataID will be set');
+
+                    for (let i = 0; i < results.length; i++) {
+                        const row = results[i];
                         
-                        // Get the starting dataID range
-                        const { dataIDStart } = await getNextDataIDRange(pool, maxPossibleInserts);
-                        console.log('Starting dataID will be set');
+                        const ppa = row.PPA || row.ppa || row['Project/Program/Activity'] || '';
+                        const category = row.Category || row.category || '';
+                        const committee = row.Committee || row.committee || '';
+                        
+                        if (!ppa) {
+                            errors.push(`Row ${i + 1}: Missing PPA`);
+                            errorCount++;
+                            continue;
+                        }
 
-                        for (let i = 0; i < results.length; i++) {
-                            const row = results[i];
-                            
-                            // Extract PPA, category, and committee
-                            const ppa = row.PPA || row.ppa || row['Project/Program/Activity'] || '';
-                            const category = row.Category || row.category || '';
-                            const committee = row.Committee || row.committee || '';
-                            
-                            if (!ppa) {
-                                errors.push(`Row ${i + 1}: Missing PPA`);
-                                errorCount++;
-                                continue;
-                            }
+                        let rddResult = await new sql.Request(transaction)
+                            .input('ppa', sql.NVarChar, ppa)
+                            .input('category', sql.NVarChar, category)
+                            .input('committee', sql.NVarChar, committee)
+                            .query('SELECT rddID FROM rawDataDetails WHERE ppa = @ppa AND category = @category AND committee = @committee');
 
-                            // Find or create rddID based on PPA, category, and committee
-                            let rddResult = await new sql.Request(transaction)
+                        let rddID;
+                        if (rddResult.recordset.length > 0) {
+                            rddID = rddResult.recordset[0].rddID;
+                        } else {
+                            const insertRddResult = await new sql.Request(transaction)
                                 .input('ppa', sql.NVarChar, ppa)
                                 .input('category', sql.NVarChar, category)
                                 .input('committee', sql.NVarChar, committee)
-                                .query('SELECT rddID FROM rawDataDetails WHERE ppa = @ppa AND category = @category AND committee = @committee');
-
-                            let rddID;
-                            if (rddResult.recordset.length > 0) {
-                                rddID = rddResult.recordset[0].rddID;
-                                console.log('Found existing rddID');
-                            } else {
-                                // Create new rawDataDetails record
-                                const insertRddResult = await new sql.Request(transaction)
-                                    .input('ppa', sql.NVarChar, ppa)
-                                    .input('category', sql.NVarChar, category)
-                                    .input('committee', sql.NVarChar, committee)
-                                    .query('INSERT INTO rawDataDetails (ppa, category, committee) OUTPUT INSERTED.rddID VALUES (@ppa, @category, @committee)');
-                                
-                                rddID = insertRddResult.recordset[0].rddID;
-                                console.log('Created new rddID');
-                            }
-
-                            // Process each detected year's data
-                            for (const year of detectedYears) {
-                                // Look for target and budget columns for this year
-                                const targetColumns = headers.filter(h => 
-                                    h.toLowerCase().includes('target') && h.includes(year.toString())
-                                );
-                                const budgetColumns = headers.filter(h => 
-                                    h.toLowerCase().includes('budget') && h.includes(year.toString())
-                                );
-
-                                let target = '';
-                                let budgetStr = '';
-
-                                // Get target value
-                                if (targetColumns.length > 0) {
-                                    target = row[targetColumns[0]] || '';
-                                }
-
-                                // Get budget value  
-                                if (budgetColumns.length > 0) {
-                                    budgetStr = row[budgetColumns[0]] || '';
-                                }
-
-                                const budget = budgetStr ? parseInt(budgetStr.toString().replace(/,/g, '')) : null;
-
-                                // Skip if both target and budget are empty
-                                if (!target && !budget) continue;
-
-                                // Delete existing record for this rddID and year to avoid duplicates
-                                await new sql.Request(transaction)
-                                    .input('rddID', sql.Int, rddID)
-                                    .input('year', sql.Int, year)
-                                    .query('DELETE FROM rawData WHERE rddID = @rddID AND year = @year');
-
-                                // Insert new record
-                                const insertQuery = `
-                                    INSERT INTO rawData (rddID, year, target, budget)
-                                    VALUES (@rddID, @year, @target, @budget)
-                                `;
-                                const insertRequest = new sql.Request(transaction);
-                                insertRequest.input('rddID', sql.Int, rddID);
-                                insertRequest.input('year', sql.Int, year);
-                                insertRequest.input('target', sql.NVarChar, target || null);
-                                insertRequest.input('budget', sql.Int, budget);
-                                
-                                await insertRequest.query(insertQuery);
-                                totalInserts++;
-                            }
-                            
-                            processedCount++;
+                                .query('INSERT INTO rawDataDetails (ppa, category, committee) OUTPUT INSERTED.rddID VALUES (@ppa, @category, @committee)');
+                            rddID = insertRddResult.recordset[0].rddID;
                         }
 
-                        // Get the actual dataID range after inserts
-                        const { dataIDEnd } = await getNextDataIDRange(pool, 0); // Get current max
-                        const actualDataIDEnd = dataIDEnd - 1; // Since we got the "next" range, subtract 1
+                        for (const year of detectedYears) {
+                            const targetColumns = headers.filter(h => h.toLowerCase().includes('target') && h.includes(year.toString()));
+                            const budgetColumns = headers.filter(h => h.toLowerCase().includes('budget') && h.includes(year.toString()));
 
-                        // Create tracking record with proper data
-                        const trackQuery = `
-                            INSERT INTO rawDataTrack (dataIDStart, dataIDEnd, yearStart, yearEnd, portal, dateUpload)
-                            VALUES (@dataIDStart, @dataIDEnd, @yearStart, @yearEnd, @portal, @dateUpload)
-                        `;
-                        
-                        const trackRequest = new sql.Request(transaction);
-                        trackRequest.input('dataIDStart', sql.Int, dataIDStart);
-                        trackRequest.input('dataIDEnd', sql.Int, actualDataIDEnd);
-                        trackRequest.input('yearStart', sql.Int, yearStart);
-                        trackRequest.input('yearEnd', sql.Int, yearEnd);
-                        trackRequest.input('portal', sql.NVarChar, userInfo.barangay);
-                        trackRequest.input('dateUpload', sql.DateTime, new Date()); // UTC time
-                        
-                        await trackRequest.query(trackQuery);
-                        console.log('Tracking record created');
+                            let target = row[targetColumns[0]] || '';
+                            let budgetStr = row[budgetColumns[0]] || '';
+                            const budget = budgetStr ? parseInt(budgetStr.toString().replace(/,/g, '')) : null;
 
-                        await transaction.commit();
+                            if (!target && !budget) continue;
 
-                        // --- Audit Trail --- 
-                        addAuditTrail({
-                            actor: 'A',
-                            module: 'Z',
-                            userID: userInfo.userID,
-                            actions: 'Update',
-                            oldValue: null,
-                            newValue: `File: ${req.file.originalname}`,
-                            descriptions: `Admin ${userInfo.fullName} updated the raw data via CSV upload.`
-                        });
-                        
-                        const responseMessage = {
-                            message: 'CSV file processed successfully.',
-                            summary: {
-                                totalRows: results.length,
-                                processedRows: processedCount,
-                                errorRows: errorCount,
-                                totalInserts: totalInserts,
-                                yearsProcessed: detectedYears,
-                                yearRange: `${yearStart} - ${yearEnd}`,
-                                uploadedBy: userInfo.fullName,
-                                barangay: userInfo.barangay,
-                                errors: errors.slice(0, 10) // Show first 10 errors only
-                            }
-                        };
+                            await new sql.Request(transaction)
+                                .input('rddID', sql.Int, rddID)
+                                .input('year', sql.Int, year)
+                                .query('DELETE FROM rawData WHERE rddID = @rddID AND year = @year');
 
-                        if (errorCount > 0) {
-                            responseMessage.warning = `${errorCount} rows had errors and were skipped.`;
+                            const insertRequest = new sql.Request(transaction);
+                            insertRequest.input('rddID', sql.Int, rddID);
+                            insertRequest.input('year', sql.Int, year);
+                            insertRequest.input('target', sql.NVarChar, target || null);
+                            insertRequest.input('budget', sql.Int, budget);
+                            await insertRequest.query('INSERT INTO rawData (rddID, year, target, budget) VALUES (@rddID, @year, @target, @budget)');
+                            totalInserts++;
                         }
-
-                        console.log('Upload complete');
-                        res.status(200).json(responseMessage);
-                        
-                    } catch (error) {
-                        await transaction.rollback();
-                        console.error('Transaction Error');
-                        res.status(500).json({
-                            message: 'Failed to process CSV file.', 
-                            error: error.message,
-                            processedCount: processedCount,
-                            errorCount: errorCount
-                        });
+                        processedCount++;
                     }
+
+                    const finalRangeResult = await transaction.request().query('SELECT ISNULL(MAX(dataID), 0) as maxID FROM rawData');
+                    const actualDataIDEnd = finalRangeResult.recordset[0].maxID;
+
+                    const trackRequest = new sql.Request(transaction);
+                    trackRequest.input('dataIDStart', sql.Int, dataIDStart);
+                    trackRequest.input('dataIDEnd', sql.Int, actualDataIDEnd);
+                    trackRequest.input('yearStart', sql.Int, yearStart);
+                    trackRequest.input('yearEnd', sql.Int, yearEnd);
+                    trackRequest.input('portal', sql.NVarChar, userInfo.barangay);
+                    trackRequest.input('dateUpload', sql.DateTime, new Date());
+                    await trackRequest.query('INSERT INTO rawDataTrack (dataIDStart, dataIDEnd, yearStart, yearEnd, portal, dateUpload) VALUES (@dataIDStart, @dataIDEnd, @yearStart, @yearEnd, @portal, @dateUpload)');
+
+                    await transaction.commit();
+
+                    addAuditTrail({
+                        actor: 'A',
+                        module: 'Z',
+                        userID: userInfo.userID,
+                        actions: 'Update',
+                        oldValue: null,
+                        newValue: `File: ${req.file.originalname}`,
+                        descriptions: `Admin ${userInfo.fullName} updated the raw data via CSV upload.`
+                    });
+                    
+                    const responseMessage = {
+                        message: 'CSV file processed successfully.',
+                        summary: {
+                            totalRows: results.length,
+                            processedRows: processedCount,
+                            errorRows: errorCount,
+                            totalInserts: totalInserts,
+                            yearsProcessed: detectedYears,
+                            yearRange: `${yearStart} - ${yearEnd}`,
+                            uploadedBy: userInfo.fullName,
+                            barangay: userInfo.barangay,
+                            errors: errors.slice(0, 10)
+                        }
+                    };
+
+                    if (errorCount > 0) {
+                        responseMessage.warning = `${errorCount} rows had errors and were skipped.`;
+                    }
+
+                    res.status(200).json(responseMessage);
+                    
                 } catch (dbErr) {
-                    console.error('Database Connection Error');
+                    if (transaction) await transaction.rollback();
+                    console.error('Transaction or DB Error', dbErr);
                     res.status(500).json({
-                        message: 'Database connection failed.', 
+                        message: 'Failed to process CSV file due to a database error.', 
                         error: dbErr.message 
                     });
                 }

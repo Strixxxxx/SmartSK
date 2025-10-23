@@ -4,6 +4,7 @@ import { AxiosProgressEvent } from 'axios';
 import api from '../../../backend connection/axiosConfig';
 import './CreatePostModal.css';
 import VideoPreviewModal from './VideoPreviewModal';
+import { toast } from 'react-toastify';
 
 interface IFormInput {
     title: string;
@@ -20,7 +21,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
     const { register, handleSubmit, formState: { errors }, trigger, getValues } = useForm<IFormInput>({ mode: 'onChange' });
     const [step, setStep] = useState(1);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState<string | null>(null);
     const [previews, setPreviews] = useState<string[]>([]);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
     const [uploadProgress, setUploadProgress] = useState(0);
@@ -39,7 +39,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
     useEffect(() => {
         if (jobId) {
             setStatusMessage('Post creation has started...');
-            pollingInterval.current = setInterval(pollJobStatus, 2000); // Poll every 2 seconds
+            pollingInterval.current = window.setInterval(pollJobStatus, 2000); // Use window.setInterval for clarity
         }
         return () => {
             if (pollingInterval.current) {
@@ -61,16 +61,17 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
             if (job.Status === 'completed') {
                 if (pollingInterval.current) clearInterval(pollingInterval.current);
                 previews.forEach(preview => URL.revokeObjectURL(preview));
+                toast.success('Post created successfully!');
                 onPostCreated();
                 onClose();
             } else if (job.Status === 'failed') {
                 if (pollingInterval.current) clearInterval(pollingInterval.current);
-                setError(job.ErrorMessage || 'An unknown error occurred during post processing.');
+                toast.error(job.ErrorMessage || 'An unknown error occurred during post processing.');
                 setIsSubmitting(false);
             }
         } catch (err: any) {
             if (pollingInterval.current) clearInterval(pollingInterval.current);
-            setError('Failed to get post status. Please check your connection.');
+            toast.error(err.response?.data?.message || 'Failed to get post status. Please check your connection.');
             setIsSubmitting(false);
         }
     };
@@ -126,7 +127,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
 
     const onSubmit = async (data: IFormInput) => {
         setIsSubmitting(true);
-        setError(null);
         setUploadProgress(0);
         setJobStatus(null);
         setStatusMessage('Preparing to upload...');
@@ -158,7 +158,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
             setJobId(response.data.jobId);
 
         } catch (err: any) {
-            setError(err.response?.data?.message || 'An error occurred while creating the post.');
+            toast.error(err.response?.data?.message || 'An error occurred while creating the post.');
             setIsSubmitting(false);
         }
     };
@@ -278,8 +278,6 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
                                     <p className="status-message">{statusMessage}</p>
                                 </div>
                             )}
-
-                            {error && <p className="error-message">{error}</p>}
 
                             <div className="form-actions">
                                 <button type="button" onClick={handleBack} disabled={isSubmitting}>Back</button>
