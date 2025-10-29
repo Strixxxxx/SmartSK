@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { toast } from 'react-toastify';
-import { useAuth } from './AuthContext';
+
 
 interface MaintenanceMessage {
   type: 'maintenance_starting' | 'maintenance_ended';

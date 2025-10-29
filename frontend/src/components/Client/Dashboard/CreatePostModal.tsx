@@ -43,7 +43,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
     const [secureFiles, setSecureFiles] = useState<File[]>([]);
     const [uploadProgress, setUploadProgress] = useState(0);
     const [showVideoWarning, setShowVideoWarning] = useState(false);
-    const [jobId, setJobId] = useState<string | null>(null);
+
     const [jobStatus, setJobStatus] = useState<string | null>(null);
     const [statusMessage, setStatusMessage] = useState<string>('');
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
@@ -146,7 +146,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
         secureFiles.forEach(file => formData.append('secure_attachments', file));
 
         try {
-            const response = await api.post('/api/create-post', formData, {
+            await api.post('/api/create-post', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
                 onUploadProgress: (progressEvent: AxiosProgressEvent) => {
                     const percentCompleted = Math.round((progressEvent.loaded * 100) / (progressEvent.total ?? 1));
