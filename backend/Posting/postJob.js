@@ -15,7 +15,9 @@ const createJob = async (details = {}) => {
         title: details.title,
         description: details.description,
         initiatedBy: details.initiatedBy,
-        userID: details.userID // Ensure userID is in the payload
+        userID: details.userID, // Ensure userID is in the payload
+        taggedProjects: details.taggedProjects || [],
+        viewOptions: details.viewOptions || {}
     };
 
     await pool.request()

@@ -19,7 +19,7 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed }) => {
         const fetchPosts = async () => {
             setLoading(true);
             try {
-                const response = await axios.get('/api/posts');
+                const response = await axios.get('/api/posts/feed');
                 setPosts(response.data);
             } catch (err) {
                 setError('Failed to fetch posts.');

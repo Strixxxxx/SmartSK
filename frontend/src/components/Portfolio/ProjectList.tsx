@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../backend connection/axiosConfig';
 import PostCard, { Post } from './PostCard';
-import Portal from '../Portal/portal';
 import Login from '../Login/Login';
 import PostModal from './PostModal'; // Import the modal component
 import './ProjectList.css';
@@ -10,9 +9,7 @@ const ProjectList: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isPortalOpen, setIsPortalOpen] = useState(false);
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-    const [selectedBarangay, setSelectedBarangay] = useState('');
     const [barangays, setBarangays] = useState<string[]>([]);
     const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
@@ -66,11 +63,7 @@ const ProjectList: React.FC = () => {
         fetchPosts();
     }, [activeFilter]);
 
-    const handleBarangaySelect = (barangay: string) => {
-        setSelectedBarangay(barangay);
-        setIsPortalOpen(false);
-        setIsLoginModalOpen(true);
-    };
+
 
     const handleFilterClick = (barangay: string) => {
         if (activeFilter === barangay) {
@@ -98,7 +91,7 @@ const ProjectList: React.FC = () => {
                     <ul>
                         <li><a href="/">Home</a></li>
                         <li><a href="/project-list">Projects</a></li>
-                        <li><button onClick={() => setIsPortalOpen(true)}>Login</button></li>
+                        <li><button onClick={() => setIsLoginModalOpen(true)}>Login</button></li>
                     </ul>
                 </nav>
 
@@ -135,15 +128,9 @@ const ProjectList: React.FC = () => {
                     </div>
                 </footer>
             </div>
-            <Portal 
-                isOpen={isPortalOpen} 
-                onClose={() => setIsPortalOpen(false)} 
-                onBarangaySelect={handleBarangaySelect} 
-            />
             <Login 
                 open={isLoginModalOpen}
                 onClose={() => setIsLoginModalOpen(false)}
-                barangay={selectedBarangay}
             />
             <PostModal post={selectedPost} show={isModalOpen} onClose={closeModal} />
         </>

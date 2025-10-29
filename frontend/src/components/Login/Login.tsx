@@ -16,7 +16,6 @@ interface NewAccountData {
 interface LoginProps {
   open: boolean;
   onClose: () => void;
-  barangay: string;
 }
 
 const style = {
@@ -32,7 +31,7 @@ const style = {
   zIndex: 1300,
 };
 
-const Login: React.FC<LoginProps> = ({ open, onClose, barangay }) => {
+const Login: React.FC<LoginProps> = ({ open, onClose }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -60,10 +59,6 @@ const Login: React.FC<LoginProps> = ({ open, onClose, barangay }) => {
       toast.error('Password is required');
       return false;
     }
-    if (!barangay) {
-      toast.error('Barangay is required');
-      return false;
-    }
     return true;
   };
 
@@ -77,7 +72,7 @@ const Login: React.FC<LoginProps> = ({ open, onClose, barangay }) => {
     setLoading(true);
 
     try {
-      const result = await login(username.trim(), password.trim(), barangay);
+      const result = await login(username.trim(), password.trim());
 
       if (result.success && result.user) {
         if (result.user.isDefaultPassword) {
@@ -135,7 +130,6 @@ const Login: React.FC<LoginProps> = ({ open, onClose, barangay }) => {
           <div className="login-header">
             <h1>Welcome Back</h1>
             <p>Sign in to your account to continue</p>
-            {barangay && <p className="barangay-display">Logging in to: <strong>{barangay}</strong></p>}
           </div>
 
           <form onSubmit={handleSubmit} autoComplete="off">

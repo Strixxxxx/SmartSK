@@ -3,13 +3,10 @@ import './Portfolio.css';
 import logoUrl from '../../assets/logo.gif';
 import nnLogo from '../../assets/NN_LOGO.jpg';
 import sbLogo from '../../assets/SB_LOGO.jpg';
-import Portal from '../Portal/portal';
 import Login from '../Login/Login';
 
 const Portfolio: React.FC = () => {
-  const [isPortalOpen, setIsPortalOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [selectedBarangay, setSelectedBarangay] = useState('');
   const [teamView, setTeamView] = useState(0); // 0 = team, 1 = collaboration
 
   useEffect(() => {
@@ -65,11 +62,7 @@ const Portfolio: React.FC = () => {
     }
   };
 
-  const handleBarangaySelect = (barangay: string) => {
-    setSelectedBarangay(barangay);
-    setIsPortalOpen(false);
-    setIsLoginModalOpen(true);
-  };
+
 
   const handlePrevView = () => {
     setTeamView((prev) => (prev === 0 ? 1 : 0));
@@ -88,7 +81,7 @@ const Portfolio: React.FC = () => {
           <ul>
             <li><button onClick={() => handleNavClick('#home')} type="button">Home</button></li>
             <li><a href="/project-list">Projects</a></li>
-            <li><button onClick={() => setIsPortalOpen(true)}>Login</button></li>
+            <li><button onClick={() => setIsLoginModalOpen(true)}>Login</button></li>
           </ul>
         </nav>
 
@@ -297,15 +290,9 @@ const Portfolio: React.FC = () => {
           </div>
         </footer>
       </div>
-      <Portal 
-        isOpen={isPortalOpen} 
-        onClose={() => setIsPortalOpen(false)} 
-        onBarangaySelect={handleBarangaySelect} 
-      />
       <Login 
         open={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
-        barangay={selectedBarangay}
       />
     </>
   );

@@ -37,10 +37,9 @@ router.post('/', async (req, res) => {
   try {
     const identifier = sanitizeInput(req.body.identifier);
     const password = req.body.password;
-    const barangay = sanitizeInput(req.body.barangay);
 
-    if (!identifier || !password || !barangay) {
-      return res.status(400).json({ success: false, message: 'Identifier, password, and barangay are required' });
+    if (!identifier || !password) {
+      return res.status(400).json({ success: false, message: 'Identifier and password are required' });
     }
 
     const pool = await getConnection();
@@ -79,11 +78,6 @@ router.post('/', async (req, res) => {
     if (user.isArchived) {
       logAudit({ actor: 'S', module: 'L', userID: user.userID, actions: 'login-failure', descriptions: `Login attempt for archived account: ${decryptedUsername}` });
       return res.status(401).json({ success: false, message: 'This account has been archived. Please contact an administrator.' });
-    }
-
-    if (user.barangayName !== barangay) {
-      logAudit({ actor: 'S', module: 'L', userID: user.userID, actions: 'login-failure', descriptions: `Incorrect barangay attempt for user: ${decryptedUsername}` });
-      return res.status(401).json({ success: false, message: 'You are not authorized to log in for this barangay.' });
     }
 
     if (!isValidBcryptHash(user.passKey)) {

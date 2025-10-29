@@ -1,0 +1,216 @@
+> there would be a major revision when it comes to the @backend/Posting/  on the backend and on the  @frontend/src/components/Client/Dashboard/CreatePostModal.tsx on the frontend. So the changes is
+  that if you scan properly from line 160 till line 198 of @backend/database/database_query.txt , there is 2 new tables that was created which would be tagProjOnPost table and viewOption table. So the
+  purpose of the two tables is that tagProjOnPost allows the clients to attach the projects that was related to the post like a tag functionality on the facebook. The purpose of the viewOption is that
+  it would allow the visibility of the projects depending on the client's desire such as if the client wants to see the project details to everyone, they would select the viewable to public option, if
+  its the client wants to shows to the authorized user, they would select the viewable to all barangay option, and if its the client wants to show to their barangay only, they could select the viewable
+   to barangay only option. It has another section which would be the encrypted attachment that might contain the receipts and documents during the process of the projects which has the same option as
+  the projects. So what i want you to do is change the backend logic and the frontend to properly adapt the changes that was needed. What i want you to do now is to show me what would you do before we
+  make any changes since i need to know if you would do it properly
+
+
+✦ This is a significant and well-thought-out feature enhancement. I've reviewed your request and the database schema. Here is my proposed plan of action, broken down into backend and frontend
+  changes. Please review it to ensure it aligns with your vision before I begin making any code modifications.
+
+  Backend Implementation Plan
+
+  My primary goal on the backend is to adapt the post creation process to handle the new data (tagged projects and view options) and then correctly reflect this data on the public-facing
+  endpoints.
+
+   1. Update Post Creation Endpoint (`/backend/Posting/post.js`):
+       * I will modify the POST /api/create-post endpoint to accept two new fields in the request body:
+           * taggedProjects: A JSON string representing an array of project IDs to be associated with the post.
+           * viewOptions: A JSON string representing an object with the six boolean visibility flags (opforPubProj, opforAllBrgyProj, etc.).
+       * This new data will be added to the payload of the background job so it can be processed asynchronously.
+
+   2. Enhance Background Job Logic (`/backend/Posting/post.js`):
+       * Inside the processPostUploadJob function, after a new post is successfully inserted into the posts table, I will add new logic to the existing database transaction:
+           * Tag Projects: I will parse the taggedProjects array from the job payload and run INSERT statements into the tagProjOnPost table for each project ID, linking them to the new postID.
+           * Save View Options: I will parse the viewOptions object and run a single INSERT statement into the viewOption table, saving the visibility settings for the new postID.
+
+   3. Update Public Post Retrieval (`/backend/Posting/postPublic.js`):
+       * I will modify the GET /api/posts endpoint to join the posts table with tagProjOnPost, projects, and viewOption.
+       * This will allow me to return the details of any tagged projects along with each post.
+       * Important: For this public-facing endpoint, I will implement logic to only return project and attachment details if they are explicitly marked as "Viewable to Public" (opforPubProj is
+         true). This ensures your privacy settings are respected.
+
+  Frontend Implementation Plan
+
+  On the frontend, I will overhaul the CreatePostModal.tsx component to provide a user-friendly way to add this new information.
+
+   1. Fetch User's Projects:
+       * When the "Create Post" modal is opened, I will add a new API call to fetch a list of all projects created by the logged-in user. This will populate the new tagging UI.
+
+   2. Revamp the Create Post Modal UI (`CreatePostModal.tsx`):
+       * Tag Projects: I will add a "Tag Related Projects" section to the form. This will likely be a searchable, multi-select dropdown, allowing you to easily find and select one or more of your
+         projects.
+       * Visibility Options: I will add a "Visibility" section with two sets of radio buttons:
+           1. Project Details Visibility: "Public", "All Barangays", or "My Barangay Only".
+           2. Sensitive Attachments Visibility: "Public", "All Barangays", or "My Barangay Only".
+       * I will add new state variables to manage the selections for these new form elements.
+
+   3. Update Form Submission Logic:
+       * In the onSubmit function, I will gather the selected project IDs and the chosen visibility options.
+       * I will append this new data to the FormData object being sent to the backend, ensuring it's properly JSON stringified.
+
+   4. Enhance Post Preview:
+       * The "Post Preview" step will be updated to display the titles of the projects you've tagged and a summary of the visibility settings you've chosen, giving you a final chance to review
+         before submission.
+
+  This plan covers all the necessary changes from the database to the UI. Please let me know if this approach meets your expectations, and I will proceed with the implementation.
+
+> what would the system do if for example, i would select viewable to the barangay only option? I need to know that because i want to know how well you understand my prompt. Same as when i selected 
+  the view to all barangay option
+
+✦ That is an excellent question, as it gets to the core of the access control logic. Here is how I understand and plan to implement the visibility options based on your prompt.
+
+  When you select "Viewable to Barangay Only"
+
+  This is the most restrictive option for authenticated users.
+
+   * What the User Sees: When another user views your post, they will only see the tagged project details (or the encrypted attachments) if they are logged in AND they belong to the exact same 
+     barangay as you (the author of the post).
+   * How the System Enforces This (Backend Logic):
+       1. When a logged-in user requests to view posts, the backend will know their userID and their associated barangayID from their authentication token.
+       2. For your post, the system will retrieve the viewOption settings from the database.
+       3. It will see that the opforBrgyProj (or opforBrgyEAttach) flag is set to true.
+       4. The backend will then perform a check: Does the barangayID of the user viewing the post match the barangayID of you, the post's author?
+       5. Only if the barangay IDs match will the server include the sensitive project/attachment details in the data sent back to the frontend. For everyone else (including users from other
+          barangays and the general public), those details will be omitted.
+
+  Example: You are from San Bartolome. You create a post and set project visibility to "Barangay Only".
+   * A logged-in user from San Bartolome WILL see the tagged projects.
+   * A logged-in user from Nagkaisang Nayon WILL NOT see the tagged projects.
+   * A public user who is not logged in WILL NOT see the tagged projects.
+
+  When you select "Viewable to All Barangays"
+
+  This option acts as a gate for all authenticated users, regardless of their specific barangay.
+
+   * What the User Sees: Anyone who is logged in to the system will be able to see the tagged project details or attachments. It doesn't matter which barangay they are from. Public, unauthenticated
+     users will not see this information.
+   * How the System Enforces This (Backend Logic):
+       1. When a request is made, the system first checks if the user is authenticated. If not, the sensitive data is automatically hidden.
+       2. If the user is authenticated, the system retrieves the viewOption settings for your post.
+       3. It will see that the opforAllBrgyProj (or opforAllBrgyEAttach) flag is true.
+       4. Because this flag is true, the system will include the project/attachment details in the response without needing to compare the viewer's barangay to your own. The only requirement is that
+          they are a valid, logged-in user.
+
+  Example: You are from San Bartolome. You create a post and set project visibility to "All Barangays".
+   * A logged-in user from San Bartolome WILL see the tagged projects.
+   * A logged-in user from Nagkaisang Nayon WILL also see the tagged projects.
+   * A public user who is not logged in WILL NOT see the tagged projects.
+
+  In summary, the system will use the user's authentication status and their associated barangayID in combination with the viewOption flags you set for each post to conditionally serve the
+  sensitive data, ensuring your visibility preferences are strictly enforced on the backend.
+
+> its good that you understood my intent properly but here is another question before we proceed. Where would the encrypted attachments and the project that was tagged on the post if i select either 
+  on the view for all barangay option or the view for the barangay only option?
+
+✦ That's a crucial question that clarifies the user experience. My plan accounts for this by creating a clear distinction between what the general public sees and what authenticated users see.
+
+  The restricted information will not appear on the public-facing post page that everyone can access. Instead, it will be displayed within the authenticated client dashboard, likely on the same
+  page where clients view the main post feed.
+
+  Here’s a more detailed breakdown of where and how a logged-in user would see this information:
+
+  The "Enhanced" Post View for Logged-in Users
+
+  When a user is logged in, the post feed they see within their dashboard will be enhanced with the restricted data they have permission to view. I'll modify the PostCard.tsx component (or a
+  similar component within the dashboard) to conditionally render new sections based on the data received from a new, secure backend endpoint.
+
+  Here's how the two types of content would be presented on a post:
+
+  1. Tagged Projects
+
+   * Location: A new section would appear at the bottom of the post card, perhaps titled "Related Projects".
+   * Content: This section would list the titles of the projects you tagged.
+   * Interaction: Each project title would be a clickable link. Clicking on it would open a modal window displaying the full details of that project (e.g., its description, status, and remarks),
+     allowing users to get more context without leaving the post feed.
+
+  Visual Mockup Idea:
+
+    1 +--------------------------------------------------+
+    2 |  POST TITLE                                      |
+    3 |  Post description goes here...                   |
+    4 |  [Image/Video Attachments]                       |
+    5 |                                                  |
+    6 |  ------------------------------------------------ |
+    7 |  👤 Author: Juan Dela Cruz | 📍 Brgy: San Bartolome |
+    8 |                                                  |
+    9 |  ▼ Related Projects                              |
+   10 |    • 🔗 Project Alpha (Click for details)        |
+   11 |    • 🔗 Project Beta (Click for details)         |
+   12 |                                                  |
+   13 +--------------------------------------------------+
+
+  2. Encrypted Attachments (Sensitive Documents)
+
+   * Location: A second new section would appear on the post card, titled "Secure Documents" or "Additional Files".
+   * Content: This section would list the file names of the encrypted attachments (e.g., receipt_01.pdf, official_document.pdf).
+   * Interaction: Next to each file name, there would be a "Download" or "View" button. Clicking this button would make a secure request to the backend. The backend would verify the user's
+     permissions one last time and then provide a temporary, secure link for the user to access the file. This ensures the files themselves are never publicly exposed.
+
+  Backend Support
+
+  To make this happen, I will create a new, authenticated-only API endpoint (e.g., GET /api/posts/feed). When a logged-in user visits their dashboard, the frontend will call this endpoint. The
+  backend will then:
+   1. Verify the user's identity and barangayID.
+   2. Fetch all posts.
+   3. For each post, check the viewOption settings.
+   4. Conditionally include the tagged project data and secure attachment details in the response only if the logged-in user meets the criteria you set ("Barangay Only" or "All Barangays").
+
+  This ensures a clear separation: the public sees a basic version of the post, while authenticated users see an enhanced version with the specific information they are authorized to view,
+  presented clearly within the context of the post itself.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  ReadManyFiles Will attempt to read and concatenate files using patterns:                                                                                                                      │
+│    frontend//**                                                                                                                                                                                  │
+│     (within target directory:                                                                                                                                                                    │
+│    D:\Projects\Projects\smartSK                                                                                                                                                                  │
+│    ) . Excluding: patterns like                                                                                                                                                                  │
+│    **/node_modules/**`, `**/.git/**...`. File encoding: utf-8. Separator: "--- path/to/file.ext ---".                                                                                            │
+│                                                                                                                                                                                                  │
+│    ### ReadManyFiles Result (Target Dir: `D:\Projects\Projects\smartSK`)                                                                                                                         │
+│                                                                                                                                                                                                  │
+│    Successfully read and concatenated content from **114 file(s)**.                                                                                                                              │
+│                                                                                                                                                                                                  │
+│    **Processed Files (first 10 shown):**                                                                                                                                                         │
+│    - `frontend/.gitignore`                                                                                                                                                                       │
+│    - `frontend/README.md`                                                                                                                                                                        │
+│    - `frontend/eslint.config.js`                                                                                                                                                                 │
+│    - `frontend/index.html`                                                                                                                                                                       │
+│    - `frontend/package-lock.json`                                                                                                                                                                │
+│    - `frontend/package.json`                                                                                                                                                                     │
+│    - `frontend/public/index.html`                                                                                                                                                                │
+│    - `frontend/src/App.css`                                                                                                                                                                      │
+│    - `frontend/src/App.tsx`                                                                                                                                                                      │
+│    - `frontend/src/AppRoutes.tsx`                                                                                                                                                                │
+│    - ...and 104 more.                                                                                                                                                                            │
+│                                                                                                                                                                                                  │
+│    **Skipped 6 item(s) (first 5 shown):**                                                                                                                                                        │
+│    - `frontend/public/logo.png` (Reason: asset file (image/pdf) was not explicitly requested by name or extension)                                                                               │
+│    - `frontend/src/assets/NN_LOGO.jpg` (Reason: asset file (image/pdf) was not explicitly requested by name or extension)                                                                        │
+│    - `frontend/src/assets/SB_LOGO.jpg` (Reason: asset file (image/pdf) was not explicitly requested by name or extension)                                                                        │
+│    - `frontend/src/assets/logo.gif` (Reason: asset file (image/pdf) was not explicitly requested by name or extension)                                                                           │
+│    - `frontend/src/assets/logo.png` (Reason: asset file (image/pdf) was not explicitly requested by name or extension)                                                                           │
+│    - ...and 1 more.                                                                                                                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+> so inshort, where in the @frontend/ would the post shows the tagged project and tagged encrypted attachment when i select between view for all barangay and view for the barangay only option?
+
+✦ Excellent question. To be precise, the tagged projects and encrypted attachments will be displayed within the authenticated client dashboard, specifically in the post feed rendered by the
+  `frontend/src/components/Client/Dashboard/DashboardFeed.tsx` component.
+
+  Here is the exact flow:
+
+   1. Authenticated Data Fetching: I will modify frontend/src/components/Client/Dashboard/DashboardFeed.tsx to call a new, secure backend endpoint (e.g., /api/posts/feed). This endpoint will require
+      authentication and will return the extra project and attachment information only if the logged-in user has the correct permissions (i.e., is from the correct barangay for the "Barangay Only"
+      option, or is simply logged in for the "All Barangays" option).
+
+   2. Component Modification: The data fetched in DashboardFeed.tsx is passed down to the frontend/src/components/Portfolio/PostCard.tsx component for rendering each post.
+
+   3. Displaying the Information: I will modify `frontend/src/components/Portfolio/PostCard.tsx` to add two new sections that will only appear if the data for tagged projects or secure attachments is
+       present:
+       * A "Related Projects" section will be added to the bottom of the card, listing the titles of the tagged projects.
+       * A "Secure Documents" section will also be added, listing the encrypted attachments with a secure download button next to each.
+
+  In short, you will see this restricted information on the post cards inside your main dashboard feed, not on the public-facing project list.

@@ -4,39 +4,31 @@
 
 --Frontend (Browser's Console)
 
-Failed to load resource: the server responded with a status of 500 (Internal Server Error)Understand this error
-axiosConfig.ts:96 Server error: 500 Objecterror: "User has no assigned barangay/portal. Cannot process upload."message: "Failed to process CSV file due to a database error."[[Prototype]]: Object
+
 
 --Frontend (VSC Terminal)
 
+PS D:\Projects\Projects\smartSK\frontend> npm run build
 
+> capstone@0.0.0 build
+> tsc -b && vite build
+
+src/components/Client/Dashboard/CreatePostModal.tsx:106:13 - error TS2304: Cannot find name 'setJobStatus'.
+
+106             setJobStatus(job.Status);
+                ~~~~~~~~~~~~
+
+src/components/Client/Dashboard/CreatePostModal.tsx:173:9 - error TS2304: Cannot find name 'setJobStatus'.
+
+173         setJobStatus(null);
+            ~~~~~~~~~~~~
+
+
+Found 2 errors.
 
 --Backend(VSC Terminal)
 
-PS D:\Projects\Projects\smartSK\backend> node main.js
-Initializing active sessions from database...
-Initializing Azure Storage with primary credentials.
-Job management system initialized with database storage.
-Post upload job management system initialized.
-[WebSocket] Server initialized.
-Server is running on port 8080
-[WebSocket] Client connected.
-Initialized active sessions.
-[WebSocket] Client disconnected.
-Raw data request with filters
-Stored procedure result count
-Raw data request with filters
-Stored procedure result count
-[WebSocket] Client connected.
-[WebSocket] Client connected.
-Processing uploaded file
-CSV headers extracted
-Parsed rows from CSV
-Detected years from headers
-User info retrieved from auth middleware
-Transaction or DB Error Error: User has no assigned barangay/portal. Cannot process upload.
-    at CsvParser.<anonymous> (D:\Projects\Projects\smartSK\backend\rawdata\rawData.js:215:31)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+
 
 --Backend(Azure Portal's Log Stream in Platform)
 

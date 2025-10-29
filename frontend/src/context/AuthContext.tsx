@@ -24,7 +24,7 @@ interface AuthContextType {
   user: UserInfo | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (username: string, password: string, barangay: string) => Promise<{ success: boolean; message: string; user?: UserInfo }>;
+  login: (username: string, password: string) => Promise<{ success: boolean; message: string; user?: UserInfo }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -100,9 +100,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
   }, []);
 
-  const login = async (username: string, password: string, barangay: string) => {
+  const login = async (username: string, password: string) => {
     try {
-      const result = await authLogin(username, password, barangay);
+      const result = await authLogin(username, password);
       
       if (result.success && result.user) {
         setUser(result.user);

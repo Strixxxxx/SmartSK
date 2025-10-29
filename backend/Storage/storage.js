@@ -9,6 +9,7 @@ const imageContainerName = process.env.IMAGE_CONTAINER;
 const videoContainerName = process.env.VIDEO_CONTAINER;
 const docContainerName = process.env.DOCS_CONTAINER;
 const backupContainerName = process.env.BACKUP_CONTAINER;
+const eAttachContainerName = process.env.E_ATTACHMENTS; // New container
 
 // Primary credentials
 const primaryConnectionString = process.env.STORAGE_CONNECTION_STRING_1;
@@ -24,8 +25,8 @@ const connectionString = useSecondary ? secondaryConnectionString : primaryConne
 const key = useSecondary ? secondaryKey : primaryKey;
 
 // Validate that at least one set of credentials and essential info are present
-if (!storageName || !imageContainerName || !videoContainerName || !docContainerName || !backupContainerName || !connectionString || !key) {
-    throw new Error('Azure Storage environment variables are not sufficiently configured. Please check STORAGE_NAME, IMAGE_CONTAINER, VIDEO_CONTAINER, DOCS_CONTAINER, BACKUP_CONTAINER and at least one set of connection strings/keys.');
+if (!storageName || !imageContainerName || !videoContainerName || !docContainerName || !backupContainerName || !eAttachContainerName || !connectionString || !key) {
+    throw new Error('Azure Storage environment variables are not sufficiently configured. Please check STORAGE_NAME, IMAGE_CONTAINER, VIDEO_CONTAINER, DOCS_CONTAINER, BACKUP_CONTAINER, E_ATTACHMENTS and at least one set of connection strings/keys.');
 }
 
 console.log(`Initializing Azure Storage with ${useSecondary ? 'secondary' : 'primary'} credentials.`);
@@ -40,18 +41,26 @@ const sharedKeyCredential = new StorageSharedKeyCredential(storageName, key);
  * @param {import('multer').File} file - The file object from multer (with buffer).
  * @returns {Promise<string>} The name of the uploaded blob.
  */
-async function uploadFile(file) {
-    console.log(`Uploading file with mimetype: ${file.mimetype}`);
+async function uploadFile(file, storageClass = 'public') {
+    console.log(`Uploading file with mimetype: ${file.mimetype} to ${storageClass} storage.`);
     
     let containerName;
     const mimetype = file.mimetype;
 
-    if (mimetype.startsWith('image')) {
-        containerName = imageContainerName;
-    } else if (mimetype.startsWith('video')) {
-        containerName = videoContainerName;
+    if (storageClass === 'secure') {
+        containerName = eAttachContainerName;
     } else {
-        containerName = docContainerName; // For documents and other files
+        if (mimetype.startsWith('image')) {
+            containerName = imageContainerName;
+        } else if (mimetype.startsWith('video')) {
+            containerName = videoContainerName;
+        } else {
+            containerName = docContainerName;
+        }
+    }
+
+    if (!containerName) {
+        throw new Error(`Invalid storage class or mimetype. Could not determine container for file: ${file.originalname}`);
     }
 
     console.log(`Selected container: ${containerName}`);
@@ -59,7 +68,7 @@ async function uploadFile(file) {
     const containerClient = blobServiceClient.getContainerClient(containerName);
     await containerClient.createIfNotExists();
 
-    const blobName = `${Date.now()}-${uuidv4()}${path.extname(file.originalname)}`;
+    const blobName = `${storageClass}--${Date.now()}-${uuidv4()}${path.extname(file.originalname)}`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
     await blockBlobClient.uploadData(file.buffer, {
@@ -78,12 +87,22 @@ async function getFileSasUrl(blobName, fileType) {
     let containerName;
     const mimetype = fileType || '';
 
-    if (mimetype.startsWith('image')) {
-        containerName = imageContainerName;
-    } else if (mimetype.startsWith('video')) {
-        containerName = videoContainerName;
+    if (blobName.startsWith('secure--')) {
+        containerName = eAttachContainerName;
     } else {
-        containerName = docContainerName; // Default to doc container for other file types
+        if (mimetype.startsWith('image')) {
+            containerName = imageContainerName;
+        } else if (mimetype.startsWith('video')) {
+            containerName = videoContainerName;
+        } else {
+            containerName = docContainerName;
+        }
+    }
+
+    if (!containerName) {
+        console.error(`Could not determine container for blob: ${blobName}`);
+        // Fallback to docs container if no other logic matches
+        containerName = docContainerName;
     }
     
     const containerClient = blobServiceClient.getContainerClient(containerName);

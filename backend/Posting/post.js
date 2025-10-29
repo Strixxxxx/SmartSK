@@ -17,11 +17,14 @@ const storage = multer.memoryStorage();
 const upload = multer({
     storage: storage,
     fileFilter: (req, file, cb) => {
-        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'video/mp4'];
+        const allowedMimeTypes = [
+            'image/jpeg', 'image/png', 'image/jpg', 'video/mp4', 
+            'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+        ];
         if (allowedMimeTypes.includes(file.mimetype)) {
             cb(null, true);
         } else {
-            cb(new Error('Invalid file type. Only JPEG, PNG, and MP4 are allowed.'), false);
+            cb(new Error('Invalid file type. Only images, videos, and documents are allowed.'), false);
         }
     },
     limits: { fileSize: 100 * 1024 * 1024 } // 100MB limit for initial upload
@@ -36,8 +39,8 @@ const getPHTimestamp = () => {
 };
 
 // POST /api/create-post - Starts an asynchronous job to create a new post
-router.post('/create-post', authMiddleware, checkRole(['SKC', 'SKO']), upload.array('attachments'), async (req, res) => {
-    const { title, description } = req.body;
+router.post('/create-post', authMiddleware, checkRole(['SKC', 'SKO']), upload.fields([{ name: 'attachments' }, { name: 'secure_attachments' }]), async (req, res) => {
+    const { title, description, taggedProjects, viewOptions } = req.body;
     const userID = req.user.userID; // Correctly get userID from req.user
 
     if (!title || !description) {
@@ -52,22 +55,31 @@ router.post('/create-post', authMiddleware, checkRole(['SKC', 'SKO']), upload.ar
             description,
             initiatedBy: req.user.fullName,
             userID: userID, // Pass the userID into the job payload
+            taggedProjects: JSON.parse(taggedProjects || '[]'),
+            viewOptions: JSON.parse(viewOptions || '{}')
         });
 
         // 2. Save files to a temporary location
         tempDir = await fs.mkdtemp(path.join(os.tmpdir(), `post-upload-${jobId}-`));
         const tempFiles = [];
-        if (req.files && req.files.length > 0) {
-            for (const file of req.files) {
-                const tempFilePath = path.join(tempDir, file.originalname);
-                await fs.writeFile(tempFilePath, file.buffer);
-                tempFiles.push({
-                    path: tempFilePath,
-                    originalname: file.originalname,
-                    mimetype: file.mimetype,
-                });
+        
+        const processFiles = async (files, storageClass) => {
+            if (files && files.length > 0) {
+                for (const file of files) {
+                    const tempFilePath = path.join(tempDir, file.originalname);
+                    await fs.writeFile(tempFilePath, file.buffer);
+                    tempFiles.push({
+                        path: tempFilePath,
+                        originalname: file.originalname,
+                        mimetype: file.mimetype,
+                        storageClass: storageClass
+                    });
+                }
             }
-        }
+        };
+
+        await processFiles(req.files.attachments, 'public');
+        await processFiles(req.files.secure_attachments, 'secure');
 
         // 3. Respond to client immediately
         res.status(202).json({ success: true, message: 'Post creation job accepted.', jobId });
@@ -114,7 +126,7 @@ async function processPostUploadJob(jobId, tempFiles, tempDir) {
         await postJob.updateJob(jobId, 'processing', 'Processing post and uploading files.');
 
         const job = await postJob.getJob(jobId);
-        const { title, description, initiatedBy } = JSON.parse(job.Payload);
+        const { title, description, initiatedBy, taggedProjects, viewOptions } = JSON.parse(job.Payload);
         const userID = job.UserID; // Get userID from the job's own column
 
         const pool = await getConnection();
@@ -156,7 +168,7 @@ async function processPostUploadJob(jobId, tempFiles, tempDir) {
                         buffer: fileBuffer,
                         originalname: file.originalname,
                         mimetype: finalMimeType
-                    });
+                    }, file.storageClass);
 
                     const attachmentRequest = new sql.Request(transaction);
                     await attachmentRequest
@@ -168,6 +180,34 @@ async function processPostUploadJob(jobId, tempFiles, tempDir) {
                             VALUES (@postID, @fileType, @filePath);
                         `);
                 }
+            }
+
+            // Insert tagged projects
+            if (taggedProjects && taggedProjects.length > 0) {
+                for (const projectID of taggedProjects) {
+                    const tagRequest = new sql.Request(transaction);
+                    await tagRequest
+                        .input('postID', sql.Int, postID)
+                        .input('projectID', sql.Int, projectID)
+                        .query('INSERT INTO tagProjOnPost (postID, projectID) VALUES (@postID, @projectID)');
+                }
+            }
+
+            // Insert view options
+            if (viewOptions) {
+                const viewRequest = new sql.Request(transaction);
+                await viewRequest
+                    .input('postID', sql.Int, postID)
+                    .input('opforPubProj', sql.Bit, viewOptions.opforPubProj || 0)
+                    .input('opforAllBrgyProj', sql.Bit, viewOptions.opforAllBrgyProj || 0)
+                    .input('opforBrgyProj', sql.Bit, viewOptions.opforBrgyProj || 0)
+                    .input('opforPubEAttach', sql.Bit, viewOptions.opforPubEAttach || 0)
+                    .input('opforAllBrgyEAttach', sql.Bit, viewOptions.opforAllBrgyEAttach || 0)
+                    .input('opforBrgyEAttach', sql.Bit, viewOptions.opforBrgyEAttach || 0)
+                    .query(`
+                        INSERT INTO viewOption (postID, opforPubProj, opforAllBrgyProj, opforBrgyProj, opforPubEAttach, opforAllBrgyEAttach, opforBrgyEAttach)
+                        VALUES (@postID, @opforPubProj, @opforAllBrgyProj, @opforBrgyProj, @opforPubEAttach, @opforAllBrgyEAttach, @opforBrgyEAttach)
+                    `);
             }
 
             await transaction.commit();

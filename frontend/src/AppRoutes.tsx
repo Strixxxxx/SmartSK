@@ -10,7 +10,7 @@ import AdminLayout from './components/Admin/Layout/LayoutAdmin';
 import AdminGuard from './components/RouteGuard/AdminGuard';
 
 // Public Pages
-import Login from './components/Login/Login';
+
 import ForgotPassword from './components/ForgotPassword/ForgotPassword';
 import Unauthorized from './components/Unauthorized/Unauthorized';
 import NewAccount from './components/Login/NewAccount';
@@ -78,7 +78,7 @@ const AppRoutes: React.FC = () => {
       {/* Public Routes */}
       <Route path="/home" element={<Portfolio />} />
       <Route path="/project-list" element={<ProjectList />} />
-      <Route path="/login" element={<Login open={true} onClose={() => {}} barangay={''} />} />
+
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/change-password" element={<NewAccount open={true} onClose={() => {}} userID={0} currentUsername={''} />} />

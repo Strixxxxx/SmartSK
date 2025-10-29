@@ -163,15 +163,14 @@ const getRoleFromPosition = (position: string): string => {
 };
 
 // Updated login function with sessionStorage only
-export const login = async (username: string, password: string, barangay: string): Promise<LoginResponse> => {
+export const login = async (username: string, password: string): Promise<LoginResponse> => {
   try {
     const trimmedUsername = username.trim();
     const trimmedPassword = password.trim();
 
     const response = await axiosInstance.post('/api/login', {
       identifier: trimmedUsername,
-      password: trimmedPassword,
-      barangay: barangay
+      password: trimmedPassword
     });
     
     if (response.data.success) {
