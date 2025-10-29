@@ -8,23 +8,7 @@
 
 --Frontend (VSC Terminal)
 
-PS D:\Projects\Projects\smartSK\frontend> npm run build
 
-> capstone@0.0.0 build
-> tsc -b && vite build
-
-src/components/Client/Dashboard/CreatePostModal.tsx:106:13 - error TS2304: Cannot find name 'setJobStatus'.
-
-106             setJobStatus(job.Status);
-                ~~~~~~~~~~~~
-
-src/components/Client/Dashboard/CreatePostModal.tsx:173:9 - error TS2304: Cannot find name 'setJobStatus'.
-
-173         setJobStatus(null);
-            ~~~~~~~~~~~~
-
-
-Found 2 errors.
 
 --Backend(VSC Terminal)
 
@@ -36,7 +20,93 @@ Found 2 errors.
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-
+2025-10-29T11:58:17.9724841Z [WebSocket] Client connected.
+2025-10-29T11:58:22.3921787Z [WebSocket] Client disconnected.
+2025-10-29T11:58:25.0168153Z [WebSocket] Client connected.
+2025-10-29T11:58:27.3836046Z Restarting OpenBSD Secure Shell server: sshd.
+2025-10-29T11:58:28.0695065Z node not running, starting node /opt/webssh/index.js
+2025-10-29T11:58:57.7341261Z Wed Oct 29 11:58:57 UTC 2025 running .net core
+2025-10-29T11:59:04.3437378Z Startup : 11.59.04.301521
+2025-10-29T11:59:04.3735743Z Configure Services : 11.59.04.373204
+2025-10-29T11:59:05.4501642Z Configure : 11.59.05.449977
+2025-10-29T11:59:06.475345Z Setting Up Routes : 11.59.06.466949
+2025-10-29T11:59:07.056989Z Exiting Configure : 11.59.07.049645
+2025-10-29T11:59:07.4918158Z Hosting environment: Production
+2025-10-29T11:59:07.4922714Z Content root path: /opt/Kudu
+2025-10-29T11:59:07.5013839Z Now listening on: http://0.0.0.0:8181
+2025-10-29T11:59:07.5014064Z Application started. Press Ctrl+C to shut down.
+2025-10-29T11:59:10.0135551Z Initializing active sessions from database...
+2025-10-29T11:59:12.2038558Z Initializing Azure Storage with primary credentials.
+2025-10-29T11:59:14.5885159Z Job management system initialized with database storage.
+2025-10-29T11:59:14.5998185Z Created backup directory at: /database_backup
+2025-10-29T11:59:14.8554962Z Post upload job management system initialized.
+2025-10-29T11:59:14.9183321Z [WebSocket] Server initialized.
+2025-10-29T11:59:14.9183562Z Server is running on port 8080
+2025-10-29T11:59:16.6148223Z Initialized active sessions.
+2025-10-29T12:00:00.6652768Z [WebSocket] Client connected.
+2025-10-29T12:01:26.9823072Z [Job a9d41767-f09d-4711-825e-8df18fa1b396] Created in database for PostUpload: {"title":"test new feature & functionalities","description":"testing the functionality of tag related projects & privacy & view option","initiatedBy":"Test Demonstration","userID":6,"taggedProjects":[5],"viewOptions":{"opforPubProj":false,"opforAllBrgyProj":false,"opforBrgyProj":true,"opforPubEAttach":false,"opforAllBrgyEAttach":false,"opforBrgyEAttach":true}}
+2025-10-29T12:01:27.6757415Z [Job a9d41767-f09d-4711-825e-8df18fa1b396] Updated in database to processing: Processing post and uploading files.
+2025-10-29T12:06:08.484Z No new trace in the past 1 min(s).
+2025-10-29T12:07:08.484Z No new trace in the past 2 min(s).
+2025-10-29T12:08:08.484Z No new trace in the past 3 min(s).
+2025-10-29T12:09:08.484Z No new trace in the past 4 min(s).
+2025-10-29T12:10:08.484Z No new trace in the past 5 min(s).
+2025-10-29T12:11:08.484Z No new trace in the past 6 min(s).
+2025-10-29T12:12:08.484Z No new trace in the past 7 min(s).
+2025-10-29T12:13:08.484Z No new trace in the past 8 min(s).
+2025-10-29T12:14:08.484Z No new trace in the past 9 min(s).
+2025-10-29T12:15:08.484Z No new trace in the past 10 min(s).
+2025-10-29T12:16:08.484Z No new trace in the past 11 min(s).
+2025-10-29T12:17:08.484Z No new trace in the past 12 min(s).
+2025-10-29T12:18:08.484Z No new trace in the past 13 min(s).
+2025-10-29T12:19:11.0718785Z Uploading file with mimetype: video/mp4 to public storage.
+2025-10-29T12:19:11.0719883Z Selected container: videos
+2025-10-29T12:19:13.5138952Z Uploading file with mimetype: application/vnd.openxmlformats-officedocument.wordprocessingml.document to secure storage.
+2025-10-29T12:19:13.5313387Z Selected container: encrypted-attachment
+2025-10-29T12:19:13.6969489Z [Job a9d41767-f09d-4711-825e-8df18fa1b396] Failed to process post upload: RequestError: String or binary data would be truncated in table 'Smart_SK_FINAL.dbo.postAttachments', column 'fileType'. Truncated value: 'application/'.
+2025-10-29T12:19:13.697728Z     at handleError (/app/node_modules/mssql/lib/tedious/request.js:384:15)
+2025-10-29T12:19:13.6977333Z     at Connection.emit (node:events:519:28)
+2025-10-29T12:19:13.6977353Z     at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-29T12:19:13.6977371Z     at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-29T12:19:13.6977416Z     at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-29T12:19:13.6977434Z     at Readable.emit (node:events:519:28)
+2025-10-29T12:19:13.697755Z     at addChunk (node:internal/streams/readable:561:12)
+2025-10-29T12:19:13.6977576Z     at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-29T12:19:13.6977596Z     at Readable.push (node:internal/streams/readable:393:5)
+2025-10-29T12:19:13.6977612Z     at nextAsync (node:internal/streams/from:194:22) {
+2025-10-29T12:19:13.6977627Z   code: 'EREQUEST',
+2025-10-29T12:19:13.6977647Z   originalError: Error: String or binary data would be truncated in table 'Smart_SK_FINAL.dbo.postAttachments', column 'fileType'. Truncated value: 'application/'.
+2025-10-29T12:19:13.6977664Z       at handleError (/app/node_modules/mssql/lib/tedious/request.js:382:19)
+2025-10-29T12:19:13.6977679Z       at Connection.emit (node:events:519:28)
+2025-10-29T12:19:13.6977696Z       at Connection.emit (/app/node_modules/tedious/lib/connection.js:970:18)
+2025-10-29T12:19:13.6977715Z       at RequestTokenHandler.onErrorMessage (/app/node_modules/tedious/lib/token/handler.js:284:21)
+2025-10-29T12:19:13.697776Z       at Readable.<anonymous> (/app/node_modules/tedious/lib/token/token-stream-parser.js:19:33)
+2025-10-29T12:19:13.6977776Z       at Readable.emit (node:events:519:28)
+2025-10-29T12:19:13.6977792Z       at addChunk (node:internal/streams/readable:561:12)
+2025-10-29T12:19:13.6977808Z       at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+2025-10-29T12:19:13.6977825Z       at Readable.push (node:internal/streams/readable:393:5)
+2025-10-29T12:19:13.697784Z       at nextAsync (node:internal/streams/from:194:22) {
+2025-10-29T12:19:13.6977855Z     info: ErrorMessageToken {
+2025-10-29T12:19:13.6977869Z       name: 'ERROR',
+2025-10-29T12:19:13.6977884Z       handlerName: 'onErrorMessage',
+2025-10-29T12:19:13.6977898Z       number: 2628,
+2025-10-29T12:19:13.6977911Z       state: 1,
+2025-10-29T12:19:13.6977943Z       class: 16,
+2025-10-29T12:19:13.6977965Z       message: "String or binary data would be truncated in table 'Smart_SK_FINAL.dbo.postAttachments', column 'fileType'. Truncated value: 'application/'.",
+2025-10-29T12:19:13.6977979Z       serverName: 'smart-sk',
+2025-10-29T12:19:13.6977992Z       procName: '',
+2025-10-29T12:19:13.6978006Z       lineNumber: 2
+2025-10-29T12:19:13.6978022Z     }
+2025-10-29T12:19:13.6978035Z   },
+2025-10-29T12:19:13.6978049Z   number: 2628,
+2025-10-29T12:19:13.6978063Z   lineNumber: 2,
+2025-10-29T12:19:13.6978078Z   state: 1,
+2025-10-29T12:19:13.6978107Z   class: 16,
+2025-10-29T12:19:13.6978122Z   serverName: 'smart-sk',
+2025-10-29T12:19:13.6978135Z   procName: '',
+2025-10-29T12:19:13.6978149Z   precedingErrors: []
+2025-10-29T12:19:13.6978163Z }
+2025-10-29T12:19:13.7380706Z [Job a9d41767-f09d-4711-825e-8df18fa1b396] Updated in database to failed: Failed to create post.
 
 --Deployment Container Logs
 

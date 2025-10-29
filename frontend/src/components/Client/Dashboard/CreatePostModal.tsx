@@ -86,43 +86,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    useEffect(() => {
-        if (jobId) {
-            setStatusMessage('Post creation has started...');
-            pollingInterval.current = window.setInterval(pollJobStatus, 2000);
-        }
-        return () => {
-            if (pollingInterval.current) clearInterval(pollingInterval.current);
-        };
-    }, [jobId]);
 
-    const pollJobStatus = async () => {
-        if (!jobId) return;
-
-        try {
-            const response = await api.get(`/api/post-status/${jobId}`);
-            const { job } = response.data;
-
-            setJobStatus(job.Status);
-            setStatusMessage(job.Message || 'Processing...');
-
-            if (job.Status === 'completed') {
-                if (pollingInterval.current) clearInterval(pollingInterval.current);
-                previews.forEach(preview => URL.revokeObjectURL(preview));
-                toast.success('Post created successfully!');
-                onPostCreated();
-                onClose();
-            } else if (job.Status === 'failed') {
-                if (pollingInterval.current) clearInterval(pollingInterval.current);
-                toast.error(job.ErrorMessage || 'An unknown error occurred during post processing.');
-                setIsSubmitting(false);
-            }
-        } catch (err: any) {
-            if (pollingInterval.current) clearInterval(pollingInterval.current);
-            toast.error(err.response?.data?.message || 'Failed to get post status. Please check your connection.');
-            setIsSubmitting(false);
-        }
-    };
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files;
@@ -190,7 +154,11 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
                     setStatusMessage(percentCompleted === 100 ? 'Upload complete. Waiting for server to process...' : `Uploading... ${percentCompleted}%`);
                 }
             });
-            setJobId(response.data.jobId);
+            // Fire-and-forget: Close modal and show initial toast
+            onClose();
+            toast.info('Post creation started! We will notify you upon completion. Please do not log out.', { autoClose: 10000 });
+            onPostCreated(); // Refresh the feed to show a pending post if desired
+
         } catch (err: any) {
             toast.error(err.response?.data?.message || 'An error occurred while creating the post.');
             setIsSubmitting(false);
@@ -314,6 +282,16 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
                                     <label htmlFor="secure_attachments">Encrypted Attachments</label>
                                     <p className="input-description">For sensitive documents (receipts, PDFs, etc.). Visibility will be based on your selected options.</p>
                                     <input type="file" id="secure_attachments" multiple accept="image/jpeg,image/png,image/jpg,application/pdf,.doc,.docx" {...register('secure_attachments')} onChange={handleSecureFileChange} />
+                                    {secureFiles.length > 0 && (
+                                        <div className="secure-files-preview">
+                                            <p>Selected secure files:</p>
+                                            <ul>
+                                                {secureFiles.map((file, index) => (
+                                                    <li key={index}>{file.name}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="form-actions">

@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { toast } from 'react-toastify';
+import { useAuth } from './AuthContext';
 
 interface MaintenanceMessage {
   type: 'maintenance_starting' | 'maintenance_ended';
@@ -46,6 +48,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         if (reconnectInterval) {
           clearInterval(reconnectInterval);
         }
+        // Authenticate the WebSocket connection
+        const token = localStorage.getItem('token');
+        if (token) {
+            ws.send(JSON.stringify({ type: 'auth', token }));
+        }
       };
 
       ws.onmessage = (event) => {
@@ -54,6 +61,12 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
           if (import.meta.env.DEV) console.log('[WebSocket] Message received:', message);
           if (message.type === 'maintenance_starting' || message.type === 'maintenance_ended') {
             setMaintenanceMessage(message);
+          } else if (message.type === 'job-update') {
+            if (message.status === 'completed') {
+                toast.success(message.message);
+            } else if (message.status === 'failed') {
+                toast.error(message.message);
+            }
           }
         } catch (error) {
           if (import.meta.env.DEV) console.error('[WebSocket] Error parsing message:', error);

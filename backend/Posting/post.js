@@ -7,6 +7,7 @@ const { checkRole } = require('../routeGuard/permission');
 const { uploadFile } = require('../Storage/storage');
 const { compressVideo } = require('../FFmpeg/ffmpeg');
 const { addAuditTrail } = require('../audit/auditService');
+const { sendToUser } = require('../websockets/websocket');
 const postJob = require('./postJob');
 const fs = require('fs').promises;
 const path = require('path');
@@ -223,6 +224,7 @@ async function processPostUploadJob(jobId, tempFiles, tempDir) {
             });
 
             await postJob.updateJob(jobId, 'completed', 'Post created successfully.', { Result: { postID } });
+            sendToUser(userID, { type: 'job-update', status: 'completed', message: 'Post created successfully!' });
 
         } catch (innerError) {
             await transaction.rollback();
@@ -232,6 +234,7 @@ async function processPostUploadJob(jobId, tempFiles, tempDir) {
     } catch (error) {
         console.error(`[Job ${jobId}] Failed to process post upload:`, error);
         await postJob.updateJob(jobId, 'failed', 'Failed to create post.', { ErrorMessage: error.message });
+        sendToUser(job.UserID, { type: 'job-update', status: 'failed', message: error.message });
     } finally {
         // Cleanup temporary files
         try {
