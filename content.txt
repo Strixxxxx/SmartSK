@@ -1,0 +1,54 @@
+Root Cause: Missing NodeJS Type Definitions
+The error TS2503: Cannot find namespace 'NodeJS' means the TypeScript compiler (tsc) cannot find the global type definitions for Node.js when compiling your frontend code, even though CreatePostModal.tsx is a React component.
+
+By reviewing your CreatePostModal.tsx file, I see the following lines that introduce the need for NodeJS types:
+
+pollingInterval = window.setInterval(pollJobStatus, 2000);
+
+const pollingInterval = useRef<number | null>(null);
+
+if (pollingInterval.current) { clearInterval(pollingInterval.current); }
+
+In a modern Node/browser environment, the setInterval function returns a NodeJS.Timeout type or simply a number depending on the compilation target. The fact that the compiler is looking for the NodeJS namespace suggests one of your configuration files (like tsconfig.json) is configured to include the Node environment types, but the remote environment is not finding them during the build.
+
+The core issue is that your local environment likely has the Node types implicitly or globally available, while the clean Railway build environment does not.
+
+🛠️ Step-by-Step Solution
+This is a configuration issue related to how TypeScript handles global types for a frontend project.
+
+1. Install the Node Type Definitions (Most Likely Fix)
+You need to explicitly install the type declarations for Node.js in your project's development dependencies.
+
+Action: In your frontend directory, run:
+
+Bash
+
+npm install --save-dev @types/node
+Reasoning: This ensures that the type information for standard Node/JS global objects (like setTimeout, setInterval, etc., which sometimes resolve to NodeJS.Timeout types) is available to the compiler during the build on Railway.
+
+2. Review tsconfig.json
+Since this is a frontend React/Vite project, the compiler should primarily rely on DOM types.
+
+Action: Check your tsconfig.json file. Ensure the compilerOptions.types array, if present, includes node (if you are using Node globals) and dom (which you should for a frontend project).
+
+JSON
+
+// Example tsconfig.json snippet
+{
+  "compilerOptions": {
+    // ... other options
+    "lib": ["DOM", "ESNext"],
+    "moduleResolution": "node", // or "bundler"
+    "types": ["node", "react", "vite/client"] // Explicitly include 'node' if needed
+  }
+}
+Alternative: If you are only using browser timers, you might be able to remove any reference to the NodeJS namespace in your code or ensure that your tsconfig.json explicitly excludes it if the error persists after installing @types/node. For simple setInterval usage, the browser's number type should be sufficient, but the compiler is picking up the Node definition from somewhere. Installing @types/node is the safest fix.
+
+3. Commit and Re-deploy
+Action: Commit the changes to your package.json (and package-lock.json) after installing @types/node.
+
+Action: Push the changes to your Git repository to trigger a new build on Railway.
+
+Installing @types/node should resolve the TS2503: Cannot find namespace 'NodeJS' error and allow your build to complete successfully, just as it does locally.
+
+Would you like me to help you check your current tsconfig.json file for the relevant configuration options?
