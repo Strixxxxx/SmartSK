@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
@@ -12,12 +12,7 @@ import {
   DialogTitle,
   Button,
 } from '@mui/material';
-import '../Projects/AdminProjects.css'; // Reusing the same CSS
 import StatusLegend from '../../Projects/StatusLegend';
-
-interface OutletContextType {
-  sidebarCollapsed: boolean;
-}
 
 interface Project {
   projectID: number;
@@ -40,7 +35,6 @@ interface Status {
 }
 
 const ProjArchive: React.FC = () => {
-  const { sidebarCollapsed } = useOutletContext<OutletContextType>();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -212,112 +206,84 @@ const ProjArchive: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className={`projects-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-        <div className="projects-content">
-          <div className="loading">Loading archived projects...</div>
-        </div>
-      </div>
-    );
+    return <p className="loading-message">Loading archived projects...</p>;
   }
 
   if (error) {
-    return (
-      <div className={`projects-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-        <div className="projects-content">
-          <p style={{ textAlign: 'center', padding: '40px', color: '#ef4444', fontSize: '1rem' }}>
-            {error}
-          </p>
-        </div>
-      </div>
-    );
+    return <p className="error-message">{error}</p>;
   }
 
   return (
-    <div className={`projects-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-      <div className="projects-content">
-        <div className="page-header">
-          <div className="header-content">
-            <h1 className="page-title">Archived Projects</h1>
-            <p className="page-subtitle">List of all archived projects</p>
-          </div>
-        </div>
-        <div className="table-card">
-          <div className="projects-table-container">
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <button ref={infoIconRef} onClick={() => setShowStatusLegend(!showStatusLegend)} style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#646cff', padding: '0 10px'}}>
-                  <FaInfoCircle />
-                </button>
-              </div>
-            {(!projects || projects.length === 0) ? (
-              <p style={{ textAlign: 'center', padding: '40px', color: '#64748b', fontSize: '1rem', fontStyle: 'italic' }}>
-                No archived projects found.
-              </p>
-            ) : (
-              <table className="projects-table">
-                <thead>
-                  <tr>
-                    <th>Reference Number</th>
-                    <th>Proposer</th>
-                    <th>Title</th>
-                    <th>Status</th>
-                    <th>Submitted</th>
-                    <th>Reviewed By</th>
-                    <th>Remarks</th>
-                    <th>Check Files</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {projects.map((proj) => (
-                    <tr key={proj.projectID}>
-                      <td>{proj.reference_number}</td>
-                      <td>{proj.submittedBy}</td>
-                      <td>{proj.title}</td>
-                      <td>
-                        <span className={`status-badge ${getStatusClassName(proj.statusName)}`}>
-                          {proj.statusName}
-                        </span>
-                      </td>
-                      <td>{new Date(proj.submittedDate).toLocaleDateString()}</td>
-                      <td>{proj.reviewedBy || 'N/A'}</td>
-                      <td>{proj.remarks || 'N/A'}</td>
-                      <td>
-                        <div className="action-btn-group">
-                          {fileLoading === proj.projectID ? (
-                            <FaSpinner className="animate-spin" />
-                          ) : (
-                            proj.file_name && (
-                              proj.file_name.toLowerCase().endsWith('.pdf') ? (
-                                <button onClick={() => handleViewPdf(proj)} style={iconButtonStyle} title="View PDF">
-                                  <FaEye />
-                                </button>
-                              ) : (
-                                <button onClick={() => handleDownloadFile(proj)} style={iconButtonStyle} title="Download Document">
-                                  <FaDownload />
-                                </button>
-                              )
-                            )
-                          )}
-                        </div>
-                      </td>
-                      <td>
-                        <button
-                          onClick={() => handleRestore(proj)}
-                          className="archive-btn"
-                          style={{ backgroundColor: '#28a745' }}
-                        >
-                          Restore
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        </div>
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h3>Archived Projects</h3>
+        <button ref={infoIconRef} onClick={() => setShowStatusLegend(!showStatusLegend)} style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#646cff'}}>
+            <FaInfoCircle />
+        </button>
       </div>
+      {(!projects || projects.length === 0) ? (
+        <p>No archived projects found.</p>
+      ) : (
+        <table className="archive-table">
+          <thead>
+            <tr>
+              <th>Reference Number</th>
+              <th>Proposer</th>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Submitted</th>
+              <th>Reviewed By</th>
+              <th>Remarks</th>
+              <th>Check Files</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {projects.map((proj) => (
+              <tr key={proj.projectID}>
+                <td>{proj.reference_number}</td>
+                <td>{proj.submittedBy}</td>
+                <td>{proj.title}</td>
+                <td>
+                  <span className={`status-badge ${getStatusClassName(proj.statusName)}`}>
+                    {proj.statusName}
+                  </span>
+                </td>
+                <td>{new Date(proj.submittedDate).toLocaleDateString()}</td>
+                <td>{proj.reviewedBy || 'N/A'}</td>
+                <td>{proj.remarks || 'N/A'}</td>
+                <td>
+                  <div className="action-btn-group">
+                    {fileLoading === proj.projectID ? (
+                      <FaSpinner className="animate-spin" />
+                    ) : (
+                      proj.file_name && (
+                        proj.file_name.toLowerCase().endsWith('.pdf') ? (
+                          <button onClick={() => handleViewPdf(proj)} style={iconButtonStyle} title="View PDF">
+                            <FaEye />
+                          </button>
+                        ) : (
+                          <button onClick={() => handleDownloadFile(proj)} style={iconButtonStyle} title="Download Document">
+                            <FaDownload />
+                          </button>
+                        )
+                      )
+                    )}
+                  </div>
+                </td>
+                <td>
+                  <button
+                    onClick={() => handleRestore(proj)}
+                    className="restore-btn"
+                  >
+                    Restore
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       {showFileViewer && (
         <div className="modal-overlay">

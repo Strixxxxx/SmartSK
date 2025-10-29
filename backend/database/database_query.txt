@@ -95,6 +95,7 @@ CREATE TABLE projects (
     file_name VARCHAR(255),
     remarks NVARCHAR(MAX),
     reviewedBy NVARCHAR(50),
+    isArchived BIT NOT NULL DEFAULT 0;
     CONSTRAINT FK_ProjectStatus FOREIGN KEY (status) REFERENCES StatusLookup(StatusID)
 );
 
@@ -174,6 +175,26 @@ postID INT NOT NULL,
 fileType NVARCHAR(12) NOT NULL,
 filePath NVARCHAR(255) NOT NULL,
 CONSTRAINT FK_Attachments_Posts FOREIGN KEY (postID)  REFERENCES posts(postID) ON DELETE CASCADE
+);
+
+CREATE TABLE tagProjOnPost(
+projPostID INT PRIMARY KEY IDENTITY (1,1),
+postID INT NOT NULL,
+projectID INT NOT NULL,
+CONSTRAINT FK_TagPost FOREIGN KEY (postID) REFERENCES posts (postID) ON DELETE CASCADE,
+CONSTRAINT FK_TagProject FOREIGN KEY (projectID) REFERENCES projects (projectID)
+);
+
+CREATE TABLE viewOption(
+postVOID INT PRIMARY KEY IDENTITY (1,1),
+postID INT NOT NULL,
+opforPubProj BIT NOT NULL,
+opforAllBrgyProj BIT NOT NULL,
+opforBrgyProj BIT NOT NULL,
+opforPubEAttach BIT NOT NULL,
+opforAllBrgyEAttach BIT NOT NULL,
+opforBrgyEAttach BIT NOT NULL,
+CONSTRAINT FK_postVOPost FOREIGN KEY (postID) REFERENCES posts (postID) ON DELETE CASCADE,
 );
 
 -- BackupJobs table
