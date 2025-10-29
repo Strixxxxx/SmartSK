@@ -5,7 +5,12 @@ import api from '../../../backend connection/axiosConfig';
 import './CreatePostModal.css';
 import VideoPreviewModal from './VideoPreviewModal';
 import ViewOptionModal from './ViewOption';
+import PdfPreviewModal from './PdfPreviewModal';
 import { toast } from 'react-toastify';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import FileDownloadIcon from '@mui/icons-material/FileDownload';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 
 interface IFormInput {
     title: string;
@@ -48,6 +53,9 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
     const [statusMessage, setStatusMessage] = useState<string>('');
     const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
     const [selectedVideoUrl, setSelectedVideoUrl] = useState('');
+    const [isPdfModalOpen, setIsPdfModalOpen] = useState(false);
+    const [selectedPdfUrl, setSelectedPdfUrl] = useState('');
+    const [selectedPdfName, setSelectedPdfName] = useState('');
     const [userProjects, setUserProjects] = useState<Project[]>([]);
     const [taggedProjects, setTaggedProjects] = useState<number[]>([]);
     const [viewOptions, setViewOptions] = useState<ViewOptions>({
@@ -116,6 +124,10 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
         }
     };
 
+    const handleRemoveSecureFile = (indexToRemove: number) => {
+        setSecureFiles(prev => prev.filter((_, index) => index !== indexToRemove));
+    };
+
     const handleDragEnd = () => {
         if (dragItem.current !== null && dragOverItem.current !== null) {
             const reorder = <T,>(list: T[]) => {
@@ -129,6 +141,24 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
         }
         dragItem.current = null;
         dragOverItem.current = null;
+    };
+
+    const handleViewPdf = (file: File) => {
+        const fileUrl = URL.createObjectURL(file);
+        setSelectedPdfUrl(fileUrl);
+        setSelectedPdfName(file.name);
+        setIsPdfModalOpen(true);
+    };
+
+    const handleDownloadFile = (file: File) => {
+        const fileUrl = URL.createObjectURL(file);
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.setAttribute('download', file.name);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(fileUrl);
     };
 
     const onSubmit = async (data: IFormInput) => {
@@ -232,13 +262,13 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
                                 <div className="form-group">
                                     <label htmlFor="title">Title</label>
                                     <input type="text" id="title" placeholder="Enter your post title..." {...register('title', { required: 'Title is required' })} />
-                                    {errors.title && <p className="error-message">{errors.title.message}</p>}
+                                    
                                 </div>
                                 
                                 <div className="form-group">
                                     <label htmlFor="description">Description</label>
                                     <textarea id="description" placeholder="Share your thoughts..." {...register('description', { required: 'Description is required' })} />
-                                    {errors.description && <p className="error-message">{errors.description.message}</p>}
+                                    
                                 </div>
 
                                 <div className="form-group" ref={tagDropdownRef}>
@@ -283,20 +313,58 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
                                     <p className="input-description">For sensitive documents (receipts, PDFs, etc.). Visibility will be based on your selected options.</p>
                                     <input type="file" id="secure_attachments" multiple accept="image/jpeg,image/png,image/jpg,application/pdf,.doc,.docx" {...register('secure_attachments')} onChange={handleSecureFileChange} />
                                     {secureFiles.length > 0 && (
-                                        <div className="secure-files-preview">
-                                            <p>Selected secure files:</p>
-                                            <ul>
-                                                {secureFiles.map((file, index) => (
-                                                    <li key={index}>{file.name}</li>
-                                                ))}
-                                            </ul>
+                                        <div className="secure-files-grid">
+                                            {secureFiles.map((file, index) => {
+                                                const isPdf = file.type === 'application/pdf';
+                                                const isDoc = file.type.startsWith('application/msword') || file.type.startsWith('application/vnd.openxmlformats-officedocument.wordprocessingml');
+                                                const isImage = file.type.startsWith('image/');
+                                                const fileUrl = URL.createObjectURL(file);
+
+                                                return (
+                                                    <div key={index} className="file-card">
+                                                        <div className="document-actions-cell">
+                                                            {isPdf ? (
+                                                                <Tooltip title="View File">
+                                                                    <IconButton onClick={() => handleViewPdf(file)}>
+                                                                        <VisibilityIcon />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            ) : isDoc ? (
+                                                                <Tooltip title="Download File">
+                                                                    <IconButton onClick={() => handleDownloadFile(file)}>
+                                                                        <FileDownloadIcon />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            ) : isImage ? (
+                                                                <img src={fileUrl} alt={file.name} className="file-image-preview" />
+                                                            ) : (
+                                                                <Tooltip title="Download File">
+                                                                    <IconButton onClick={() => handleDownloadFile(file)}>
+                                                                        <FileDownloadIcon />
+                                                                    </IconButton>
+                                                                </Tooltip>
+                                                            )}
+                                                        </div>
+                                                        <div className="file-name" title={file.name}>{file.name}</div>
+                                                        <button type="button" className="remove-attachment-btn" onClick={() => handleRemoveSecureFile(index)}>&times;</button>
+                                                    </div>
+                                                );
+                                            })}
                                         </div>
                                     )}
                                 </div>
 
                                 <div className="form-actions">
                                     <button type="button" onClick={handleClose}>Cancel</button>
-                                    <button type="button" onClick={async () => { if (await trigger()) setStep(2); }}>Next</button>
+                                    <button type="button" onClick={async () => {
+                                        const isValid = await trigger();
+                                        if (isValid) {
+                                            setStep(2);
+                                        } else {
+                                            if (errors.title) toast.error(errors.title.message);
+                                            if (errors.description) toast.error(errors.description.message);
+                                        }
+                                    }}>Next</button>
                                 </div>
                             </form>
                         </>
@@ -343,6 +411,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
             </div>
             {isVideoModalOpen && <VideoPreviewModal videoUrl={selectedVideoUrl} onClose={() => { setIsVideoModalOpen(false); setSelectedVideoUrl(''); }} />}
             <ViewOptionModal isOpen={isViewOptionsModalOpen} onClose={() => setIsViewOptionsModalOpen(false)} options={viewOptions} onSave={setViewOptions} />
+            {isPdfModalOpen && <PdfPreviewModal fileUrl={selectedPdfUrl} fileName={selectedPdfName} onClose={() => setIsPdfModalOpen(false)} />}
         </>
     );
 };

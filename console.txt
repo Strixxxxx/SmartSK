@@ -13,28 +13,14 @@ PS D:\Projects\Projects\smartSK\frontend> npm run build
 > capstone@0.0.0 build
 > tsc -b && vite build
 
-src/components/Client/Dashboard/CreatePostModal.tsx:46:12 - error TS6133: 'jobId' is declared but its value is never read.
+src/components/Client/Dashboard/CreatePostModal.tsx:379:74 - error TS2322: Type '{ fileUrl: string; fileName: string; onClose: () => void; }' is not assignable to type 'IntrinsicAttributes & PdfPreviewModalProps'.
+  Property 'fileName' does not exist on type 'IntrinsicAttributes & PdfPreviewModalProps'.
 
-46     const [jobId, setJobId] = useState<string | null>(null);
-              ~~~~~
-
-src/components/Client/Dashboard/CreatePostModal.tsx:46:19 - error TS6133: 'setJobId' is declared but its value is never read.
-
-46     const [jobId, setJobId] = useState<string | null>(null);
-                     ~~~~~~~~
-
-src/components/Client/Dashboard/CreatePostModal.tsx:149:19 - error TS6133: 'response' is declared but its value is never read.
-
-149             const response = await api.post('/api/create-post', formData, {
-                      ~~~~~~~~
-
-src/context/WebSocketContext.tsx:3:1 - error TS6133: 'useAuth' is declared but its value is never read.   
-
-3 import { useAuth } from './AuthContext';
-  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+379             {isPdfModalOpen && <PdfPreviewModal fileUrl={selectedPdfUrl} fileName={selectedPdfName} onClose={() => setIsPdfModalOpen(false)} />}
+                                                                             ~~~~~~~~
 
 
-Found 4 errors.
+Found 1 error.
 
 --Backend(VSC Terminal)
 
