@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
                 p.postID, p.title, p.description,
                 u.fullName AS author,
                 b.barangayName,
-                pa.attachmentID, pa.fileType, pa.filePath,
+                pa.attachmentID, pa.fileType, pa.filePath, pa.isPublic,
                 proj.projectID as taggedProjectID, proj.title as taggedProjectTitle,
                 vo.opforPubProj, vo.opforPubEAttach
             FROM posts p
@@ -61,20 +61,33 @@ router.get('/', async (req, res) => {
                     description: row.description,
                     author: decrypt(row.author),
                     barangayName: row.barangayName,
-                    attachments: [],
-                    taggedProjects: []
+                    publicAttachments: [],
+                    secureAttachments: [],
+                    taggedProjects: [],
+                    viewOptions: {
+                        opforPubEAttach: row.opforPubEAttach
+                    }
                 };
             }
 
-            // Handle public attachments (non-encrypted)
-            if (row.attachmentID && row.filePath) {
-                const attachmentExists = postsMap[row.postID].attachments.some(a => a.attachmentID === row.attachmentID);
-                if (!attachmentExists) {
-                    postsMap[row.postID].attachments.push({
-                        attachmentID: row.attachmentID,
-                        fileType: row.fileType,
-                        filePath: row.filePath
-                    });
+            if (row.attachmentID) {
+                const attachment = {
+                    attachmentID: row.attachmentID,
+                    fileType: row.fileType,
+                    filePath: row.filePath,
+                    isPublic: row.isPublic
+                };
+
+                if (row.isPublic) {
+                    const attachmentExists = postsMap[row.postID].publicAttachments.some(a => a.attachmentID === row.attachmentID);
+                    if (!attachmentExists) {
+                        postsMap[row.postID].publicAttachments.push(attachment);
+                    }
+                } else if (row.opforPubEAttach) { // Only add secure if opforPubEAttach is true
+                    const attachmentExists = postsMap[row.postID].secureAttachments.some(a => a.attachmentID === row.attachmentID);
+                    if (!attachmentExists) {
+                        postsMap[row.postID].secureAttachments.push(attachment);
+                    }
                 }
             }
 
@@ -84,7 +97,7 @@ router.get('/', async (req, res) => {
                 if (!projectExists) {
                     postsMap[row.postID].taggedProjects.push({
                         projectID: row.taggedProjectID,
-                        title: row.taggedProjectTitle
+                        title: decrypt(row.taggedProjectTitle)
                     });
                 }
             }
@@ -93,8 +106,12 @@ router.get('/', async (req, res) => {
         const posts = Object.values(postsMap);
 
         for (const post of posts) {
-            post.attachments = await Promise.all(post.attachments.map(async (attachment) => {
-                const sasUrl = await getFileSasUrl(attachment.filePath, attachment.fileType);
+            post.publicAttachments = await Promise.all(post.publicAttachments.map(async (attachment) => {
+                const sasUrl = await getFileSasUrl(attachment.filePath, attachment.fileType, attachment.isPublic);
+                return { ...attachment, filePath: sasUrl };
+            }));
+            post.secureAttachments = await Promise.all(post.secureAttachments.map(async (attachment) => {
+                const sasUrl = await getFileSasUrl(attachment.filePath, attachment.fileType, attachment.isPublic);
                 return { ...attachment, filePath: sasUrl };
             }));
         }
@@ -121,7 +138,7 @@ router.get('/feed', authMiddleware, async (req, res) => {
                 u.fullName AS author,
                 b.barangayID as authorBarangayID,
                 b.barangayName,
-                pa.attachmentID, pa.fileType, pa.filePath,
+                pa.attachmentID, pa.fileType, pa.filePath, pa.isPublic,
                 proj.projectID as taggedProjectID, proj.title as taggedProjectTitle,
                 vo.*
             FROM posts p
@@ -145,42 +162,54 @@ router.get('/feed', authMiddleware, async (req, res) => {
                     description: row.description,
                     author: decrypt(row.author),
                     barangayName: row.barangayName,
-                    attachments: [],
+                    publicAttachments: [],
+                    secureAttachments: [],
                     taggedProjects: [],
-                    // Store author's barangay ID for permission checks
-                    authorBarangayID: row.authorBarangayID 
+                    authorBarangayID: row.authorBarangayID,
+                    viewOptions: row // Store all view options
                 };
             }
 
-            // Attachment visibility logic
-            // If view options are null (for old posts), default to public (true).
-            const canViewPublicAttach = row.opforPubEAttach ?? true;
-            const canViewAllBrgyAttach = row.opforAllBrgyEAttach ?? true;
-            const canViewOwnBrgyAttach = (row.opforBrgyEAttach ?? true) && (userBarangayId === row.authorBarangayID);
+            if (row.attachmentID) {
+                const attachment = {
+                    attachmentID: row.attachmentID,
+                    fileType: row.fileType,
+                    filePath: row.filePath,
+                    isPublic: row.isPublic
+                };
 
-            if (row.attachmentID && (canViewPublicAttach || canViewAllBrgyAttach || canViewOwnBrgyAttach)) {
-                const attachmentExists = postsMap[row.postID].attachments.some(a => a.attachmentID === row.attachmentID);
-                if (!attachmentExists) {
-                    postsMap[row.postID].attachments.push({
-                        attachmentID: row.attachmentID,
-                        fileType: row.fileType,
-                        filePath: row.filePath
-                    });
+                if (attachment.isPublic) {
+                    const exists = postsMap[row.postID].publicAttachments.some(a => a.attachmentID === attachment.attachmentID);
+                    if (!exists) postsMap[row.postID].publicAttachments.push(attachment);
+                } else {
+                    // Secure attachment visibility logic
+                    let canView = false;
+                    if (row.opforBrgyEAttach === true && userBarangayId === row.authorBarangayID) canView = true;
+                    else if (row.opforAllBrgyEAttach === true) canView = true;
+                    else if (row.opforPubEAttach === true) canView = true; // Publicly visible secure docs
+
+                    if (canView) {
+                        const exists = postsMap[row.postID].secureAttachments.some(a => a.attachmentID === attachment.attachmentID);
+                        if (!exists) postsMap[row.postID].secureAttachments.push(attachment);
+                    }
                 }
             }
 
-            // Tagged project visibility logic
-            // If view options are null (for old posts), default to public (true).
-            const canViewPublicProj = row.opforPubProj ?? true;
-            const canViewAllBrgyProj = row.opforAllBrgyProj ?? true;
-            const canViewOwnBrgyProj = (row.opforBrgyProj ?? true) && (userBarangayId === row.authorBarangayID);
+            // Tagged project processing
+            if (row.taggedProjectID && !postsMap[row.postID].taggedProjects.some(p => p.projectID === row.taggedProjectID)) {
+                let canView = false;
+                if (row.opforBrgyProj === true) {
+                    canView = (userBarangayId === row.authorBarangayID);
+                } else if (row.opforAllBrgyProj === true) {
+                    canView = true;
+                } else if (row.opforPubProj === true || (row.opforBrgyProj === null && row.opforAllBrgyProj === null && row.opforPubProj === null)) {
+                    canView = true; // Default to public
+                }
 
-            if (row.taggedProjectID && (canViewPublicProj || canViewAllBrgyProj || canViewOwnBrgyProj)) {
-                const projectExists = postsMap[row.postID].taggedProjects.some(p => p.projectID === row.taggedProjectID);
-                if (!projectExists) {
+                if (canView) {
                     postsMap[row.postID].taggedProjects.push({
                         projectID: row.taggedProjectID,
-                        title: row.taggedProjectTitle
+                        title: decrypt(row.taggedProjectTitle),
                     });
                 }
             }
@@ -189,8 +218,13 @@ router.get('/feed', authMiddleware, async (req, res) => {
         const posts = Object.values(postsMap);
 
         for (const post of posts) {
-            post.attachments = await Promise.all(post.attachments.map(async (attachment) => {
-                const sasUrl = await getFileSasUrl(attachment.filePath, attachment.fileType);
+            // Generate SAS URLs for all viewable attachments
+            post.publicAttachments = await Promise.all(post.publicAttachments.map(async (attachment) => {
+                const sasUrl = await getFileSasUrl(attachment.filePath, attachment.fileType, attachment.isPublic);
+                return { ...attachment, filePath: sasUrl };
+            }));
+            post.secureAttachments = await Promise.all(post.secureAttachments.map(async (attachment) => {
+                const sasUrl = await getFileSasUrl(attachment.filePath, attachment.fileType, attachment.isPublic);
                 return { ...attachment, filePath: sasUrl };
             }));
         }

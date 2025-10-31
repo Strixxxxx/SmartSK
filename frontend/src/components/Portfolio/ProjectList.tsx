@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../backend connection/axiosConfig';
-import PostCard, { Post } from './PostCard';
+import PostCard from './PostCard';
+import { Post } from '../../types/PostTypes';
 import Login from '../Login/Login';
-import PostModal from './PostModal'; // Import the modal component
+import ContentViewer from './ContentViewer'; // Import the modal component
 import './ProjectList.css';
 
 const ProjectList: React.FC = () => {
@@ -83,6 +84,13 @@ const ProjectList: React.FC = () => {
         setSelectedPost(null);
     };
 
+    const handlePostChange = (postId: number) => {
+        const post = posts.find(p => p.postID === postId);
+        if (post) {
+            setSelectedPost(post);
+        }
+    };
+
     return (
         <>
             <div className="portfolio">
@@ -132,7 +140,7 @@ const ProjectList: React.FC = () => {
                 open={isLoginModalOpen}
                 onClose={() => setIsLoginModalOpen(false)}
             />
-            <PostModal post={selectedPost} show={isModalOpen} onClose={closeModal} />
+            <ContentViewer post={selectedPost} show={isModalOpen} onClose={closeModal} onPostChange={handlePostChange} />
         </>
     );
 };

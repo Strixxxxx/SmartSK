@@ -1,20 +1,6 @@
 import React from 'react';
 import './PostCard.css';
-
-export interface Attachment {
-    attachmentID: number;
-    fileType: string;
-    filePath: string;
-}
-
-export interface Post {
-    postID: number;
-    title: string;
-    description: string;
-    author: string;
-    attachments: Attachment[];
-    taggedProjects?: { projectID: number; title: string }[];
-}
+import { Post, Attachment } from '../../types/PostTypes';
 
 interface PostCardProps {
     post: Post;
@@ -47,9 +33,8 @@ const PostDescription: React.FC<{ description: string; onShowMore: () => void }>
 };
 
 const PostCard: React.FC<PostCardProps> = ({ post, onPostClick }) => {
-    const { attachments, title, author, description, taggedProjects } = post;
-    const mediaAttachments = attachments.filter(att => att.fileType.startsWith('image') || att.fileType.startsWith('video'));
-    const documentAttachments = attachments.filter(att => !att.fileType.startsWith('image') && !att.fileType.startsWith('video'));
+    const { publicAttachments, title, author, description } = post;
+    const mediaAttachments = publicAttachments.filter(att => att.fileType.startsWith('image') || att.fileType.startsWith('video'));
 
     const visibleAttachments = mediaAttachments.slice(0, 4);
     const remainingCount = mediaAttachments.length - 4;
@@ -88,30 +73,6 @@ const PostCard: React.FC<PostCardProps> = ({ post, onPostClick }) => {
                             {renderMedia(attachment, index === 3 && remainingCount > 0)}
                         </React.Fragment>
                     ))}
-                </div>
-            )}
-
-            {taggedProjects && taggedProjects.length > 0 && (
-                <div className="tagged-projects-section">
-                    <h4>Related Projects:</h4>
-                    <ul>
-                        {taggedProjects.map(p => <li key={p.projectID}>{p.title}</li>)}
-                    </ul>
-                </div>
-            )}
-
-            {documentAttachments.length > 0 && (
-                <div className="secure-documents-section">
-                    <h4>Secure Documents:</h4>
-                    <ul>
-                        {documentAttachments.map(doc => (
-                            <li key={doc.attachmentID}>
-                                <a href={doc.filePath} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
-                                    {doc.filePath.split('/').pop()}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
                 </div>
             )}
         </div>

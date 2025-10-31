@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../../backend connection/axiosConfig';
-import PostCard, { Post } from '../../Portfolio/PostCard';
-import PostModal from '../../Portfolio/PostModal';
+import PostCard from '../../Portfolio/PostCard';
+import { Post } from '../../../types/PostTypes';
+import ContentViewer from '../../Portfolio/ContentViewer';
 import './DashboardFeed.css';
 
 interface DashboardFeedProps {
@@ -41,6 +42,13 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed }) => {
         setSelectedPost(null);
     };
 
+    const handlePostChange = (postId: number) => {
+        const post = posts.find(p => p.postID === postId);
+        if (post) {
+            setSelectedPost(post);
+        }
+    };
+
     return (
         <div className="dashboard-feed">
             {loading && <div>Loading...</div>}
@@ -50,7 +58,7 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed }) => {
                     <PostCard key={post.postID} post={post} onPostClick={openModal} />
                 ))}
             </div>
-            <PostModal post={selectedPost} show={isModalOpen} onClose={closeModal} />
+            <ContentViewer post={selectedPost} show={isModalOpen} onClose={closeModal} onPostChange={handlePostChange} />
         </div>
     );
 };

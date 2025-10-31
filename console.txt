@@ -4,23 +4,40 @@
 
 --Frontend (Browser's Console)
 
+PostCard.tsx:37 Uncaught TypeError: Cannot read properties of undefined (reading 'filter')
+    at PostCard (PostCard.tsx:37:48)
+PostCard	@	PostCard.tsx:37
+<PostCard>		
+(anonymous)	@	DashboardFeed.tsx:58
+DashboardFeed	@	DashboardFeed.tsx:57
+<DashboardFeed>		
+Dashboard	@	Dashboard.tsx:40
+<Dashboard>		
+AppRoutes	@	AppRoutes.tsx:102
+<AppRoutes>		
+App	@	App.tsx:24
+<App>		
+(anonymous)	@	main.tsx:8
 
+DashboardFeed.tsx:58 An error occurred in the <PostCard> component.
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
+<PostCard>		
+(anonymous)	@	DashboardFeed.tsx:58
+DashboardFeed	@	DashboardFeed.tsx:57
+<DashboardFeed>		
+Dashboard	@	Dashboard.tsx:40
+<Dashboard>		
+AppRoutes	@	AppRoutes.tsx:102
+<AppRoutes>		
+App	@	App.tsx:24
+<App>		
+(anonymous)	@	main.tsx:8
 
 --Frontend (VSC Terminal)
 
-PS D:\Projects\Projects\smartSK\frontend> npm run build
 
-> capstone@0.0.0 build
-> tsc -b && vite build
-
-src/components/Client/Dashboard/CreatePostModal.tsx:379:74 - error TS2322: Type '{ fileUrl: string; fileName: string; onClose: () => void; }' is not assignable to type 'IntrinsicAttributes & PdfPreviewModalProps'.
-  Property 'fileName' does not exist on type 'IntrinsicAttributes & PdfPreviewModalProps'.
-
-379             {isPdfModalOpen && <PdfPreviewModal fileUrl={selectedPdfUrl} fileName={selectedPdfName} onClose={() => setIsPdfModalOpen(false)} />}
-                                                                             ~~~~~~~~
-
-
-Found 1 error.
 
 --Backend(VSC Terminal)
 

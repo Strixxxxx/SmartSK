@@ -125,6 +125,13 @@ app.get('/api/maintenance-status', (req, res) => {
   });
 });
 
+// Public Tagged Project Posts Router
+const pubTaggedProjRouter = require('./Posting/pubTaggedProj');
+if (pubTaggedProjRouter && typeof pubTaggedProjRouter === 'function') {
+  app.use('/api/public-tagged-projects', pubTaggedProjRouter);
+} else {
+  console.error('pubTaggedProjRouter is not a valid middleware function');
+}
 // --- POST /api/maintenance-end : End maintenance mode ---
 app.post('/api/maintenance-end', (req, res) => {
     const maintenanceFlagPath = path.join(__dirname, 'maintenance.flag');

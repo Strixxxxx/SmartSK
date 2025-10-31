@@ -41,15 +41,13 @@ const sharedKeyCredential = new StorageSharedKeyCredential(storageName, key);
  * @param {import('multer').File} file - The file object from multer (with buffer).
  * @returns {Promise<string>} The name of the uploaded blob.
  */
-async function uploadFile(file, storageClass = 'public') {
-    console.log(`Uploading file with mimetype: ${file.mimetype} to ${storageClass} storage.`);
+async function uploadFile(file, isPublic) {
+    console.log(`Uploading file with mimetype: ${file.mimetype}, isPublic: ${isPublic}`);
     
     let containerName;
     const mimetype = file.mimetype;
 
-    if (storageClass === 'secure') {
-        containerName = eAttachContainerName;
-    } else {
+    if (isPublic) {
         if (mimetype.startsWith('image')) {
             containerName = imageContainerName;
         } else if (mimetype.startsWith('video')) {
@@ -57,10 +55,13 @@ async function uploadFile(file, storageClass = 'public') {
         } else {
             containerName = docContainerName;
         }
+    } else {
+        // All secure files go to the encrypted attachments container
+        containerName = eAttachContainerName;
     }
 
     if (!containerName) {
-        throw new Error(`Invalid storage class or mimetype. Could not determine container for file: ${file.originalname}`);
+        throw new Error(`Could not determine container for file: ${file.originalname}`);
     }
 
     console.log(`Selected container: ${containerName}`);
@@ -68,7 +69,8 @@ async function uploadFile(file, storageClass = 'public') {
     const containerClient = blobServiceClient.getContainerClient(containerName);
     await containerClient.createIfNotExists();
 
-    const blobName = `${storageClass}--${Date.now()}-${uuidv4()}${path.extname(file.originalname)}`;
+    // Blob name no longer has a prefix
+    const blobName = `${Date.now()}-${uuidv4()}${path.extname(file.originalname)}`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
 
     await blockBlobClient.uploadData(file.buffer, {
@@ -83,13 +85,12 @@ async function uploadFile(file, storageClass = 'public') {
  * @param {string} fileType - The MIME type of the file.
  * @returns {Promise<string>} A temporary SAS URL for the blob.
  */
-async function getFileSasUrl(blobName, fileType) {
+async function getFileSasUrl(blobName, fileType, isPublic) {
     let containerName;
     const mimetype = fileType || '';
+    console.log(`Generating SAS URL for blob: ${blobName}, isPublic: ${isPublic}`);
 
-    if (blobName.startsWith('secure--')) {
-        containerName = eAttachContainerName;
-    } else {
+    if (isPublic) {
         if (mimetype.startsWith('image')) {
             containerName = imageContainerName;
         } else if (mimetype.startsWith('video')) {
@@ -97,14 +98,16 @@ async function getFileSasUrl(blobName, fileType) {
         } else {
             containerName = docContainerName;
         }
+    } else {
+        // All secure files are in the encrypted attachments container
+        containerName = eAttachContainerName;
     }
 
     if (!containerName) {
-        console.error(`Could not determine container for blob: ${blobName}`);
-        // Fallback to docs container if no other logic matches
-        containerName = docContainerName;
+        throw new Error(`Could not determine container for blob: ${blobName}`);
     }
     
+    console.log(`Determined container: ${containerName}`);
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const blobClient = containerClient.getBlobClient(blobName);
 

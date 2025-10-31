@@ -169,16 +169,17 @@ async function processPostUploadJob(jobId, tempFiles, tempDir) {
                         buffer: fileBuffer,
                         originalname: file.originalname,
                         mimetype: finalMimeType
-                    }, file.storageClass);
+                    }, file.storageClass === 'public');
 
                     const attachmentRequest = new sql.Request(transaction);
                     await attachmentRequest
                         .input('postID', sql.Int, postID)
                         .input('fileType', sql.NVarChar, finalMimeType)
                         .input('filePath', sql.NVarChar, azureBlobName)
+                        .input('isPublic', sql.Bit, file.storageClass === 'public' ? 1 : 0)
                         .query(`
-                            INSERT INTO postAttachments (postID, fileType, filePath)
-                            VALUES (@postID, @fileType, @filePath);
+                            INSERT INTO postAttachments (postID, fileType, filePath, isPublic)
+                            VALUES (@postID, @fileType, @filePath, @isPublic);
                         `);
                 }
             }
