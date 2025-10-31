@@ -140,7 +140,7 @@ const ProjectList: React.FC = () => {
                 open={isLoginModalOpen}
                 onClose={() => setIsLoginModalOpen(false)}
             />
-            <ContentViewer post={selectedPost} show={isModalOpen} onClose={closeModal} onPostChange={handlePostChange} />
+            <ContentViewer post={selectedPost} show={isModalOpen} onClose={closeModal} onPostChange={handlePostChange} isAuthenticated={false} />
         </>
     );
 };

@@ -4,318 +4,23 @@
 
 --Frontend (Browser's Console)
 
-GET http://localhost:8080/api/public-tagged-projects/6/post/35 404 (Not Found)
-dispatchXhrRequest @ axios.js?v=ad885491:1648
-xhr @ axios.js?v=ad885491:1528
-dispatchRequest @ axios.js?v=ad885491:2003
-Promise.then
-_request @ axios.js?v=ad885491:2206
-request @ axios.js?v=ad885491:2115
-Axios.<computed> @ axios.js?v=ad885491:2243
-wrap @ axios.js?v=ad885491:8
-handleSelectProject @ ContentViewer.tsx:178
-handleNext @ ContentViewer.tsx:29
-executeDispatch @ react-dom_client.js?v=ad885491:11736
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-processDispatchQueue @ react-dom_client.js?v=ad885491:11772
-(anonymous) @ react-dom_client.js?v=ad885491:12182
-batchedUpdates$1 @ react-dom_client.js?v=ad885491:2628
-dispatchEventForPluginEventSystem @ react-dom_client.js?v=ad885491:11877
-dispatchEvent @ react-dom_client.js?v=ad885491:14792
-dispatchDiscreteEvent @ react-dom_client.js?v=ad885491:14773
-<button>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-ProjectListModal @ ContentViewer.tsx:54
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ad885491:11558
-(anonymous) @ react-dom_client.js?v=ad885491:11649
-<ProjectListModal>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-ContentViewer @ ContentViewer.tsx:319
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ad885491:11558
-(anonymous) @ react-dom_client.js?v=ad885491:11649
-<ContentViewer>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-ProjectList @ ProjectList.tsx:143
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
-flushPassiveEffects @ react-dom_client.js?v=ad885491:11311
-(anonymous) @ react-dom_client.js?v=ad885491:11060
-performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
-<ProjectList>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-AppRoutes @ AppRoutes.tsx:80
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
-flushPassiveEffects @ react-dom_client.js?v=ad885491:11311
-(anonymous) @ react-dom_client.js?v=ad885491:11060
-performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
-<AppRoutes>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-App @ App.tsx:24
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ad885491:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
-<App>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-(anonymous) @ main.tsx:8Understand this error
-axiosConfig.ts:98 Client error: 404 {success: false, message: 'Project not found.'}message: "Project not found."success: false[[Prototype]]: Object
-(anonymous) @ axiosConfig.ts:98
-Promise.then
-_request @ axios.js?v=ad885491:2206
-request @ axios.js?v=ad885491:2115
-Axios.<computed> @ axios.js?v=ad885491:2243
-wrap @ axios.js?v=ad885491:8
-handleSelectProject @ ContentViewer.tsx:178
-handleNext @ ContentViewer.tsx:29
-executeDispatch @ react-dom_client.js?v=ad885491:11736
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-processDispatchQueue @ react-dom_client.js?v=ad885491:11772
-(anonymous) @ react-dom_client.js?v=ad885491:12182
-batchedUpdates$1 @ react-dom_client.js?v=ad885491:2628
-dispatchEventForPluginEventSystem @ react-dom_client.js?v=ad885491:11877
-dispatchEvent @ react-dom_client.js?v=ad885491:14792
-dispatchDiscreteEvent @ react-dom_client.js?v=ad885491:14773
-<button>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-ProjectListModal @ ContentViewer.tsx:54
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ad885491:11558
-(anonymous) @ react-dom_client.js?v=ad885491:11649
-<ProjectListModal>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-ContentViewer @ ContentViewer.tsx:319
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ad885491:11558
-(anonymous) @ react-dom_client.js?v=ad885491:11649
-<ContentViewer>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-ProjectList @ ProjectList.tsx:143
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
-flushPassiveEffects @ react-dom_client.js?v=ad885491:11311
-(anonymous) @ react-dom_client.js?v=ad885491:11060
-performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
-<ProjectList>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-AppRoutes @ AppRoutes.tsx:80
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
-flushPassiveEffects @ react-dom_client.js?v=ad885491:11311
-(anonymous) @ react-dom_client.js?v=ad885491:11060
-performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
-<AppRoutes>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-App @ App.tsx:24
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ad885491:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
-<App>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-(anonymous) @ main.tsx:8Understand this error
-ContentViewer.tsx:187 Failed to fetch project details AxiosError {message: 'Request failed with status code 404', name: 'AxiosError', code: 'ERR_BAD_REQUEST', config: {…}, request: XMLHttpRequest, …}code: "ERR_BAD_REQUEST"config: {transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}message: "Request failed with status code 404"name: "AxiosError"request: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}response: {data: {…}, status: 404, statusText: 'Not Found', headers: AxiosHeaders, config: {…}, …}status: 404stack: "AxiosError: Request failed with status code 404\n    at settle (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ad885491:1229:12)\n    at XMLHttpRequest.onloadend (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ad885491:1561:7)\n    at Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ad885491:2119:41)\n    at async handleSelectProject (http://localhost:5173/src/components/Portfolio/ContentViewer.tsx:236:24)"[[Prototype]]: Error
-handleSelectProject @ ContentViewer.tsx:187
-await in handleSelectProject
-handleNext @ ContentViewer.tsx:29
-executeDispatch @ react-dom_client.js?v=ad885491:11736
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-processDispatchQueue @ react-dom_client.js?v=ad885491:11772
-(anonymous) @ react-dom_client.js?v=ad885491:12182
-batchedUpdates$1 @ react-dom_client.js?v=ad885491:2628
-dispatchEventForPluginEventSystem @ react-dom_client.js?v=ad885491:11877
-dispatchEvent @ react-dom_client.js?v=ad885491:14792
-dispatchDiscreteEvent @ react-dom_client.js?v=ad885491:14773
-<button>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-ProjectListModal @ ContentViewer.tsx:54
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ad885491:11558
-(anonymous) @ react-dom_client.js?v=ad885491:11649
-<ProjectListModal>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-ContentViewer @ ContentViewer.tsx:319
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
-processRootScheduleInMicrotask @ react-dom_client.js?v=ad885491:11558
-(anonymous) @ react-dom_client.js?v=ad885491:11649
-<ContentViewer>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-ProjectList @ ProjectList.tsx:143
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
-flushPassiveEffects @ react-dom_client.js?v=ad885491:11311
-(anonymous) @ react-dom_client.js?v=ad885491:11060
-performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
-<ProjectList>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-AppRoutes @ AppRoutes.tsx:80
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
-flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
-flushPassiveEffects @ react-dom_client.js?v=ad885491:11311
-(anonymous) @ react-dom_client.js?v=ad885491:11060
-performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
-<AppRoutes>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-App @ App.tsx:24
-react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
-renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
-renderWithHooks @ react-dom_client.js?v=ad885491:4217
-updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
-beginWork @ react-dom_client.js?v=ad885491:7654
-runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
-performUnitOfWork @ react-dom_client.js?v=ad885491:10868
-workLoopSync @ react-dom_client.js?v=ad885491:10728
-renderRootSync @ react-dom_client.js?v=ad885491:10711
-performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
-performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ad885491:11623
-performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
-<App>
-exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
-(anonymous) @ main.tsx:8Understand this error
+DashboardFeed.tsx:50 Invalid postId: 
+(2) [38, 38]
+handlePostChange	@	DashboardFeed.tsx:50
+handleSelectRelatedPost	@	ContentViewer.tsx:215
+handleNext	@	ContentViewer.tsx:69
+<button>		
+RelatedPostsModal	@	ContentViewer.tsx:94
+<RelatedPostsModal>		
+ContentViewer	@	ContentViewer.tsx:348
+<ContentViewer>		
+DashboardFeed	@	DashboardFeed.tsx:92
+<DashboardFeed>		
+Dashboard	@	Dashboard.tsx:40
+<Dashboard>		
+AppRoutes	@	AppRoutes.tsx:102
+
+﻿
 
 --Frontend (VSC Terminal)
 
@@ -323,7 +28,270 @@ exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
 
 --Backend(VSC Terminal)
 
-
+PS D:\Projects\Projects\smartSK\backend> node main.js
+Initializing active sessions from database...
+Initializing Azure Storage with primary credentials.
+Job management system initialized with database storage.
+Post upload job management system initialized.
+[WebSocket] Server initialized.
+Server is running on port 8080
+[WebSocket] Client connected.
+[WebSocket] Client connected.
+Initialized active sessions.
+[WebSocket] Unauthenticated client disconnected.
+[WebSocket] Unauthenticated client disconnected.
+[WebSocket] Client connected.
+Generating SAS URL for blob: 1760432960992-f75e8472-ecb1-4129-a1ef-bb7a84071963.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1760432978591-89d77b77-8cf8-4471-8765-2deaa8eb668f.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432978646-58830cc3-bb76-420f-aab2-32e7a987f742.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432978690-089c82e7-c990-4a33-b0ae-6363d50af659.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432978746-6e497868-2404-4fc2-82cb-63eb0fcbaeba.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432978808-3eba2121-8573-4a66-86e9-dbe101875dc3.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432978887-d610436d-0289-43dd-88ea-342dda2e65d1.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432978982-0c82fe9b-d01b-427d-973f-81c4b8130787.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432979068-193e64ca-a580-44d6-8265-783a886ee786.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761254729179-8fc157e9-0639-4bc5-9983-dbf507abb32f.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761256065160-2d3d332a-f5c5-4340-accc-9c8eeaf2e1de.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256204360-bbd75eac-8073-4975-b565-b6e84b47ccd9.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256204742-4310ef72-492c-4910-8837-53f52ed674b8.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256322485-8d5009bd-2a73-4110-8dd8-471e98a4f149.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256516827-955138e5-947e-4fb0-b6bd-a7899a09530a.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256516877-f024a369-212a-4d12-aa12-0008d3da8709.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256678710-9cb5aa01-4c96-4365-a18c-325ed5bff450.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256820486-64f3650a-3aef-4cdd-aae6-7a687a5bebbd.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761256860524-7ebe51ad-c722-4826-813d-3fd22ef6ca32.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256860582-8dbdd56b-2cd1-46dc-b510-7ccb7b7b7daf.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256860606-ffbdc7ee-830d-4e84-844c-92453590cd62.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256860638-3c0704bf-4b6e-4da6-b25c-4aafa28b524c.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256965122-c646712c-bf8c-4555-a905-39c38b35cc37.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761257073483-b9143854-3f53-489e-bad8-b047a6a92794.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073539-49835ce8-54eb-43e8-b682-ba7ddc360442.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073579-3330d19e-093d-4eef-b29d-c1e04531af6f.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073614-d70159ab-5dd4-451a-82cd-5703e44c5417.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073649-097ee0c3-109b-4161-9a38-fda39929ddd5.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073683-914c89f9-48a7-4d9f-8855-888f987b46d7.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073730-1bf45794-006b-4afe-a1eb-f37c6dd397e2.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073775-44b26b74-4eb3-4757-a4a4-b30f5ebc1b83.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073837-3f11ac9e-4994-49f8-a090-442e93fe4ee9.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073948-3b737b7f-0030-44ab-8b02-81ed824314fb.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257146569-6bb64354-8879-4d17-b668-3f2ec32f2307.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761257262201-11d25455-f242-4c78-8646-3c84f78f153d.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257262362-b7319d6f-1606-4501-bb76-c5e9c6bf4303.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257262465-549c8007-0712-487c-a413-b6850953659d.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257262646-c5543610-fafc-49f8-b0d0-8e0bba7085eb.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257262863-0093d23d-96e8-47cc-9058-c849a3a847cc.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257262957-19fa746a-7c21-441c-bae2-3c124bf528a9.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257263030-67d252f7-de49-43c0-8164-918f0943aa35.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257263102-701114b1-dcc4-4dfa-afaa-736cd02ad3ee.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257263210-b3b9ac03-6868-475e-8e68-bef926072dc1.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257263301-be795085-0fc6-43f8-a53f-d1b8a065baa9.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257263578-ceee2b3b-ede9-4a24-8cdc-df94d933cdf4.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257299572-46815fc2-6dfc-409d-afb3-bf8ff8a1c1ac.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257301797-c5383d23-09a6-453b-ac79-7232c74c1524.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761257401278-5021cb51-7995-46ac-8e4a-7c6af6b69427.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257410658-6c18054c-ba9f-4b24-b21c-96a7654f9f36.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761257524852-bf147077-720b-48ed-8942-241ba9ebf66a.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761257576417-1586b682-86f8-4ab4-86c9-69fae7f37522.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761257580314-f206b30b-c739-46a4-ad92-6faabb337966.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761277777935-028799bf-85ee-4878-bcc6-4a0a1c25b31c.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761746741825-6f6237b4-43b4-4dac-be33-5c0a25601503.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761746745620-5f87d928-fb1e-424d-86a1-4b533e752fc4.docx, isPublic: false, source: post
+Determined container: encrypted-attachment
+Generating SAS URL for blob: 1761746745739-6c172e5f-9f72-48e0-a48a-c34921048756.pdf, isPublic: false, source: post
+Determined container: encrypted-attachment
+Generating SAS URL for blob: 1761747455703-c4f05d90-9a48-4ed7-99f9-9d09fcbcc733.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761747456195-9297b300-06b5-4cb1-a3a2-d67f8ec055cc.jpg, isPublic: false, source: post
+Determined container: encrypted-attachment
+Generating SAS URL for blob: 1761747456245-3ba61356-be32-4057-835f-ab5d08822512.jpg, isPublic: false, source: post
+Determined container: encrypted-attachment
+Generating SAS URL for blob: 1761887648643-1fcb1e56-90b9-4cec-9494-6dd406120aa4.png, isPublic: false, source: post
+Determined container: encrypted-attachment
+Generating SAS URL for blob: 1761913630306-44e53ec8-38f9-46f4-a06e-7535993229cc.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761913630514-20815c59-fa47-4c6b-a6e8-40be9d672658.png, isPublic: false, source: post
+Determined container: encrypted-attachment
+Generating SAS URL for blob: 1760432960992-f75e8472-ecb1-4129-a1ef-bb7a84071963.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1760432978591-89d77b77-8cf8-4471-8765-2deaa8eb668f.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432978646-58830cc3-bb76-420f-aab2-32e7a987f742.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432978690-089c82e7-c990-4a33-b0ae-6363d50af659.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432978746-6e497868-2404-4fc2-82cb-63eb0fcbaeba.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432978808-3eba2121-8573-4a66-86e9-dbe101875dc3.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432978887-d610436d-0289-43dd-88ea-342dda2e65d1.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432978982-0c82fe9b-d01b-427d-973f-81c4b8130787.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1760432979068-193e64ca-a580-44d6-8265-783a886ee786.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761254729179-8fc157e9-0639-4bc5-9983-dbf507abb32f.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761256065160-2d3d332a-f5c5-4340-accc-9c8eeaf2e1de.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256204360-bbd75eac-8073-4975-b565-b6e84b47ccd9.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256204742-4310ef72-492c-4910-8837-53f52ed674b8.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256322485-8d5009bd-2a73-4110-8dd8-471e98a4f149.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256516827-955138e5-947e-4fb0-b6bd-a7899a09530a.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256516877-f024a369-212a-4d12-aa12-0008d3da8709.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256678710-9cb5aa01-4c96-4365-a18c-325ed5bff450.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256820486-64f3650a-3aef-4cdd-aae6-7a687a5bebbd.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761256860524-7ebe51ad-c722-4826-813d-3fd22ef6ca32.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256860582-8dbdd56b-2cd1-46dc-b510-7ccb7b7b7daf.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256860606-ffbdc7ee-830d-4e84-844c-92453590cd62.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256860638-3c0704bf-4b6e-4da6-b25c-4aafa28b524c.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761256965122-c646712c-bf8c-4555-a905-39c38b35cc37.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761257073483-b9143854-3f53-489e-bad8-b047a6a92794.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073539-49835ce8-54eb-43e8-b682-ba7ddc360442.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073579-3330d19e-093d-4eef-b29d-c1e04531af6f.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073614-d70159ab-5dd4-451a-82cd-5703e44c5417.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073649-097ee0c3-109b-4161-9a38-fda39929ddd5.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073683-914c89f9-48a7-4d9f-8855-888f987b46d7.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073730-1bf45794-006b-4afe-a1eb-f37c6dd397e2.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073775-44b26b74-4eb3-4757-a4a4-b30f5ebc1b83.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073837-3f11ac9e-4994-49f8-a090-442e93fe4ee9.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257073948-3b737b7f-0030-44ab-8b02-81ed824314fb.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257146569-6bb64354-8879-4d17-b668-3f2ec32f2307.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761257262201-11d25455-f242-4c78-8646-3c84f78f153d.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257262362-b7319d6f-1606-4501-bb76-c5e9c6bf4303.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257262465-549c8007-0712-487c-a413-b6850953659d.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257262646-c5543610-fafc-49f8-b0d0-8e0bba7085eb.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257262863-0093d23d-96e8-47cc-9058-c849a3a847cc.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257262957-19fa746a-7c21-441c-bae2-3c124bf528a9.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257263030-67d252f7-de49-43c0-8164-918f0943aa35.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257263102-701114b1-dcc4-4dfa-afaa-736cd02ad3ee.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257263210-b3b9ac03-6868-475e-8e68-bef926072dc1.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257263301-be795085-0fc6-43f8-a53f-d1b8a065baa9.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257263578-ceee2b3b-ede9-4a24-8cdc-df94d933cdf4.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257299572-46815fc2-6dfc-409d-afb3-bf8ff8a1c1ac.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257301797-c5383d23-09a6-453b-ac79-7232c74c1524.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761257401278-5021cb51-7995-46ac-8e4a-7c6af6b69427.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761257410658-6c18054c-ba9f-4b24-b21c-96a7654f9f36.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761257524852-bf147077-720b-48ed-8942-241ba9ebf66a.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761257576417-1586b682-86f8-4ab4-86c9-69fae7f37522.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761257580314-f206b30b-c739-46a4-ad92-6faabb337966.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761277777935-028799bf-85ee-4878-bcc6-4a0a1c25b31c.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761746741825-6f6237b4-43b4-4dac-be33-5c0a25601503.mp4, isPublic: true, source: post
+Determined container: videos
+Generating SAS URL for blob: 1761746745620-5f87d928-fb1e-424d-86a1-4b533e752fc4.docx, isPublic: false, source: post
+Determined container: encrypted-attachment
+Generating SAS URL for blob: 1761746745739-6c172e5f-9f72-48e0-a48a-c34921048756.pdf, isPublic: false, source: post
+Determined container: encrypted-attachment
+Generating SAS URL for blob: 1761747455703-c4f05d90-9a48-4ed7-99f9-9d09fcbcc733.jpg, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761747456195-9297b300-06b5-4cb1-a3a2-d67f8ec055cc.jpg, isPublic: false, source: post
+Determined container: encrypted-attachment
+Generating SAS URL for blob: 1761747456245-3ba61356-be32-4057-835f-ab5d08822512.jpg, isPublic: false, source: post
+Determined container: encrypted-attachment
+Generating SAS URL for blob: 1761887648643-1fcb1e56-90b9-4cec-9494-6dd406120aa4.png, isPublic: false, source: post
+Determined container: encrypted-attachment
+Generating SAS URL for blob: 1761913630306-44e53ec8-38f9-46f4-a06e-7535993229cc.png, isPublic: true, source: post
+Determined container: images
+Generating SAS URL for blob: 1761913630514-20815c59-fa47-4c6b-a6e8-40be9d672658.png, isPublic: false, source: post
+Determined container: encrypted-attachment
+[WebSocket] Client connected.
+Generating SAS URL for blob: 1761743640782-a9ae44aa-b20b-4b4e-88fd-be02bb7cde98.pdf, isPublic: true, source: project
+Determined container: documents
 
 --Backend(Azure Portal's Log Stream in Platform)
 

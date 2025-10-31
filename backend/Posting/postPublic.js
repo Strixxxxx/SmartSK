@@ -140,7 +140,7 @@ router.get('/feed', authMiddleware, async (req, res) => {
                 b.barangayName,
                 pa.attachmentID, pa.fileType, pa.filePath, pa.isPublic,
                 proj.projectID as taggedProjectID, proj.title as taggedProjectTitle,
-                vo.*
+                vo.opforBrgyEAttach, vo.opforAllBrgyEAttach, vo.opforPubEAttach, vo.opforBrgyProj, vo.opforAllBrgyProj, vo.opforPubProj
             FROM posts p
             JOIN userInfo u ON p.userID = u.userID
             JOIN barangays b ON u.barangay = b.barangayID

@@ -10,7 +10,6 @@ interface ProjectDetails extends TaggedProject {
     description: string;
     author: string;
     attachments?: Attachment[]; // Projects can also have attachments
-    relatedPosts?: { postID: number; title: string }[];
 }
 
 type ViewMode = 'public_post' | 'secure_attachments' | 'project_details';
@@ -71,24 +70,31 @@ const RelatedPostsModal: React.FC<{
         }
     };
 
+    const handleRadioChange = (postId: number) => {
+        setSelectedPostId(postId);
+    };
+
     return (
         <div className="secondary-modal-overlay" onClick={onClose}>
             <div className="secondary-modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2>Related Posts</h2>
                 <div className="radio-group">
-                    {posts.map(p => (
-                        <div key={p.postID} className="radio-option">
-                            <input
-                                type="radio"
-                                id={`post-${p.postID}`}
-                                name="post-selection"
-                                value={p.postID}
-                                checked={selectedPostId === p.postID}
-                                onChange={() => setSelectedPostId(p.postID)}
-                            />
-                            <label htmlFor={`post-${p.postID}`}>{p.title}</label>
-                        </div>
-                    ))}
+                    {posts.map(p => {
+                        // Ensure postID is a number, not an array
+                        const postId = Array.isArray(p.postID) ? p.postID[0] : p.postID;
+                        return (
+                            <div key={postId} className="radio-option">
+                                <input
+                                    type="radio"
+                                    id={`post-${postId}`}
+                                    name="post-selection"
+                                    checked={selectedPostId === postId}
+                                    onChange={() => handleRadioChange(postId)}
+                                />
+                                <label htmlFor={`post-${postId}`}>{p.title}</label>
+                            </div>
+                        );
+                    })}
                 </div>
                 <div className="form-actions">
                     <button type="button" onClick={onClose}>Cancel</button>
@@ -106,11 +112,13 @@ interface ContentViewerProps {
     show: boolean;
     onClose: () => void;
     onPostChange: (postId: number) => void;
+    isAuthenticated: boolean;
 }
 
-const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPostChange }) => {
+const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPostChange, isAuthenticated }) => {
     const [currentPost, setCurrentPost] = useState<Post | null>(post);
     const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
+    const [relatedPosts, setRelatedPosts] = useState<{ postID: number; title: string }[]>([]);
     const [viewMode, setViewMode] = useState<ViewMode>('public_post');
     const [currentAttachmentIndex, setCurrentAttachmentIndex] = useState(0);
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
@@ -122,6 +130,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
             setCurrentPost(post);
             setViewMode('public_post');
             setProjectDetails(null);
+            setRelatedPosts([]);
             setCurrentAttachmentIndex(0);
         }
     }, [post]);
@@ -172,10 +181,11 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
 
     const handleSelectProject = async (projectId: number) => {
         try {
-            // Note: currentPost is available in the component's scope
-            if (!currentPost) return;
+            const endpoint = isAuthenticated
+                ? `/api/tagged-projects/${projectId}`
+                : `/api/public-tagged-projects/${projectId}`;
 
-            const response = await api.get(`/api/public-tagged-projects/${projectId}/post/${currentPost.postID}`);
+            const response = await api.get(endpoint);
 
             if (response.data.success) {
                 setProjectDetails(response.data.project);
@@ -184,13 +194,39 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
                 setCurrentAttachmentIndex(0);
             }
         } catch (error) {
-            console.error("Failed to fetch project details", error);
+            // console.error("Failed to fetch project details", error);
         }
     };
 
+    const handleFetchRelatedPosts = async () => {
+        if (!projectDetails) return;
+    
+        const endpoint = isAuthenticated 
+            ? `/api/tagged-projects/${projectDetails.projectID}/related-posts?currentPostId=${currentPost?.postID}`
+            : `/api/public-tagged-projects/${projectDetails.projectID}/related-posts`;
+    
+        try {
+            const response = await api.get(endpoint);
+            if (response.data.success) {
+                // Sanitize the data to ensure postID is always a number
+                const sanitizedPosts = response.data.relatedPosts.map((p: any) => ({
+                    postID: Array.isArray(p.postID) ? p.postID[0] : Number(p.postID),
+                    title: p.title
+                }));
+
+                setRelatedPosts(sanitizedPosts);
+                setShowRelatedPosts(true);
+            }
+        } catch (error) {
+            // console.error("Failed to fetch related posts", error);
+        }
+    };
+    
     const handleSelectRelatedPost = (postId: number) => {
-        onPostChange(postId);
-        setShowRelatedPosts(false);
+        if (typeof postId === 'number' && !isNaN(postId) && postId > 0) {
+            onPostChange(postId);
+            setShowRelatedPosts(false);
+        }
     };
 
     const toggleDescription = () => {
@@ -242,9 +278,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
             )}
             {viewMode === 'project_details' && (
                  <>
-                    {projectDetails?.relatedPosts && projectDetails.relatedPosts.length > 0 && (
-                        <button onClick={() => setShowRelatedPosts(true)}>Related Posts</button>
-                    )}
+                    <button onClick={handleFetchRelatedPosts}>Related Posts</button>
                      <button onClick={() => setViewMode('public_post')}>Back to Post</button>
                  </>
             )}
@@ -322,9 +356,9 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
                     onClose={() => setShowProjectList(false)}
                 />
             )}
-            {showRelatedPosts && projectDetails?.relatedPosts && (
+            {showRelatedPosts && (
                 <RelatedPostsModal
-                    posts={projectDetails.relatedPosts}
+                    posts={relatedPosts}
                     onSelect={handleSelectRelatedPost}
                     onClose={() => setShowRelatedPosts(false)}
                 />

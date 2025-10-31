@@ -28,36 +28,21 @@ const getMimeType = (fileName) => {
     }
 };
 
-router.get('/:projectId/post/:postId', async (req, res) => {
-    const { projectId, postId } = req.params;
+router.get('/:projectId', async (req, res) => {
+    const { projectId } = req.params;
 
     try {
         const pool = await getConnection();
-
-        // 1. Check for public view permission on the post
-        const permissionResult = await pool.request()
-            .input('postID', sql.Int, postId)
-            .query('SELECT opforPubProj FROM viewOption WHERE postID = @postID');
-
-        if (permissionResult.recordset.length === 0 || !permissionResult.recordset[0].opforPubProj) {
-            return res.status(403).json({ success: false, message: 'This project is not public.' });
-        }
-
-        // 2. If permission is granted, fetch project details
         const result = await pool.request()
             .input('projectID', sql.Int, projectId)
             .query(`
                 SELECT 
                     p.projectID, p.reference_number, p.title, p.description, p.file_path, p.file_name,
                     s.StatusName as status,
-                    u.fullName as authorName,
-                    t.postID as relatedPostID,
-                    po.title as relatedPostTitle
+                    u.fullName as authorName
                 FROM projects p
                 LEFT JOIN StatusLookup s ON p.status = s.StatusID
                 LEFT JOIN userInfo u ON p.userID = u.userID
-                LEFT JOIN tagProjOnPost t ON p.projectID = t.projectID
-                LEFT JOIN posts po ON t.postID = po.postID
                 WHERE p.projectID = @projectID
             `);
 
@@ -72,8 +57,7 @@ router.get('/:projectId/post/:postId', async (req, res) => {
             description: decrypt(result.recordset[0].description),
             author: decrypt(result.recordset[0].authorName),
             status: result.recordset[0].status,
-            attachments: [],
-            relatedPosts: []
+            attachments: []
         };
 
         if (result.recordset[0].file_path) {
@@ -88,24 +72,38 @@ router.get('/:projectId/post/:postId', async (req, res) => {
             });
         }
 
-        const relatedPostsMap = new Map();
-        result.recordset.forEach(row => {
-            if (row.relatedPostID && !relatedPostsMap.has(row.relatedPostID)) {
-                relatedPostsMap.set(row.relatedPostID, {
-                    postID: row.relatedPostID,
-                    title: decrypt(row.relatedPostTitle)
-                });
-            }
-        });
-        // Filter out the current post from the related posts list
-        projectData.relatedPosts = Array.from(relatedPostsMap.values())
-            .filter(p => p.postID !== parseInt(postId, 10));
-        
         res.json({ success: true, project: projectData });
 
     } catch (err) {
         console.error('Error fetching public project details:', err);
         res.status(500).json({ success: false, message: 'Failed to fetch project details.' });
+    }
+});
+
+router.get('/:projectId/related-posts', async (req, res) => {
+    const { projectId } = req.params;
+
+    try {
+        const pool = await getConnection();
+        const result = await pool.request()
+            .input('projectID', sql.Int, projectId)
+            .query(`
+                SELECT po.postID, po.title
+                FROM tagProjOnPost t
+                JOIN posts po ON t.postID = po.postID
+                LEFT JOIN viewOption vo ON po.postID = vo.postID
+                WHERE t.projectID = @projectID AND (vo.opforPubProj = 1 OR vo.postVOID IS NULL)
+            `);
+
+        const decryptedPosts = result.recordset.map(p => ({
+            postID: p.postID,
+            title: p.title
+        }));
+
+        res.json({ success: true, relatedPosts: decryptedPosts });
+    } catch (err) {
+        console.error('Error fetching public related posts:', err);
+        res.status(500).json({ success: false, message: 'Failed to fetch public related posts.' });
     }
 });
 

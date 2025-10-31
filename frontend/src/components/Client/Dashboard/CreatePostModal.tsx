@@ -73,7 +73,7 @@ const CreatePostModal: React.FC<CreatePostModalProps> = ({ onClose, onPostCreate
     useEffect(() => {
         const fetchUserProjects = async () => {
             try {
-                const response = await api.get('/api/projects/for-tagging');
+                const response = await api.get('/api/tagged-projects/for-tagging');
                 if (response.data.success) {
                     setUserProjects(response.data.projects);
                 }

@@ -42,10 +42,41 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed }) => {
         setSelectedPost(null);
     };
 
-    const handlePostChange = (postId: number) => {
-        const post = posts.find(p => p.postID === postId);
-        if (post) {
-            setSelectedPost(post);
+    const handlePostChange = async (postId: number) => {
+        // Ensure postId is a valid number
+        const numericPostId = typeof postId === 'string' ? parseInt(postId, 10) : postId;
+        
+        if (isNaN(numericPostId)) {
+            console.error('Invalid postId:', postId);
+            setError('Invalid post ID');
+            return;
+        }
+
+        // First check if the post already exists in the current posts array
+        const existingPost = posts.find(p => p.postID === numericPostId);
+        if (existingPost) {
+            setSelectedPost(existingPost);
+            return;
+        }
+
+        // If not found, fetch it from the API
+        try {
+            setLoading(true);
+            setError(null);
+            const response = await axios.get(`/api/tagged-projects/post/${numericPostId}`);
+            if (response.data.success) {
+                const newPost = response.data.post;
+                // Add the new post to the beginning of the posts array
+                setPosts(prevPosts => [newPost, ...prevPosts]);
+                setSelectedPost(newPost);
+            } else {
+                setError('Post not found');
+            }
+        } catch (err) {
+            console.error('Error fetching post:', err);
+            setError('An error occurred while fetching the post.');
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -58,7 +89,13 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed }) => {
                     <PostCard key={post.postID} post={post} onPostClick={openModal} />
                 ))}
             </div>
-            <ContentViewer post={selectedPost} show={isModalOpen} onClose={closeModal} onPostChange={handlePostChange} />
+            <ContentViewer 
+                post={selectedPost} 
+                show={isModalOpen} 
+                onClose={closeModal} 
+                onPostChange={handlePostChange} 
+                isAuthenticated={true} 
+            />
         </div>
     );
 };
