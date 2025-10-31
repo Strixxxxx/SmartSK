@@ -111,28 +111,31 @@ router.get('/:projectId', authMiddleware, async (req, res) => {
 
 router.get('/:projectId/related-posts', authMiddleware, async (req, res) => {
     const { projectId } = req.params;
+    const { currentPostId } = req.query;
     const userBarangayId = req.user.barangay;
-    const currentPostId = req.query.currentPostId; // Get current post ID from query
 
     try {
         const pool = await getConnection();
-        const result = await pool.request()
-            .input('projectID', sql.Int, projectId)
-            .query(`
-                SELECT po.postID, po.title, u.barangay as authorBarangayID, vo.*
-                FROM tagProjOnPost t
-                JOIN posts po ON t.postID = po.postID
-                JOIN userInfo u ON po.userID = u.userID
-                LEFT JOIN viewOption vo ON po.postID = vo.postID
-                WHERE t.projectID = @projectID
-            `);
+        
+        let queryText = `
+            SELECT po.postID, po.title, u.barangay as authorBarangayID, vo.*
+            FROM tagProjOnPost t
+            JOIN posts po ON t.postID = po.postID
+            JOIN userInfo u ON po.userID = u.userID
+            LEFT JOIN viewOption vo ON po.postID = vo.postID
+            WHERE t.projectID = @projectID
+        `;
+        
+        const request = pool.request().input('projectID', sql.Int, projectId);
+
+        if (currentPostId) {
+            queryText += ` AND po.postID != @currentPostId`;
+            request.input('currentPostId', sql.Int, currentPostId);
+        }
+
+        const result = await request.query(queryText);
 
         const decryptedPosts = result.recordset.filter(p => {
-            // Filter out the current post
-            if (currentPostId && p.postID === parseInt(currentPostId)) {
-                return false;
-            }
-
             let canView = false;
             if (p.postVOID === null) {
                 canView = true; // Default to public if no options set

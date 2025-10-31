@@ -82,18 +82,27 @@ router.get('/:projectId', async (req, res) => {
 
 router.get('/:projectId/related-posts', async (req, res) => {
     const { projectId } = req.params;
+    const { currentPostId } = req.query;
 
     try {
         const pool = await getConnection();
-        const result = await pool.request()
-            .input('projectID', sql.Int, projectId)
-            .query(`
-                SELECT po.postID, po.title
-                FROM tagProjOnPost t
-                JOIN posts po ON t.postID = po.postID
-                LEFT JOIN viewOption vo ON po.postID = vo.postID
-                WHERE t.projectID = @projectID AND (vo.opforPubProj = 1 OR vo.postVOID IS NULL)
-            `);
+
+        let queryText = `
+            SELECT po.postID, po.title
+            FROM tagProjOnPost t
+            JOIN posts po ON t.postID = po.postID
+            LEFT JOIN viewOption vo ON po.postID = vo.postID
+            WHERE t.projectID = @projectID AND (vo.opforPubProj = 1 OR vo.postVOID IS NULL)
+        `;
+
+        const request = pool.request().input('projectID', sql.Int, projectId);
+
+        if (currentPostId) {
+            queryText += ` AND po.postID != @currentPostId`;
+            request.input('currentPostId', sql.Int, currentPostId);
+        }
+        
+        const result = await request.query(queryText);
 
         const decryptedPosts = result.recordset.map(p => ({
             postID: p.postID,

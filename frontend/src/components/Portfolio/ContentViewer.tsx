@@ -199,22 +199,16 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
     };
 
     const handleFetchRelatedPosts = async () => {
-        if (!projectDetails) return;
+        if (!projectDetails || !currentPost) return;
     
         const endpoint = isAuthenticated 
-            ? `/api/tagged-projects/${projectDetails.projectID}/related-posts?currentPostId=${currentPost?.postID}`
-            : `/api/public-tagged-projects/${projectDetails.projectID}/related-posts`;
+            ? `/api/tagged-projects/${projectDetails.projectID}/related-posts?currentPostId=${currentPost.postID}`
+            : `/api/public-tagged-projects/${projectDetails.projectID}/related-posts?currentPostId=${currentPost.postID}`;
     
         try {
             const response = await api.get(endpoint);
             if (response.data.success) {
-                // Sanitize the data to ensure postID is always a number
-                const sanitizedPosts = response.data.relatedPosts.map((p: any) => ({
-                    postID: Array.isArray(p.postID) ? p.postID[0] : Number(p.postID),
-                    title: p.title
-                }));
-
-                setRelatedPosts(sanitizedPosts);
+                setRelatedPosts(response.data.relatedPosts);
                 setShowRelatedPosts(true);
             }
         } catch (error) {
