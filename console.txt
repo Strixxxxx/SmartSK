@@ -4,36 +4,318 @@
 
 --Frontend (Browser's Console)
 
-PostCard.tsx:37 Uncaught TypeError: Cannot read properties of undefined (reading 'filter')
-    at PostCard (PostCard.tsx:37:48)
-PostCard	@	PostCard.tsx:37
-<PostCard>		
-(anonymous)	@	DashboardFeed.tsx:58
-DashboardFeed	@	DashboardFeed.tsx:57
-<DashboardFeed>		
-Dashboard	@	Dashboard.tsx:40
-<Dashboard>		
-AppRoutes	@	AppRoutes.tsx:102
-<AppRoutes>		
-App	@	App.tsx:24
-<App>		
-(anonymous)	@	main.tsx:8
-
-DashboardFeed.tsx:58 An error occurred in the <PostCard> component.
-
-Consider adding an error boundary to your tree to customize error handling behavior.
-Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
-<PostCard>		
-(anonymous)	@	DashboardFeed.tsx:58
-DashboardFeed	@	DashboardFeed.tsx:57
-<DashboardFeed>		
-Dashboard	@	Dashboard.tsx:40
-<Dashboard>		
-AppRoutes	@	AppRoutes.tsx:102
-<AppRoutes>		
-App	@	App.tsx:24
-<App>		
-(anonymous)	@	main.tsx:8
+GET http://localhost:8080/api/public-tagged-projects/6/post/35 404 (Not Found)
+dispatchXhrRequest @ axios.js?v=ad885491:1648
+xhr @ axios.js?v=ad885491:1528
+dispatchRequest @ axios.js?v=ad885491:2003
+Promise.then
+_request @ axios.js?v=ad885491:2206
+request @ axios.js?v=ad885491:2115
+Axios.<computed> @ axios.js?v=ad885491:2243
+wrap @ axios.js?v=ad885491:8
+handleSelectProject @ ContentViewer.tsx:178
+handleNext @ ContentViewer.tsx:29
+executeDispatch @ react-dom_client.js?v=ad885491:11736
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+processDispatchQueue @ react-dom_client.js?v=ad885491:11772
+(anonymous) @ react-dom_client.js?v=ad885491:12182
+batchedUpdates$1 @ react-dom_client.js?v=ad885491:2628
+dispatchEventForPluginEventSystem @ react-dom_client.js?v=ad885491:11877
+dispatchEvent @ react-dom_client.js?v=ad885491:14792
+dispatchDiscreteEvent @ react-dom_client.js?v=ad885491:14773
+<button>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+ProjectListModal @ ContentViewer.tsx:54
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=ad885491:11558
+(anonymous) @ react-dom_client.js?v=ad885491:11649
+<ProjectListModal>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+ContentViewer @ ContentViewer.tsx:319
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=ad885491:11558
+(anonymous) @ react-dom_client.js?v=ad885491:11649
+<ContentViewer>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+ProjectList @ ProjectList.tsx:143
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
+flushPassiveEffects @ react-dom_client.js?v=ad885491:11311
+(anonymous) @ react-dom_client.js?v=ad885491:11060
+performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
+<ProjectList>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+AppRoutes @ AppRoutes.tsx:80
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
+flushPassiveEffects @ react-dom_client.js?v=ad885491:11311
+(anonymous) @ react-dom_client.js?v=ad885491:11060
+performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
+<AppRoutes>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+App @ App.tsx:24
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ad885491:11623
+performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+(anonymous) @ main.tsx:8Understand this error
+axiosConfig.ts:98 Client error: 404 {success: false, message: 'Project not found.'}message: "Project not found."success: false[[Prototype]]: Object
+(anonymous) @ axiosConfig.ts:98
+Promise.then
+_request @ axios.js?v=ad885491:2206
+request @ axios.js?v=ad885491:2115
+Axios.<computed> @ axios.js?v=ad885491:2243
+wrap @ axios.js?v=ad885491:8
+handleSelectProject @ ContentViewer.tsx:178
+handleNext @ ContentViewer.tsx:29
+executeDispatch @ react-dom_client.js?v=ad885491:11736
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+processDispatchQueue @ react-dom_client.js?v=ad885491:11772
+(anonymous) @ react-dom_client.js?v=ad885491:12182
+batchedUpdates$1 @ react-dom_client.js?v=ad885491:2628
+dispatchEventForPluginEventSystem @ react-dom_client.js?v=ad885491:11877
+dispatchEvent @ react-dom_client.js?v=ad885491:14792
+dispatchDiscreteEvent @ react-dom_client.js?v=ad885491:14773
+<button>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+ProjectListModal @ ContentViewer.tsx:54
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=ad885491:11558
+(anonymous) @ react-dom_client.js?v=ad885491:11649
+<ProjectListModal>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+ContentViewer @ ContentViewer.tsx:319
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=ad885491:11558
+(anonymous) @ react-dom_client.js?v=ad885491:11649
+<ContentViewer>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+ProjectList @ ProjectList.tsx:143
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
+flushPassiveEffects @ react-dom_client.js?v=ad885491:11311
+(anonymous) @ react-dom_client.js?v=ad885491:11060
+performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
+<ProjectList>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+AppRoutes @ AppRoutes.tsx:80
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
+flushPassiveEffects @ react-dom_client.js?v=ad885491:11311
+(anonymous) @ react-dom_client.js?v=ad885491:11060
+performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
+<AppRoutes>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+App @ App.tsx:24
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ad885491:11623
+performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+(anonymous) @ main.tsx:8Understand this error
+ContentViewer.tsx:187 Failed to fetch project details AxiosError {message: 'Request failed with status code 404', name: 'AxiosError', code: 'ERR_BAD_REQUEST', config: {…}, request: XMLHttpRequest, …}code: "ERR_BAD_REQUEST"config: {transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}message: "Request failed with status code 404"name: "AxiosError"request: XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}response: {data: {…}, status: 404, statusText: 'Not Found', headers: AxiosHeaders, config: {…}, …}status: 404stack: "AxiosError: Request failed with status code 404\n    at settle (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ad885491:1229:12)\n    at XMLHttpRequest.onloadend (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ad885491:1561:7)\n    at Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=ad885491:2119:41)\n    at async handleSelectProject (http://localhost:5173/src/components/Portfolio/ContentViewer.tsx:236:24)"[[Prototype]]: Error
+handleSelectProject @ ContentViewer.tsx:187
+await in handleSelectProject
+handleNext @ ContentViewer.tsx:29
+executeDispatch @ react-dom_client.js?v=ad885491:11736
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+processDispatchQueue @ react-dom_client.js?v=ad885491:11772
+(anonymous) @ react-dom_client.js?v=ad885491:12182
+batchedUpdates$1 @ react-dom_client.js?v=ad885491:2628
+dispatchEventForPluginEventSystem @ react-dom_client.js?v=ad885491:11877
+dispatchEvent @ react-dom_client.js?v=ad885491:14792
+dispatchDiscreteEvent @ react-dom_client.js?v=ad885491:14773
+<button>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+ProjectListModal @ ContentViewer.tsx:54
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=ad885491:11558
+(anonymous) @ react-dom_client.js?v=ad885491:11649
+<ProjectListModal>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+ContentViewer @ ContentViewer.tsx:319
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
+processRootScheduleInMicrotask @ react-dom_client.js?v=ad885491:11558
+(anonymous) @ react-dom_client.js?v=ad885491:11649
+<ContentViewer>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+ProjectList @ ProjectList.tsx:143
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
+flushPassiveEffects @ react-dom_client.js?v=ad885491:11311
+(anonymous) @ react-dom_client.js?v=ad885491:11060
+performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
+<ProjectList>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+AppRoutes @ AppRoutes.tsx:80
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performSyncWorkOnRoot @ react-dom_client.js?v=ad885491:11635
+flushSyncWorkAcrossRoots_impl @ react-dom_client.js?v=ad885491:11536
+flushPassiveEffects @ react-dom_client.js?v=ad885491:11311
+(anonymous) @ react-dom_client.js?v=ad885491:11060
+performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
+<AppRoutes>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+App @ App.tsx:24
+react_stack_bottom_frame @ react-dom_client.js?v=ad885491:17424
+renderWithHooksAgain @ react-dom_client.js?v=ad885491:4281
+renderWithHooks @ react-dom_client.js?v=ad885491:4217
+updateFunctionComponent @ react-dom_client.js?v=ad885491:6619
+beginWork @ react-dom_client.js?v=ad885491:7654
+runWithFiberInDEV @ react-dom_client.js?v=ad885491:1485
+performUnitOfWork @ react-dom_client.js?v=ad885491:10868
+workLoopSync @ react-dom_client.js?v=ad885491:10728
+renderRootSync @ react-dom_client.js?v=ad885491:10711
+performWorkOnRoot @ react-dom_client.js?v=ad885491:10330
+performWorkOnRootViaSchedulerTask @ react-dom_client.js?v=ad885491:11623
+performWorkUntilDeadline @ react-dom_client.js?v=ad885491:36
+<App>
+exports.jsxDEV @ react_jsx-dev-runtime.js?v=ad885491:250
+(anonymous) @ main.tsx:8Understand this error
 
 --Frontend (VSC Terminal)
 

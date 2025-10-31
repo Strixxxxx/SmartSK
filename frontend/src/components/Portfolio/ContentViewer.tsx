@@ -8,6 +8,7 @@ import { Post, TaggedProject, Attachment } from '../../types/PostTypes';
 
 interface ProjectDetails extends TaggedProject {
     description: string;
+    author: string;
     attachments?: Attachment[]; // Projects can also have attachments
     relatedPosts?: { postID: number; title: string }[];
 }
@@ -61,21 +62,42 @@ const RelatedPostsModal: React.FC<{
     posts: { postID: number; title: string }[];
     onSelect: (postId: number) => void;
     onClose: () => void;
-}> = ({ posts, onSelect, onClose }) => (
-    <div className="secondary-modal-overlay" onClick={onClose}>
-        <div className="secondary-modal-content" onClick={(e) => e.stopPropagation()}>
-            <h3>Related Posts</h3>
-            <ul>
-                {posts.map(p => (
-                    <li key={p.postID} onClick={() => onSelect(p.postID)}>
-                        {p.title}
-                    </li>
-                ))}
-            </ul>
-            <button onClick={onClose}>Close</button>
+}> = ({ posts, onSelect, onClose }) => {
+    const [selectedPostId, setSelectedPostId] = useState<number | null>(null);
+
+    const handleNext = () => {
+        if (selectedPostId !== null) {
+            onSelect(selectedPostId);
+        }
+    };
+
+    return (
+        <div className="secondary-modal-overlay" onClick={onClose}>
+            <div className="secondary-modal-content" onClick={(e) => e.stopPropagation()}>
+                <h2>Related Posts</h2>
+                <div className="radio-group">
+                    {posts.map(p => (
+                        <div key={p.postID} className="radio-option">
+                            <input
+                                type="radio"
+                                id={`post-${p.postID}`}
+                                name="post-selection"
+                                value={p.postID}
+                                checked={selectedPostId === p.postID}
+                                onChange={() => setSelectedPostId(p.postID)}
+                            />
+                            <label htmlFor={`post-${p.postID}`}>{p.title}</label>
+                        </div>
+                    ))}
+                </div>
+                <div className="form-actions">
+                    <button type="button" onClick={onClose}>Cancel</button>
+                    <button type="button" onClick={handleNext} disabled={selectedPostId === null}>Next</button>
+                </div>
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 // --- MAIN COMPONENT ---
 
@@ -252,7 +274,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
                         <div className="post-modal-info-section">
                             <div className="post-modal-header-section">
                                 <h2 className="post-modal-title">{viewMode === 'project_details' && projectDetails ? projectDetails.title : title}</h2>
-                                <p className="post-modal-author">{viewMode === 'project_details' ? 'Project' : `By: ${author}`}</p>
+                                <p className="post-modal-author">{viewMode === 'project_details' && projectDetails ? `By: ${projectDetails.author}` : `By: ${author}`}</p>
                             </div>
                             <div className="post-modal-description-section">
                                 <p className="post-modal-description-text">{viewMode === 'project_details' && projectDetails ? projectDetails.description : description}</p>
@@ -269,7 +291,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
                                             onClick={() => setCurrentAttachmentIndex(index)}
                                         />
                                     ))}
-                                </div>
+                               </div>
                             )}
                         </div>
                     </div>
@@ -278,7 +300,7 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
                         <div className="post-modal-bottom-content">
                             <div className="post-modal-header-compact">
                                 <h2 className="post-modal-title-compact">{viewMode === 'project_details' && projectDetails ? projectDetails.title : title}</h2>
-                                <p className="post-modal-author-compact">{viewMode === 'project_details' ? 'Project' : `By: ${author}`}</p>
+                                <p className="post-modal-author-compact">{viewMode === 'project_details' && projectDetails ? `By: ${projectDetails.author}` : `By: ${author}`}</p>
                             </div>
                             <div className="post-modal-description-compact">
                                 <p className="post-modal-description-text-compact">
@@ -310,5 +332,4 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
         </>
     );
 };
-
 export default ContentViewer;

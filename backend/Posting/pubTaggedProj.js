@@ -50,10 +50,12 @@ router.get('/:projectId/post/:postId', async (req, res) => {
                 SELECT 
                     p.projectID, p.reference_number, p.title, p.description, p.file_path, p.file_name,
                     s.StatusName as status,
+                    u.fullName as authorName,
                     t.postID as relatedPostID,
                     po.title as relatedPostTitle
                 FROM projects p
                 LEFT JOIN StatusLookup s ON p.status = s.StatusID
+                LEFT JOIN userInfo u ON p.userID = u.userID
                 LEFT JOIN tagProjOnPost t ON p.projectID = t.projectID
                 LEFT JOIN posts po ON t.postID = po.postID
                 WHERE p.projectID = @projectID
@@ -68,20 +70,21 @@ router.get('/:projectId/post/:postId', async (req, res) => {
             reference_number: result.recordset[0].reference_number,
             title: decrypt(result.recordset[0].title),
             description: decrypt(result.recordset[0].description),
+            author: decrypt(result.recordset[0].authorName),
             status: result.recordset[0].status,
             attachments: [],
             relatedPosts: []
         };
 
         if (result.recordset[0].file_path) {
+            const filePath = result.recordset[0].file_path;
             const fileName = result.recordset[0].file_name;
             const fileType = getMimeType(fileName);
 
             projectData.attachments.push({
                 attachmentID: -1, // Placeholder ID
                 fileType: fileType,
-                filePath: await getFileSasUrl(result.recordset[0].file_path),
-                isSecure: false 
+                filePath: await getFileSasUrl(filePath, fileType, true, 'project')
             });
         }
 
@@ -94,7 +97,9 @@ router.get('/:projectId/post/:postId', async (req, res) => {
                 });
             }
         });
-        projectData.relatedPosts = Array.from(relatedPostsMap.values());
+        // Filter out the current post from the related posts list
+        projectData.relatedPosts = Array.from(relatedPostsMap.values())
+            .filter(p => p.postID !== parseInt(postId, 10));
         
         res.json({ success: true, project: projectData });
 

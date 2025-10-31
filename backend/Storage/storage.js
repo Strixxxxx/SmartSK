@@ -85,26 +85,28 @@ async function uploadFile(file, isPublic) {
  * @param {string} fileType - The MIME type of the file.
  * @returns {Promise<string>} A temporary SAS URL for the blob.
  */
-async function getFileSasUrl(blobName, fileType, isPublic) {
+async function getFileSasUrl(blobName, fileType, isPublic, source = 'post') {
     let containerName;
     const mimetype = fileType || '';
-    console.log(`Generating SAS URL for blob: ${blobName}, isPublic: ${isPublic}`);
+    console.log(`Generating SAS URL for blob: ${blobName}, isPublic: ${isPublic}, source: ${source}`);
 
-    if (isPublic) {
+    if (source === 'project') {
+        // Project attachments are always public documents
+        containerName = docContainerName;
+    } else if (!isPublic) {
+        // Secure post attachments can be any file type and are always in the encrypted container
+        containerName = eAttachContainerName;
+    } else {
+        // Public post attachments can only be images or videos
         if (mimetype.startsWith('image')) {
             containerName = imageContainerName;
         } else if (mimetype.startsWith('video')) {
             containerName = videoContainerName;
-        } else {
-            containerName = docContainerName;
         }
-    } else {
-        // All secure files are in the encrypted attachments container
-        containerName = eAttachContainerName;
     }
 
     if (!containerName) {
-        throw new Error(`Could not determine container for blob: ${blobName}`);
+        throw new Error(`Could not determine container for blob: ${blobName} with source: ${source} and mimetype: ${mimetype}`);
     }
     
     console.log(`Determined container: ${containerName}`);
