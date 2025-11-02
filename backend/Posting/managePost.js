@@ -234,7 +234,7 @@ router.put('/edit/:postId', authMiddleware, checkRole(['SKC', 'SKO']), upload.fi
             .input('description', sql.NVarChar, description)
             .query('UPDATE posts SET title = @title, description = @description WHERE postID = @postID');
 
-        // 6. Update view options
+        // 6. Upsert view options
         const viewOptions = JSON.parse(req.body.viewOptions || '{}');
         await new sql.Request(transaction)
             .input('postID', sql.Int, postId)
@@ -245,10 +245,20 @@ router.put('/edit/:postId', authMiddleware, checkRole(['SKC', 'SKO']), upload.fi
             .input('opforAllBrgyEAttach', sql.Bit, viewOptions.opforAllBrgyEAttach || 0)
             .input('opforBrgyEAttach', sql.Bit, viewOptions.opforBrgyEAttach || 0)
             .query(`
-                UPDATE viewOption 
-                SET opforPubProj = @opforPubProj, opforAllBrgyProj = @opforAllBrgyProj, opforBrgyProj = @opforBrgyProj, 
-                    opforPubEAttach = @opforPubEAttach, opforAllBrgyEAttach = @opforAllBrgyEAttach, opforBrgyEAttach = @opforBrgyEAttach
-                WHERE postID = @postID;
+                MERGE INTO viewOption AS target
+                USING (SELECT @postID AS postID) AS source
+                ON (target.postID = source.postID)
+                WHEN MATCHED THEN
+                    UPDATE SET
+                        opforPubProj = @opforPubProj,
+                        opforAllBrgyProj = @opforAllBrgyProj,
+                        opforBrgyProj = @opforBrgyProj,
+                        opforPubEAttach = @opforPubEAttach,
+                        opforAllBrgyEAttach = @opforAllBrgyEAttach,
+                        opforBrgyEAttach = @opforBrgyEAttach
+                WHEN NOT MATCHED THEN
+                    INSERT (postID, opforPubProj, opforAllBrgyProj, opforBrgyProj, opforPubEAttach, opforAllBrgyEAttach, opforBrgyEAttach)
+                    VALUES (@postID, @opforPubProj, @opforAllBrgyProj, @opforBrgyProj, @opforPubEAttach, @opforAllBrgyEAttach, @opforBrgyEAttach);
             `);
 
         await transaction.commit();

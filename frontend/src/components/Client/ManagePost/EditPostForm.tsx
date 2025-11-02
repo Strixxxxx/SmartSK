@@ -60,6 +60,7 @@ const EditPostForm: React.FC<EditPostFormProps> = ({ postId, onClose, onUpdated 
     // Tagged projects state
     const [userProjects, setUserProjects] = useState<Project[]>([]);
     const [taggedProjects, setTaggedProjects] = useState<number[]>([]);
+    const [initialTaggedProjects, setInitialTaggedProjects] = useState<number[]>([]); // For default logic
     const [isTagDropdownOpen, setIsTagDropdownOpen] = useState(false);
     const tagDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -73,6 +74,7 @@ const EditPostForm: React.FC<EditPostFormProps> = ({ postId, onClose, onUpdated 
         opforAllBrgyEAttach: false,
         opforBrgyEAttach: false,
     });
+    const [isOldPost, setIsOldPost] = useState(false); // For default logic
 
     useEffect(() => {
         const fetchPostDetails = async () => {
@@ -83,10 +85,11 @@ const EditPostForm: React.FC<EditPostFormProps> = ({ postId, onClose, onUpdated 
                 ]);
 
                 if (detailsRes.data.success) {
-                    const { title, description, taggedProjects, attachments, viewOptions } = detailsRes.data.details;
+                    const { title, description, taggedProjects, attachments, viewOptions: fetchedViewOptions } = detailsRes.data.details;
                     setValue('title', title);
                     setValue('description', description);
                     setTaggedProjects(taggedProjects || []);
+                    setInitialTaggedProjects(taggedProjects || []); // Set initial state for comparison
 
                     if (attachments && attachments.length > 0) {
                         const attachmentsWithUrls = await Promise.all(
@@ -111,8 +114,11 @@ const EditPostForm: React.FC<EditPostFormProps> = ({ postId, onClose, onUpdated 
                         setExistingSecureAttachments(attachmentsWithUrls.filter((a: Attachment) => !a.isPublic));
                     }
 
-                    if (viewOptions) {
-                        setViewOptions(viewOptions);
+                    if (fetchedViewOptions) {
+                        setViewOptions(fetchedViewOptions);
+                        setIsOldPost(false);
+                    } else {
+                        setIsOldPost(true);
                     }
                 }
 
@@ -130,6 +136,31 @@ const EditPostForm: React.FC<EditPostFormProps> = ({ postId, onClose, onUpdated 
 
         fetchPostDetails();
     }, [postId, setValue]);
+
+    // Effect for auto-selecting 'Barangay Only' for new secure attachments on old posts
+    useEffect(() => {
+        if (isOldPost && newSecureFiles.length > 0) {
+            setViewOptions(prev => ({
+                ...prev,
+                opforBrgyEAttach: true,
+                opforAllBrgyEAttach: false,
+                opforPubEAttach: false
+            }));
+        }
+    }, [newSecureFiles.length, isOldPost]);
+
+    // Effect for auto-selecting 'Barangay Only' for new tagged projects on old posts
+    useEffect(() => {
+        const hasNewTaggedProjects = taggedProjects.length > initialTaggedProjects.length;
+        if (isOldPost && hasNewTaggedProjects) {
+            setViewOptions(prev => ({
+                ...prev,
+                opforBrgyProj: true,
+                opforAllBrgyProj: false,
+                opforPubProj: false
+            }));
+        }
+    }, [taggedProjects.length, initialTaggedProjects.length, isOldPost]);
 
     const onSubmit = async (data: IFormInput) => {
         setIsSubmitting(true);

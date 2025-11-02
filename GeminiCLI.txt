@@ -1,23 +1,77 @@
-> so i want you to scan the @Screenshots/1st.png because the close icon is still too close. So how about this, addd a new div on the preview so that it would be properly on the top right of the preview. Next, if you see the @Screenshots/2nd.png , the post itself was deleted on the table and the actual file on the file path because i can confirm that the video file was properly deleted on the VIDEO_CONTAINER envrionment variable which can be seen on the @Screenshots/3rd.png , & the docx & pdf file on the E_ATTACHMENTS environment variable which can be seen on the @Screenshots/4th.png & @Screenshots/5th.png respectively. But if you look closely on the @Screenshots/2nd.png , you can see that the relationship post of the post itself which has a postID of 35 can still be seen on the postAttachments, TagProjOnPost, & ViewOption tables which should happened is that first it would delete the files that was related to the posts table which was stored on the azure blob storage, delete the row that has relationship to the post in PostAttachments, TagProjOnPost, & ViewOption tables, then finally deleting the row on the posts table itself. To properly do it, we would do it by using stored procedure. Can we do that?  
+> now, if you scan the @backend/database/database_query.txt & on @Screenshots/1st.png , i already updated the database schema to match. What we need to do now is that we need to create a new js file 
+  called comment.js inside of @backend/Posting/ on the backend. Next, for the frontend, we need to add a new div inside of @frontend/src/components/Portfolio/PostCard.tsx which can be seen on 
+  @Screenshots/2nd.png and inside of @frontend/src/components/Portfolio/ContentViewer.tsx a button in the bottom part of description which should have a placement like this: Title, Tagged Projects, SK
+   Full Disclosure Documents, Descriptions, then the newly added comment. In short, in the @frontend/src/components/Portfolio/PostCard.tsx , there should be a comment icon which is the chat bubble and
+   on the rightside of the icon should be the counts of comment within that post while inside of the @frontend/src/components/Portfolio/ContentViewer.tsx , there should be a button that has chat
+  bubblle on it and on the top right of the button, it should have "Comments: (Number of Comments including Replies)" . Did you get my idea? Also please take note that you would only need to add a
+  button and the backend logic because in the frontend, what should happened is that if the user clicks the icon, it would show a comment modal which would be created on
+  @frontend/src/components/Portfolio/ .
 
-✦ You are absolutely right. My apologies. I skipped a step and failed to follow the rules we established. I should have presented the plan and asked for your approval before proceeding.
+✦ Yes, I understand your idea perfectly. It's a great feature to add.
 
-  Here is the plan again:
+  Here is the plan to implement the comment functionality, following the structure of your project:
 
-  Part 1: Frontend Change (Close Icon)
+  Plan:
 
-   1. Modify `ContentViewer.tsx`: I will wrap the close button element in a new div to create a dedicated container for it.
-   2. Modify `ContentViewer.css`: I will add styling for the new container to position the close button properly in the top-right corner with appropriate spacing, ensuring it looks correct as per
-      your screenshot.
+  Backend First:
+   1. Create `comment.js`: I will create a new file at D:\Projects\Projects\smartSK\backend\Posting\comment.js. This file will handle all the logic for comments, such as creating new comments,
+      replying to comments, and fetching comments for a post.
+   2. Update `main.js`: I will add the new routes from comment.js to the main backend router at D:\Projects\Projects\smartSK\backend\main.js.
+   3. Get Comment Count: I will modify D:\Projects\Projects\smartSK\backend\Posting\postPublic.js to include the number of comments when fetching posts. This way, we don't have to make a separate
+      request for the count.
 
-  Part 2: Backend Change (Cascading Delete)
+  Then Frontend:
+   1. Update Data Type: I'll add commentCount to the Post type in D:\Projects\Projects\smartSK\frontend\src\types\PostTypes.ts.
+   2. Modify `PostCard.tsx`: I will edit D:\Projects\Projects\smartSK\frontend\src\components\Portfolio\PostCard.tsx to add the chat bubble icon and the comment count.
+   3. Modify `ContentViewer.tsx`: I will update D:\Projects\Projects\smartSK\frontend\src\components\Portfolio\ContentViewer.tsx to add the "Comments" button with the count, exactly as you described.
 
-   1. Create Stored Procedure: I will write a SQL script to create a stored procedure named DeletePostAndRelatedData. This procedure will accept a postID and will perform the following actions in
-      order:
-       * Delete records from PostAttachments for the given postID.
-       * Delete records from TagProjOnPost for the given postID.
-       * Delete records from ViewOption for the given postID.
-       * Finally, delete the main record from the posts table.
-   2. Update Backend Code: I will modify the post deletion logic in backend/Posting/managePost.js to execute this new stored procedure instead of the current simple DELETE query.
+  As you requested, clicking the new buttons will not do anything yet. We will build the comment modal in the next phase.
 
-  Shall I proceed with these changes, starting with the frontend modification?
+  Shall I proceed with these changes?
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  ReadManyFiles Will attempt to read and concatenate files using patterns:                                                                                                                      │
+│    frontend/src/components/Portfolio/ContentViewer.tsx                                                                                                                                           │
+│     (within target directory:                                                                                                                                                                    │
+│    D:\Projects\Projects\smartSK                                                                                                                                                                  │
+│    ) . Excluding: patterns like                                                                                                                                                                  │
+│    **/node_modules/**`, `**/.git/**...`. File encoding: utf-8. Separator: "--- path/to/file.ext ---".                                                                                            │
+│                                                                                                                                                                                                  │
+│    ### ReadManyFiles Result (Target Dir: `D:\Projects\Projects\smartSK`)                                                                                                                         │
+│                                                                                                                                                                                                  │
+│    Successfully read and concatenated content from **1 file(s)**.                                                                                                                                │
+│                                                                                                                                                                                                  │
+│    **Processed Files:**                                                                                                                                                                          │
+│    - `frontend/src/components/Portfolio/ContentViewer.tsx`                                                                                                                                       │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+> let me clarify this okay? in the @frontend/src/components/Portfolio/ContentViewer.tsx . So the placement would be like this: title, author, description, tagged projects, SK full disclosure 
+  Documents, Comments:(count). Did you get that?
+
+
+ℹRequest cancelled.
+ 
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  ReadManyFiles Will attempt to read and concatenate files using patterns:                                                                                                                      │
+│    frontend/src/components/Portfolio/ContentViewer.tsx                                                                                                                                           │
+│     (within target directory:                                                                                                                                                                    │
+│    D:\Projects\Projects\smartSK                                                                                                                                                                  │
+│    ) . Excluding: patterns like                                                                                                                                                                  │
+│    **/node_modules/**`, `**/.git/**...`. File encoding: utf-8. Separator: "--- path/to/file.ext ---".                                                                                            │
+│                                                                                                                                                                                                  │
+│    ### ReadManyFiles Result (Target Dir: `D:\Projects\Projects\smartSK`)                                                                                                                         │
+│                                                                                                                                                                                                  │
+│    Successfully read and concatenated content from **1 file(s)**.                                                                                                                                │
+│                                                                                                                                                                                                  │
+│    **Processed Files:**                                                                                                                                                                          │
+│    - `frontend/src/components/Portfolio/ContentViewer.tsx`                                                                                                                                       │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+> let me clarify this okay? in the @frontend/src/components/Portfolio/ContentViewer.tsx . So the placement would be like this: title, author, description, tagged projects, SK full disclosure
+  Documents, Comments:(count). Did you get that? What i meant here is that make sure that the comments with a comment count is on the bottom part.
+
+✦ Yes, thank you for the clarification. I understand completely.
+
+  In ContentViewer.tsx, the "Comments" button will be the last item in the list of action buttons, appearing after "Tagged Projects" and "SK Full Disclosure Documents". This entire block of buttons
+  is located directly under the post's description.
+
+  The plan remains the same, and I will ensure the button is placed exactly as you've specified.

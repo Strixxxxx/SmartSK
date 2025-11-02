@@ -184,6 +184,20 @@ opforBrgyEAttach BIT NOT NULL,
 CONSTRAINT FK_postVOPost FOREIGN KEY (postID) REFERENCES posts (postID) ON DELETE CASCADE,
 );
 
+CREATE TABLE postComment(
+commentID INT PRIMARY KEY IDENTITY (1, 1),
+PostID INT NOT NULL,
+userID INT NULL,
+parentCommentID INT NULL,
+commentText NVARCHAR(MAX) NOT NULL,
+commentDate DATETIME NOT NULL,
+isAnonymous BIT NOT NULL,
+alias NVARCHAR(50) NULL,
+CONSTRAINT FK_Comment_Post FOREIGN KEY (PostID) REFERENCES posts (PostID) ON DELETE CASCADE,
+CONSTRAINT FK_Comment_User FOREIGN KEY (userID) REFERENCES userInfo (userID),
+CONSTRAINT FK_Comment_Parent FOREIGN KEY (parentCommentID) REFERENCES postComment (commentID)
+);
+
 -- BackupJobs table
 
 CREATE TABLE BackupJobs (
@@ -374,26 +388,19 @@ CREATE PROCEDURE DeletePostAndRelatedData
     @postID INT
 AS
 BEGIN
-    -- Begin a transaction to ensure all operations succeed or fail together
     BEGIN TRANSACTION;
-
     BEGIN TRY
-        -- Delete from child tables first to respect foreign key constraints
+        DELETE FROM postComment WHERE postID = @postID;
         DELETE FROM PostAttachments WHERE postID = @postID;
         DELETE FROM TagProjOnPost WHERE postID = @postID;
         DELETE FROM ViewOption WHERE postID = @postID;
 
-        -- Finally, delete the main post
         DELETE FROM posts WHERE postID = @postID;
 
-        -- Commit the transaction if all deletions were successful
         COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
-        -- If any error occurs, roll back the entire transaction
         ROLLBACK TRANSACTION;
-        
-        -- Re-throw the error to be caught by the application
         THROW;
     END CATCH
 END
