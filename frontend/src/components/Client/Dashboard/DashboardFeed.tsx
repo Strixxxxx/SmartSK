@@ -3,37 +3,58 @@ import axios from '../../../backend connection/axiosConfig';
 import PostCard from '../../Portfolio/PostCard';
 import { Post } from '../../../types/PostTypes';
 import ContentViewer from '../../Portfolio/ContentViewer';
-import { useWebSocket } from '../../../context/WebSocketContext'; // Import the hook
+import { useWebSocket } from '../../../context/WebSocketContext';
 import Loading from '../../Loading/Loading';
 import './DashboardFeed.css';
 
 interface DashboardFeedProps {
     refreshFeed: boolean;
+    searchQuery: string;
+    filter: string | null;
 }
 
-const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed }) => {
-    const { postUpdateTimestamp } = useWebSocket(); // Use the hook
-    const [posts, setPosts] = useState<Post[]>([]);
+const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed, searchQuery, filter }) => {
+    const { postUpdateTimestamp } = useWebSocket();
+    const [posts, setPosts] = useState<Post[]>([]); // Raw posts from API
+    const [filteredPosts, setFilteredPosts] = useState<Post[]>([]); // Posts to display
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedPost, setSelectedPost] = useState<Post | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    // Fetch posts from the API based on the filter
     useEffect(() => {
         const fetchPosts = async () => {
             setLoading(true);
             try {
-                const response = await axios.get('/api/posts/feed');
+                const response = await axios.get('/api/posts/feed', {
+                    params: { filter },
+                });
                 setPosts(response.data);
             } catch (err) {
                 setError('Failed to fetch posts.');
+                console.error(err);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchPosts();
-    }, [refreshFeed, postUpdateTimestamp]); // Add postUpdateTimestamp to dependency array
+    }, [refreshFeed, postUpdateTimestamp, filter]);
+
+    // Filter posts locally based on the search query
+    useEffect(() => {
+        if (!searchQuery) {
+            setFilteredPosts(posts);
+            return;
+        }
+        const lowercasedQuery = searchQuery.toLowerCase();
+        const result = posts.filter(post =>
+            post.title.toLowerCase().includes(lowercasedQuery) ||
+            post.author.toLowerCase().includes(lowercasedQuery)
+        );
+        setFilteredPosts(result);
+    }, [searchQuery, posts]);
 
     const openModal = (post: Post) => {
         setSelectedPost(post);
@@ -46,37 +67,29 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed }) => {
     };
 
     const handlePostChange = async (postId: number) => {
-        // Ensure postId is a valid number
         const numericPostId = typeof postId === 'string' ? parseInt(postId, 10) : postId;
-        
         if (isNaN(numericPostId)) {
-            console.error('Invalid postId:', postId);
             setError('Invalid post ID');
             return;
         }
 
-        // First check if the post already exists in the current posts array
         const existingPost = posts.find(p => p.postID === numericPostId);
         if (existingPost) {
             setSelectedPost(existingPost);
             return;
         }
 
-        // If not found, fetch it from the API
         try {
             setLoading(true);
-            setError(null);
             const response = await axios.get(`/api/tagged-projects/post/${numericPostId}`);
             if (response.data.success) {
                 const newPost = response.data.post;
-                // Add the new post to the beginning of the posts array
-                setPosts(prevPosts => [newPost, ...prevPosts]);
+                setPosts(prev => [newPost, ...prev]);
                 setSelectedPost(newPost);
             } else {
                 setError('Post not found');
             }
         } catch (err) {
-            console.error('Error fetching post:', err);
             setError('An error occurred while fetching the post.');
         } finally {
             setLoading(false);
@@ -88,7 +101,7 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed }) => {
             {loading && <Loading />}
             {error && <div>{error}</div>}
             <div className="project-list">
-                {posts.map(post => (
+                {filteredPosts.map(post => (
                     <PostCard key={post.postID} post={post} onPostClick={openModal} />
                 ))}
             </div>

@@ -51,12 +51,14 @@ router.get('/', async (req, res) => {
         query += ' ORDER BY p.postID DESC;';
 
         const result = await request.query(query);
+        const posts = [];
+        const postsMap = new Map();
 
-        const postsMap = {};
+        for (const row of result.recordset) {
+            let post = postsMap.get(row.postID);
 
-        result.recordset.forEach(row => {
-            if (!postsMap[row.postID]) {
-                postsMap[row.postID] = {
+            if (!post) {
+                post = {
                     postID: row.postID,
                     title: row.title,
                     description: row.description,
@@ -69,6 +71,8 @@ router.get('/', async (req, res) => {
                         opforPubEAttach: row.opforPubEAttach
                     }
                 };
+                postsMap.set(row.postID, post);
+                posts.push(post);
             }
 
             if (row.attachmentID) {
@@ -80,31 +84,29 @@ router.get('/', async (req, res) => {
                 };
 
                 if (row.isPublic) {
-                    const attachmentExists = postsMap[row.postID].publicAttachments.some(a => a.attachmentID === row.attachmentID);
+                    const attachmentExists = post.publicAttachments.some(a => a.attachmentID === row.attachmentID);
                     if (!attachmentExists) {
-                        postsMap[row.postID].publicAttachments.push(attachment);
+                        post.publicAttachments.push(attachment);
                     }
                 } else if (row.opforPubEAttach) { // Only add secure if opforPubEAttach is true
-                    const attachmentExists = postsMap[row.postID].secureAttachments.some(a => a.attachmentID === row.attachmentID);
+                    const attachmentExists = post.secureAttachments.some(a => a.attachmentID === row.attachmentID);
                     if (!attachmentExists) {
-                        postsMap[row.postID].secureAttachments.push(attachment);
+                        post.secureAttachments.push(attachment);
                     }
                 }
             }
 
             // Handle public tagged projects
             if (row.taggedProjectID && row.opforPubProj) {
-                const projectExists = postsMap[row.postID].taggedProjects.some(p => p.projectID === row.taggedProjectID);
+                const projectExists = post.taggedProjects.some(p => p.projectID === row.taggedProjectID);
                 if (!projectExists) {
-                    postsMap[row.postID].taggedProjects.push({
+                    post.taggedProjects.push({
                         projectID: row.taggedProjectID,
                         title: decrypt(row.taggedProjectTitle)
                     });
                 }
             }
-        });
-
-        const posts = Object.values(postsMap);
+        }
 
         for (const post of posts) {
             post.publicAttachments = await Promise.all(post.publicAttachments.map(async (attachment) => {
@@ -125,14 +127,15 @@ router.get('/', async (req, res) => {
     }
 });
 
-// GET /api/posts/feed - Fetch posts for authenticated users
+// GET /api/posts/feed - Fetch posts for authenticated users, with filter
 router.get('/feed', authMiddleware, async (req, res) => {
     try {
-        const userBarangayId = req.user.barangay; // Assuming barangay ID is in the user token
+        const { userID, barangay: userBarangayId } = req.user;
+        const { filter } = req.query; // Search is handled client-side
         const pool = await getConnection();
         const request = pool.request();
 
-        const query = `
+        let query = `
             SELECT 
                 p.postID, p.title, p.description,
                 p.userID as authorUserID,
@@ -150,15 +153,30 @@ router.get('/feed', authMiddleware, async (req, res) => {
             LEFT JOIN tagProjOnPost tpp ON p.postID = tpp.postID
             LEFT JOIN projects proj ON tpp.projectID = proj.projectID
             WHERE p.isArchived = 0
-            ORDER BY p.postID DESC;
         `;
 
-        const result = await request.query(query);
-        const postsMap = {};
+        if (filter) {
+            if (filter === 'My Posts') {
+                query += ' AND p.userID = @userID';
+                request.input('userID', sql.Int, userID);
+            } else {
+                // Filter by barangay name
+                query += ' AND b.barangayName = @filter';
+                request.input('filter', sql.NVarChar, filter);
+            }
+        }
 
-        result.recordset.forEach(row => {
-            if (!postsMap[row.postID]) {
-                postsMap[row.postID] = {
+        query += ' ORDER BY p.postID DESC;';
+
+        const result = await request.query(query);
+        const posts = [];
+        const postsMap = new Map();
+
+        for (const row of result.recordset) {
+            let post = postsMap.get(row.postID);
+
+            if (!post) {
+                post = {
                     postID: row.postID,
                     title: row.title,
                     description: row.description,
@@ -170,6 +188,8 @@ router.get('/feed', authMiddleware, async (req, res) => {
                     authorBarangayID: row.authorBarangayID,
                     viewOptions: row // Store all view options
                 };
+                postsMap.set(row.postID, post);
+                posts.push(post);
             }
 
             if (row.attachmentID) {
@@ -181,8 +201,8 @@ router.get('/feed', authMiddleware, async (req, res) => {
                 };
 
                 if (attachment.isPublic) {
-                    const exists = postsMap[row.postID].publicAttachments.some(a => a.attachmentID === attachment.attachmentID);
-                    if (!exists) postsMap[row.postID].publicAttachments.push(attachment);
+                    const exists = post.publicAttachments.some(a => a.attachmentID === attachment.attachmentID);
+                    if (!exists) post.publicAttachments.push(attachment);
                 } else {
                     // Secure attachment visibility logic
                     let canView = false;
@@ -191,14 +211,14 @@ router.get('/feed', authMiddleware, async (req, res) => {
                     else if (row.opforPubEAttach === true) canView = true; // Publicly visible secure docs
 
                     if (canView) {
-                        const exists = postsMap[row.postID].secureAttachments.some(a => a.attachmentID === attachment.attachmentID);
-                        if (!exists) postsMap[row.postID].secureAttachments.push(attachment);
+                        const exists = post.secureAttachments.some(a => a.attachmentID === attachment.attachmentID);
+                        if (!exists) post.secureAttachments.push(attachment);
                     }
                 }
             }
 
             // Tagged project processing
-            if (row.taggedProjectID && !postsMap[row.postID].taggedProjects.some(p => p.projectID === row.taggedProjectID)) {
+            if (row.taggedProjectID && !post.taggedProjects.some(p => p.projectID === row.taggedProjectID)) {
                 let canView = false;
                 if (row.opforBrgyProj === true) {
                     canView = (userBarangayId === row.authorBarangayID);
@@ -209,15 +229,13 @@ router.get('/feed', authMiddleware, async (req, res) => {
                 }
 
                 if (canView) {
-                    postsMap[row.postID].taggedProjects.push({
+                    post.taggedProjects.push({
                         projectID: row.taggedProjectID,
                         title: decrypt(row.taggedProjectTitle),
                     });
                 }
             }
-        });
-
-        const posts = Object.values(postsMap);
+        }
 
         for (const post of posts) {
             // Generate SAS URLs for all viewable attachments
