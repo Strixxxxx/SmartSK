@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import './RawDataList.css';
 import api from '../../../backend connection/axiosConfig';
+import Loading from '../../Loading/Loading';
 
 interface DataRow {
     ppa: string;
@@ -156,10 +157,7 @@ const RawDataList: React.FC<RawDataListProps> = () => {
     if (loading && data.length === 0) {
         return (
             <div className={`rawdata-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-                <div className="loading">
-                    <div className="loading-spinner"></div>
-                    <p>Loading raw data...</p>
-                </div>
+                <Loading />
             </div>
         );
     }

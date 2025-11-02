@@ -4,6 +4,7 @@ import axiosInstance from '../../../backend connection/axiosConfig';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import './audit.css';
+import Loading from '../../Loading/Loading';
 
 interface AuditLog {
   auditID: string;
@@ -64,7 +65,7 @@ const AuditTrail: React.FC<AuditTrailProps> = () => {
   }, [navigate]);
 
   if (loading) {
-    return <div className="loading">Loading...</div>;
+    return <Loading />;
   }
 
   if (error) {

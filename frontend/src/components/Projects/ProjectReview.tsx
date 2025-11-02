@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import axiosInstance from '../../backend connection/axiosConfig';
 import StatusLegend from './StatusLegend';
 import { FaInfoCircle } from 'react-icons/fa';
+import Loading from '../Loading/Loading';
 
 interface Project {
   id: number;
@@ -196,7 +197,7 @@ const ProjectReview: React.FC<ProjectReviewProps> = ({ userFullName, userRole })
             </tr>
           </thead>
           <tbody>
-            {loading ? (<tr><td colSpan={userRole === 'SKC' ? 6 : 5} className="loading-message">Loading...</td></tr>) 
+            {loading ? (<tr><td colSpan={userRole === 'SKC' ? 6 : 5}><Loading /></td></tr>) 
             : error ? (<tr><td colSpan={userRole === 'SKC' ? 6 : 5} className="error-message">{error}</td></tr>) 
             : projects.map(project => (
                 <React.Fragment key={project.id}>

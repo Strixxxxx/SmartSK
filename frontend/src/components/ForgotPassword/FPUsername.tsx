@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import Loading from '../Loading/Loading';
 
 interface FPUsernameProps {
   onSubmit: (username: string) => void;
@@ -61,7 +62,7 @@ const FPUsername: React.FC<FPUsernameProps> = ({ onSubmit }) => {
             className="fp-continue-btn"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Sending...' : 'Continue'}
+            {isSubmitting ? <Loading /> : 'Continue'}
           </button>
         </div>
       </form>

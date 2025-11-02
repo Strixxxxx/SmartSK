@@ -17,6 +17,7 @@ import {
   FormLabel,
   Box
 } from '@mui/material';
+import Loading from '../../Loading/Loading';
 
 interface User {
   userID: number;
@@ -207,7 +208,7 @@ const Roles: React.FC<RolesProps> = () => {
   if (isLoading) {
     return (
       <div className={`roles-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-        <div className="loading">Loading users...</div>
+        <Loading />
       </div>
     );
   }

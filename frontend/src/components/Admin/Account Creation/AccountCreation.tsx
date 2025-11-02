@@ -17,6 +17,7 @@ import {
   Box,
   MenuItem,
 } from '@mui/material';
+import Loading from '../../Loading/Loading';
 
 interface User {
   userName: string;
@@ -204,7 +205,7 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
   };
 
   if (loading && !users.length) {
-    return <div className="loading">Loading...</div>;
+    return <Loading />;
   }
 
   return (
@@ -226,7 +227,7 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
             <p>List of all registered users</p>
           </div>
           <div className="users-table-container">
-            {loading ? <div className="loading">Refreshing...</div> : (
+            {loading ? <Loading /> : (
               <table className="users-table">
                 <thead>
                   <tr>

@@ -4,6 +4,7 @@ import PostCard from '../../Portfolio/PostCard';
 import { Post } from '../../../types/PostTypes';
 import ContentViewer from '../../Portfolio/ContentViewer';
 import { useWebSocket } from '../../../context/WebSocketContext'; // Import the hook
+import Loading from '../../Loading/Loading';
 import './DashboardFeed.css';
 
 interface DashboardFeedProps {
@@ -84,7 +85,7 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed }) => {
 
     return (
         <div className="dashboard-feed">
-            {loading && <div>Loading...</div>}
+            {loading && <Loading />}
             {error && <div>{error}</div>}
             <div className="project-list">
                 {posts.map(post => (

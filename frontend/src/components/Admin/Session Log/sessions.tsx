@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import axios from '../../../backend connection/axiosConfig';
 import './sessions.css';
+import Loading from '../../Loading/Loading';
 
 interface Session {
   sessionID: string;
@@ -99,7 +100,7 @@ const Sessions: React.FC<SessionsProps> = () => {
                     <h3>Active and Past Sessions</h3>
                 </div>
                 {loading ? (
-                    <div className="loading">Loading...</div>
+                    <Loading />
                 ) : error ? (
                     <div>{error}</div>
                 ) : (

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './Projects.css';
+import Loading from '../Loading/Loading';
 
 // Import submodules
 import ProjectSubmission from './ProjectSubmission';
@@ -20,7 +21,7 @@ const Projects: React.FC = () => {
   }, [user, navigate]);
 
   if (!user) {
-    return <p>Loading user data...</p>;
+    return <Loading />;
   }
 
   // View for SK Officer (SKO)

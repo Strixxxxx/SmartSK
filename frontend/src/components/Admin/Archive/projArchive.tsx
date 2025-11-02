@@ -13,6 +13,7 @@ import {
   Button,
 } from '@mui/material';
 import StatusLegend from '../../Projects/StatusLegend';
+import Loading from '../../Loading/Loading';
 
 interface Project {
   projectID: number;
@@ -206,7 +207,7 @@ const ProjArchive: React.FC = () => {
   };
 
   if (loading) {
-    return <p className="loading-message">Loading archived projects...</p>;
+    return <Loading />;
   }
 
   if (error) {

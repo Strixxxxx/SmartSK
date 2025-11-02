@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import './Login.css';
 import { Modal, Box, Typography } from '@mui/material';
 import axiosInstance from '../../backend connection/axiosConfig';
+import Loading from '../Loading/Loading';
 
 interface PasswordRequirement {
   met: boolean;
@@ -203,7 +204,7 @@ const NewAccount: React.FC<NewAccountProps> = ({ open, onClose, userID, currentU
                 className="submit-btn"
                 disabled={loading || !allRequirementsMet}
               >
-                {loading ? 'Changing...' : 'Confirm'}
+                {loading ? <Loading /> : 'Confirm'}
               </button>
             </div>
           </form>

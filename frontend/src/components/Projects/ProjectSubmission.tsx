@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import axiosInstance from '../../backend connection/axiosConfig';
 import StatusLegend from './StatusLegend';
 import { FaInfoCircle } from 'react-icons/fa';
+import Loading from '../Loading/Loading';
 
 interface Project {
   id: string;
@@ -274,7 +275,7 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
               </tr>
             </thead>
             <tbody>
-              {loading ? ( <tr><td colSpan={5} className="loading-message">Loading...</td></tr>)
+              {loading ? ( <tr><td colSpan={5}><Loading /></td></tr>)
               : error ? (<tr><td colSpan={5} className="error-message">{error}</td></tr>)
               : projects.length === 0 ? (<tr><td colSpan={5} className="no-projects-message">No projects submitted yet.</td></tr>)
               : (

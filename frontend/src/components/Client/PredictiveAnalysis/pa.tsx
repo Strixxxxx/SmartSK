@@ -1,11 +1,12 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { Card, Button, Form, Spinner, Alert } from 'react-bootstrap';
+import { Card, Button, Form, Alert } from 'react-bootstrap';
 import { ArrowClockwise } from 'react-bootstrap-icons';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import { toast } from 'react-toastify'; // Ensure toast is imported
 import PredictiveAnalysisResponse from './paResponse'; // Existing component for general results
 import PaCstmResponse, { PaCstmApiResponse } from './paCstmResponse'; // **** ADDED: Import the new component and its main interface ****
 import Trends from './paTrends';
+import Loading from '../../Loading/Loading';
 import './pa.css';
 
 // --- Interfaces ---
@@ -530,10 +531,7 @@ const PredictiveAnalysis: React.FC = () => {
 
               {loading && !analysisResult && (
                   <div className="text-center mt-4">
-                      <Spinner animation="border" role="status">
-                          <span className="visually-hidden">Loading...</span>
-                      </Spinner>
-                      <p>Loading analysis results...</p>
+                      <Loading />
                   </div>
               )}
 

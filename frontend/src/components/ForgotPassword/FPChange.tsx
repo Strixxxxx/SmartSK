@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import Loading from '../Loading/Loading';
 
 interface FPChangeProps {
   onSubmit: (password: string) => void;
@@ -148,7 +149,7 @@ const FPChange: React.FC<FPChangeProps> = ({ onSubmit }) => {
             className="fp-continue-btn"
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Processing...' : 'Update Password'}
+            {isSubmitting ? <Loading /> : 'Update Password'}
           </button>
         </div>
       </form>

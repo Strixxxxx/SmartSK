@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import ViewOptionModal from '../Dashboard/ViewOption';
 import AttachmentItem from './AttachmentItem';
 import AttachmentPreviewModal from './AttachmentPreviewModal';
+import Loading from '../../Loading/Loading';
 import './EditPostForm.css';
 
 // --- Interfaces ---
@@ -182,7 +183,7 @@ const EditPostForm: React.FC<EditPostFormProps> = ({ postId, onClose, onUpdated 
     };
 
     if (loading) {
-        return <div>Loading editor...</div>;
+        return <Loading />;
     }
 
     return (

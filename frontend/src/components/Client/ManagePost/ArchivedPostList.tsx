@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import './ArchivedPostList.css';
 import ContentViewer from '../../Portfolio/ContentViewer';
 import { Post } from '../../../types/PostTypes';
+import Loading from '../../Loading/Loading';
 
 interface ArchivedPost {
     postID: number;
@@ -78,7 +79,7 @@ const ArchivedPostList: React.FC = () => {
     };
 
     if (loading) {
-        return <div>Loading archived posts...</div>;
+        return <Loading />;
     }
 
     if (error) {

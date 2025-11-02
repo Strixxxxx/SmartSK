@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import axiosInstance from '../../backend connection/axiosConfig';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
+import Loading from '../Loading/Loading';
 
 interface FPOTPProps {
   onSubmit: (otp: string) => void;
@@ -159,7 +160,7 @@ const FPOTP: React.FC<FPOTPProps> = ({ onSubmit, username }) => {
       </div>
       
       <button type="button" className="fp-continue-btn" onClick={handleSubmit}>
-        {isSubmitting ? 'Verifying...' : 'Verify Code'}
+        {isSubmitting ? <Loading /> : 'Verify Code'}
       </button>
       
       <button 
@@ -168,7 +169,7 @@ const FPOTP: React.FC<FPOTPProps> = ({ onSubmit, username }) => {
         onClick={handleResendOTP}
         disabled={!canResend || isResending}
       >
-        {isResending ? 'Sending...' : 'Resend Code'}
+        {isResending ? <Loading /> : 'Resend Code'}
       </button>
     </div>
   );

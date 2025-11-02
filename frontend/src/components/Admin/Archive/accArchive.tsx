@@ -9,6 +9,7 @@ import {
   DialogTitle,
   Button,
 } from '@mui/material';
+import Loading from '../../Loading/Loading';
 
 interface ArchivedAccount {
   userID: number;
@@ -66,8 +67,7 @@ const AccArchive: React.FC = () => {
         setArchivedAccounts(prev => prev.filter(acc => acc.userID !== userToRestore.userID));
       } else {
         throw new Error(response.data.message || 'Failed to restore account');
-      }
-    } catch (err: any) {
+      }    } catch (err: any) {
       toast.error(err.message || 'An error occurred during restoration.');
     } finally {
       handleCancelRestore();
@@ -75,7 +75,7 @@ const AccArchive: React.FC = () => {
   };
 
   if (loading) {
-    return <p className="loading-message">Loading archived accounts...</p>;
+    return <Loading />;
   }
 
   if (error) {

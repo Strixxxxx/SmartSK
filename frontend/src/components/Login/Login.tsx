@@ -5,6 +5,7 @@ import './Login.css';
 import { toast } from 'react-toastify';
 import NewAccount from './NewAccount';
 import { Modal, Box } from '@mui/material';
+import Loading from '../Loading/Loading';
 
 
 
@@ -181,7 +182,7 @@ const Login: React.FC<LoginProps> = ({ open, onClose }) => {
               className="login-button"
               disabled={loading}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? <Loading /> : 'Login'}
             </button>
           </form>
         </div>

@@ -4,8 +4,6 @@ import {
   Box,
   ToggleButton,
   ToggleButtonGroup,
-  Typography,
-  CircularProgress,
 } from '@mui/material';
 import {
   Chart as ChartJS,
@@ -19,6 +17,7 @@ import {
 import { Bar } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import axios from '../../../backend connection/axiosConfig';
+import Loading from '../../Loading/Loading';
 import './Graph.css';
 
 // Register Chart.js components
@@ -173,7 +172,7 @@ const Graph: React.FC<GraphProps> = ({ currentView, onViewChange }) => {
       </Box>
       <div className="plot-container">
         {isLoading ? (
-          <div className="loading-container"><CircularProgress /> <Typography sx={{ml: 2}}>Loading Chart Data...</Typography></div>
+          <Loading />
         ) : error ? (
           <div className="error-message">{error}</div>
         ) : chartData ? (

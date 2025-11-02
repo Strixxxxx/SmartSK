@@ -6,6 +6,7 @@ import Login from '../Login/Login';
 import ContentViewer from './ContentViewer'; // Import the modal component
 import { useWebSocket } from '../../context/WebSocketContext';
 import './ProjectList.css';
+import Loading from '../Loading/Loading';
 
 const ProjectList: React.FC = () => {
     const { postUpdateTimestamp } = useWebSocket();
@@ -124,7 +125,7 @@ const ProjectList: React.FC = () => {
                         ))}
                     </div>
                     <div className="project-list">
-                        {loading && <div>Loading...</div>}
+                        {loading && <Loading />}
                         {error && <div>{error}</div>}
                         {posts.map(post => (
                             <PostCard key={post.postID} post={post} onPostClick={openModal} />

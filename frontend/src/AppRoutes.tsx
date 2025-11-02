@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import Loading from './components/Loading/Loading';
 
 // Layouts
 import ClientMainLayout from './components/Client/Layout/ClientMainLayout';
@@ -53,7 +54,7 @@ const AppRoutes: React.FC = () => {
   }, []);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   // If mobile, only show home and project-list, everything else shows ComingSoon

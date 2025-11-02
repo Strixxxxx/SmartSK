@@ -6,6 +6,7 @@ import { AxiosError } from 'axios';
 import { FaEye, FaDownload, FaSpinner, FaInfoCircle } from 'react-icons/fa';
 import StatusLegend from '../../Projects/StatusLegend';
 import '../../Projects/ProjectReview.css';
+import Loading from '../../Loading/Loading';
 
 interface Project {
   projectID: number;
@@ -218,7 +219,7 @@ const AdminProjects: React.FC = () => {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={9} className="loading-message">Loading...</td></tr>
+              <tr><td colSpan={9}><Loading /></td></tr>
             ) : projects.length === 0 ? (
               <tr>
                 <td colSpan={9} style={{ textAlign: 'center' }}>No projects found for your barangay.</td>

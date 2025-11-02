@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../../../backend connection/axiosConfig';
+import Loading from '../../Loading/Loading';
 import './ActivePostSelector.css';
 
 interface Post {
@@ -49,7 +50,7 @@ const ActivePostSelector: React.FC<ActivePostSelectorProps> = ({ onPostSelect, o
     };
 
     if (loading) {
-        return <div>Loading posts...</div>;
+        return <Loading />;
     }
 
     if (error) {

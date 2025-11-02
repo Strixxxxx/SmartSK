@@ -3,6 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import './rawdata.css';
 import api from '../../../backend connection/axiosConfig';
 import { toast } from 'react-toastify';
+import Loading from '../../Loading/Loading';
 
 interface DataRow {
     ppa: string;
@@ -242,10 +243,7 @@ const RawData: React.FC<RawDataProps> = () => {
     if (loading && data.length === 0) {
         return (
             <div className={`rawdata-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-                <div className="loading">
-                    <div className="loading-spinner"></div>
-                    <p>Loading raw data...</p>
-                </div>
+                <Loading />
             </div>
         );
     }
@@ -393,10 +391,7 @@ const RawData: React.FC<RawDataProps> = () => {
                         
                         <div className="table-container">
                             {loading ? (
-                                <div className="loading-container">
-                                    <div className="loading-spinner"></div>
-                                    <p>Loading data...</p>
-                                </div>
+                                <Loading />
                             ) : (
                                 <div className="table-wrapper">
                                     <table className="compact-table">
