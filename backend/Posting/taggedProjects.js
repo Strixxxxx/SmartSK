@@ -234,6 +234,16 @@ router.get('/post/:postId', authMiddleware, async (req, res) => {
             }
         });
 
+        // Generate SAS URLs for attachments before sending
+        post.publicAttachments = await Promise.all(post.publicAttachments.map(async (attachment) => {
+            const sasUrl = await getFileSasUrl(attachment.filePath, attachment.fileType, attachment.isPublic);
+            return { ...attachment, filePath: sasUrl };
+        }));
+        post.secureAttachments = await Promise.all(post.secureAttachments.map(async (attachment) => {
+            const sasUrl = await getFileSasUrl(attachment.filePath, attachment.fileType, attachment.isPublic);
+            return { ...attachment, filePath: sasUrl };
+        }));
+
         res.json({ success: true, post });
 
     } catch (error) {

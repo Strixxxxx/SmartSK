@@ -44,33 +44,51 @@ router.get('/', authMiddleware, async (req, res) => {
 // POST to archive an account
 router.post('/:userId', authMiddleware, async (req, res) => {
     const { userId } = req.params;
-    try {
-        const pool = await getConnection();
+    const pool = await getConnection();
+    const transaction = new sql.Transaction(pool);
 
-        const userToArchive = await pool.request()
+    try {
+        await transaction.begin();
+
+        const userToArchiveResult = await transaction.request()
             .input('userID', sql.Int, userId)
             .query('SELECT username FROM userInfo WHERE userID = @userID');
 
-        if (userToArchive.recordset.length === 0) {
+        if (userToArchiveResult.recordset.length === 0) {
+            await transaction.rollback();
             return res.status(404).json({ success: false, message: 'User not found.' });
         }
-        const decryptedUsername = decrypt(userToArchive.recordset[0].username);
+        const decryptedUsername = decrypt(userToArchiveResult.recordset[0].username);
 
-        // Update the isArchived flag instead of calling the stored procedure
-        await pool.request()
+        // 1. Archive the user account
+        await transaction.request()
             .input('userID', sql.Int, userId)
             .query('UPDATE userInfo SET isArchived = 1 WHERE userID = @userID');
+
+        // 2. Archive all posts by that user
+        await transaction.request()
+            .input('userID', sql.Int, userId)
+            .input('archivedAt', sql.DateTime, new Date())
+            .query('UPDATE posts SET isArchived = 1, archivedAt = @archivedAt WHERE userID = @userID');
+
+        await transaction.commit();
 
         addAuditTrail({
             actor: 'A',
             module: 'D',
             userID: req.user.userId,
             actions: 'archive-account',
-            descriptions: `Admin ${req.user.fullName} archived account for user: ${decryptedUsername}`
+            descriptions: `Admin ${req.user.fullName} archived account for user: ${decryptedUsername}. All associated posts were also archived.`
         });
 
-        res.json({ success: true, message: 'Account archived successfully.' });
+        res.json({ success: true, message: 'Account and all associated posts have been archived successfully.' });
+
     } catch (error) {
+        try {
+            await transaction.rollback();
+        } catch (rollbackError) {
+            console.error(`Error rolling back transaction for account archive ${userId}:`, rollbackError);
+        }
         console.error(`Error archiving account ${userId}:`, error);
         res.status(500).json({ success: false, message: 'Failed to archive account.' });
     }

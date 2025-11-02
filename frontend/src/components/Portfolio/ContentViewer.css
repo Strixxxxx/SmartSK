@@ -25,10 +25,14 @@
     position: relative;
 }
 
-.post-modal-close-btn {
+.post-modal-close-btn-container {
     position: absolute;
-    top: 15px;
-    right: 15px;
+    top: 5px;
+    right: 5px;
+    z-index: 2101;
+}
+
+.post-modal-close-btn {
     background: rgba(0, 0, 0, 0.7);
     color: white;
     border: none;

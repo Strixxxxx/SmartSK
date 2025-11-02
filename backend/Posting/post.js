@@ -7,7 +7,7 @@ const { checkRole } = require('../routeGuard/permission');
 const { uploadFile } = require('../Storage/storage');
 const { compressVideo } = require('../FFmpeg/ffmpeg');
 const { addAuditTrail } = require('../audit/auditService');
-const { sendToUser } = require('../websockets/websocket');
+const { sendToUser, broadcast } = require('../websockets/websocket');
 const postJob = require('./postJob');
 const fs = require('fs').promises;
 const path = require('path');
@@ -31,13 +31,7 @@ const upload = multer({
     limits: { fileSize: 100 * 1024 * 1024 } // 100MB limit for initial upload
 });
 
-// Function to get current timestamp in GMT+8
-const getPHTimestamp = () => {
-    const now = new Date();
-    const offset = 8 * 60; // GMT+8 in minutes
-    const localNow = new Date(now.getTime() + (offset * 60 * 1000));
-    return localNow;
-};
+const { getPHTimestamp } = require('../utils/time');
 
 // POST /api/create-post - Starts an asynchronous job to create a new post
 router.post('/create-post', authMiddleware, checkRole(['SKC', 'SKO']), upload.fields([{ name: 'attachments' }, { name: 'secure_attachments' }]), async (req, res) => {
@@ -123,12 +117,13 @@ router.get('/post-status/:jobId', authMiddleware, async (req, res) => {
 
 // Background processing function
 async function processPostUploadJob(jobId, tempFiles, tempDir) {
+    let job; // Declared in higher scope to be accessible in catch block
     try {
         await postJob.updateJob(jobId, 'processing', 'Processing post and uploading files.');
 
-        const job = await postJob.getJob(jobId);
+        job = await postJob.getJob(jobId); // Assign to the higher-scoped variable
         const { title, description, initiatedBy, taggedProjects, viewOptions } = JSON.parse(job.Payload);
-        const userID = job.UserID; // Get userID from the job's own column
+        const userID = job.UserID;
 
         const pool = await getConnection();
         const transaction = new sql.Transaction(pool);
@@ -144,10 +139,11 @@ async function processPostUploadJob(jobId, tempFiles, tempDir) {
                 .input('title', sql.NVarChar, title)
                 .input('description', sql.NVarChar, description)
                 .input('postReference', sql.NVarChar, postReference)
+                .input('createdAt', sql.DateTime, timestamp)
                 .query(`
-                    INSERT INTO posts (userID, title, description, postReference)
+                    INSERT INTO posts (userID, title, description, postReference, createdAt)
                     OUTPUT INSERTED.postID
-                    VALUES (@userID, @title, @description, @postReference);
+                    VALUES (@userID, @title, @description, @postReference, @createdAt);
                 `);
 
             const postID = postResult.recordset[0].postID;
@@ -184,7 +180,6 @@ async function processPostUploadJob(jobId, tempFiles, tempDir) {
                 }
             }
 
-            // Insert tagged projects
             if (taggedProjects && taggedProjects.length > 0) {
                 for (const projectID of taggedProjects) {
                     const tagRequest = new sql.Request(transaction);
@@ -195,7 +190,6 @@ async function processPostUploadJob(jobId, tempFiles, tempDir) {
                 }
             }
 
-            // Insert view options
             if (viewOptions) {
                 const viewRequest = new sql.Request(transaction);
                 await viewRequest
@@ -226,18 +220,20 @@ async function processPostUploadJob(jobId, tempFiles, tempDir) {
 
             await postJob.updateJob(jobId, 'completed', 'Post created successfully.', { Result: { postID } });
             sendToUser(userID, { type: 'job-update', status: 'completed', message: 'Post created successfully!' });
+            broadcast({ type: 'POSTS_UPDATED' });
 
         } catch (innerError) {
             await transaction.rollback();
-            throw innerError; // Propagate to outer catch
+            throw innerError;
         }
 
     } catch (error) {
         console.error(`[Job ${jobId}] Failed to process post upload:`, error);
         await postJob.updateJob(jobId, 'failed', 'Failed to create post.', { ErrorMessage: error.message });
-        sendToUser(job.UserID, { type: 'job-update', status: 'failed', message: error.message });
+        if (job && job.UserID) {
+            sendToUser(job.UserID, { type: 'job-update', status: 'failed', message: 'Post creation failed. Please try again.' });
+        }
     } finally {
-        // Cleanup temporary files
         try {
             await fs.rm(tempDir, { recursive: true, force: true });
         } catch (cleanupError) {

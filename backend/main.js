@@ -48,6 +48,7 @@ const postPublicRouter = require('./Posting/postPublic');
 const protectedPostRouter = require('./Posting/post');
 const pStatusListRouter = require('./Projects/pStatusList.js');
 const taggedProjectsRouter = require('./Posting/taggedProjects');
+const managePostRouter = require('./Posting/managePost');
 
 // Import the new PyBridge modules with error handling
 let PyBridgeFC, PyBridgePA;
@@ -271,6 +272,12 @@ if (taggedProjectsRouter && typeof taggedProjectsRouter === 'function') {
   app.use('/api/tagged-projects', taggedProjectsRouter);
 } else {
   console.error('taggedProjectsRouter is not a valid middleware function');
+}
+
+if (managePostRouter && typeof managePostRouter === 'function') {
+  app.use('/api/manage-post', managePostRouter);
+} else {
+  console.error('managePostRouter is not a valid middleware function');
 }
 
 if (emailRouter && typeof emailRouter === 'function') {

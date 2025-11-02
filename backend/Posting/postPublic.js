@@ -40,11 +40,12 @@ router.get('/', async (req, res) => {
             LEFT JOIN postAttachments pa ON p.postID = pa.postID
             LEFT JOIN tagProjOnPost tpp ON p.postID = tpp.postID
             LEFT JOIN projects proj ON tpp.projectID = proj.projectID
+            WHERE p.isArchived = 0
         `;
 
         if (barangay) {
             request.input('barangayName', sql.NVarChar, barangay);
-            query += ' WHERE b.barangayName = @barangayName';
+            query += ' AND b.barangayName = @barangayName';
         }
 
         query += ' ORDER BY p.postID DESC;';
@@ -148,6 +149,7 @@ router.get('/feed', authMiddleware, async (req, res) => {
             LEFT JOIN postAttachments pa ON p.postID = pa.postID
             LEFT JOIN tagProjOnPost tpp ON p.postID = tpp.postID
             LEFT JOIN projects proj ON tpp.projectID = proj.projectID
+            WHERE p.isArchived = 0
             ORDER BY p.postID DESC;
         `;
 

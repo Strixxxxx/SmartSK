@@ -24,9 +24,10 @@ router.get('/', authMiddleware, async (req, res) => {
             p.reviewedBy,
             u.fullName as submittedBy,
             s.StatusName as statusName
-        FROM projectsARC p
-        LEFT JOIN userInfoARC u ON p.userID = u.userID
+        FROM projects p
+        LEFT JOIN userInfo u ON p.userID = u.userID
         LEFT JOIN StatusLookup s ON p.status = s.StatusID
+        WHERE p.isArchived = 1
         ORDER BY p.submittedDate DESC
     `);
 
@@ -63,7 +64,7 @@ router.post('/:projectId', authMiddleware, async (req, res) => {
         }
         const { reference_number } = projectToArchive.recordset[0];
 
-        await request.execute('prjArchived');
+        await request.query('UPDATE projects SET isArchived = 1 WHERE projectID = @projectID');
 
         addAuditTrail({
             actor: 'A',
@@ -90,14 +91,14 @@ router.post('/restore/:projectId', authMiddleware, async (req, res) => {
 
         const projectToRestore = await pool.request()
             .input('projectID', sql.Int, projectId)
-            .query('SELECT reference_number FROM projectsARC WHERE projectID = @projectID');
+            .query('SELECT reference_number FROM projects WHERE projectID = @projectID');
 
         if (projectToRestore.recordset.length === 0) {
             return res.status(404).json({ success: false, message: 'Archived project not found.' });
         }
         const { reference_number } = projectToRestore.recordset[0];
 
-        await request.execute('prjReturn');
+        await request.query('UPDATE projects SET isArchived = 0 WHERE projectID = @projectID');
 
         addAuditTrail({
             actor: 'A',
@@ -122,7 +123,7 @@ router.get('/file-url/:projectID', authMiddleware, async (req, res) => {
         const pool = await getConnection();
         const result = await pool.request()
             .input('projectID', sql.Int, projectID)
-            .query('SELECT file_path FROM projectsARC WHERE projectID = @projectID');
+            .query('SELECT file_path FROM projects WHERE projectID = @projectID');
 
         if (result.recordset.length === 0 || !result.recordset[0].file_path) {
             return res.status(404).json({ success: false, message: 'File not found for this project.' });

@@ -285,7 +285,9 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
         <>
             <div className="post-modal-overlay" onClick={onClose}>
                 <div className="post-modal-content" onClick={(e) => e.stopPropagation()}>
-                    <button className="post-modal-close-btn" onClick={onClose} aria-label="Close modal">&times;</button>
+                    <div className="post-modal-close-btn-container">
+                        <button className="post-modal-close-btn" onClick={onClose} aria-label="Close modal">&times;</button>
+                    </div>
                     <div className="post-modal-body">
                         <div className="post-modal-image-section">
                             {attachmentsToDisplay.length > 0 ? renderMedia(attachmentsToDisplay[currentAttachmentIndex]) : <div className="placeholder-media">No attachments</div>}

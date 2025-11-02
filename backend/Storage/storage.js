@@ -176,10 +176,54 @@ async function downloadBackupFile(blobName, downloadPath) {
     console.log(`Successfully downloaded ${blobName} to ${downloadPath}.`);
 }
 
+/**
+ * Deletes a blob from Azure Storage.
+ * @param {string} blobName - The name of the blob to delete.
+ * @param {string} fileType - The MIME type of the file.
+ * @param {boolean} isPublic - Whether the file is in a public container.
+ * @returns {Promise<void>}
+ */
+async function deleteFile(blobName, fileType, isPublic) {
+    let containerName;
+    const mimetype = fileType || '';
+
+    if (!isPublic) {
+        containerName = eAttachContainerName;
+    } else {
+        if (mimetype.startsWith('image')) {
+            containerName = imageContainerName;
+        } else if (mimetype.startsWith('video')) {
+            containerName = videoContainerName;
+        } else {
+            containerName = docContainerName;
+        }
+    }
+
+    if (!containerName) {
+        throw new Error(`Could not determine container for blob: ${blobName} to delete.`);
+    }
+
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobClient = containerClient.getBlobClient(blobName);
+
+    try {
+        await blobClient.delete();
+        console.log(`Successfully deleted blob ${blobName} from container ${containerName}.`);
+    } catch (error) {
+        // If the blob doesn't exist, Azure throws a 404 error. We can often ignore this.
+        if (error.statusCode === 404) {
+            console.warn(`Blob ${blobName} not found in container ${containerName}. It may have already been deleted.`);
+        } else {
+            throw error; // Re-throw other errors
+        }
+    }
+}
+
 module.exports = {
     uploadFile,
     getFileSasUrl,
     uploadBackupFile,
     listBackups,
     downloadBackupFile,
+    deleteFile, // Export the new function
 };

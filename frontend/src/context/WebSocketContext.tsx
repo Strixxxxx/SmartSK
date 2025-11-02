@@ -8,6 +8,7 @@ interface MaintenanceMessage {
 
 interface WebSocketContextType {
   maintenanceMessage: MaintenanceMessage | null;
+  postUpdateTimestamp: number; // New state to track post updates
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -26,6 +27,7 @@ interface WebSocketProviderProps {
 
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
   const [maintenanceMessage, setMaintenanceMessage] = useState<MaintenanceMessage | null>(null);
+  const [postUpdateTimestamp, setPostUpdateTimestamp] = useState<number>(Date.now()); // New state
 
   useEffect(() => {
     let ws: WebSocket;
@@ -59,6 +61,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         try {
           const message = JSON.parse(event.data);
           if (import.meta.env.DEV) console.log('[WebSocket] Message received:', message);
+          
           if (message.type === 'maintenance_starting' || message.type === 'maintenance_ended') {
             setMaintenanceMessage(message);
           } else if (message.type === 'job-update') {
@@ -67,7 +70,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
             } else if (message.status === 'failed') {
                 toast.error(message.message);
             }
+          } else if (message.type === 'POSTS_UPDATED') { // Handle the new message type
+            if (import.meta.env.DEV) console.log('[WebSocket] Posts updated, triggering refresh.');
+            setPostUpdateTimestamp(Date.now()); // Update timestamp to trigger re-renders
           }
+
         } catch (error) {
           if (import.meta.env.DEV) console.error('[WebSocket] Error parsing message:', error);
         }
@@ -108,7 +115,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
   }, [maintenanceMessage]);
 
   return (
-    <WebSocketContext.Provider value={{ maintenanceMessage }}>
+    <WebSocketContext.Provider value={{ maintenanceMessage, postUpdateTimestamp }}>
       {children}
     </WebSocketContext.Provider>
   );

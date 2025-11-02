@@ -127,23 +127,6 @@ CREATE TABLE rawDataTrack (
     dateUpload DATETIME NOT NULL
 );
 
---Archive Related Tables
-
-CREATE TABLE projectsARC (
-    projectID INT IDENTITY(1,1) PRIMARY KEY,
-    reference_number VARCHAR(255) UNIQUE NOT NULL,
-    title VARCHAR(255) NOT NULL,
-    description NVARCHAR(MAX),
-    userID INT NOT NULL,
-    status INT NOT NULL,
-    submittedDate DATETIME DEFAULT GETDATE(),
-    file_path VARCHAR(255),
-    file_name VARCHAR(255),
-    remarks NVARCHAR(MAX),
-    reviewedBy NVARCHAR(50),
-    CONSTRAINT FK_ProjectStatus_ARC FOREIGN KEY (status) REFERENCES StatusLookup(StatusID)
-);
-
 --Storing OTP
 
 CREATE TABLE otpStore (
@@ -165,6 +148,9 @@ postReference NVARCHAR(16) NOT NULL,
 userID INT NOT NULL,
 title NVARCHAR(255) NOT NULL,
 description NVARCHAR(MAX) NOT NULL,
+isArchived BIT DEFAULT 0 NOT NULL,
+createdAt DATETIME DEFAULT GETDATE(),
+archivedAt DATETIME NULL,
 CONSTRAINT FK_Posts_ClientUsers FOREIGN KEY (userID) REFERENCES userInfo(userID),
 );
 
@@ -382,126 +368,32 @@ BEGIN
 END;
 GO
 
---Project Archiving
+--Deleting related Rows in a Post
 
-CREATE PROCEDURE prjArchived
-    -- Input parameter: The ID of the project to archive
-    @projectID INT
+CREATE PROCEDURE DeletePostAndRelatedData
+    @postID INT
 AS
 BEGIN
-    SET NOCOUNT ON;
-
-    -- Start a transaction for the move operation.
+    -- Begin a transaction to ensure all operations succeed or fail together
     BEGIN TRANSACTION;
 
     BEGIN TRY
-        -- Check if the project exists before attempting to move it.
-        IF EXISTS (SELECT 1 FROM dbo.projects WHERE projectID = @projectID)
-        BEGIN
-            -- Enable IDENTITY_INSERT to preserve the original projectID.
-            SET IDENTITY_INSERT dbo.projectsARC ON;
+        -- Delete from child tables first to respect foreign key constraints
+        DELETE FROM PostAttachments WHERE postID = @postID;
+        DELETE FROM TagProjOnPost WHERE postID = @postID;
+        DELETE FROM ViewOption WHERE postID = @postID;
 
-            -- Step 1: Copy the project data to the archive table.
-            INSERT INTO dbo.projectsARC (
-                projectID, reference_number, title, description, userID, status,
-                submittedDate, file_path, file_name, remarks, reviewedBy
-            )
-            SELECT
-                projectID, reference_number, title, description, userID, status,
-                submittedDate, file_path, file_name, remarks, reviewedBy
-            FROM
-                dbo.projects
-            WHERE
-                projectID = @projectID;
+        -- Finally, delete the main post
+        DELETE FROM posts WHERE postID = @postID;
 
-            -- Disable IDENTITY_INSERT.
-            SET IDENTITY_INSERT dbo.projectsARC OFF;
-
-            -- Step 2: Delete the project from the main table.
-            DELETE FROM dbo.projects
-            WHERE projectID = @projectID;
-
-            -- If all goes well, commit the changes.
-            COMMIT TRANSACTION;
-            PRINT 'Project with ID ' + CAST(@projectID AS VARCHAR) + ' was successfully archived.';
-        END
-        ELSE
-        BEGIN
-             -- If project does not exist, rollback to do nothing and print a message.
-            ROLLBACK TRANSACTION;
-            PRINT 'Error: Project with ID ' + CAST(@projectID AS VARCHAR) + ' not found. No action taken.';
-        END
-    END TRY
-    BEGIN CATCH
-        -- If an error occurs, undo all changes.
-        ROLLBACK TRANSACTION;
-        PRINT 'An error occurred. Transaction rolled back.';
-        THROW;
-    END CATCH
-END
-GO
-
---Projects return
-
-CREATE PROCEDURE prjReturn
-    -- Input parameter: The ID of the project to return from the archive
-    @projectID INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-    BEGIN TRANSACTION;
-
-    BEGIN TRY
-        -- PRE-FLIGHT CHECKS --
-        -- 1. Check if the project is in the archive.
-        IF NOT EXISTS (SELECT 1 FROM dbo.projectsARC WHERE projectID = @projectID)
-        BEGIN
-            PRINT 'Error: Project with ID ' + CAST(@projectID AS VARCHAR) + ' not found in the archive. No action taken.';
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-
-        -- 2. Check if the project ID already exists in the main projects table.
-        IF EXISTS (SELECT 1 FROM dbo.projects WHERE projectID = @projectID)
-        BEGIN
-            PRINT 'Error: Project with ID ' + CAST(@projectID AS VARCHAR) + ' already exists in the main projects table. Cannot restore.';
-            ROLLBACK TRANSACTION;
-            RETURN;
-        END
-
-        -- Enable IDENTITY_INSERT on the destination table.
-        SET IDENTITY_INSERT dbo.projects ON;
-
-        -- Step 1: Copy the project data from the archive back to the main table.
-        INSERT INTO dbo.projects (
-            projectID, reference_number, title, description, userID, status,
-            submittedDate, file_path, file_name, remarks, reviewedBy
-        )
-        SELECT
-            projectID, reference_number, title, description, userID, status,
-            submittedDate, file_path, file_name, remarks, reviewedBy
-        FROM
-            dbo.projectsARC
-        WHERE
-            projectID = @projectID;
-
-        -- Disable IDENTITY_INSERT.
-        SET IDENTITY_INSERT dbo.projects OFF;
-
-        -- Step 2: Delete the project from the archive table.
-        DELETE FROM dbo.projectsARC
-        WHERE projectID = @projectID;
-
-        -- Commit the transaction if everything succeeded.
+        -- Commit the transaction if all deletions were successful
         COMMIT TRANSACTION;
-        PRINT 'Project with ID ' + CAST(@projectID AS VARCHAR) + ' was successfully returned from the archive.';
-
     END TRY
     BEGIN CATCH
-        -- If any error happens, cancel the transaction.
+        -- If any error occurs, roll back the entire transaction
         ROLLBACK TRANSACTION;
-        PRINT 'An error occurred. Transaction rolled back.';
+        
+        -- Re-throw the error to be caught by the application
         THROW;
     END CATCH
 END

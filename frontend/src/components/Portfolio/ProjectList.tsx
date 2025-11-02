@@ -4,9 +4,11 @@ import PostCard from './PostCard';
 import { Post } from '../../types/PostTypes';
 import Login from '../Login/Login';
 import ContentViewer from './ContentViewer'; // Import the modal component
+import { useWebSocket } from '../../context/WebSocketContext';
 import './ProjectList.css';
 
 const ProjectList: React.FC = () => {
+    const { postUpdateTimestamp } = useWebSocket();
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -62,7 +64,7 @@ const ProjectList: React.FC = () => {
         };
 
         fetchPosts();
-    }, [activeFilter]);
+    }, [activeFilter, postUpdateTimestamp]);
 
 
 

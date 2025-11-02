@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
                 JOIN 
                     dbo.StatusLookup sl ON p.status = sl.StatusID
                 WHERE 
-                    u.barangay = @barangayId
+                    u.barangay = @barangayId AND p.isArchived = 0
                 ORDER BY
                     p.submittedDate DESC;
             `);

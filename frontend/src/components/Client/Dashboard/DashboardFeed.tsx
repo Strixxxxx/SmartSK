@@ -3,6 +3,7 @@ import axios from '../../../backend connection/axiosConfig';
 import PostCard from '../../Portfolio/PostCard';
 import { Post } from '../../../types/PostTypes';
 import ContentViewer from '../../Portfolio/ContentViewer';
+import { useWebSocket } from '../../../context/WebSocketContext'; // Import the hook
 import './DashboardFeed.css';
 
 interface DashboardFeedProps {
@@ -10,6 +11,7 @@ interface DashboardFeedProps {
 }
 
 const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed }) => {
+    const { postUpdateTimestamp } = useWebSocket(); // Use the hook
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -30,7 +32,7 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed }) => {
         };
 
         fetchPosts();
-    }, [refreshFeed]);
+    }, [refreshFeed, postUpdateTimestamp]); // Add postUpdateTimestamp to dependency array
 
     const openModal = (post: Post) => {
         setSelectedPost(post);

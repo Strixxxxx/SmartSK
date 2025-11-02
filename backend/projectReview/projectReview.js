@@ -29,7 +29,7 @@ router.get('/all', authMiddleware, async (req, res) => {
         FROM projects p
         INNER JOIN userInfo u ON p.userID = u.userID
         INNER JOIN StatusLookup s ON p.status = s.StatusID
-        WHERE u.barangay = @userBarangay
+        WHERE u.barangay = @userBarangay AND p.isArchived = 0
         ORDER BY p.submittedDate DESC
       `);
     

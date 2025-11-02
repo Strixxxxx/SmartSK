@@ -117,7 +117,7 @@ router.get('/user/:userId', authMiddleware, async (req, res) => {
                p.remarks, p.userID as userId, p.reviewedBy
         FROM projects p
         JOIN StatusLookup s ON p.status = s.StatusID
-        WHERE p.userID = @userId
+        WHERE p.userID = @userId AND p.isArchived = 0
         ORDER BY p.submittedDate DESC
       `);
 
