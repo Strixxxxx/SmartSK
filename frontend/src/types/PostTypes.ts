@@ -11,9 +11,11 @@ export interface TaggedProject {
 
 export interface Post {
     postID: number;
+    userID: number;
     title: string;
     description: string;
     author: string;
+    postReference: string;
     publicAttachments: Attachment[];
     secureAttachments: Attachment[];
     taggedProjects?: TaggedProject[];

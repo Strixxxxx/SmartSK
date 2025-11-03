@@ -4,6 +4,19 @@
 
 --Frontend (Browser's Console)
 
+ContentViewer.tsx:386 MUI: The `anchorEl` prop provided to the component is invalid.
+The anchor element should be part of the document layout.
+Make sure the element is present in the document or that it's not display none.
+<ForwardRef(Menu2)>		
+ContentViewer	@	ContentViewer.tsx:386
+
+ContentViewer.tsx:386 MUI: The `anchorEl` prop provided to the component is invalid.
+The anchor element should be part of the document layout.
+Make sure the element is present in the document or that it's not display none.
+<ForwardRef(Menu2)>		
+ContentViewer	@	ContentViewer.tsx:386
+﻿
+
 
 
 --Frontend (VSC Terminal)

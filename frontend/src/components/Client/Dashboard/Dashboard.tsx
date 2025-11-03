@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
             <div className="dashboard-header">
                 <h2>Welcome to Smart SK Dashboard</h2>
                 <div className="dashboard-header-buttons">
-                    <button onClick={() => setIsManageModalOpen(true)} className="manage-post-btn">Manage Posts</button>
+                    <button onClick={() => setIsManageModalOpen(true)} className="manage-post-btn">View Archived Posts</button>
                     <button onClick={() => setIsCreateModalOpen(true)} className="create-post-btn">Create Post</button>
                 </div>
             </div>

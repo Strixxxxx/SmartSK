@@ -1,1 +1,0 @@
-so if you look at the @Screenshots/1st.png & @Screenshots/2nd.png , you did increase the white space on the top and the close icon can be seen but the UI design is weird. So here what you should do. First is that increase the padding to 80 px. Next, make sure that in the top right, the close icon should be shown on the top right which should be in the top padding.

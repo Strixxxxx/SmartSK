@@ -7,6 +7,8 @@ import { useWebSocket } from '../../../context/WebSocketContext';
 import Loading from '../../Loading/Loading';
 import './DashboardFeed.css';
 
+import PostManagerModal from '../ManagePost/PostManagerModal';
+
 interface DashboardFeedProps {
     refreshFeed: boolean;
     searchQuery: string;
@@ -15,12 +17,13 @@ interface DashboardFeedProps {
 
 const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed, searchQuery, filter }) => {
     const { postUpdateTimestamp } = useWebSocket();
-    const [posts, setPosts] = useState<Post[]>([]); // Raw posts from API
-    const [filteredPosts, setFilteredPosts] = useState<Post[]>([]); // Posts to display
+    const [posts, setPosts] = useState<Post[]>([]);
+    const [filteredPosts, setFilteredPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedPost, setSelectedPost] = useState<Post | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isViewerOpen, setIsViewerOpen] = useState(false);
+    const [managePost, setManagePost] = useState<Post | null>(null);
 
     // Fetch posts from the API based on the filter
     useEffect(() => {
@@ -56,14 +59,46 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed, searchQuery,
         setFilteredPosts(result);
     }, [searchQuery, posts]);
 
-    const openModal = (post: Post) => {
+    const openViewer = (post: Post) => {
         setSelectedPost(post);
-        setIsModalOpen(true);
+        setIsViewerOpen(true);
     };
 
-    const closeModal = () => {
-        setIsModalOpen(false);
+    const closeViewer = () => {
+        setIsViewerOpen(false);
         setSelectedPost(null);
+    };
+
+    const handleOpenManagePost = (post: Post) => {
+        setManagePost(post); // Set the data for the manager modal
+        closeViewer();       // Close the content viewer modal
+    };
+
+    const handleCloseManagePost = () => {
+        setManagePost(null);
+        closeViewer(); // Close both modals
+        // Trigger feed refresh by re-fetching posts
+        fetchPostsManually();
+    };
+
+    const handleBackToList = () => {
+        setManagePost(null);
+        // Keep ContentViewer open, just close PostManagerModal
+    };
+
+    const fetchPostsManually = async () => {
+        setLoading(true);
+        try {
+            const response = await axios.get('/api/posts/feed', {
+                params: { filter },
+            });
+            setPosts(response.data);
+        } catch (err) {
+            setError('Failed to fetch posts.');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handlePostChange = async (postId: number) => {
@@ -91,7 +126,8 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed, searchQuery,
             }
         } catch (err) {
             setError('An error occurred while fetching the post.');
-        } finally {
+        }
+        finally {
             setLoading(false);
         }
     };
@@ -102,16 +138,25 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed, searchQuery,
             {error && <div>{error}</div>}
             <div className="project-list">
                 {filteredPosts.map(post => (
-                    <PostCard key={post.postID} post={post} onPostClick={openModal} />
+                    <PostCard key={post.postID} post={post} onPostClick={openViewer} />
                 ))}
             </div>
             <ContentViewer 
                 post={selectedPost} 
-                show={isModalOpen} 
-                onClose={closeModal} 
+                show={isViewerOpen} 
+                onClose={closeViewer} 
                 onPostChange={handlePostChange} 
                 isAuthenticated={true} 
+                onOpenManagePost={handleOpenManagePost}
             />
+            {managePost && (
+                <PostManagerModal
+                    postId={managePost.postID}
+                    postReference={managePost.postReference}
+                    onClose={handleCloseManagePost}
+                    onBackToList={handleBackToList}
+                />
+            )}
         </div>
     );
 };

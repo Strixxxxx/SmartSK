@@ -3,13 +3,16 @@ import './ContentViewer.css';
 import api from '../../backend connection/axiosConfig';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { Post, TaggedProject, Attachment } from '../../types/PostTypes';
+import { useAuth } from '../../context/AuthContext';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import { IconButton } from '@mui/material';
 
 // --- TYPE DEFINITIONS ---
 
 interface ProjectDetails extends TaggedProject {
     description: string;
     author: string;
-    attachments?: Attachment[]; // Projects can also have attachments
+    attachments?: Attachment[];
 }
 
 type ViewMode = 'public_post' | 'secure_attachments' | 'project_details';
@@ -80,7 +83,6 @@ const RelatedPostsModal: React.FC<{
                 <h2>Related Posts</h2>
                 <div className="radio-group">
                     {posts.map(p => {
-                        // Ensure postID is a number, not an array
                         const postId = Array.isArray(p.postID) ? p.postID[0] : p.postID;
                         return (
                             <div key={postId} className="radio-option">
@@ -113,9 +115,11 @@ interface ContentViewerProps {
     onClose: () => void;
     onPostChange: (postId: number) => void;
     isAuthenticated: boolean;
+    onOpenManagePost?: (post: Post) => void;
 }
 
-const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPostChange, isAuthenticated }) => {
+const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPostChange, isAuthenticated, onOpenManagePost }) => {
+    const { user } = useAuth();
     const [currentPost, setCurrentPost] = useState<Post | null>(post);
     const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
     const [relatedPosts, setRelatedPosts] = useState<{ postID: number; title: string }[]>([]);
@@ -178,6 +182,13 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
     if (!show || !currentPost) {
         return null;
     }
+
+    const handleManageClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (onOpenManagePost && currentPost) {
+            onOpenManagePost(currentPost);
+        }
+    };
 
     const handleSelectProject = async (projectId: number) => {
         try {
@@ -279,15 +290,32 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
         </div>
     );
 
-    const { author, description, title } = currentPost;
+    const { author, description, title, userID } = currentPost;
+    const isAuthor = isAuthenticated && user && user.id === userID;
 
     return (
         <>
             <div className="post-modal-overlay" onClick={onClose}>
                 <div className="post-modal-content" onClick={(e) => e.stopPropagation()}>
-                    <div className="post-modal-close-btn-container">
-                        <button className="post-modal-close-btn" onClick={onClose} aria-label="Close modal">&times;</button>
+                    {/* Header Bar */}
+                    <div className="post-modal-header-bar">
+                        <div className="header-bar-left">
+                            {/* Empty space for balance */}
+                        </div>
+                        <div className="header-bar-right">
+                            {isAuthor && onOpenManagePost && (
+                                <IconButton
+                                    aria-label="manage post"
+                                    onClick={handleManageClick}
+                                    className="post-modal-manage-btn"
+                                >
+                                    <MoreVertIcon />
+                                </IconButton>
+                            )}
+                            <button className="post-modal-close-btn" onClick={onClose} aria-label="Close modal">&times;</button>
+                        </div>
                     </div>
+
                     <div className="post-modal-body">
                         <div className="post-modal-image-section">
                             {attachmentsToDisplay.length > 0 ? renderMedia(attachmentsToDisplay[currentAttachmentIndex]) : <div className="placeholder-media">No attachments</div>}
@@ -362,4 +390,5 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
         </>
     );
 };
+
 export default ContentViewer;

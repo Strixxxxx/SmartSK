@@ -178,6 +178,7 @@ router.get('/feed', authMiddleware, async (req, res) => {
             if (!post) {
                 post = {
                     postID: row.postID,
+                    userID: row.authorUserID,
                     title: row.title,
                     description: row.description,
                     author: decrypt(row.author),

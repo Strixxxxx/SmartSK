@@ -25,33 +25,92 @@
     position: relative;
 }
 
-.post-modal-close-btn-container {
-    position: absolute;
-    top: 5px;
-    right: 5px;
+/* NEW: Dedicated Header Bar */
+.post-modal-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0.85) 100%);
+    backdrop-filter: blur(10px);
+    min-height: 50px;
     z-index: 2101;
+    flex-shrink: 0;
+}
+
+.header-bar-left {
+    flex: 1;
+}
+
+.header-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.manage-post-container {
+    position: relative;
+}
+
+.post-modal-manage-btn {
+    color: white !important;
+    padding: 8px !important;
+}
+
+.post-modal-manage-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.custom-manage-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 2102;
+    overflow: hidden;
+    min-width: 150px;
+    margin-top: 4px;
+}
+
+.custom-manage-menu button {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    color: #333;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+}
+
+.custom-manage-menu button:hover {
+    background-color: #f5f5f5;
 }
 
 .post-modal-close-btn {
-    background: rgba(0, 0, 0, 0.7);
+    background: transparent;
     color: white;
     border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    font-size: 1.8rem;
+    width: 36px;
+    height: 36px;
+    font-size: 2rem;
     cursor: pointer;
-    z-index: 2100;
     display: flex;
     justify-content: center;
     align-items: center;
-    transition: background 0.2s ease;
+    transition: all 0.2s ease;
     padding: 0;
     line-height: 1;
+    border-radius: 4px;
 }
 
 .post-modal-close-btn:hover {
-    background: rgba(0, 0, 0, 0.9);
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ccc;
 }
 
 .post-modal-body {
@@ -142,7 +201,7 @@
     right: 1rem;
 }
 
-/* DESKTOP: Info section - RIGHT side (ORIGINAL LAYOUT) */
+/* DESKTOP: Info section - RIGHT side */
 .post-modal-info-section {
     flex: 1;
     display: flex;
@@ -237,9 +296,9 @@
     z-index: 20;
 }
 
-/* MOBILE ONLY: Bottom overlay (Facebook style) - HIDDEN on desktop */
+/* MOBILE ONLY: Bottom overlay - HIDDEN on desktop */
 .post-modal-bottom-overlay {
-    display: none; /* Hidden by default on desktop */
+    display: none;
 }
 
 /* Tablet Responsive */
@@ -274,7 +333,7 @@
     }
 }
 
-/* Mobile Responsive - FACEBOOK STYLE OVERLAY */
+/* Mobile Responsive */
 @media (max-width: 768px) {
     .post-modal-overlay {
         padding: 0;
@@ -287,6 +346,23 @@
         max-height: 100vh;
         border-radius: 0;
         background-color: #000;
+    }
+
+    /* Header bar on mobile */
+    .post-modal-header-bar {
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.4) 100%);
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 2101;
+        min-height: 50px;
+    }
+
+    .post-modal-close-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1.8rem;
     }
 
     .post-modal-body {
@@ -436,20 +512,6 @@
         transform: scale(1.1);
     }
 
-    .post-modal-close-btn {
-        width: 36px;
-        height: 36px;
-        font-size: 1.5rem;
-        top: 0.625rem;
-        right: 0.625rem;
-        background: rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-    }
-
-    .post-modal-close-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
-    }
-
     .post-modal-nav {
         width: 36px;
         height: 36px;
@@ -471,7 +533,7 @@
     }
 
     .image-counter {
-        top: 0.625rem;
+        top: 60px;
         bottom: auto;
         padding: 0.4rem 0.75rem;
         font-size: 0.85rem;
@@ -519,9 +581,7 @@
     .post-modal-close-btn {
         width: 32px;
         height: 32px;
-        font-size: 1.3rem;
-        top: 0.5rem;
-        right: 0.5rem;
+        font-size: 1.5rem;
     }
 
     .post-modal-nav {
@@ -539,7 +599,7 @@
     }
 
     .image-counter {
-        top: 0.5rem;
+        top: 55px;
         padding: 0.375rem 0.625rem;
         font-size: 0.8rem;
     }
@@ -565,8 +625,7 @@
     }
 }
 
-/* --- NEW STYLES --- */
-
+/* Action Buttons */
 .action-buttons {
     margin-top: 1.5rem;
     display: flex;
@@ -592,6 +651,7 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
+/* Secondary Modals */
 .secondary-modal-overlay {
     position: fixed;
     top: 0;
@@ -602,7 +662,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 2100; /* Higher than the main modal */
+    z-index: 2100;
 }
 
 .secondary-modal-content {
