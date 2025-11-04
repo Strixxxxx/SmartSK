@@ -3,6 +3,7 @@ import axios from '../../../backend connection/axiosConfig';
 import PostCard from '../../Portfolio/PostCard';
 import { Post } from '../../../types/PostTypes';
 import ContentViewer from '../../Portfolio/ContentViewer';
+import CommentModal from '../../Portfolio/CommentModal'; // Import CommentModal
 import { useWebSocket } from '../../../context/WebSocketContext';
 import Loading from '../../Loading/Loading';
 import './DashboardFeed.css';
@@ -24,6 +25,7 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed, searchQuery,
     const [selectedPost, setSelectedPost] = useState<Post | null>(null);
     const [isViewerOpen, setIsViewerOpen] = useState(false);
     const [managePost, setManagePost] = useState<Post | null>(null);
+    const [commentModalPostId, setCommentModalPostId] = useState<number | null>(null); // State for CommentModal
 
     // Fetch posts from the API based on the filter
     useEffect(() => {
@@ -69,6 +71,22 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed, searchQuery,
         setSelectedPost(null);
     };
 
+    const openComments = (postId: number) => {
+        setCommentModalPostId(postId);
+    };
+
+    const closeComments = () => {
+        setCommentModalPostId(null);
+    };
+
+    const handleCommentPosted = (postId: number) => {
+        const updateCount = (p: Post) => p.postID === postId ? { ...p, commentCount: p.commentCount + 1 } : p;
+        setPosts(prevPosts => prevPosts.map(updateCount));
+        if (selectedPost && selectedPost.postID === postId) {
+            setSelectedPost(prev => prev ? updateCount(prev) : null);
+        }
+    };
+
     const handleOpenManagePost = (post: Post) => {
         setManagePost(post); // Set the data for the manager modal
         closeViewer();       // Close the content viewer modal
@@ -83,7 +101,6 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed, searchQuery,
 
     const handleBackToList = () => {
         setManagePost(null);
-        // Keep ContentViewer open, just close PostManagerModal
     };
 
     const fetchPostsManually = async () => {
@@ -138,7 +155,7 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed, searchQuery,
             {error && <div>{error}</div>}
             <div className="project-list">
                 {filteredPosts.map(post => (
-                    <PostCard key={post.postID} post={post} onPostClick={openViewer} />
+                    <PostCard key={post.postID} post={post} onPostClick={openViewer} onCommentClick={openComments} />
                 ))}
             </div>
             <ContentViewer 
@@ -148,6 +165,14 @@ const DashboardFeed: React.FC<DashboardFeedProps> = ({ refreshFeed, searchQuery,
                 onPostChange={handlePostChange} 
                 isAuthenticated={true} 
                 onOpenManagePost={handleOpenManagePost}
+                onCommentClick={openComments} // Pass the handler here
+            />
+            <CommentModal 
+                postID={commentModalPostId}
+                show={commentModalPostId !== null}
+                onClose={closeComments}
+                onCommentPosted={handleCommentPosted}
+                isAuthenticated={true} // Specify authenticated state
             />
             {managePost && (
                 <PostManagerModal

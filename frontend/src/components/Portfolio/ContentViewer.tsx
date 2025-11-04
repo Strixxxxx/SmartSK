@@ -5,6 +5,7 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import { Post, TaggedProject, Attachment } from '../../types/PostTypes';
 import { useAuth } from '../../context/AuthContext';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import { IconButton } from '@mui/material';
 
 // --- TYPE DEFINITIONS ---
@@ -116,9 +117,10 @@ interface ContentViewerProps {
     onPostChange: (postId: number) => void;
     isAuthenticated: boolean;
     onOpenManagePost?: (post: Post) => void;
+    onCommentClick?: (postId: number) => void; // Make optional
 }
 
-const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPostChange, isAuthenticated, onOpenManagePost }) => {
+const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPostChange, isAuthenticated, onOpenManagePost, onCommentClick }) => {
     const { user } = useAuth();
     const [currentPost, setCurrentPost] = useState<Post | null>(post);
     const [projectDetails, setProjectDetails] = useState<ProjectDetails | null>(null);
@@ -276,6 +278,10 @@ const ContentViewer: React.FC<ContentViewerProps> = ({ post, show, onClose, onPo
                     {secureAttachments.length > 0 && (
                         <button onClick={() => setViewMode('secure_attachments')}>SK Full Disclosure Documents</button>
                     )}
+                    <button onClick={() => onCommentClick && onCommentClick(currentPost.postID)}>
+                        <ChatBubbleOutlineIcon style={{ fontSize: 20, verticalAlign: 'bottom', marginRight: '8px' }} />
+                        Comments ({currentPost.commentCount})
+                    </button>
                 </>
             )}
             {viewMode === 'secure_attachments' && (

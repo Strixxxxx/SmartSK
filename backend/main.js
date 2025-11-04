@@ -49,6 +49,8 @@ const protectedPostRouter = require('./Posting/post');
 const pStatusListRouter = require('./Projects/pStatusList.js');
 const taggedProjectsRouter = require('./Posting/taggedProjects');
 const managePostRouter = require('./Posting/managePost');
+const commentRouter = require('./Posting/comment');
+const protectedCommentRouter = require('./Posting/commentProtected');
 
 // Import the new PyBridge modules with error handling
 let PyBridgeFC, PyBridgePA;
@@ -167,6 +169,7 @@ app.post('/api/maintenance-end', (req, res) => {
 });
 
 app.use('/api/posts', postPublicRouter);
+app.use('/api', commentRouter);
 
 // --- AUTHENTICATION MIDDLEWARE ---
 // All routes defined after this point will be protected by the authMiddleware.
@@ -300,6 +303,10 @@ if (auditRouter && typeof auditRouter === 'function') {
 
 if (rawDataRouter && typeof rawDataRouter === 'function') {
   app.use('/api/rawdata', rawDataRouter);
+}
+
+if (protectedCommentRouter && typeof protectedCommentRouter === 'function') {
+  app.use('/api', protectedCommentRouter);
 } else {
   console.error('rawDataRouter is not a valid middleware function');
 }

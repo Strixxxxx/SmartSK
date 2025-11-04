@@ -3,7 +3,8 @@ import axios from '../../backend connection/axiosConfig';
 import PostCard from './PostCard';
 import { Post } from '../../types/PostTypes';
 import Login from '../Login/Login';
-import ContentViewer from './ContentViewer'; // Import the modal component
+import ContentViewer from './ContentViewer';
+import CommentModal from './CommentModal'; // Import CommentModal
 import { useWebSocket } from '../../context/WebSocketContext';
 import './ProjectList.css';
 import Loading from '../Loading/Loading';
@@ -19,12 +20,13 @@ const ProjectList: React.FC = () => {
 
     const [selectedPost, setSelectedPost] = useState<Post | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [commentModalPostId, setCommentModalPostId] = useState<number | null>(null);
 
     useEffect(() => {
         const createParticles = () => {
             const particles = document.getElementById('particles');
             if (particles) {
-                particles.innerHTML = ''; // Clear existing particles
+                particles.innerHTML = '';
                 const particleCount = 50;
                 for (let i = 0; i < particleCount; i++) {
                     const particle = document.createElement('div');
@@ -67,14 +69,8 @@ const ProjectList: React.FC = () => {
         fetchPosts();
     }, [activeFilter, postUpdateTimestamp]);
 
-
-
     const handleFilterClick = (barangay: string) => {
-        if (activeFilter === barangay) {
-            setActiveFilter(null); // Toggle off if already active
-        } else {
-            setActiveFilter(barangay);
-        }
+        setActiveFilter(activeFilter === barangay ? null : barangay);
     };
 
     const openModal = (post: Post) => {
@@ -85,6 +81,22 @@ const ProjectList: React.FC = () => {
     const closeModal = () => {
         setIsModalOpen(false);
         setSelectedPost(null);
+    };
+
+    const openComments = (postId: number) => {
+        setCommentModalPostId(postId);
+    };
+
+    const closeComments = () => {
+        setCommentModalPostId(null);
+    };
+
+    const handleCommentPosted = (postId: number) => {
+        const updateCount = (p: Post) => p.postID === postId ? { ...p, commentCount: p.commentCount + 1 } : p;
+        setPosts(prevPosts => prevPosts.map(updateCount));
+        if (selectedPost && selectedPost.postID === postId) {
+            setSelectedPost(prev => prev ? updateCount(prev) : null);
+        }
     };
 
     const handlePostChange = (postId: number) => {
@@ -128,7 +140,12 @@ const ProjectList: React.FC = () => {
                         {loading && <Loading />}
                         {error && <div>{error}</div>}
                         {posts.map(post => (
-                            <PostCard key={post.postID} post={post} onPostClick={openModal} />
+                            <PostCard 
+                                key={post.postID} 
+                                post={post} 
+                                onPostClick={openModal} 
+                                onCommentClick={openComments} 
+                            />
                         ))}
                     </div>
                 </div>
@@ -143,7 +160,21 @@ const ProjectList: React.FC = () => {
                 open={isLoginModalOpen}
                 onClose={() => setIsLoginModalOpen(false)}
             />
-            <ContentViewer post={selectedPost} show={isModalOpen} onClose={closeModal} onPostChange={handlePostChange} isAuthenticated={false} />
+            <ContentViewer 
+                post={selectedPost} 
+                show={isModalOpen} 
+                onClose={closeModal} 
+                onPostChange={handlePostChange} 
+                isAuthenticated={false} 
+                onCommentClick={openComments}
+            />
+            <CommentModal 
+                postID={commentModalPostId}
+                show={commentModalPostId !== null}
+                onClose={closeComments}
+                onCommentPosted={handleCommentPosted}
+                isAuthenticated={false}
+            />
         </>
     );
 };

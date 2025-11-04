@@ -1,0 +1,4 @@
+
+commentID   PostID      userID      parentCommentID     commentText                                 commentDate                 isAnonymous     alias     
+6	        37          6	        NULL	            testing functionality when user logged in	2025-11-04 21:44:22.030	    0	            NULL
+

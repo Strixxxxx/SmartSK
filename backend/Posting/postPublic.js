@@ -28,6 +28,7 @@ router.get('/', async (req, res) => {
         let query = `
             SELECT 
                 p.postID, p.title, p.description,
+                (SELECT COUNT(*) FROM postComment pc WHERE pc.PostID = p.postID) as commentCount,
                 u.fullName AS author,
                 b.barangayName,
                 pa.attachmentID, pa.fileType, pa.filePath, pa.isPublic,
@@ -62,6 +63,7 @@ router.get('/', async (req, res) => {
                     postID: row.postID,
                     title: row.title,
                     description: row.description,
+                    commentCount: row.commentCount,
                     author: decrypt(row.author),
                     barangayName: row.barangayName,
                     publicAttachments: [],
@@ -138,6 +140,7 @@ router.get('/feed', authMiddleware, async (req, res) => {
         let query = `
             SELECT 
                 p.postID, p.title, p.description,
+                (SELECT COUNT(*) FROM postComment pc WHERE pc.PostID = p.postID) as commentCount,
                 p.userID as authorUserID,
                 u.fullName AS author,
                 b.barangayID as authorBarangayID,
@@ -181,6 +184,7 @@ router.get('/feed', authMiddleware, async (req, res) => {
                     userID: row.authorUserID,
                     title: row.title,
                     description: row.description,
+                    commentCount: row.commentCount,
                     author: decrypt(row.author),
                     barangayName: row.barangayName,
                     publicAttachments: [],

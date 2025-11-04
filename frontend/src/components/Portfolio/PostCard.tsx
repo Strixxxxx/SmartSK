@@ -1,10 +1,12 @@
 import React from 'react';
 import './PostCard.css';
 import { Post, Attachment } from '../../types/PostTypes';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 
 interface PostCardProps {
     post: Post;
     onPostClick: (post: Post) => void;
+    onCommentClick?: (postId: number) => void; // Make optional
 }
 
 const PostDescription: React.FC<{ description: string; onShowMore: () => void }> = ({ description, onShowMore }) => {
@@ -32,8 +34,8 @@ const PostDescription: React.FC<{ description: string; onShowMore: () => void }>
     );
 };
 
-const PostCard: React.FC<PostCardProps> = ({ post, onPostClick }) => {
-    const { publicAttachments, title, author, description } = post;
+const PostCard: React.FC<PostCardProps> = ({ post, onPostClick, onCommentClick }) => {
+    const { publicAttachments, title, author, description, commentCount } = post;
     const mediaAttachments = publicAttachments.filter(att => att.fileType.startsWith('image') || att.fileType.startsWith('video'));
 
     const visibleAttachments = mediaAttachments.slice(0, 4);
@@ -58,6 +60,13 @@ const PostCard: React.FC<PostCardProps> = ({ post, onPostClick }) => {
         );
     };
 
+    const handleCommentClick = (e: React.MouseEvent) => {
+        if (onCommentClick) {
+            e.stopPropagation();
+            onCommentClick(post.postID);
+        }
+    };
+
     return (
         <div className="post-card" onClick={() => onPostClick(post)}>
             <div className="post-content">
@@ -75,6 +84,10 @@ const PostCard: React.FC<PostCardProps> = ({ post, onPostClick }) => {
                     ))}
                 </div>
             )}
+            <div className="post-footer" onClick={handleCommentClick}>
+                <ChatBubbleOutlineIcon style={{ fontSize: 20, color: '#666' }} />
+                <span>{commentCount}</span>
+            </div>
         </div>
     );
 };

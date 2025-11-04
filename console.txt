@@ -4,20 +4,33 @@
 
 --Frontend (Browser's Console)
 
-ContentViewer.tsx:386 MUI: The `anchorEl` prop provided to the component is invalid.
-The anchor element should be part of the document layout.
-Make sure the element is present in the document or that it's not display none.
-<ForwardRef(Menu2)>		
-ContentViewer	@	ContentViewer.tsx:386
+CommentModal.tsx:129 
+ PUT http://localhost:8080/api/comments/6 404 (Not Found)
+Promise.then		
+handleUpdate	@	CommentModal.tsx:129
+<button>		
+Comment	@	CommentModal.tsx:171
+<Comment>		
+(anonymous)	@	CommentModal.tsx:282
+CommentModal	@	CommentModal.tsx:281
 
-ContentViewer.tsx:386 MUI: The `anchorEl` prop provided to the component is invalid.
-The anchor element should be part of the document layout.
-Make sure the element is present in the document or that it's not display none.
-<ForwardRef(Menu2)>		
-ContentViewer	@	ContentViewer.tsx:386
+axiosConfig.ts:98 Client error: 404 
+{message: 'Comment not found or user not authorized to edit.'}
+message
+: 
+"Comment not found or user not authorized to edit."
+[[Prototype]]
+: 
+Object
+(anonymous)	@	axiosConfig.ts:98
+Promise.then		
+handleUpdate	@	CommentModal.tsx:129
+<button>		
+Comment	@	CommentModal.tsx:171
+<Comment>		
+(anonymous)	@	CommentModal.tsx:282
+CommentModal	@	CommentModal.tsx:281
 ﻿
-
-
 
 --Frontend (VSC Terminal)
 

@@ -139,3 +139,14 @@
     border-bottom: 15px solid transparent;
     border-left: 25px solid white;
 }
+
+.post-footer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 16px;
+    margin-top: 16px;
+    border-top: 1px solid #e2e8f0;
+    color: #666;
+    font-size: 14px;
+}
