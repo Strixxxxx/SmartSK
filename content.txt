@@ -1,4 +1,12 @@
+3. Client-Side DFD
+This diagram details the data flow from the perspective of a standard (non-admin) client user.
 
-commentID   PostID      userID      parentCommentID     commentText                                 commentDate                 isAnonymous     alias     
-6	        37          6	        NULL	            testing functionality when user logged in	2025-11-04 21:44:22.030	    0	            NULL
+Lexical error on line 13. Unrecognized text.
+... API_Auth[/api/login]        API_Projec
+-----------------------^
+4. Admin-Side DFD
+This diagram details the data flow from the perspective of an administrator, highlighting their extended privileges.
 
+Lexical error on line 15. Unrecognized text.
+... API_Auth[/api/login]        API_Admin_
+-----------------------^

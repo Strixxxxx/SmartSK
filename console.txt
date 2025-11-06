@@ -4,33 +4,103 @@
 
 --Frontend (Browser's Console)
 
-CommentModal.tsx:129 
- PUT http://localhost:8080/api/comments/6 404 (Not Found)
-Promise.then		
-handleUpdate	@	CommentModal.tsx:129
-<button>		
-Comment	@	CommentModal.tsx:171
-<Comment>		
-(anonymous)	@	CommentModal.tsx:282
-CommentModal	@	CommentModal.tsx:281
-
-axiosConfig.ts:98 Client error: 404 
-{message: 'Comment not found or user not authorized to edit.'}
+index-cgIEx8YG.js:81 Server error: 500 
+{error: true, message: 'Error running forecast analysis', details: 'Invalid JSON response from Python analysis script.'}
+details
+: 
+"Invalid JSON response from Python analysis script."
+error
+: 
+true
 message
 : 
-"Comment not found or user not authorized to edit."
+"Error running forecast analysis"
 [[Prototype]]
 : 
 Object
-(anonymous)	@	axiosConfig.ts:98
+(anonymous)	@	index-cgIEx8YG.js:81
 Promise.then		
-handleUpdate	@	CommentModal.tsx:129
-<button>		
-Comment	@	CommentModal.tsx:171
-<Comment>		
-(anonymous)	@	CommentModal.tsx:282
-CommentModal	@	CommentModal.tsx:281
-﻿
+_request	@	index-cgIEx8YG.js:81
+request	@	index-cgIEx8YG.js:80
+Ei.<computed>	@	index-cgIEx8YG.js:81
+(anonymous)	@	index-cgIEx8YG.js:76
+(anonymous)	@	index-cgIEx8YG.js:315
+(anonymous)	@	index-cgIEx8YG.js:315
+tc	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+or	@	index-cgIEx8YG.js:48
+m1	@	index-cgIEx8YG.js:48
+D1	@	index-cgIEx8YG.js:48
+(anonymous)	@	index-cgIEx8YG.js:48
+B	@	index-cgIEx8YG.js:25
 
 --Frontend (VSC Terminal)
 
@@ -46,7 +116,318 @@ CommentModal	@	CommentModal.tsx:281
 
 --Backend(Azure Portal's Log Stream in Runtime)
 
-
+2025-11-06T13:42:50.1903256Z Handler: Running forecast analysis with options: { view_by: 'committee' }
+2025-11-06T13:42:50.1910805Z Spawning Python analysis process: python3 /app/AI/forecast.py --analysis --view_by committee
+2025-11-06T13:43:00.4135765Z Error parsing JSON from Python script: SyntaxError: Unexpected token 'A', "An error o"... is not valid JSON
+2025-11-06T13:43:00.4136376Z     at JSON.parse (<anonymous>)
+2025-11-06T13:43:00.4136397Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:46:31)
+2025-11-06T13:43:00.4136414Z     at ChildProcess.emit (node:events:519:28)
+2025-11-06T13:43:00.413643Z     at maybeClose (node:internal/child_process:1101:16)
+2025-11-06T13:43:00.4136446Z     at Socket.<anonymous> (node:internal/child_process:456:11)
+2025-11-06T13:43:00.4136461Z     at Socket.emit (node:events:519:28)
+2025-11-06T13:43:00.4136475Z     at Pipe.<anonymous> (node:net:346:12)
+2025-11-06T13:43:00.4136491Z     at Pipe.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-11-06T13:43:00.4163598Z Error running forecast: Error: Invalid JSON response from Python script.
+2025-11-06T13:43:00.4163841Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:53:18)
+2025-11-06T13:43:00.4163904Z     at ChildProcess.emit (node:events:519:28)
+2025-11-06T13:43:00.4163923Z     at maybeClose (node:internal/child_process:1101:16)
+2025-11-06T13:43:00.4163939Z     at Socket.<anonymous> (node:internal/child_process:456:11)
+2025-11-06T13:43:00.4163954Z     at Socket.emit (node:events:519:28)
+2025-11-06T13:43:00.4163969Z     at Pipe.<anonymous> (node:net:346:12)
+2025-11-06T13:43:00.4163985Z     at Pipe.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-11-06T13:43:08.421388Z Error parsing JSON from Python analysis script: SyntaxError: Unexpected token 'A', "An error o"... is not valid JSON
+2025-11-06T13:43:08.421415Z     at JSON.parse (<anonymous>)
+2025-11-06T13:43:08.4214172Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:126:33)
+2025-11-06T13:43:08.421419Z     at ChildProcess.emit (node:events:519:28)
+2025-11-06T13:43:08.4214283Z     at maybeClose (node:internal/child_process:1101:16)
+2025-11-06T13:43:08.4214302Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+2025-11-06T13:43:08.4214323Z     at Process.callbackTrampoline (node:internal/async_hooks:130:17) Raw Data: An error occurred: module 'importlib.metadata' has no attribute 'packages_distributions'
+2025-11-06T13:43:08.4214336Z {
+2025-11-06T13:43:08.4214365Z   "summary": "The SK council's budget allocation varies significantly across committees and years. Education consistently receives the largest share of the budget. There is also notable investment in Health. Other committees like Environmental Protection, Livelihood and Employment, Anti-Drug Abuse and Gender and Development receive smaller allocations but are also important.",
+2025-11-06T13:43:08.4214379Z   "trends": [
+2025-11-06T13:43:08.4214392Z     {
+2025-11-06T13:43:08.4214407Z       "title": "Consistent Investment in Education",
+2025-11-06T13:43:08.4214428Z       "description": "The Committee on Education and Culture consistently receives a significant portion of the SK budget across all three years, suggesting a strong focus on youth education and academic development.",
+2025-11-06T13:43:08.4214442Z       "type": "positive"
+2025-11-06T13:43:08.4214477Z     },
+2025-11-06T13:43:08.421449Z     {
+2025-11-06T13:43:08.4214506Z       "title": "Growing Emphasis on Health Initiatives",
+2025-11-06T13:43:08.4214526Z       "description": "The SK Chairman and SK Committee on Health showcases consistent funding, demonstrating an understanding of the impact of the committee on society.",
+2025-11-06T13:43:08.4214539Z       "type": "positive"
+2025-11-06T13:43:08.4214552Z     },
+2025-11-06T13:43:08.4214565Z     {
+2025-11-06T13:43:08.421458Z       "title": "Variable Funding for Other Committees",
+2025-11-06T13:43:08.4214602Z       "description": "Committees like Environmental Protection, Livelihood and Employment, Anti-Drug Abuse, and Gender and Development experience fluctuating funding levels, potentially indicating shifting priorities or project-specific funding models.",
+2025-11-06T13:43:08.4214615Z       "type": "info"
+2025-11-06T13:43:08.4214628Z     }
+2025-11-06T13:43:08.4214666Z   ],
+2025-11-06T13:43:08.421468Z   "recommendations": [
+2025-11-06T13:43:08.4214693Z     {
+2025-11-06T13:43:08.4214713Z       "action": "Conduct a needs assessment to determine the optimal budget allocation for each committee based on the community's most pressing needs and the potential impact of each project."
+2025-11-06T13:43:08.4214726Z     },
+2025-11-06T13:43:08.4214738Z     {
+2025-11-06T13:43:08.4214758Z       "action": "Develop a clear and transparent process for budget allocation, ensuring that all committees have a fair opportunity to request funding and that decisions are based on objective criteria."
+2025-11-06T13:43:08.4214771Z     },
+2025-11-06T13:43:08.4214784Z     {
+2025-11-06T13:43:08.4214804Z       "action": "Establish key performance indicators (KPIs) for each project to track its effectiveness and ensure that resources are being used efficiently."
+2025-11-06T13:43:08.4214817Z     }
+2025-11-06T13:43:08.4214851Z   ],
+2025-11-06T13:43:08.4214865Z   "confidence": 0.85,
+2025-11-06T13:43:08.4214879Z   "chartExplanation": {
+2025-11-06T13:43:08.4214894Z     "title": "Understanding the SK Budget Allocation Stacked Bar Chart",
+2025-11-06T13:43:08.4214918Z     "description": "This stacked bar chart visualizes the SK council's budget distribution across different committees for the years 2023, 2024, and 2025. Each bar represents a year, and the different colored segments within each bar represent the budget allocated to each committee.",
+2025-11-06T13:43:08.4214932Z     "keyInsights": [
+2025-11-06T13:43:08.4214948Z       "The height of each bar represents the total SK budget for that year.",
+2025-11-06T13:43:08.4214965Z       "The relative size of each segment shows the proportion of the budget allocated to that specific committee.",
+2025-11-06T13:43:08.4214982Z       "Changes in segment size across the years indicate shifts in budget priorities.",
+2025-11-06T13:43:08.4214998Z       "The color represents each committee in the SK council (ex: Education, Health, Environment, etc.)"
+2025-11-06T13:43:08.4215034Z     ],
+2025-11-06T13:43:08.4215047Z     "howToRead": [
+2025-11-06T13:43:08.4215064Z       "Locate the bar representing the year you are interested in (2023, 2024, or 2025).",
+2025-11-06T13:43:08.4215081Z       "Identify the colored segment corresponding to the committee you want to analyze.",
+2025-11-06T13:43:08.4215099Z       "Compare the height of that segment to the total height of the bar to understand the proportion of the budget allocated to that committee.",
+2025-11-06T13:43:08.4215117Z       "Compare the height of that segment across different years to identify trends in budget allocation for that committee."
+2025-11-06T13:43:08.421513Z     ]
+2025-11-06T13:43:08.4215142Z   },
+2025-11-06T13:43:08.4215155Z   "metadata": {
+2025-11-06T13:43:08.421517Z     "data_source": "Database - Smart_SK_FINAL",
+2025-11-06T13:43:08.4215184Z     "total_projects_analyzed": 126,
+2025-11-06T13:43:08.4215219Z     "view_by": "committee",
+2025-11-06T13:43:08.4215233Z     "gemini_used": true,
+2025-11-06T13:43:08.4215248Z     "generated_at": "2025-11-06T21:43:05.641116+08:00"
+2025-11-06T13:43:08.4215261Z   }
+2025-11-06T13:43:08.4215273Z }
+2025-11-06T13:43:08.4215286Z
+2025-11-06T13:43:09.2934271Z Handler Error: Error running forecast analysis: Error: Invalid JSON response from Python analysis script.
+2025-11-06T13:43:09.2934486Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:134:20)
+2025-11-06T13:43:09.2934506Z     at ChildProcess.emit (node:events:519:28)
+2025-11-06T13:43:09.2934523Z     at maybeClose (node:internal/child_process:1101:16)
+2025-11-06T13:43:09.293454Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+2025-11-06T13:43:09.2934555Z     at Process.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-11-06T13:43:40.7169432Z Handler: Running forecast analysis with options: { view_by: 'category' }
+2025-11-06T13:43:40.71699Z Spawning Python analysis process: python3 /app/AI/forecast.py --analysis --view_by category
+2025-11-06T13:43:41.9843531Z Handler: Running forecast analysis with options: { view_by: 'committee' }
+2025-11-06T13:43:41.9854304Z Spawning Python analysis process: python3 /app/AI/forecast.py --analysis --view_by committee
+2025-11-06T13:43:44.6589396Z [WebSocket] Unauthenticated client disconnected.
+2025-11-06T13:43:45.0304828Z [WebSocket] Client connected.
+2025-11-06T13:43:46.579505Z Handler: Running forecast analysis with options: { view_by: 'committee' }
+2025-11-06T13:43:46.5801163Z Spawning Python analysis process: python3 /app/AI/forecast.py --analysis --view_by committee
+2025-11-06T13:44:01.7508034Z Error parsing JSON from Python script: SyntaxError: Unexpected token 'A', "An error o"... is not valid JSON
+2025-11-06T13:44:01.7508481Z     at JSON.parse (<anonymous>)
+2025-11-06T13:44:01.7508501Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:46:31)
+2025-11-06T13:44:01.7508519Z     at ChildProcess.emit (node:events:519:28)
+2025-11-06T13:44:01.7508534Z     at maybeClose (node:internal/child_process:1101:16)
+2025-11-06T13:44:01.7508549Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+2025-11-06T13:44:01.7508566Z     at Process.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-11-06T13:44:01.7516601Z Error running forecast: Error: Invalid JSON response from Python script.
+2025-11-06T13:44:01.751679Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:53:18)
+2025-11-06T13:44:01.7516809Z     at ChildProcess.emit (node:events:519:28)
+2025-11-06T13:44:01.7516862Z     at maybeClose (node:internal/child_process:1101:16)
+2025-11-06T13:44:01.7516879Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+2025-11-06T13:44:01.7516895Z     at Process.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-11-06T13:44:02.3548925Z Error parsing JSON from Python analysis script: SyntaxError: Unexpected token 'A', "An error o"... is not valid JSON
+2025-11-06T13:44:02.3723052Z     at JSON.parse (<anonymous>)
+2025-11-06T13:44:02.3723127Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:126:33)
+2025-11-06T13:44:02.3723145Z     at ChildProcess.emit (node:events:519:28)
+2025-11-06T13:44:02.372316Z     at maybeClose (node:internal/child_process:1101:16)
+2025-11-06T13:44:02.3723176Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+2025-11-06T13:44:02.3723196Z     at Process.callbackTrampoline (node:internal/async_hooks:130:17) Raw Data: An error occurred: module 'importlib.metadata' has no attribute 'packages_distributions'
+2025-11-06T13:44:02.3723278Z {
+2025-11-06T13:44:02.3723306Z   "summary": "The SK council's budget allocation shows a significant focus on Education, particularly in 2023 and 2025. Health and Economic Empowerment also receive considerable funding, while Environment receives relatively less. There are increases and decreases in budget allocations per category across the three years, indicating shifts in priorities.",
+2025-11-06T13:44:02.372332Z   "trends": [
+2025-11-06T13:44:02.3723333Z     {
+2025-11-06T13:44:02.372335Z       "title": "Consistent Investment in Education",
+2025-11-06T13:44:02.3723373Z       "description": "Education consistently receives the largest budget allocation across all three years, suggesting a strong commitment to youth development through educational initiatives. This remains stable with slight variations each year.",
+2025-11-06T13:44:02.3723387Z       "type": "positive"
+2025-11-06T13:44:02.3723401Z     },
+2025-11-06T13:44:02.3723415Z     {
+2025-11-06T13:44:02.3723431Z       "title": "Fluctuations in Economic Empowerment Funding",
+2025-11-06T13:44:02.3723475Z       "description": "Economic Empowerment shows some activity with an allocation in 2024 and 2025, but little activity in 2023 indicating that it may be a newer priority or a renewed one.",
+2025-11-06T13:44:02.3723489Z       "type": "info"
+2025-11-06T13:44:02.3723503Z     },
+2025-11-06T13:44:02.3723516Z     {
+2025-11-06T13:44:02.3723531Z       "title": "Lower Investment in Environment",
+2025-11-06T13:44:02.3723554Z       "description": "The funding allocated to the Environment is comparatively low compared to other categories. While projects exist, the limited resources could hinder the scope and impact of environmental initiatives.",
+2025-11-06T13:44:02.3723567Z       "type": "negative"
+2025-11-06T13:44:02.372358Z     }
+2025-11-06T13:44:02.3723594Z   ],
+2025-11-06T13:44:02.3723608Z   "recommendations": [
+2025-11-06T13:44:02.3723621Z     {
+2025-11-06T13:44:02.3723662Z       "action": "Conduct a needs assessment to better understand the specific needs of the youth in each category and adjust budget allocations accordingly."
+2025-11-06T13:44:02.3723675Z     },
+2025-11-06T13:44:02.3723689Z     {
+2025-11-06T13:44:02.3723708Z       "action": "Explore opportunities to secure external funding or partnerships to supplement the SK council's budget, particularly for underfunded areas like Environment."
+2025-11-06T13:44:02.3723722Z     },
+2025-11-06T13:44:02.3723734Z     {
+2025-11-06T13:44:02.3723754Z       "action": "Evaluate the effectiveness of existing programs in each category to ensure that resources are being used efficiently and achieving desired outcomes, focusing on ROI."
+2025-11-06T13:44:02.3723768Z     }
+2025-11-06T13:44:02.3723781Z   ],
+2025-11-06T13:44:02.3723795Z   "confidence": 0.85,
+2025-11-06T13:44:02.3723809Z   "chartExplanation": {
+2025-11-06T13:44:02.3723846Z     "title": "Interpreting the SK Council Budget Allocation Stacked Bar Chart",
+2025-11-06T13:44:02.372387Z     "description": "This stacked bar chart visualizes the distribution of the SK council's budget across different categories (Education, Health, Environment, etc.) for the years 2023, 2024, and 2025. Each category's budget is represented by a different colored segment within each year's bar.",
+2025-11-06T13:44:02.3723884Z     "keyInsights": [
+2025-11-06T13:44:02.3723901Z       "The height of each bar represents the total budget allocated for that year.",
+2025-11-06T13:44:02.3723919Z       "The proportion of each color within a bar indicates the relative amount allocated to that specific category.",
+2025-11-06T13:44:02.3723936Z       "Comparing the sizes of the colored segments across different years reveals trends in budget allocation over time."
+2025-11-06T13:44:02.3723949Z     ],
+2025-11-06T13:44:02.3723964Z     "howToRead": [
+2025-11-06T13:44:02.372398Z       "Locate the bar representing the year you are interested in.",
+2025-11-06T13:44:02.3723996Z       "Identify the colored segment corresponding to the category you want to analyze.",
+2025-11-06T13:44:02.3724037Z       "Estimate the height (or proportion) of that segment relative to the total height of the bar to determine the budget allocated to that category for that year.",
+2025-11-06T13:44:02.3724055Z       "Compare the height (or proportion) of that segment across different years to identify trends in funding over time."
+2025-11-06T13:44:02.3724069Z     ]
+2025-11-06T13:44:02.3724082Z   },
+2025-11-06T13:44:02.3724095Z   "metadata": {
+2025-11-06T13:44:02.3724111Z     "data_source": "Database - Smart_SK_FINAL",
+2025-11-06T13:44:02.3724126Z     "total_projects_analyzed": 126,
+2025-11-06T13:44:02.372414Z     "view_by": "category",
+2025-11-06T13:44:02.3724154Z     "gemini_used": true,
+2025-11-06T13:44:02.3724169Z     "generated_at": "2025-11-06T21:43:57.279151+08:00"
+2025-11-06T13:44:02.3724183Z   }
+2025-11-06T13:44:02.3724218Z }
+2025-11-06T13:44:02.3724231Z
+2025-11-06T13:44:02.3838397Z Handler Error: Error running forecast analysis: Error: Invalid JSON response from Python analysis script.
+2025-11-06T13:44:02.3838921Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:134:20)
+2025-11-06T13:44:02.3838952Z     at ChildProcess.emit (node:events:519:28)
+2025-11-06T13:44:02.383897Z     at maybeClose (node:internal/child_process:1101:16)
+2025-11-06T13:44:02.3838986Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+2025-11-06T13:44:02.3839001Z     at Process.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-11-06T13:44:05.6606812Z Error parsing JSON from Python analysis script: SyntaxError: Unexpected token 'A', "An error o"... is not valid JSON
+2025-11-06T13:44:05.6607164Z     at JSON.parse (<anonymous>)
+2025-11-06T13:44:05.6607345Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:126:33)
+2025-11-06T13:44:05.6607365Z     at ChildProcess.emit (node:events:519:28)
+2025-11-06T13:44:05.660738Z     at maybeClose (node:internal/child_process:1101:16)
+2025-11-06T13:44:05.6607397Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+2025-11-06T13:44:05.6607416Z     at Process.callbackTrampoline (node:internal/async_hooks:130:17) Raw Data: An error occurred: module 'importlib.metadata' has no attribute 'packages_distributions'
+2025-11-06T13:44:05.6607429Z {
+2025-11-06T13:44:05.6607465Z   "summary": "The SK council's budget allocation reveals a significant investment in Education, particularly in 2023 and 2025, with a substantial project focusing on 'Balik eSKwela'. Health and Anti-Drug Abuse initiatives also receive consistent funding across the years. Environmental projects are funded in 2024 and 2025 but appear less prominent compared to Education. Gender and Development has the lowest allocated budget. The chairman's committee has varied but smaller budgets across all years compared to other committees.",
+2025-11-06T13:44:05.6607478Z   "trends": [
+2025-11-06T13:44:05.6607492Z     {
+2025-11-06T13:44:05.6607507Z       "title": "Education Funding Dominance",
+2025-11-06T13:44:05.660755Z       "description": "Education consistently receives the highest budget allocation, driven by projects like 'Knowledge is Power' and 'Balik eSKwela'. This indicates a strong focus on educational initiatives.",
+2025-11-06T13:44:05.6607565Z       "type": "positive"
+2025-11-06T13:44:05.6607578Z     },
+2025-11-06T13:44:05.6607591Z     {
+2025-11-06T13:44:05.6607606Z       "title": "Consistent Health and Anti-Drug Initiatives",
+2025-11-06T13:44:05.6607626Z       "description": "Health-related projects and Anti-Drug campaigns receive steady funding across all three years, highlighting their sustained importance in the SK council's priorities.",
+2025-11-06T13:44:05.6607642Z       "type": "info"
+2025-11-06T13:44:05.6607654Z     },
+2025-11-06T13:44:05.6607667Z     {
+2025-11-06T13:44:05.6607682Z       "title": "Environmental Budget Variation",
+2025-11-06T13:44:05.6607726Z       "description": "Funding for environmental projects appears only in 2024 and 2025, lower compared to other areas. This suggests a potential need for reassessment and consistent funding",
+2025-11-06T13:44:05.660774Z       "type": "info"
+2025-11-06T13:44:05.6607752Z     }
+2025-11-06T13:44:05.6607766Z   ],
+2025-11-06T13:44:05.660778Z   "recommendations": [
+2025-11-06T13:44:05.6607793Z     {
+2025-11-06T13:44:05.6607812Z       "action": "Evaluate the effectiveness of the 'Balik eSKwela' program and explore opportunities for scaling or replication in other barangays."
+2025-11-06T13:44:05.6607824Z     },
+2025-11-06T13:44:05.6607837Z     {
+2025-11-06T13:44:05.6607858Z       "action": "Conduct a needs assessment to determine if the current allocation for Environmental projects adequately addresses the community's environmental concerns and to allocate budgets accordingly."
+2025-11-06T13:44:05.660787Z     },
+2025-11-06T13:44:05.6607883Z     {
+2025-11-06T13:44:05.6607926Z       "action": "Consider allocating additional funds towards Gender and Development initiatives, given the relatively low budget, to promote greater social inclusion and equity."
+2025-11-06T13:44:05.6607938Z     }
+2025-11-06T13:44:05.6607951Z   ],
+2025-11-06T13:44:05.6607965Z   "confidence": 0.85,
+2025-11-06T13:44:05.6607978Z   "chartExplanation": {
+2025-11-06T13:44:05.6607994Z     "title": "Stacked Bar Chart: SK Budget Allocation by Committee (2023-2025)",
+2025-11-06T13:44:05.6608017Z     "description": "This chart visualizes the distribution of the SK council's budget across different committees for the years 2023, 2024, and 2025. Each bar represents a year, and the stacked segments within each bar represent the budget allocated to each committee.",
+2025-11-06T13:44:05.6608031Z     "keyInsights": [
+2025-11-06T13:44:05.6608048Z       "The height of each segment represents the budget amount for a specific committee in a given year.",
+2025-11-06T13:44:05.6608064Z       "Comparing the segment heights across different years reveals trends in budget allocation.",
+2025-11-06T13:44:05.6608102Z       "The total height of each bar represents the total budget allocated for that year."
+2025-11-06T13:44:05.6608115Z     ],
+2025-11-06T13:44:05.6608128Z     "howToRead": [
+2025-11-06T13:44:05.6608143Z       "Identify the committee by its color within the stacked bar.",
+2025-11-06T13:44:05.660816Z       "Estimate the budget amount for each committee by comparing the height of its segment to the chart's scale.",
+2025-11-06T13:44:05.6608178Z       "Compare the heights of the same-colored segments across different years to identify trends in budget allocation for that committee over time.",
+2025-11-06T13:44:05.6608197Z       "Look for significant increases or decreases in segment heights to identify shifts in the SK council's priorities."
+2025-11-06T13:44:05.6608209Z     ]
+2025-11-06T13:44:05.6608221Z   },
+2025-11-06T13:44:05.6608236Z   "metadata": {
+2025-11-06T13:44:05.6608274Z     "data_source": "Database - Smart_SK_FINAL",
+2025-11-06T13:44:05.6608288Z     "total_projects_analyzed": 126,
+2025-11-06T13:44:05.6608302Z     "view_by": "committee",
+2025-11-06T13:44:05.6608316Z     "gemini_used": true,
+2025-11-06T13:44:05.6608332Z     "generated_at": "2025-11-06T21:44:02.011919+08:00"
+2025-11-06T13:44:05.6608344Z   }
+2025-11-06T13:44:05.6608357Z }
+2025-11-06T13:44:05.6608369Z
+2025-11-06T13:44:05.7010104Z Handler Error: Error running forecast analysis: Error: Invalid JSON response from Python analysis script.
+2025-11-06T13:44:05.7010303Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:134:20)
+2025-11-06T13:44:05.7010323Z     at ChildProcess.emit (node:events:519:28)
+2025-11-06T13:44:05.7010366Z     at maybeClose (node:internal/child_process:1101:16)
+2025-11-06T13:44:05.7010385Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+2025-11-06T13:44:05.7010401Z     at Process.callbackTrampoline (node:internal/async_hooks:130:17)
+2025-11-06T13:44:09.5335291Z Error parsing JSON from Python analysis script: SyntaxError: Unexpected token 'A', "An error o"... is not valid JSON
+2025-11-06T13:44:09.5335767Z     at JSON.parse (<anonymous>)
+2025-11-06T13:44:09.5335793Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:126:33)
+2025-11-06T13:44:09.5335811Z     at ChildProcess.emit (node:events:519:28)
+2025-11-06T13:44:09.5335826Z     at maybeClose (node:internal/child_process:1101:16)
+2025-11-06T13:44:09.5335844Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+2025-11-06T13:44:09.5335865Z     at Process.callbackTrampoline (node:internal/async_hooks:130:17) Raw Data: An error occurred: module 'importlib.metadata' has no attribute 'packages_distributions'
+2025-11-06T13:44:09.5335954Z {
+2025-11-06T13:44:09.5335989Z   "summary": "The SK council's budget allocation shows varying priorities across different committees from 2023 to 2025. Education consistently receives a substantial portion of the budget, while other committees like Health, Anti-Drug Abuse, Environmental Protection, Livelihood and Employment, and Gender and Development receive smaller allocations. There are notable increases and decreases in funding for specific committees across the years, suggesting evolving priorities or project-based funding.",
+2025-11-06T13:44:09.5336004Z   "trends": [
+2025-11-06T13:44:09.5336018Z     {
+2025-11-06T13:44:09.5336033Z       "title": "Education Remains a Top Priority",
+2025-11-06T13:44:09.5336052Z       "description": "The SK Committee on Education and Culture consistently receives a large share of the budget, indicating a sustained focus on educational initiatives.",
+2025-11-06T13:44:09.5336066Z       "type": "positive"
+2025-11-06T13:44:09.533608Z     },
+2025-11-06T13:44:09.5336093Z     {
+2025-11-06T13:44:09.5336108Z       "title": "Fluctuations in Health Committee Funding",
+2025-11-06T13:44:09.5336153Z       "description": "The budget allocation for the SK Committee on Health shows moderate but consistent funding, suggesting an ongoing focus on health initiatives, although there may be some variability based on specific projects planned each year.",
+2025-11-06T13:44:09.5336168Z       "type": "info"
+2025-11-06T13:44:09.533618Z     },
+2025-11-06T13:44:09.5336193Z     {
+2025-11-06T13:44:09.5336207Z       "title": "Emerging Focus on Gender and Development",
+2025-11-06T13:44:09.5336228Z       "description": "While initial funding for the Gender and Development committee was minimal, a significant allocation in 2025 signals a potentially growing focus on social inclusion and equity.",
+2025-11-06T13:44:09.5336242Z       "type": "positive"
+2025-11-06T13:44:09.5336255Z     }
+2025-11-06T13:44:09.5336267Z   ],
+2025-11-06T13:44:09.5336281Z   "recommendations": [
+2025-11-06T13:44:09.5336294Z     {
+2025-11-06T13:44:09.5336332Z       "action": "Conduct a comprehensive review of the effectiveness of existing education programs to optimize resource allocation."
+2025-11-06T13:44:09.5336345Z     },
+2025-11-06T13:44:09.5336358Z     {
+2025-11-06T13:44:09.5336376Z       "action": "Explore collaborative opportunities between committees (e.g., Health and Anti-Drug Abuse) to maximize impact and resource utilization."
+2025-11-06T13:44:09.5336389Z     },
+2025-11-06T13:44:09.5336402Z     {
+2025-11-06T13:44:09.5336423Z       "action": "Develop a clear and transparent budget allocation process with defined criteria to ensure equitable distribution of funds across all committees based on needs and impact."
+2025-11-06T13:44:09.5336435Z     }
+2025-11-06T13:44:09.5336448Z   ],
+2025-11-06T13:44:09.5336461Z   "confidence": 0.85,
+2025-11-06T13:44:09.5336475Z   "chartExplanation": {
+2025-11-06T13:44:09.5336513Z     "title": "Understanding the SK Council Budget Allocation Stacked Bar Chart",
+2025-11-06T13:44:09.5336537Z     "description": "This chart visually represents the budget allocated to each SK committee across the years 2023, 2024, and 2025. Each bar represents a year, and the colored segments within each bar show the proportion of the budget allocated to each committee.",
+2025-11-06T13:44:09.533655Z     "keyInsights": [
+2025-11-06T13:44:09.5336567Z       "The height of each bar indicates the total budget for that year.",
+2025-11-06T13:44:09.5336584Z       "The size of each colored segment within a bar represents the budget allocated to the corresponding committee for that year.",
+2025-11-06T13:44:09.5336601Z       "Changes in segment size from year to year indicate shifts in budget priorities."
+2025-11-06T13:44:09.5336613Z     ],
+2025-11-06T13:44:09.5336627Z     "howToRead": [
+2025-11-06T13:44:09.5336644Z       "Identify the tallest bar to determine the year with the largest overall budget.",
+2025-11-06T13:44:09.5336661Z       "Compare the sizes of the colored segments for each committee across the years to see how their funding has changed.",
+2025-11-06T13:44:09.5336709Z       "Look for patterns in segment sizes (e.g., consistently large segments, segments that increase over time) to identify the committees that receive the most funding and those whose funding is growing."
+2025-11-06T13:44:09.5336723Z     ]
+2025-11-06T13:44:09.5336736Z   },
+2025-11-06T13:44:09.5336749Z   "metadata": {
+2025-11-06T13:44:09.5336764Z     "data_source": "Database - Smart_SK_FINAL",
+2025-11-06T13:44:09.5336778Z     "total_projects_analyzed": 126,
+2025-11-06T13:44:09.5336792Z     "view_by": "committee",
+2025-11-06T13:44:09.5336805Z     "gemini_used": true,
+2025-11-06T13:44:09.533682Z     "generated_at": "2025-11-06T21:44:06.359839+08:00"
+2025-11-06T13:44:09.5336833Z   }
+2025-11-06T13:44:09.5336845Z }
+2025-11-06T13:44:09.5336881Z
+2025-11-06T13:44:09.5337312Z Handler Error: Error running forecast analysis: Error: Invalid JSON response from Python analysis script.
+2025-11-06T13:44:09.5337333Z     at ChildProcess.<anonymous> (/app/pyBridge/pyBridgeFC.js:134:20)
+2025-11-06T13:44:09.5337347Z     at ChildProcess.emit (node:events:519:28)
+2025-11-06T13:44:09.5337362Z     at maybeClose (node:internal/child_process:1101:16)
+2025-11-06T13:44:09.5337378Z     at ChildProcess._handle.onexit (node:internal/child_process:304:5)
+2025-11-06T13:44:09.5337393Z     at Process.callbackTrampoline (node:internal/async_hooks:130:17)
 
 --Deployment Container Logs
 

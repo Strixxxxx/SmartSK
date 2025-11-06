@@ -13,7 +13,7 @@ RUN echo "Installing Node.js dependencies..." && npm ci --omit=dev
 # ============================
 # Stage 2: Build Python deps
 # ============================
-FROM python:3.9-slim-bullseye AS python-builder
+FROM python:3.12-slim-bullseye AS python-builder
 
 WORKDIR /app
 
@@ -41,17 +41,18 @@ RUN echo "Installing Python dependencies..." && pip install --no-cache-dir -r re
 # ============================
 # Final Stage: Runtime
 # ============================
-FROM node:22-bullseye-slim
+FROM python:3.12-slim-bullseye
 
 WORKDIR /app
 
-# Install Python + pip + ODBC runtime libraries + ffmpeg + sqlpackage dependencies
+# Install Node.js 22, Python, pip, ODBC runtime libraries, ffmpeg, and sqlpackage dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 \
-    python3-pip \
-    unixodbc \
     curl \
     gnupg2 \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends \
+    nodejs \
+    unixodbc \
     ffmpeg \
     unzip \
     p7zip-full \
@@ -80,8 +81,8 @@ RUN echo "Final container build:" && node --version && npm --version && python3 
 # Copy node modules
 COPY --from=node-builder /app/node_modules ./node_modules
 
-# Copy Python packages to the system's Python path (Bullseye uses dist-packages)
-COPY --from=python-builder /python-packages /usr/lib/python3/dist-packages
+# Copy Python packages to the system's Python path
+COPY --from=python-builder /python-packages /usr/local/lib/python3.12/site-packages
 
 # Copy app source
 COPY . .

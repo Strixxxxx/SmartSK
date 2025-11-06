@@ -1,77 +1,70 @@
-> now, if you scan the @backend/database/database_query.txt & on @Screenshots/1st.png , i already updated the database schema to match. What we need to do now is that we need to create a new js file 
-  called comment.js inside of @backend/Posting/ on the backend. Next, for the frontend, we need to add a new div inside of @frontend/src/components/Portfolio/PostCard.tsx which can be seen on 
-  @Screenshots/2nd.png and inside of @frontend/src/components/Portfolio/ContentViewer.tsx a button in the bottom part of description which should have a placement like this: Title, Tagged Projects, SK
-   Full Disclosure Documents, Descriptions, then the newly added comment. In short, in the @frontend/src/components/Portfolio/PostCard.tsx , there should be a comment icon which is the chat bubble and
-   on the rightside of the icon should be the counts of comment within that post while inside of the @frontend/src/components/Portfolio/ContentViewer.tsx , there should be a button that has chat
-  bubblle on it and on the top right of the button, it should have "Comments: (Number of Comments including Replies)" . Did you get my idea? Also please take note that you would only need to add a
-  button and the backend logic because in the frontend, what should happened is that if the user clicks the icon, it would show a comment modal which would be created on
-  @frontend/src/components/Portfolio/ .
+ Definitive Implementation Plan (Final Version)
 
-✦ Yes, I understand your idea perfectly. It's a great feature to add.
+  This document serves as the final blueprint for refactoring the AI reporting system into a resilient, high-performance, asynchronous architecture.
 
-  Here is the plan to implement the comment functionality, following the structure of your project:
+  Phase 1: Azure & Environment Configuration
 
-  Plan:
+   * Status: Confirmed.
+   * Details: The HA_CONTAINER (for historical CSVs) and JSON_CONTAINER (for report outputs) are created and configured in the backend environment variables.
 
-  Backend First:
-   1. Create `comment.js`: I will create a new file at D:\Projects\Projects\smartSK\backend\Posting\comment.js. This file will handle all the logic for comments, such as creating new comments,
-      replying to comments, and fetching comments for a post.
-   2. Update `main.js`: I will add the new routes from comment.js to the main backend router at D:\Projects\Projects\smartSK\backend\main.js.
-   3. Get Comment Count: I will modify D:\Projects\Projects\smartSK\backend\Posting\postPublic.js to include the number of comments when fetching posts. This way, we don't have to make a separate
-      request for the count.
+  Phase 2: Database Migration
 
-  Then Frontend:
-   1. Update Data Type: I'll add commentCount to the Post type in D:\Projects\Projects\smartSK\frontend\src\types\PostTypes.ts.
-   2. Modify `PostCard.tsx`: I will edit D:\Projects\Projects\smartSK\frontend\src\components\Portfolio\PostCard.tsx to add the chat bubble icon and the comment count.
-   3. Modify `ContentViewer.tsx`: I will update D:\Projects\Projects\smartSK\frontend\src\components\Portfolio\ContentViewer.tsx to add the "Comments" button with the count, exactly as you described.
+   * Action: The following SQL script will be placed in Query.txt for manual execution.
+   * Details: This script only adds the new rawDataUpTrack table. The existing rawData, rawDataDetails, and [Raw Data] stored procedure are kept to serve as a synchronized backup data source.
 
-  As you requested, clicking the new buttons will not do anything yet. We will build the comment modal in the next phase.
+    1     -- Create the new table to specifically track CSV file uploads.
+    2     -- Existing rawData tables and procedures will be kept.
+    3     CREATE TABLE rawDataUpTrack (
+    4         uploadID INT PRIMARY KEY IDENTITY(1,1),
+    5         fileName NVARCHAR(255) NOT NULL,
+    6         fileUrl NVARCHAR(MAX) NOT NULL,
+    7         fileHash VARCHAR(64) NOT NULL,
+    8         rowCount INT NOT NULL,
+    9         uploadedByUserID INT NOT NULL,
+   10         createdAt DATETIME NOT NULL DEFAULT GETDATE(),
+   11         CONSTRAINT FK_RawDataUpTrack_User FOREIGN KEY (uploadedByUserID) REFERENCES userInfo(userID)
+   12     );
+   13 
+   14     CREATE INDEX IX_RawDataUpTrack_DateUpload ON rawDataUpTrack(createdAt DESC);
 
-  Shall I proceed with these changes?
-╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ ✓  ReadManyFiles Will attempt to read and concatenate files using patterns:                                                                                                                      │
-│    frontend/src/components/Portfolio/ContentViewer.tsx                                                                                                                                           │
-│     (within target directory:                                                                                                                                                                    │
-│    D:\Projects\Projects\smartSK                                                                                                                                                                  │
-│    ) . Excluding: patterns like                                                                                                                                                                  │
-│    **/node_modules/**`, `**/.git/**...`. File encoding: utf-8. Separator: "--- path/to/file.ext ---".                                                                                            │
-│                                                                                                                                                                                                  │
-│    ### ReadManyFiles Result (Target Dir: `D:\Projects\Projects\smartSK`)                                                                                                                         │
-│                                                                                                                                                                                                  │
-│    Successfully read and concatenated content from **1 file(s)**.                                                                                                                                │
-│                                                                                                                                                                                                  │
-│    **Processed Files:**                                                                                                                                                                          │
-│    - `frontend/src/components/Portfolio/ContentViewer.tsx`                                                                                                                                       │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  Phase 3: Backend Implementation (`/backend`)
 
-> let me clarify this okay? in the @frontend/src/components/Portfolio/ContentViewer.tsx . So the placement would be like this: title, author, description, tagged projects, SK full disclosure 
-  Documents, Comments:(count). Did you get that?
+   1. Reconstruct Data Synchronization Endpoint (`rawData.js`):
+       * The POST /api/rawdata/upload route will perform a "dual-write" to keep both data sources synchronized.
+       * Logic: Upon receiving a CSV, it will start a database transaction. For each row in the CSV, it will perform an "upsert" (UPDATE or INSERT) into the rawData and rawDataDetails tables. If the
+          database update succeeds, it will upload the CSV to the HA_CONTAINER and log the event in rawDataUpTrack. If any step fails, the entire transaction is rolled back.
 
+   2. Create the Python AI Engine (`backend/AI/aiJobs.py`):
+       * This self-contained script will execute the entire hourly AI job.
+       * Data Sourcing (Primary/Fallback Strategy):
+           1. Primary: The script will first attempt to fetch and parse all CSVs from the HA_CONTAINER.
+           2. Fallback: Only if the primary source is unavailable, the script will connect to the SQL database and execute the `[Raw Data]` stored procedure. The resulting dataset will be loaded into
+               a pandas DataFrame.
+       * Processing & Output: The script will use the sourced DataFrame to perform all AI/ML tasks and upload the three final JSON reports to the JSON_CONTAINER.
 
-ℹRequest cancelled.
- 
-╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ ✓  ReadManyFiles Will attempt to read and concatenate files using patterns:                                                                                                                      │
-│    frontend/src/components/Portfolio/ContentViewer.tsx                                                                                                                                           │
-│     (within target directory:                                                                                                                                                                    │
-│    D:\Projects\Projects\smartSK                                                                                                                                                                  │
-│    ) . Excluding: patterns like                                                                                                                                                                  │
-│    **/node_modules/**`, `**/.git/**...`. File encoding: utf-8. Separator: "--- path/to/file.ext ---".                                                                                            │
-│                                                                                                                                                                                                  │
-│    ### ReadManyFiles Result (Target Dir: `D:\Projects\Projects\smartSK`)                                                                                                                         │
-│                                                                                                                                                                                                  │
-│    Successfully read and concatenated content from **1 file(s)**.                                                                                                                                │
-│                                                                                                                                                                                                  │
-│    **Processed Files:**                                                                                                                                                                          │
-│    - `frontend/src/components/Portfolio/ContentViewer.tsx`                                                                                                                                       │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+   3. Implement the Node.js Scheduler (`main.js`):
+       * A node-cron job will execute the aiJobs.py script once per hour via a direct spawn command, logging its output for monitoring.
 
-> let me clarify this okay? in the @frontend/src/components/Portfolio/ContentViewer.tsx . So the placement would be like this: title, author, description, tagged projects, SK full disclosure
-  Documents, Comments:(count). Did you get that? What i meant here is that make sure that the comments with a comment count is on the bottom part.
+   4. Create Report Retrieval Logic (`backend/AIDataRetrieval/`):
+       * This directory will contain dataRetrieve.js (to download JSON reports from Azure) and reports.js (to define the frontend-facing API endpoints).
 
-✦ Yes, thank you for the clarification. I understand completely.
+   5. Cleanup:
+       * The obsolete pyBridgeFC.js and pyBridgePA.js files will be deleted.
 
-  In ContentViewer.tsx, the "Comments" button will be the last item in the list of action buttons, appearing after "Tagged Projects" and "SK Full Disclosure Documents". This entire block of buttons
-  is located directly under the post's description.
+  Phase 4: Frontend Implementation (`/frontend`)
 
-  The plan remains the same, and I will ensure the button is placed exactly as you've specified.
+   1. Modify Admin Data Management UI (`/src/components/Admin/Raw Data/`):
+       * The existing rawdata.tsx component will be updated. Its "Update Data" feature will trigger the new "upsert" process.
+   2. Update Client-Facing Report Pages:
+       * Forecast Page (`/src/components/Client/Forecast/`): Will be refactored to fetch data from the new /api/reports/forecast endpoint.
+       * Predictive Analysis Page (`/src/components/Client/PredictiveAnalysis/`): Will be refactored to fetch data from /api/reports/pa-analysis and /api/reports/pa-trends, with all filtering
+         handled instantly on the client-side.
+
+  Phase 5: Risk Mitigation & Resilience
+
+   1. Hourly Job Failure:
+       * Mitigation: The aiJobs.py script will use an "atomic overwrite" method (saving new reports only on full success) to ensure the old, valid reports remain online if a job fails. The node-cron
+          job will have a lightweight retry mechanism.
+   2. Corrupt Input Data:
+       * Mitigation: A two-layered defense: rawData.js will perform validation on CSVs at upload time, and aiJobs.py will use try...except blocks to abort safely if it encounters a corrupt file,
+         preventing a system crash.
