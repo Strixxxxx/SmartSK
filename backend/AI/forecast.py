@@ -1,11 +1,15 @@
 import os
-import sys
 import json
-import argparse
 import logging
+import re
 from datetime import datetime, timezone, timedelta
 import pandas as pd
-from db_utils import get_raw_data_from_db
+import numpy as np
+from sklearn.preprocessing import MinMaxScaler
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import LSTM, Dense
+
+from .gemini_utils import call_gemini_with_retry
 
 try:
     import google.generativeai as genai
@@ -17,202 +21,228 @@ except ImportError:
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Configuration
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-DB_DATABASE = os.getenv("DB_DATABASE")
-
-def process_db_data(df):
-    """Processes the DataFrame from the database."""
-    logger.info("Step 2/5: Processing database data...")
-    if df.empty:
-        raise Exception("No data to process.")
-    
-    budget_cols = [col for col in df.columns if 'budget' in col.lower()]
-    if not budget_cols:
-        raise Exception("No budget-related columns found in the data from the database.")
-
-    for col in budget_cols:
-        df[col] = pd.to_numeric(df[col], errors='coerce')
-    
-    df.dropna(subset=budget_cols, how='all', inplace=True)
-    df.fillna(0, inplace=True)
-
-    if df.empty:
-        raise Exception("No valid budget data found after processing")
-
-    logger.info(f"Step 2/5: Processed {len(df)} rows with valid budget data.")
-    return df
-
-
-def generate_chart_data(df, group_by_col):
+def _run_lstm_forecast(series: pd.Series) -> float:
     """
-    Generates structured data for a stacked bar chart using pandas.
+    Trains a simple LSTM model on a given time series and predicts the next value.
+    Args:
+        series (pd.Series): A pandas Series with time-ordered data (e.g., budget per year).
+    Returns:
+        float: The predicted next value in the series.
     """
-    if group_by_col not in df.columns:
-        logger.warning(f"Grouping column '{group_by_col}' not found. Skipping.")
-        return None
+    if len(series) < 3:
+        # Not enough data to train, return the last value or 0
+        return series.iloc[-1] if not series.empty else 0
 
-    budget_cols = sorted([col for col in df.columns if 'budget' in col.lower()])
-    years = [col.split('_')[0] for col in budget_cols]
+    # Normalize the data
+    scaler = MinMaxScaler()
+    series_scaled = scaler.fit_transform(series.values.reshape(-1, 1))
+
+    # Create sequences
+    X, y = [], []
+    for i in range(len(series_scaled) - 1):
+        X.append(series_scaled[i:i+1])
+        y.append(series_scaled[i+1])
     
-    grouped_df = df.groupby(group_by_col)[budget_cols].sum()
-    groups = grouped_df.index.tolist()
+    X, y = np.array(X), np.array(y)
+    X = X.reshape((X.shape[0], X.shape[1], 1))
 
-    budget_data = []
-    for year, budget_col in zip(years, budget_cols):
-        year_data_list = []
-        for group in groups:
-            budget_value = grouped_df.loc[group, budget_col]
-            year_data_list.append({
-                'committee': group,
-                'budget': budget_value if pd.notna(budget_value) else 0
-            })
-        budget_data.append({
-            'year': str(year),
-            'data': year_data_list
+    # Build and train the LSTM model
+    model = Sequential([
+        LSTM(50, activation='relu', input_shape=(X.shape[1], 1)),
+        Dense(1)
+    ])
+    model.compile(optimizer='adam', loss='mse')
+    model.fit(X, y, epochs=100, verbose=0)
+
+    # Predict the next value
+    last_sequence = series_scaled[-1:].reshape((1, 1, 1))
+    predicted_scaled = model.predict(last_sequence, verbose=0)
+    
+    # Inverse transform to get the actual value
+    predicted_value = scaler.inverse_transform(predicted_scaled)[0][0]
+    
+    return float(predicted_value)
+
+def _generate_chart_data(df: pd.DataFrame, group_by_column: str) -> dict:
+    """
+    Aggregates data, runs a forecast for the next year, and formats for Chart.js.
+    """
+    logger.info(f"Generating chart data grouped by {group_by_column}...")
+
+    # 1. Aggregate historical data
+    agg_df = df.groupby(['year', group_by_column])['budget'].sum().unstack(fill_value=0)
+    
+    # 2. Run forecast for each group
+    forecast_year = agg_df.index.max() + 1 if not agg_df.empty else datetime.now().year + 1
+    forecast_values = {}
+    for col in agg_df.columns:
+        historical_series = agg_df[col]
+        forecast_values[col] = _run_lstm_forecast(historical_series)
+    
+    # 3. Append forecast to the aggregated data
+    agg_df.loc[forecast_year] = forecast_values
+    agg_df.fillna(0, inplace=True)
+
+    # 4. Format for Chart.js
+    labels = agg_df.index.astype(str).tolist()
+    datasets = []
+    
+    # Define a color palette
+    historical_colors = [
+        '#42A5F5', '#FFA726', '#66BB6A', '#EF5350', '#AB47BC', '#78909C',
+        '#26A69A', '#FF7043', '#9CCC65', '#D4E157', '#5C6BC0', '#8D6E63'
+    ]
+    forecast_color = '#BDBDBD' # Grey for forecast
+
+    for i, column in enumerate(agg_df.columns):
+        # Create a color array for this dataset: historical colors + grey for the last bar
+        color_array = [historical_colors[i % len(historical_colors)]] * (len(labels) - 1)
+        color_array.append(forecast_color)
+
+        datasets.append({
+            'label': column,
+            'data': agg_df[column].tolist(),
+            'backgroundColor': color_array,
         })
     
-    palette = [
-        '#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b',
-        '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#ff9896', '#98df8a',
-        '#ffbb78', '#c5b0d5', '#c49c94', '#f7b6d2', '#c7c7c7', '#dbdb8d'
-    ]
-    colors = [palette[i % len(palette)] for i in range(len(groups))]
+    logger.info(f"Finished generating chart data for {group_by_column}.")
+    return {'labels': labels, 'datasets': datasets}
 
-    return {
-        'years': years,
-        'committees': groups,
-        'budget_data': budget_data,
-        'colors': colors
-    }
 
-def generate_gemini_analysis(df, view_by):
-    """Generates a textual analysis report using Gemini."""
-    logger.info("Step 3/5: Starting Gemini analysis generation...")
-    if not gemini_available or not GEMINI_API_KEY:
-        raise Exception("Gemini AI is not available or API key is not configured.")
+def _generate_gemini_analysis(chart_data: dict, view_by: str, api_key: str) -> dict:
+    """Generates a textual analysis report using Gemini based on chart data."""
+    logger.info(f"Starting Gemini analysis for forecast view: {view_by}")
+    if not gemini_available or not api_key:
+        raise ConnectionError("Gemini AI is not available or API key is not configured.")
 
-    logger.info("Configuring Gemini API...")
-    genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-2.0-flash')
-    logger.info("Gemini model initialized.")
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel('gemini-2.5-flash')
 
-    budget_cols = sorted([col for col in df.columns if 'budget' in col.lower()])
-    years = [col.split('_')[0] for col in budget_cols]
-    years_str = ", ".join(years)
+    # Create a simplified text preview of the chart data for the prompt
+    data_preview = f"Chart Data for view: {view_by}\n"
+    data_preview += f"Years (Labels): {chart_data['labels']}\n"
+    for dataset in chart_data['datasets']:
+        label = dataset['label']
+        data = ", ".join([f"₱{x:,.0f}" for x in dataset['data']])
+        data_preview += f"- {label}: [{data}]\n"
 
-    data_preview = df.head(10).to_string()
-    
-    logger.info("Constructing prompt for Gemini...")
-    prompt = f"""
+    prompt = f'''
     You are a senior data analyst for a Sangguniang Kabataan (SK) council.
-    Analyze the following project budget data, which is grouped by '{view_by}'.
-    The data represents budget allocations across the years: {years_str}.
+    Analyze the following project budget data, which has been prepared for a stacked bar chart.
+    The data includes historical budget allocations and a new LSTM-based forecast for the final year.
 
     Data Preview:
     {data_preview}
 
     Your task is to generate a professional analysis report in a JSON format.
-    The report should explain the patterns visible in a stacked bar chart created from this data.
+    The report should explain the patterns visible in the data, with special attention to the forecast year.
 
     Provide the following in your JSON response:
-    1.  "summary": An executive summary of the key findings, focusing on the budget distribution by '{view_by}'.
-    2.  "trends": A list of 2-3 significant trends (e.g., "Increased funding for Health", "Shift in focus from Environment to Education"). Each trend should have a "title", "description", and "type" ('positive', 'negative', or 'info').
-    3.  "recommendations": A list of 2-3 actionable recommendations for the SK council based on the analysis. Each recommendation MUST be an object with an "action" key (e.g., [{{"action": "Increase funding for..."}}, {{"action": "Launch a new program..."}}]).
-    4.  "confidence": Your confidence in the analysis as a float between 0.0 and 1.0.
-    5.  "chartExplanation": An object explaining how to interpret the stacked bar chart. It should have a "title", "description", "keyInsights" (list), and "howToRead" (list).
+    1.  "summary": An executive summary of the key findings, including the overall budget trend and the significance of the forecast.
+    2.  "trends": A list of 2-3 significant historical trends observed from the data.
+    3.  "forecast_analysis": A specific analysis of the forecast. Explain what it implies for budget planning.
+    4.  "recommendations": A list of 2-3 actionable recommendations based on the entire analysis (historical + forecast).
+    5.  "confidence": Your confidence in the analysis as a float between 0.0 and 1.0.
 
-    Generate ONLY the JSON object. Do not include markdown formatting like ```json or any other text.
-    """
-    logger.info(f"Prompt constructed. Length: {len(prompt)} characters.")
-    
-    try:
-        logger.info("Step 4/5: Sending request to Gemini API... (This may take a while)")
-        response = model.generate_content(prompt)
-        logger.info("Step 4/5: Received response from Gemini API.")
-        
-        cleaned_response = response.text.strip()
-        
-        if cleaned_response.startswith('```json'):
-            cleaned_response = cleaned_response[len('```json'):]
-        if cleaned_response.endswith('```'):
-            cleaned_response = cleaned_response[:-len('```')]
-        
-        logger.info("Parsing Gemini response...")
-        analysis_result = json.loads(cleaned_response)
-        logger.info("Successfully generated and parsed analysis report from Gemini.")
+    Generate ONLY the JSON object. Do not include markdown formatting (```json) or any other text.
+    '''
+
+    # Define the validation function for this specific report
+    def is_valid_forecast_analysis(data):
+        return 'summary' in data and 'recommendations' in data
+
+    # Call the utility
+    analysis_result = call_gemini_with_retry(model, prompt, is_valid_forecast_analysis)
+
+    if analysis_result:
+        logger.info(f"Successfully generated Gemini analysis for forecast view: {view_by}")
         return analysis_result
-    except Exception as e:
-        logger.error(f"Error generating or parsing Gemini analysis: {e}")
+    else:
+        logger.error(f"Failed to generate Gemini forecast analysis for {view_by} after multiple attempts.")
         return {
-            "summary": "Failed to generate AI analysis due to an internal error.",
-            "trends": [],
-            "recommendations": ["Check backend logs for more details."],
-            "confidence": 0.0,
-            "chartExplanation": {
-                "title": "Analysis Unavailable",
-                "description": "The AI model could not generate a valid explanation.",
-                "keyInsights": [],
-                "howToRead": []
-            },
             "error": True,
-            "message": str(e)
+            "message": f"Failed to generate Gemini forecast analysis for {view_by} after 5 attempts."
         }
 
-def main():
-    """Main function to handle forecast generation."""
-    logger.info("--- Starting Forecast Analysis Script ---")
-    parser = argparse.ArgumentParser(description='Generate forecast data for SK projects.')
-    parser.add_argument('--analysis', action='store_true', help='Include Gemini-powered analysis.')
-    parser.add_argument('--view_by', type=str, default='Committee', help='The column to group data by for analysis (e.g., Committee, Category).')
+def _process_data_for_forecast(df):
+    """
+    Prepares the DataFrame for forecasting.
+    - Ensures 'start_date' is a datetime object.
+    - Extracts 'year' from 'start_date'.
+    - Ensures 'budget' is a numeric type.
+    - Fills NaN values.
+    """
+    logger.info("Processing raw data for forecast...")
+    if 'start_date' not in df.columns:
+        raise ValueError("DataFrame must contain a 'start_date' column.")
+
+    df['start_date'] = pd.to_datetime(df['start_date'], errors='coerce')
+    df.dropna(subset=['start_date'], inplace=True)
     
-    args = parser.parse_args()
+    # The 'year' column should already exist from the reshaping step, but we ensure it.
+    if 'year' not in df.columns:
+        df['year'] = df['start_date'].dt.year
 
+    budget_col = 'budget'
+    if budget_col not in df.columns:
+        # If no budget column, create it and fill with 0
+        df[budget_col] = 0
+    
+    df[budget_col] = pd.to_numeric(df[budget_col], errors='coerce')
+    df.fillna({budget_col: 0}, inplace=True)
+    
+    logger.info(f"Finished processing data. {len(df)} rows are ready for forecasting.")
+    return df
+
+
+def generate_forecast_report(df, api_key):
+    """
+    Main function to generate the complete forecast report, including chart data and analysis.
+
+    Args:
+        df (pd.DataFrame): The raw DataFrame containing all historical data.
+        api_key (str): The Gemini API key.
+
+    Returns:
+        dict: A dictionary containing the full forecast report.
+    """
+    logger.info("--- Starting Full Forecast Report Generation ---")
     try:
-        logger.info("Starting forecast generation process...")
-        raw_data = get_raw_data_from_db()
-        raw_df = pd.DataFrame(raw_data)
-        df = process_db_data(raw_df)
-        df.rename(columns={'committee': 'Committee', 'category': 'Category'}, inplace=True)
+        processed_df = _process_data_for_forecast(df.copy())
 
-        if args.analysis:
-            logger.info(f"Analysis mode enabled. View by: {args.view_by}")
-            analysis = generate_gemini_analysis(df, args.view_by)
-            
-            logger.info("Step 5/5: Preparing final JSON response...")
-            ph_tz = timezone(timedelta(hours=8))
-            analysis['metadata'] = {
-                'data_source': f"Database - {DB_DATABASE}",
-                'total_projects_analyzed': len(df),
-                'view_by': args.view_by,
-                'gemini_used': True,
-                'generated_at': datetime.now(ph_tz).isoformat(),
+        # Generate data for both views
+        committee_chart_data = _generate_chart_data(processed_df, 'committee')
+        category_chart_data = _generate_chart_data(processed_df, 'category')
+
+        # Generate analysis for both views using the chart data
+        committee_analysis = _generate_gemini_analysis(committee_chart_data, 'committee', api_key)
+        category_analysis = _generate_gemini_analysis(category_chart_data, 'category', api_key)
+
+        # Combine into a single report structure
+        report = {
+            "by_committee": {
+                "chart_data": committee_chart_data,
+                "analysis": committee_analysis
+            },
+            "by_category": {
+                "chart_data": category_chart_data,
+                "analysis": category_analysis
             }
-            final_json = json.dumps(analysis, indent=2)
-            logger.info("Step 5/5: Final JSON response prepared. Sending to output.")
-            print(final_json)
-            logger.info("--- Forecast Analysis Script Finished Successfully ---")
-        else:
-            logger.info("Generating chart data for Committee and Category views.")
-            committee_data = generate_chart_data(df, 'Committee')
-            category_data = generate_chart_data(df, 'Category')
-            
-            response = {
-                "by_committee": committee_data,
-                "by_category": category_data
-            }
-            print(json.dumps(response, indent=2))
-            logger.info("--- Forecast Chart Data Script Finished Successfully ---")
+        }
+        
+        # Add metadata
+        ph_tz = timezone(timedelta(hours=8))
+        report['metadata'] = {
+            'data_source': "Historical Data",
+            'total_projects_analyzed': len(processed_df),
+            'timestamp': datetime.now(ph_tz).isoformat(),
+            'gemini_used': not (committee_analysis.get('error') or category_analysis.get('error')),
+            'lstm_used': True
+        }
+
+        logger.info("--- Finished Full Forecast Report Generation ---")
+        return report
 
     except Exception as e:
-        logger.error(f"Forecast generation failed: {e}", exc_info=True)
-        error_response = {
-            'error': True,
-            'message': str(e),
-            'timestamp': datetime.now(timezone(timedelta(hours=8))).isoformat(),
-        }
-        print(json.dumps(error_response, indent=2))
-        sys.exit(1)
-
-if __name__ == "__main__":
-    main()
+        logger.error(f"An unhandled error occurred in generate_forecast_report: {e}", exc_info=True)
+        raise  # Re-raise the exception to signal failure to the caller

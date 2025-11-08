@@ -21,6 +21,10 @@ const pdfParse = require('pdf-parse');
 const { spawn } = require('child_process');
 const os = require('os');
 const dotenv = require('dotenv');
+const cron = require('node-cron');
+
+// Define the python executable based on the operating system
+const PYTHON_EXECUTABLE = os.platform() === 'win32' ? 'python' : 'python3';
 
 // Import WebSocket Initializer
 const { initializeWebSocketServer, broadcast } = require('./websockets/websocket');
@@ -31,7 +35,8 @@ const { getConnection, sql } = require('./database/database');
 const forgotPasswordRoutes = require('./forgotpassword/forgotPassword');
 const accountCreationRouter = require('./Admin/accountCreation');
 const rolesRouter = require('./Admin/roles');
-const backupRouter = require('./Admin/backup');
+const { router: backupRouter, executeBackup } = require('./Admin/backup');
+const { createJob } = require('./Admin/backupJob');
 const sessionLogRouter = require('./Admin/sessionlog');
 const projectSubmissionRouter = require('./projectSubmission/projectSubmission');
 const emailRouter = require('./Email/email').router;
@@ -51,23 +56,8 @@ const taggedProjectsRouter = require('./Posting/taggedProjects');
 const managePostRouter = require('./Posting/managePost');
 const commentRouter = require('./Posting/comment');
 const protectedCommentRouter = require('./Posting/commentProtected');
+const reportsRouter = require('./AIDataRetrieval/reports');
 
-// Import the new PyBridge modules with error handling
-let PyBridgeFC, PyBridgePA;
-
-try {
-  PyBridgeFC = require('./pyBridge/pyBridgeFC');
-} catch (error) {
-  console.error('Failed to load PyBridgeFC:', error.message);
-  PyBridgeFC = null;
-}
-
-try {
-  PyBridgePA = require('./pyBridge/pyBridgePA');
-} catch (error) {
-  console.error('Failed to load PyBridgePA:', error.message);
-  PyBridgePA = null;
-}
 
 // Load environment variables
 dotenv.config();
@@ -305,6 +295,10 @@ if (rawDataRouter && typeof rawDataRouter === 'function') {
   app.use('/api/rawdata', rawDataRouter);
 }
 
+if (reportsRouter && typeof reportsRouter === 'function') {
+  app.use('/api/reports', reportsRouter);
+}
+
 if (protectedCommentRouter && typeof protectedCommentRouter === 'function') {
   app.use('/api', protectedCommentRouter);
 } else {
@@ -330,126 +324,6 @@ app.get('/api/user-data', async (req, res) => {
   }
 });
 
-// Forecast-related API endpoints using PyBridgeFC
-app.get('/api/forecast', async (req, res) => {
-  try {
-    // Get any query parameters
-    const options = req.query;
-    
-    // Run the forecast using PyBridgeFC
-    const forecastData = await PyBridgeFC.runForecast(options);
-    
-    // Return the forecast data
-    res.json(forecastData);
-  } catch (error) {
-    console.error('Error running forecast:', error);
-    res.status(500).json({ 
-      error: 'Failed to generate forecast',
-      message: error.message
-    });
-  }
-});
-
-// Forecast analysis API endpoint
-app.get('/api/forecast-analysis', (req, res) => {
-  if (PyBridgeFC && typeof PyBridgeFC.handleForecastAnalysisRequest === 'function') {
-    PyBridgeFC.handleForecastAnalysisRequest(req, res);
-  } else {
-    console.error('PyBridgeFC.handleForecastAnalysisRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Forecast analysis service unavailable' });
-  }
-});
-
-// Project trends API endpoint (now uses PyBridgePA since fcTrends.py became paTrends.py)
-app.get('/api/project-trends', (req, res) => {
-  if (PyBridgePA && typeof PyBridgePA.handleProjectTrendsRequest === 'function') {
-    PyBridgePA.handleProjectTrendsRequest(req, res);
-  } else {
-    console.error('PyBridgePA.handleProjectTrendsRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Project trends service unavailable' });
-  }
-});
-
-// Custom project trends API endpoint (now uses PyBridgePA since fcCstmTrends.py became paCstmTrends.py)
-app.get('/api/custom-project-trends', (req, res) => {
-  if (PyBridgePA && typeof PyBridgePA.handleCustomProjectTrendsRequest === 'function') {
-    PyBridgePA.handleCustomProjectTrendsRequest(req, res);
-  } else {
-    console.error('PyBridgePA.handleCustomProjectTrendsRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Custom project trends service unavailable' });
-  }
-});
-
-
-// Predictive Analysis Routes using PyBridgePA
-app.get('/api/predictive-analysis/trends', (req, res) => {
-  if (PyBridgePA && typeof PyBridgePA.handlePaTrendsRequest === 'function') {
-    PyBridgePA.handlePaTrendsRequest(req, res);
-  } else {
-    console.error('PyBridgePA.handlePaTrendsRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Predictive analysis trends service unavailable' });
-  }
-});
-
-app.post('/api/predictive-analysis', (req, res) => {
-  if (PyBridgePA && typeof PyBridgePA.handlePredictiveAnalysisRequest === 'function') {
-    PyBridgePA.handlePredictiveAnalysisRequest(req, res);
-  } else {
-    console.error('PyBridgePA.handlePredictiveAnalysisRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Predictive analysis service unavailable' });
-  }
-});
-
-app.post('/api/predictive-analysis/custom', (req, res) => {
-  if (PyBridgePA && typeof PyBridgePA.handleCustomizedAnalysisRequest === 'function') {
-    PyBridgePA.handleCustomizedAnalysisRequest(req, res);
-  } else {
-    console.error('PyBridgePA.handleCustomizedAnalysisRequest is not a valid middleware function');
-    res.status(500).json({ error: 'Customized predictive analysis service unavailable' });
-  }
-});
-
-// Determine the correct Python executable based on the OS
-const getPythonExecutable = () => {
-  const platform = os.platform();
-  // On Windows, typically just 'python' is used
-  if (platform === 'win32') {
-    return 'python';
-  }
-  // On macOS and Linux, try 'python3' first
-  return 'python3';
-};
-
-// Python executable name
-const PYTHON_EXECUTABLE = getPythonExecutable();
-
-// Update your existing predictive analysis endpoint to handle customization options
-app.post('/api/predictive-analysis/custom-options', async (req, res) => {
-  try {
-    // Get analysis options from request body
-    const options = {
-      analysis_type: req.body.analysis_type || 'general',
-      category: req.body.category || 'None',
-      time_period: req.body.time_period || 'None',
-      include_budget: req.body.include_budget,
-      include_duration: req.body.include_duration,
-      include_implement_date: req.body.include_implement_date,
-      include_recommendations: req.body.include_recommendations,
-      include_risks: req.body.include_risks,
-      include_trends: req.body.include_trends,
-      include_success_factors: req.body.include_success_factors,
-      include_feedback: req.body.include_feedback
-    };
-    
-    // Use PyBridgePA for predictive analysis
-    const analysisResult = await PyBridgePA.runPredictiveAnalysis(options);
-    res.json(analysisResult);
-    
-  } catch (error) {
-    console.error('Error in predictive analysis:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
 
 // Define the port
 const PORT = process.env.PORT;
@@ -482,4 +356,100 @@ if (fs.existsSync(flagPath)) {
 // Start the server
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on port ${PORT}`);
+
+  // --- AI Job Scheduler with Retry Logic ---
+
+  // State variables to manage the job runner
+  let jobIsRunning = false;
+  let retryCount = 0;
+  const MAX_RETRIES = 5; // 5 retries over 30 minutes (5 min interval)
+  const RETRY_INTERVAL = 5 * 60 * 1000; // 5 minutes
+  const COOLDOWN_PERIOD = 60 * 60 * 1000; // 1 hour
+
+  /**
+   * Executes the Python AI job with integrated retry and cooldown logic.
+   */
+  const runAIJob = () => {
+    if (jobIsRunning) {
+      console.log('[AI Job Runner] A job is already in progress. Skipping scheduled run.');
+      return;
+    }
+
+    jobIsRunning = true;
+    console.log(`[AI Job Runner] Starting job attempt #${retryCount + 1}...`);
+
+    const pythonProcess = spawn(PYTHON_EXECUTABLE, ['-m', 'AI.aiJobs'], { cwd: __dirname });
+
+    let stdout = '';
+    let stderr = '';
+
+    pythonProcess.stdout.on('data', (data) => {
+      stdout += data.toString();
+    });
+
+    pythonProcess.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+
+    pythonProcess.on('close', (code) => {
+      jobIsRunning = false;
+      if (code === 0) {
+        console.log('[AI Job Runner] Job finished successfully.');
+        console.log(`[AI Job STDOUT]:\n${stdout}`);
+        retryCount = 0; // Reset on success
+      } else {
+        console.error(`[AI Job Runner] Job failed with code ${code}.`);
+        console.error(`[AI Job STDERR]:\n${stderr}`);
+        handleFailedJob();
+      }
+    });
+  };
+
+  /**
+   * Handles the logic for retrying or cooling down a failed job.
+   */
+  const handleFailedJob = () => {
+    if (retryCount < MAX_RETRIES) {
+      retryCount++;
+      console.log(`[AI Job Runner] Scheduling retry #${retryCount} in 5 minutes.`);
+      setTimeout(runAIJob, RETRY_INTERVAL);
+    } else {
+      console.log('[AI Job Runner] Maximum retries reached. Entering 1-hour cooldown.');
+      retryCount = 0; // Reset for the next cycle
+      setTimeout(() => {
+        console.log('[AI Job Runner] Cooldown finished. Attempting one final run.');
+        runAIJob();
+      }, COOLDOWN_PERIOD);
+    }
+  };
+
+  // Schedule the job to run at the start of every hour.
+  cron.schedule('0 * * * *', runAIJob, {
+    scheduled: true,
+    timezone: "Asia/Manila"
+  });
+
+  console.log('Hourly AI job with retry logic has been scheduled.');
+
+  // --- Monthly Database Backup Scheduler ---
+  cron.schedule('0 0 1 * *', async () => {
+    console.log('[Backup Job] Starting scheduled monthly database backup.');
+    try {
+      const jobId = await createJob({
+        backupType: 'cloud-only',
+        initiatedBy: 'System Scheduler',
+        userID: 0 // System user ID 0 or a dedicated system user ID
+      });
+      console.log(`[Backup Job] Created job ${jobId}. Executing backup.`);
+      // This is a fire-and-forget operation, as executeBackup runs asynchronously.
+      executeBackup(jobId);
+    } catch (error) {
+      console.error('[Backup Job] Failed to initiate scheduled backup:', error);
+    }
+  }, {
+    scheduled: true,
+    timezone: "Asia/Manila"
+  });
+
+  console.log('Monthly cloud backup job has been scheduled.');
 });

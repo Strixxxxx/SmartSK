@@ -39,6 +39,11 @@ interface EstimatedDuration {
   dependencies?: string;
 }
 
+interface QuantitativeAnalysis {
+  predicted_success_probability?: number;
+  forecasted_budget_variance?: string;
+}
+
 interface Metadata {
   timestamp: string;
   analysis_type: string;
@@ -61,6 +66,7 @@ export interface PaCstmApiResponse {
   estimated_duration?: EstimatedDuration;
   feedback?: string | string[];
   citations?: Citation[];
+  quantitative_analysis?: QuantitativeAnalysis;
   metadata?: Metadata;
   error?: string; // For top-level errors
   message?: string; // Often comes with 'error'
@@ -128,6 +134,7 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
     estimated_duration,
     feedback,
     citations = [],
+    quantitative_analysis,
     metadata
   } = analysisResult;
 
@@ -136,7 +143,7 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
     : 'N/A';
 
   // Check if there are any results to display besides metadata
-  const hasContent = summary_report || success_factors || recommendations || risk_mitigation_strategies || predicted_trends || budget || implementation_date || estimated_duration || feedback;
+  const hasContent = summary_report || success_factors || recommendations || risk_mitigation_strategies || predicted_trends || budget || implementation_date || estimated_duration || feedback || quantitative_analysis;
 
   if (!hasContent) {
       return <Alert variant="warning" className="mt-4">The customized analysis returned no content based on the selected filters. Please try different options.</Alert>;
@@ -156,6 +163,29 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
               )}
             </Card.Body>
           </Card>
+
+          {quantitative_analysis && (
+            <SectionCard title="Quantitative Predictions">
+              <Row>
+                {quantitative_analysis.predicted_success_probability && (
+                  <Col md={6}>
+                    <h5 className="fw-normal">Predicted Success Probability</h5>
+                    <p className="fs-4 fw-bold text-primary">
+                      {(quantitative_analysis.predicted_success_probability * 100).toFixed(0)}%
+                    </p>
+                  </Col>
+                )}
+                {quantitative_analysis.forecasted_budget_variance && (
+                  <Col md={6}>
+                    <h5 className="fw-normal">Forecasted Budget Variance</h5>
+                    <p className="fs-4 fw-bold text-info">
+                      {quantitative_analysis.forecasted_budget_variance}
+                    </p>
+                  </Col>
+                )}
+              </Row>
+            </SectionCard>
+          )}
 
           {success_factors && success_factors.length > 0 && (
             <SectionCard title="Success Factors">

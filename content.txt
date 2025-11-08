@@ -1,12 +1,46 @@
-3. Client-Side DFD
-This diagram details the data flow from the perspective of a standard (non-admin) client user.
+  Here is the full, revised, and final plan:
 
-Lexical error on line 13. Unrecognized text.
-... API_Auth[/api/login]        API_Projec
------------------------^
-4. Admin-Side DFD
-This diagram details the data flow from the perspective of an administrator, highlighting their extended privileges.
+  Phase 1: Database and Data Storage
 
-Lexical error on line 15. Unrecognized text.
-... API_Auth[/api/login]        API_Admin_
------------------------^
+   1. Database Migration: I will create a Query.txt file with the SQL script for the new rawDataUpTrack table to log CSV uploads. You will execute this script manually.
+   2. Azure Storage: The system will use two pre-configured Azure Blob Storage containers: HA_CONTAINER for raw CSVs and JSON_CONTAINER for the generated reports.
+
+  Phase 2: Backend Refactoring
+
+   1. Asynchronous AI Engine (`aiJobs.py`): I will create a new, standalone Python script to run hourly.
+       * Data Sourcing: It will primarily use CSVs from HA_CONTAINER. The fallback will be to execute the [Raw Data] stored procedure in the SQL database. No external data will be used.
+       * Report Generation: It will generate three JSON reports: forecast.json, pa_analysis.json, and pa_trends.json.
+       * Report Storage: It will atomically upload these reports to JSON_CONTAINER.
+
+   2. Data Upload Endpoint (`rawData.js`): I will rewrite the file upload logic to perform a transactional "dual write" to both the SQL database and HA_CONTAINER.
+
+   3. Scheduler (`main.js`): I will add a node-cron job to execute aiJobs.py hourly.
+
+   4. Report Retrieval API (`AIDataRetrieval/`): I will create new API endpoints (/api/reports/forecast, etc.) that retrieve and serve the pre-generated JSON reports from JSON_CONTAINER.
+
+   5. Cleanup: The obsolete pyBridgeFC.js and pyBridgePA.js files will be deleted.
+
+  Phase 3: Frontend Implementation (Detailed)
+
+  This phase refactors the UI to be faster and align with the new backend and your specific filter requirements.
+
+   1. Forecast Page (`/frontend/src/components/Client/Forecast/`):
+       * `Graph.tsx`: The axios.get request will be changed to the new /api/reports/forecast endpoint.
+       * `Response.tsx`: This component will be simplified to be purely presentational, receiving all its data via props. Its internal data-fetching logic will be removed.
+
+   2. Predictive Analysis Page (`/frontend/src/components/Client/PredictiveAnalysis/`):
+       * Core Change: All on-demand analysis is removed. The page will fetch two reports on load (pa_analysis.json and pa_trends.json). All filters will now operate on this client-side data for an
+         instant response.
+       * `pa.tsx` (Main Component / "Project Analysis" Tab):
+           * The runAnalysis and runGeneralAnalysis functions will be removed. A useEffect hook will fetch the pa_analysis.json report on load.
+           * Filter UI Simplification:
+               * The "Time Period" dropdown will be modified to remove the 'Yearly' option. The remaining 'Quarterly' and 'Monthly' options will be understood to apply to the next calendar year.
+               * The "Category" dropdown and the response customization checkboxes will be kept, but will now function as client-side filters.
+       * `paTrends.tsx` (Component for "Project Trends" Tab):
+           * All internal data-fetching logic will be removed. It will receive its data from the pa.tsx parent component, which will have already fetched the pa_trends.json report.
+           * Filter UI Simplification:
+               * The "Time Period" filter will have the 'Yearly' option removed.
+               * The "Forecast Category" filter will have the 'Others (Custom)' option removed, along with the corresponding text input field.
+       * Citation Logic Removal:
+           * CitationRenderer.tsx: This file will be deleted.
+           * paResponse.tsx & paCstmResponse.tsx: The use of CitationRenderer will be removed, and text will be rendered directly without citation links.

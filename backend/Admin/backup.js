@@ -256,8 +256,20 @@ async function executeBackup(jobId) {
         const message = BackupType === 'hybrid' ? 'Backup complete. Ready for download.' : 'Backup complete. File uploaded to cloud storage.';
         await updateJob(jobId, 'completed', message, finalUpdateData);
 
-        // Correctly add audit trail record matching the database schema
-        const auditID = randomBytes(8).toString('hex');
+        // Generate custom auditID based on the specified format
+        const phTime = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Manila' }));
+        const month = String(phTime.getMonth() + 1).padStart(2, '0');
+        const day = String(phTime.getDate()).padStart(2, '0');
+        const year = String(phTime.getFullYear()).slice(-2);
+        const hours = String(phTime.getHours()).padStart(2, '0');
+        const minutes = String(phTime.getMinutes()).padStart(2, '0');
+        const seconds = String(phTime.getSeconds()).padStart(2, '0');
+        const timestamp = `${month}${day}${year}${hours}${minutes}${seconds}`;
+
+        // Determine actor: 'S' for System Scheduler, 'A' for Admin
+        const actor = (CreatedBy === 'System Scheduler') ? 'S' : 'A';
+        const auditID = `${timestamp}${actor}B`; // 'B' for Backup module
+
         const pool = await getConnection();
         await pool.request()
             .input('auditID', sql.NVarChar(16), auditID)
@@ -858,4 +870,4 @@ router.post('/maintenance-start', authMiddleware, async (req, res) => {
     }
 });
 
-module.exports = router;
+module.exports = { router, executeBackup };

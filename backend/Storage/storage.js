@@ -9,7 +9,9 @@ const imageContainerName = process.env.IMAGE_CONTAINER;
 const videoContainerName = process.env.VIDEO_CONTAINER;
 const docContainerName = process.env.DOCS_CONTAINER;
 const backupContainerName = process.env.BACKUP_CONTAINER;
-const eAttachContainerName = process.env.E_ATTACHMENTS; // New container
+const eAttachContainerName = process.env.E_ATTACHMENTS;
+const jsonContainerName = process.env.JSON_CONTAINER; // For AI-generated JSON reports
+const haContainerName = process.env.HA_CONTAINER;     // For historical analysis data
 
 // Primary credentials
 const primaryConnectionString = process.env.STORAGE_CONNECTION_STRING_1;
@@ -25,8 +27,8 @@ const connectionString = useSecondary ? secondaryConnectionString : primaryConne
 const key = useSecondary ? secondaryKey : primaryKey;
 
 // Validate that at least one set of credentials and essential info are present
-if (!storageName || !imageContainerName || !videoContainerName || !docContainerName || !backupContainerName || !eAttachContainerName || !connectionString || !key) {
-    throw new Error('Azure Storage environment variables are not sufficiently configured. Please check STORAGE_NAME, IMAGE_CONTAINER, VIDEO_CONTAINER, DOCS_CONTAINER, BACKUP_CONTAINER, E_ATTACHMENTS and at least one set of connection strings/keys.');
+if (!storageName || !imageContainerName || !videoContainerName || !docContainerName || !backupContainerName || !eAttachContainerName || !jsonContainerName || !haContainerName || !connectionString || !key) {
+    throw new Error('Azure Storage environment variables are not sufficiently configured. Please check STORAGE_NAME, all container names (IMAGE, VIDEO, DOCS, BACKUP, E_ATTACHMENTS, JSON, HA), and at least one set of connection strings/keys.');
 }
 
 console.log(`Initializing Azure Storage with ${useSecondary ? 'secondary' : 'primary'} credentials.`);
@@ -35,6 +37,50 @@ console.log(`Initializing Azure Storage with ${useSecondary ? 'secondary' : 'pri
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(connectionString);
 const sharedKeyCredential = new StorageSharedKeyCredential(storageName, key);
+
+/**
+ * Helper function to convert a readable stream to a string.
+ * @param {NodeJS.ReadableStream} readableStream The stream to convert.
+ * @returns {Promise<string>} A promise that resolves to the string content.
+ */
+async function streamToString(readableStream) {
+    return new Promise((resolve, reject) => {
+        const chunks = [];
+        readableStream.on("data", (data) => {
+            chunks.push(data.toString());
+        });
+        readableStream.on("end", () => {
+            resolve(chunks.join(""));
+        });
+        readableStream.on("error", reject);
+    });
+}
+
+/**
+ * Downloads and returns the content of a blob as a string.
+ * @param {string} containerName - The name of the container.
+ * @param {string} blobName - The name of the blob.
+ * @returns {Promise<string>} The string content of the blob.
+ */
+async function getBlobContent(containerName, blobName) {
+    try {
+        const containerClient = blobServiceClient.getContainerClient(containerName);
+        const blobClient = containerClient.getBlobClient(blobName);
+
+        if (!(await blobClient.exists())) {
+            const err = new Error(`Blob '${blobName}' not found in container '${containerName}'.`);
+            err.statusCode = 404;
+            throw err;
+        }
+
+        const downloadBlockBlobResponse = await blobClient.download(0);
+        return await streamToString(downloadBlockBlobResponse.readableStreamBody);
+
+    } catch (error) {
+        console.error(`Failed to get content of blob '${blobName}' from container '${containerName}':`, error);
+        throw error; // Re-throw the error for the caller to handle
+    }
+}
 
 /**
  * Uploads a file to Azure Blob Storage.
@@ -123,6 +169,39 @@ async function getFileSasUrl(blobName, fileType, isPublic, source = 'post') {
 
     const sasToken = generateBlobSASQueryParameters(sasOptions, sharedKeyCredential).toString();
     return `${blobClient.url}?${sasToken}`;
+}
+
+/**
+ * Lists all blobs in a container.
+ * @param {string} containerName - The name of the container.
+ * @returns {Promise<string[]>} A list of blob names.
+ */
+async function listBlobs(containerName) {
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    await containerClient.createIfNotExists();
+    const blobs = [];
+    for await (const blob of containerClient.listBlobsFlat()) {
+        blobs.push(blob.name);
+    }
+    return blobs;
+}
+
+/**
+ * Uploads a buffer to a specific blob in a specific container.
+ * @param {string} containerName - The name of the container.
+ * @param {string} blobName - The name for the blob.
+ * @param {Buffer} buffer - The buffer to upload.
+ * @param {string} mimetype - The mimetype of the file.
+ * @returns {Promise<string>} The URL of the uploaded blob.
+ */
+async function uploadBlob(containerName, blobName, buffer, mimetype) {
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    await containerClient.createIfNotExists();
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    await blockBlobClient.upload(buffer, buffer.length, {
+        blobHTTPHeaders: { blobContentType: mimetype }
+    });
+    return blockBlobClient.url;
 }
 
 /**
@@ -225,5 +304,16 @@ module.exports = {
     uploadBackupFile,
     listBackups,
     downloadBackupFile,
-    deleteFile, // Export the new function
+    deleteFile,
+    getBlobContent, // Export the new function
+    listBlobs,      // Export the new function
+    uploadBlob,     // Export the new function
+    // Export container names for centralized access
+    imageContainerName,
+    videoContainerName,
+    docContainerName,
+    backupContainerName,
+    eAttachContainerName,
+    jsonContainerName,
+    haContainerName,
 };

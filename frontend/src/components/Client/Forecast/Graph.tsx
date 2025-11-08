@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import {
   Paper,
   Box,
@@ -16,8 +16,6 @@ import {
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import axios from '../../../backend connection/axiosConfig';
-import Loading from '../../Loading/Loading';
 import './Graph.css';
 
 // Register Chart.js components
@@ -26,19 +24,14 @@ ChartJS.register(
 );
 
 // --- Interfaces ---
+// This interface matches the structure of `chart_data` from the new API response
 interface ChartData {
-  years: string[];
-  committees: string[];
-  budget_data: Array<{
-    year: string;
-    data: Array<{ committee: string; budget: number; }>;
+  labels: string[];
+  datasets: Array<{
+    label: string;
+    data: number[];
+    backgroundColor: string[];
   }>;
-  colors: string[];
-}
-
-interface ForecastApiResponse {
-  by_committee: ChartData;
-  by_category: ChartData;
 }
 
 export type ViewBy = 'committee' | 'category';
@@ -46,57 +39,16 @@ export type ViewBy = 'committee' | 'category';
 interface GraphProps {
   currentView: ViewBy;
   onViewChange: (view: ViewBy) => void;
+  chartData: ChartData | null; // Receive chart data directly
 }
 
-const Graph: React.FC<GraphProps> = ({ currentView, onViewChange }) => {
-  const [plotData, setPlotData] = useState<ForecastApiResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Fetch forecast data on component mount
-  const fetchForecastData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get<ForecastApiResponse>('/api/forecast');
-      if (import.meta.env.DEV) {
-        console.log('Received forecast API response (raw):', response);
-        console.log('Received forecast API response (data):', response.data);
-      }
-
-      if (!response.data?.by_committee || !response.data?.by_category) {
-        throw new Error('Invalid data structure received from server.');
-      }
-      setPlotData(response.data);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Forecasting error, please try again later.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchForecastData();
-  }, [fetchForecastData]);
+const Graph: React.FC<GraphProps> = ({ currentView, onViewChange, chartData }) => {
 
   const handleViewChange = (_event: React.MouseEvent<HTMLElement>, newView: ViewBy | null) => {
     if (newView) {
       onViewChange(newView);
     }
   };
-
-  const activeChartData = plotData ? (currentView === 'committee' ? plotData.by_committee : plotData.by_category) : null;
-
-  const chartData = activeChartData ? {
-    labels: activeChartData.years,
-    datasets: activeChartData.committees.map((groupName, index) => ({
-      label: groupName,
-      data: activeChartData.budget_data.map(yearData => 
-        yearData.data.find(d => d.committee === groupName)?.budget || 0
-      ),
-      backgroundColor: activeChartData.colors[index % activeChartData.colors.length],
-    })),
-  } : null;
 
   // Pre-calculate the total for each year to use in the x-axis label
   const yearlyTotals = chartData ? chartData.labels.map((_year, index) => {
@@ -109,7 +61,7 @@ const Graph: React.FC<GraphProps> = ({ currentView, onViewChange }) => {
     plugins: {
       title: {
         display: true,
-        text: `Stacked Budget by ${currentView.charAt(0).toUpperCase() + currentView.slice(1)} and Year`,
+        text: `Stacked Budget Forecast by ${currentView.charAt(0).toUpperCase() + currentView.slice(1)}`,
         font: { size: 18, weight: 'bold' as const },
         color: '#333',
       },
@@ -119,14 +71,11 @@ const Graph: React.FC<GraphProps> = ({ currentView, onViewChange }) => {
         }
       },
       legend: { position: 'bottom' as const, labels: { font: { size: 11 } } },
-      // **MODIFICATION START: The datalabels plugin is now disabled for showing totals.**
       datalabels: {
-        display: false, // We are moving the total to the x-axis label instead.
+        display: false, // Totals are shown on the x-axis label
       },
-      // **MODIFICATION END**
     },
     scales: {
-      // **MODIFICATION START: The X-axis tick callback now formats the label.**
       x: { 
         stacked: true, 
         title: { 
@@ -153,7 +102,6 @@ const Graph: React.FC<GraphProps> = ({ currentView, onViewChange }) => {
           }
         }
       },
-      // **MODIFICATION END**
       y: { 
         stacked: true, 
         title: { display: true, text: 'Budget Amount (PHP)' }, 
@@ -171,16 +119,12 @@ const Graph: React.FC<GraphProps> = ({ currentView, onViewChange }) => {
         </ToggleButtonGroup>
       </Box>
       <div className="plot-container">
-        {isLoading ? (
-          <Loading />
-        ) : error ? (
-          <div className="error-message">{error}</div>
-        ) : chartData ? (
+        {chartData ? (
           <div style={{ width: '100%', height: '600px' }}>
             <Bar data={chartData} options={options as any} />
           </div>
         ) : (
-          <div>No data available.</div>
+          <div>No chart data available.</div>
         )}
       </div>
     </Paper>

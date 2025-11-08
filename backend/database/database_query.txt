@@ -127,6 +127,19 @@ CREATE TABLE rawDataTrack (
     dateUpload DATETIME NOT NULL
 );
 
+CREATE TABLE rawDataUpTrack (
+    uploadID INT PRIMARY KEY IDENTITY(1,1),
+    fileName NVARCHAR(255) NOT NULL,
+    fileUrl NVARCHAR(MAX) NOT NULL,
+    fileHash VARCHAR(64) NOT NULL,
+    totalRows INT NOT NULL,
+    uploadedByUserID INT NOT NULL,
+    createdAt DATETIME NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT FK_RawDataUpTrack_User FOREIGN KEY (uploadedByUserID) REFERENCES userInfo(userID)
+);
+
+CREATE INDEX IX_RawDataUpTrack_DateUpload ON rawDataUpTrack(createdAt DESC);
+
 --Storing OTP
 
 CREATE TABLE otpStore (
