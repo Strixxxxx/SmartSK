@@ -174,6 +174,7 @@ const Login: React.FC<LoginProps> = ({ open, onClose }) => {
             </div>
 
             <div className="form-links">
+              <Link to="/register">Register an Account</Link>
               <Link to="/forgot-password">Forgot Password?</Link>
             </div>
 

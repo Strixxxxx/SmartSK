@@ -100,7 +100,5 @@ npm run dev
 - **Rule1:** When Gemini CLI changes something on the backend, Gemini CLI would always take note that the backend programming language is Node JS.
 - **Rule2:** Gemini CLI must always remember that there are 2 programming languages that exist on the backend. The first is Node.js, which focuses on the main backend functionalities. The second is Python, which focuses on the AI/ML-related functionalities.
 - **Rule3:** Gemini CLI must make sure that the routers is added to the main.js file if needed and has conditionally applied middleware and error logging if it's invalid.
-- **Rule4:** Gemini CLI must always remember that Node.js can call the Python files via pyBridgeFC.js and pyBridgePA.js using child process spawn.
-- **Rule5:** When there is a new forecast-related function, Gemini CLI must make sure to add logic on PyBridgeFC.js, which handles forecast-related child process spawning.
-- **Rule6:** When there is a new predictive analysis-related function, Gemini CLI must make sure to add logic on PyBridgePA.js, which handles predictive analysis-related child process spawning.
-- **Rule7:** Gemini CLI must adhere to the rules mentioned above to make sure nothing wrong happens to the backend directory.
+- **Rule4:** Gemini CLI must always remember that Node.js can call the Python files via aiJobs.py using child process spawn to execute the asynchronous job.
+- **Rule5:** Gemini CLI must adhere to the rules mentioned above to make sure nothing wrong happens to the backend directory.

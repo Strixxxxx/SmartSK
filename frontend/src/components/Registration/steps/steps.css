@@ -1,0 +1,19 @@
+/* Shared styles for registration steps */
+.password-requirements {
+  margin: 16px 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.requirement {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #d32f2f; /* Default to error color */
+  transition: color 0.3s ease;
+}
+
+.requirement.valid {
+  color: #2e7d32; /* Success color */
+}

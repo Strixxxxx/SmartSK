@@ -1,0 +1,25 @@
+.registration-page-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 40px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.registration-paper {
+  padding: 40px;
+  border-radius: 20px !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15) !important;
+}
+
+.registration-title {
+  text-align: center;
+  font-weight: 700 !important;
+  background: linear-gradient(135deg, #646cff, #747bff);
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  margin-bottom: 16px !important;
+}

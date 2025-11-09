@@ -57,14 +57,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                   Dashboard
                 </Link>
               </li>
-              <li className={isActive('/admin/account-creation') ? 'active' : ''}>
-                <Link to="/admin/account-creation" title="Account Creation">
-                  Account Creation
-                </Link>
-              </li>
-              <li className={isActive('/admin/roles') ? 'active' : ''}>
-                <Link to="/admin/roles" title="Roles">
-                  Roles
+              <li className={location.pathname.startsWith('/admin/account-management') ? 'active' : ''}>
+                <Link to="/admin/account-management" title="Account Management">
+                  Account Management
                 </Link>
               </li>
               <li className={isActive('/admin/projects') ? 'active' : ''}>

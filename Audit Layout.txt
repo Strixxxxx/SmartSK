@@ -8,6 +8,7 @@ First Letter after the digits: The actor who initiated the action. Here are the 
 S for system
 A for Admin 
 C for client
+U for User
 
 Second Letter after the first letter - The specific module the action took place in. Which means 'which module it came from.' Here are the following modules:
 A- Authentication
@@ -17,6 +18,7 @@ D- Archive
 E- Email
 F- Forgot Password
 G- Posting
+I- Registration
 L- Login
 P- Projects
 Q- Portfolio

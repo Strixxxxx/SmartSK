@@ -3,6 +3,7 @@ const { getConnection, sql } = require('../database/database');
 const express = require('express');
 const router = express.Router();
 const { addAuditTrail } = require('../audit/auditService');
+const { decrypt } = require('../utils/crypto');
 
 // Configure email transporter
 const transporter = nodemailer.createTransport({
@@ -350,6 +351,72 @@ const sendProjectStatusEmail = async (projectId, status, remarks) => {
   }
 };
 
+const sendRegistrationApprovalEmail = async (userID) => {
+  try {
+    const pool = await getConnection();
+    const userResult = await pool.request()
+      .input('userID', sql.Int, userID)
+      .query('SELECT fullName, emailAddress FROM preUserInfo WHERE userID = @userID');
+    
+    if (userResult.recordset.length === 0) {
+      throw new Error(`User with ID ${userID} not found in preUserInfo.`);
+    }
+    
+    const user = userResult.recordset[0];
+    const decryptedFullName = decrypt(user.fullName);
+    const decryptedEmail = decrypt(user.emailAddress);
+
+    const htmlContent = createAccountApprovalEmail(decryptedFullName);
+    
+    const mailOptions = {
+      from: '"Smart SK" <smartsk2025@gmail.com>',
+      to: decryptedEmail,
+      subject: 'Your Smart SK Account has been Approved',
+      html: htmlContent
+    };
+    
+    await transporter.sendMail(mailOptions);
+    console.log(`Registration approval email sent to ${decryptedEmail}`);
+    return { success: true };
+  } catch (error) {
+    console.error(`Error sending registration approval email for userID ${userID}:`, error);
+    return { success: false, error: error.message };
+  }
+};
+
+const sendRegistrationRejectionEmail = async (userID, reason) => {
+  try {
+    const pool = await getConnection();
+    const userResult = await pool.request()
+      .input('userID', sql.Int, userID)
+      .query('SELECT fullName, emailAddress FROM preUserInfo WHERE userID = @userID');
+
+    if (userResult.recordset.length === 0) {
+      throw new Error(`User with ID ${userID} not found in preUserInfo.`);
+    }
+
+    const user = userResult.recordset[0];
+    const decryptedFullName = decrypt(user.fullName);
+    const decryptedEmail = decrypt(user.emailAddress);
+
+    const htmlContent = createAccountRejectionEmail(decryptedFullName, reason);
+    
+    const mailOptions = {
+      from: '"Smart SK" <smartsk2025@gmail.com>',
+      to: decryptedEmail,
+      subject: 'Your Smart SK Account Application Status',
+      html: htmlContent
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log(`Registration rejection email sent to ${decryptedEmail}`);
+    return { success: true };
+  } catch (error) {
+    console.error(`Error sending registration rejection email for userID ${userID}:`, error);
+    return { success: false, error: error.message };
+  }
+};
+
 // API Routes for sending emails
 
 router.post('/send-password-reset', async (req, res) => {
@@ -392,5 +459,7 @@ module.exports = {
   sendAccountRejectionEmail,
   sendProjectStatusEmail,
   sendAccountCreationEmail,
+  sendRegistrationApprovalEmail,
+  sendRegistrationRejectionEmail,
   generateOTP
 };

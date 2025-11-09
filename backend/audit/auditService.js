@@ -11,6 +11,7 @@ const moduleMapping = {
     'E': 'Email',
     'F': 'Forgot Password',
     'G': 'Posting',
+    'I': 'Registration',
     'L': 'Login',
     'P': 'Projects',
     'Q': 'Portfolio',

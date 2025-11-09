@@ -103,9 +103,24 @@ function generateUsernameHash(username) {
     return crypto.createHash('sha256').update(normalizedUsername).digest('hex');
 }
 
+/**
+ * Generates a SHA-256 hash for a phone number, used for blind indexing and lookups.
+ * @param {string} phoneNumber The phone number to hash.
+ * @returns {string|null} The SHA-256 hash as a hex string, or null if input is invalid.
+ */
+function generatePhoneNumberHash(phoneNumber) {
+    if (!phoneNumber || typeof phoneNumber !== 'string') {
+        return null;
+    }
+    // Normalize phone number by removing non-digit characters
+    const normalizedPhoneNumber = phoneNumber.replace(/\D/g, '');
+    return crypto.createHash('sha256').update(normalizedPhoneNumber).digest('hex');
+}
+
 module.exports = {
     encrypt,
     decrypt,
     generateEmailHash,
     generateUsernameHash,
+    generatePhoneNumberHash,
 };

@@ -18,6 +18,7 @@ import NewAccount from './components/Login/NewAccount';
 import Portfolio from './components/Portfolio/Portfolio';
 import ProjectList from './components/Portfolio/ProjectList';
 import ComingSoon from './components/ComingSoon/ComingSoon';
+import RegistrationPage from './components/Registration/RegistrationPage';
 
 // Client Pages
 import Dashboard from './components/Client/Dashboard/Dashboard';
@@ -28,8 +29,7 @@ import RawDataList from './components/Client/RawData/RawDataList';
 
 // Admin Pages
 import DashboardAdmin from './components/Admin/Dashboard/DashboardAdmin';
-import AccountCreation from './components/Admin/Account Creation/AccountCreation';
-import Roles from './components/Admin/Roles/Roles';
+import AccountManagement from './components/Admin/AccountManagement/AccountManagement';
 import AdminProjects from './components/Admin/Projects/AdminProjects';
 import RawData from './components/Admin/Raw Data/rawdata';
 import AuditTrail from './components/Admin/Audit Trail/audit';
@@ -79,6 +79,7 @@ const AppRoutes: React.FC = () => {
       {/* Public Routes */}
       <Route path="/home" element={<Portfolio />} />
       <Route path="/project-list" element={<ProjectList />} />
+      <Route path="/register" element={<RegistrationPage />} />
 
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
@@ -114,8 +115,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<Navigate to="dashboard" />} />
           <Route path="dashboard" element={<DashboardAdmin />} />
-          <Route path="account-creation" element={<AccountCreation />} />
-          <Route path="roles" element={<Roles />} />
+          <Route path="account-management" element={<AccountManagement />} />
           <Route path="projects" element={<AdminProjects />} />
           <Route path="raw-data" element={<RawData />} />
           <Route path="sessions" element={<SessionLog />} />

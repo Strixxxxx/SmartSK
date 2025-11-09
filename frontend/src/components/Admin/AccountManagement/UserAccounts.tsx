@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
-import './AccountCreation.css';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import { AxiosError } from 'axios';
@@ -27,14 +26,7 @@ interface User {
   isArchived: boolean;
 }
 
-interface AccountCreationProps {}
-
-interface OutletContextType {
-  sidebarCollapsed: boolean;
-}
-
-const AccountCreation: React.FC<AccountCreationProps> = () => {
-  const { sidebarCollapsed } = useOutletContext<OutletContextType>();
+const UserAccounts: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [formData, setFormData] = useState({
     username: '',
@@ -56,12 +48,8 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
   useEffect(() => {
     if (!authChecked) {
       if (user) {
-        // The AdminGuard has already verified the user's role.
-        // It's safe to fetch the user data now.
         fetchUsers();
       } else {
-        // This is a fallback in case the auth state is lost.
-        // The AdminGuard should handle this, but this makes it more robust.
         navigate('/home', { replace: true });
       }
       setAuthChecked(true);
@@ -71,15 +59,14 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await axiosInstance.get('/api/admin/user-list'); // Changed from fetch to axiosInstance
-
+      const response = await axiosInstance.get('/api/admin/user-list');
       if (response.data.success) {
         setUsers(response.data.users);
       } else {
         throw new Error(response.data.message || 'Failed to fetch users');
       }
     } catch (error) {
-      const axiosError = error as AxiosError; // Added type assertion
+      const axiosError = error as AxiosError;
       if (axiosError.response?.status === 401) {
         navigate('/home', { replace: true });
         return;
@@ -158,7 +145,7 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
     try {
       const defaultPassword = `${formData.username}.SmartSK2025`;
 
-      const response = await axiosInstance.post('/api/admin/user-list/create-account', { // Changed from fetch to axiosInstance
+      const response = await axiosInstance.post('/api/admin/user-list/create-account', {
         username: formData.username,
         fullName: formData.fullName,
         barangay: formData.barangay,
@@ -209,53 +196,46 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
   }
 
   return (
-    <div className={`account-creation-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-      <div className="account-creation-content">
-        <div className="page-header">
-          <div className="header-content">
-            <h1 className="page-title">Account Creation</h1>
-            <p className="page-subtitle">Create and manage user accounts in the system.</p>
+    <React.Fragment>
+      <div className="table-card">
+        <div className="table-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <h3>Existing Accounts</h3>
+            <p>List of all registered users</p>
           </div>
           <button onClick={handleOpenModal} className="create-account-btn">
             <span className="btn-icon">+</span> Create Account
           </button>
         </div>
-
-        <div className="table-card">
-          <div className="table-header">
-            <h3>Existing Accounts</h3>
-            <p>List of all registered users</p>
-          </div>
-          <div className="users-table-container">
-            {loading ? <Loading /> : (
-              <table className="users-table">
-                <thead>
-                  <tr>
-                    <th>Username</th>
-                    <th>Full Name</th>
-                    <th>Email Address</th>
-                    <th>Phone Number</th>
-                    <th>Status</th>
+        <div className="users-table-container">
+          {loading ? <Loading /> : (
+            <table className="users-table">
+              <thead>
+                <tr>
+                  <th>Username</th>
+                  <th>Full Name</th>
+                  <th>Email Address</th>
+                  <th>Phone Number</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {users.map((user) => (
+                  <tr key={user.userName}>
+                    <td>{user.userName}</td>
+                    <td>{user.fullName}</td>
+                    <td>{user.emailAddress}</td>
+                    <td>{user.phoneNumber}</td>
+                    <td>
+                      <span className={`status ${user.isArchived ? 'inactive' : 'active'}`}>
+                        {user.isArchived ? 'Inactive' : 'Active'}
+                      </span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody>
-                  {users.map((user) => (
-                    <tr key={user.userName}>
-                      <td>{user.userName}</td>
-                      <td>{user.fullName}</td>
-                      <td>{user.emailAddress}</td>
-                      <td>{user.phoneNumber}</td>
-                      <td>
-                        <span className={`status ${user.isArchived ? 'inactive' : 'active'}`}>
-                          {user.isArchived ? 'Inactive' : 'Active'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
+                ))}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
@@ -277,7 +257,7 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
               value={formData.username}
               onChange={handleChange}
               required
-              sx={{ mb: 2 }} // Adds spacing below the TextField
+              sx={{ mb: 2 }}
             />
             <TextField
               margin="dense"
@@ -365,8 +345,8 @@ const AccountCreation: React.FC<AccountCreationProps> = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </div>
+    </React.Fragment>
   );
 };
 
-export default AccountCreation;
+export default UserAccounts;

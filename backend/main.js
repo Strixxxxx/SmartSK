@@ -33,6 +33,7 @@ const { initializeWebSocketServer, broadcast } = require('./websockets/websocket
 const routeGuard = require('./routeGuard/routeGuard');
 const { getConnection, sql } = require('./database/database');
 const forgotPasswordRoutes = require('./forgotpassword/forgotPassword');
+const registerRouter = require('./register/register');
 const accountCreationRouter = require('./Admin/accountCreation');
 const rolesRouter = require('./Admin/roles');
 const { router: backupRouter, executeBackup } = require('./Admin/backup');
@@ -49,6 +50,7 @@ const archiveRouter = require('./Admin/archive');
 const accArchiveRouter = require('./Admin/accArchive');
 const projArchiveRouter = require('./Admin/projArchive');
 const projListRouter = require('./Admin/projList');
+const registerAuditRouter = require('./Admin/registerAudit');
 const postPublicRouter = require('./Posting/postPublic');
 const protectedPostRouter = require('./Posting/post');
 const pStatusListRouter = require('./Projects/pStatusList.js');
@@ -105,6 +107,13 @@ if (forgotPasswordRoutes && typeof forgotPasswordRoutes === 'function') {
   app.use('/api/forgotpassword', forgotPasswordRoutes);
 } else {
   console.error('forgotPasswordRoutes is not a valid middleware function');
+}
+
+// Register router
+if (registerRouter && typeof registerRouter === 'function') {
+    app.use('/api/register', registerRouter);
+} else {
+    console.error('registerRouter is not a valid middleware function');
 }
 
 // Health Check Endpoint
@@ -231,6 +240,12 @@ if (projListRouter && typeof projListRouter === 'function') {
   adminRouter.use('/project-list', projListRouter);
 } else {
   console.error('projListRouter is not a valid middleware function');
+}
+
+if (registerAuditRouter && typeof registerAuditRouter === 'function') {
+  adminRouter.use('/audit', registerAuditRouter);
+} else {
+  console.error('registerAuditRouter is not a valid middleware function');
 }
 
 if (protectedPostRouter && typeof protectedPostRouter === 'function') {
