@@ -4,7 +4,149 @@
 
 --Frontend (Browser's Console)
 
-
+1762708363003-testReg-Yas.jpg:1 
+ GET https://smartskstorage.blob.core.windows.net/undefined/1762708363003-testRe…%3A55%3A02Z&sr=b&sp=r&sig=ydgbnAWaERaSaxykuXFG3ko14frAY5N%2BT2pVuaQVjag%3D 404 (The specified container does not exist.)
+Image		
+HS	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+qi	@	index-10ixxyHQ.js:48
+YS	@	index-10ixxyHQ.js:48
+gw	@	index-10ixxyHQ.js:48
+pw	@	index-10ixxyHQ.js:48
+ow	@	index-10ixxyHQ.js:48
+aw	@	index-10ixxyHQ.js:48
+jw	@	index-10ixxyHQ.js:48
+F	@	index-10ixxyHQ.js:25
 
 --Frontend (VSC Terminal)
 
@@ -14,61 +156,16 @@
 
 PS D:\Projects\Projects\smartSK\backend> node main.js
 Initializing Azure Storage with primary credentials.
+In storage.js, registerContainerName is: register-id
 Initializing active sessions from database...
 Job management system initialized with database storage.
+In registerAudit.js, imported registerContainerName is: register-id
 Post upload job management system initialized.
 [WebSocket] Server initialized.
 Server is running on port 8080
 Hourly AI job with retry logic has been scheduled.
 Monthly cloud backup job has been scheduled.
 Initialized active sessions.
-[WebSocket] Client connected.
-[WebSocket] Client connected.
-File uploaded to Azure container 'register-id'. Blob Name: 1762701253447-testReg-1st.png
-User pending data inserted for userID: 7
-Error adding audit trail: RequestError: The INSERT statement conflicted with the FOREIGN KEY constraint "FK__audit tra__userI__30C33EC3". The conflict occurred in database "Smart_SK_FINAL", table "dbo.userInfo", column 'userID'.
-    at handleError (D:\Projects\Projects\smartSK\backend\node_modules\mssql\lib\tedious\request.js:384:15)
-    at Connection.emit (node:events:519:28)
-    at Connection.emit (D:\Projects\Projects\smartSK\backend\node_modules\tedious\lib\connection.js:970:18)
-    at RequestTokenHandler.onErrorMessage (D:\Projects\Projects\smartSK\backend\node_modules\tedious\lib\token\handler.js:284:21)
-    at Readable.<anonymous> (D:\Projects\Projects\smartSK\backend\node_modules\tedious\lib\token\token-stream-parser.js:19:33)
-    at Readable.emit (node:events:519:28)
-    at addChunk (node:internal/streams/readable:561:12)
-    at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-    at Readable.push (node:internal/streams/readable:393:5)
-    at nextAsync (node:internal/streams/from:194:22) {
-  code: 'EREQUEST',
-  originalError: Error: The INSERT statement conflicted with the FOREIGN KEY constraint "FK__audit tra__userI__30C33EC3". The conflict occurred in database "Smart_SK_FINAL", table "dbo.userInfo", column 'userID'.      
-      at handleError (D:\Projects\Projects\smartSK\backend\node_modules\mssql\lib\tedious\request.js:382:19)
-      at Connection.emit (node:events:519:28)
-      at Connection.emit (D:\Projects\Projects\smartSK\backend\node_modules\tedious\lib\connection.js:970:18)
-      at RequestTokenHandler.onErrorMessage (D:\Projects\Projects\smartSK\backend\node_modules\tedious\lib\token\handler.js:284:21)
-      at Readable.<anonymous> (D:\Projects\Projects\smartSK\backend\node_modules\tedious\lib\token\token-stream-parser.js:19:33)
-      at Readable.emit (node:events:519:28)
-      at addChunk (node:internal/streams/readable:561:12)
-      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
-      at Readable.push (node:internal/streams/readable:393:5)
-      at nextAsync (node:internal/streams/from:194:22) {
-    info: ErrorMessageToken {
-      name: 'ERROR',
-      handlerName: 'onErrorMessage',
-      number: 547,
-      state: 0,
-      class: 16,
-      message: `The INSERT statement conflicted with the FOREIGN KEY constraint "FK__audit tra__userI__30C33EC3". The conflict occurred in database "Smart_SK_FINAL", table "dbo.userInfo", column 'userID'.`,
-      serverName: 'smart-sk',
-      procName: '',
-      lineNumber: 2
-    }
-  },
-  number: 547,
-  lineNumber: 2,
-  state: undefined,
-  class: 16,
-  serverName: 'smart-sk',
-  procName: '',
-  precedingErrors: []
-}
 
 --Backend(Azure Portal's Log Stream in Platform)
 

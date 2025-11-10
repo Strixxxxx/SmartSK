@@ -4,7 +4,7 @@ const { getConnection, sql } = require('../database/database');
 const { authMiddleware } = require('../session/session');
 const { addAuditTrail } = require('../audit/auditService');
 const { decrypt } = require('../utils/crypto');
-const { uploadTextToBlob, downloadBlobAsText, generateSasUrl, REGISTER_CONTAINER } = require('../Storage/storage');
+const { uploadTextToBlob, downloadBlobAsText, generateSasUrl, registerContainerName } = require('../Storage/storage');
 
 // --- SK Official List Endpoints ---
 
@@ -25,7 +25,7 @@ router.get('/officials', authMiddleware, async (req, res) => {
         const barangayName = barangayResult.recordset[0].barangayName;
         const blobName = `SK OFFICIAL - ${barangayName}.txt`;
 
-        const content = await downloadBlobAsText(REGISTER_CONTAINER, blobName);
+        const content = await downloadBlobAsText(registerContainerName, blobName);
         res.json({ success: true, content: content || '' });
 
     } catch (error) {
@@ -62,7 +62,7 @@ router.post('/officials', authMiddleware, async (req, res) => {
         const blobName = `SK OFFICIAL - ${barangayName}.txt`;
 
         // Upload the text content to Azure Blob Storage
-        await uploadTextToBlob(REGISTER_CONTAINER, blobName, officialsList);
+        await uploadTextToBlob(registerContainerName, blobName, officialsList);
 
         // Add audit trail
         addAuditTrail({
@@ -134,14 +134,14 @@ router.get('/attachment/:userId', authMiddleware, async (req, res) => {
         const pool = await getConnection();
         const result = await pool.request()
             .input('userID', sql.Int, userId)
-            .query('SELECT attachmentPath FROM preUserInfoEx WHERE userID = @userID');
+            .query('SELECT attachmentPath FROM registrationAudit WHERE userID = @userID');
 
         if (result.recordset.length === 0 || !result.recordset[0].attachmentPath) {
             return res.status(404).json({ success: false, message: 'Attachment not found for this user.' });
         }
 
         const blobName = result.recordset[0].attachmentPath;
-        const sasUrl = await generateSasUrl(REGISTER_CONTAINER, blobName);
+        const sasUrl = await generateSasUrl(registerContainerName, blobName);
 
         res.json({ success: true, url: sasUrl });
 

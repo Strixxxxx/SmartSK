@@ -195,13 +195,31 @@ const RegistrationSummary: React.FC = () => {
             </Dialog>
 
             {/* Attachment Viewer Modal */}
-            <Dialog open={isAttachmentModalOpen} onClose={handleCloseAttachmentModal} fullWidth maxWidth="lg">
+            <Dialog 
+                open={isAttachmentModalOpen} 
+                onClose={handleCloseAttachmentModal} 
+                fullWidth 
+                maxWidth="lg"
+                PaperProps={{
+                    sx: {
+                        userSelect: 'none',
+                        WebkitUserSelect: 'none',
+                        MozUserSelect: 'none',
+                        msUserSelect: 'none'
+                    }
+                }}
+            >
                 <DialogTitle>Attachment Viewer</DialogTitle>
                 <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     {modalLoading ? (
                         <CircularProgress />
                     ) : (
-                        <img src={attachmentUrl} alt="Registration Attachment" style={{ maxWidth: '100%', maxHeight: '80vh' }} />
+                        <img 
+                            src={attachmentUrl} 
+                            alt="Registration Attachment" 
+                            style={{ maxWidth: '100%', maxHeight: '80vh' }} 
+                            onContextMenu={(e) => e.preventDefault()}
+                        />
                     )}
                 </DialogContent>
                 <DialogActions>
