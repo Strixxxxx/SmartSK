@@ -101,7 +101,7 @@ const createAccountRejectionEmail = (username, reason) => {
         <p><strong>Reason:</strong> ${reason || 'Your application did not meet our current requirements.'}</p>
       </div>
       
-      <p>If you believe this is an error or would like to provide additional information, please go to your respective Barangay SK Hall.</p>
+      <p>If you believe this is an error or would like to provide additional information, please go to your respective Barangay SK Hall and contact the Admin for further assistance.</p>
       
       <p>Thank you for your interest in Smart SK.</p>
       

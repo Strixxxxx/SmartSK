@@ -9,6 +9,7 @@ const { uploadBlob, registerContainerName, downloadBlobToBuffer } = require('../
 const { sendRegistrationApprovalEmail, sendRegistrationRejectionEmail } = require('../Email/email');
 const { encrypt, decrypt, generateUsernameHash, generateEmailHash, generatePhoneNumberHash } = require('../utils/crypto');
 const { addAuditTrail } = require('../audit/auditService');
+const { getPHTimestamp } = require('../utils/time');
 const bcrypt = require('bcrypt');
 
 // Use in-memory storage for multer to handle the file as a buffer
@@ -212,13 +213,16 @@ router.post('/', upload.single('attachment'), async (req, res) => {
             
             newUserId = userResult.recordset[0].userID;
 
+            const registeredAt = getPHTimestamp();
+
             await transaction.request()
                 .input('userID', sql.Int, newUserId)
                 .input('dateOfBirth', sql.Date, new Date(dateOfBirth))
                 .input('attachmentPath', sql.NVarChar(sql.MAX), attachmentPath)
+                .input('registeredAt', sql.DateTime, registeredAt)
                 .query(`
-                    INSERT INTO preUserInfoEx (userID, dateOfBirth, attachmentPath)
-                    VALUES (@userID, @dateOfBirth, @attachmentPath);
+                    INSERT INTO preUserInfoEx (userID, dateOfBirth, attachmentPath, registeredAt)
+                    VALUES (@userID, @dateOfBirth, @attachmentPath, @registeredAt);
                 `);
 
             await transaction.commit();

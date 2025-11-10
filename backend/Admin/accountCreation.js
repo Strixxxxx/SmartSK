@@ -20,9 +20,11 @@ router.get('/', authMiddleware, async (req, res) => {
 
     // Get database connection
     const pool = await getConnection();
+    const userBarangay = req.user.barangay; // Get barangay from the authenticated user
 
-    // Fetch all non-archived users
+    // Fetch non-archived users from the user's barangay
     const users = await pool.request()
+      .input('userBarangay', sql.Int, userBarangay)
       .query(`
         SELECT 
           userName,
@@ -31,7 +33,7 @@ router.get('/', authMiddleware, async (req, res) => {
           phoneNumber,
           isArchived
         FROM userInfo
-        WHERE isArchived = 0
+        WHERE isArchived = 0 AND barangay = @userBarangay
         ORDER BY fullName ASC
       `);
 

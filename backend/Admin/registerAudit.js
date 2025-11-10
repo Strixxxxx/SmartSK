@@ -91,23 +91,29 @@ router.post('/officials', authMiddleware, async (req, res) => {
 router.get('/registrations', authMiddleware, async (req, res) => {
     try {
         const pool = await getConnection();
-        const result = await pool.request().query(`
-            SELECT 
-                ra.auditID,
-                ra.userID,
-                pui.username,
-                pui.fullName,
-                pui.emailAddress,
-                ra.verificationReport,
-                ra.attachmentPath,
-                ra.processedAt,
-                puie.status,
-                puie.rejectionReason
-            FROM registrationAudit ra
-            JOIN preUserInfo pui ON ra.userID = pui.userID
-            JOIN preUserInfoEx puie ON ra.userID = puie.userID
-            ORDER BY ra.processedAt DESC
-        `);
+        const userBarangay = req.user.barangay; // Get barangay from authenticated user
+
+        const result = await pool.request()
+            .input('userBarangay', sql.Int, userBarangay)
+            .query(`
+                SELECT 
+                    ra.auditID,
+                    ra.userID,
+                    pui.username,
+                    pui.fullName,
+                    pui.emailAddress,
+                    ra.verificationReport,
+                    ra.attachmentPath,
+                    ra.processedAt,
+                    puie.status,
+                    puie.rejectionReason,
+                    puie.registeredAt
+                FROM registrationAudit ra
+                JOIN preUserInfo pui ON ra.userID = pui.userID
+                JOIN preUserInfoEx puie ON ra.userID = puie.userID
+                WHERE pui.barangay = @userBarangay
+                ORDER BY ra.processedAt DESC
+            `);
 
         const decryptedLogs = result.recordset.map(log => ({
             ...log,
@@ -130,8 +136,28 @@ router.get('/registrations', authMiddleware, async (req, res) => {
  */
 router.get('/attachment/:userId', authMiddleware, async (req, res) => {
     const { userId } = req.params;
+    const userBarangay = req.user.barangay; // Admin's barangay
+
     try {
         const pool = await getConnection();
+
+        // Security Check: Verify the requested user belongs to the admin's barangay
+        const userCheckResult = await pool.request()
+            .input('userID', sql.Int, userId)
+            .query('SELECT barangay FROM preUserInfo WHERE userID = @userID');
+
+        if (userCheckResult.recordset.length === 0) {
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+
+        const targetUserBarangay = userCheckResult.recordset[0].barangay;
+
+        // Deny access if barangays don't match
+        if (targetUserBarangay !== userBarangay) {
+            return res.status(403).json({ success: false, message: 'Forbidden: You can only access attachments for users in your own barangay.' });
+        }
+
+        // Proceed if check passes
         const result = await pool.request()
             .input('userID', sql.Int, userId)
             .query('SELECT attachmentPath FROM registrationAudit WHERE userID = @userID');

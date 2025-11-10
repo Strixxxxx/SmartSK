@@ -15,6 +15,7 @@ interface AuditLog {
     verificationReport: string;
     processedAt: string;
     status: string;
+    registeredAt: string;
 }
 
 const RegistrationSummary: React.FC = () => {
@@ -125,19 +126,20 @@ const RegistrationSummary: React.FC = () => {
                             <TableCell>Status</TableCell>
                             <TableCell>Verification Report</TableCell>
                             <TableCell align="center">Attachment</TableCell>
+                            <TableCell>Registered At</TableCell>
                             <TableCell>Processed At</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {pageLoading ? (
                             <TableRow>
-                                <TableCell colSpan={6} align="center">
+                                <TableCell colSpan={7} align="center">
                                     <CircularProgress />
                                 </TableCell>
                             </TableRow>
                         ) : logs.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={6} align="center">
+                                <TableCell colSpan={7} align="center">
                                     No registration logs found.
                                 </TableCell>
                             </TableRow>
@@ -157,6 +159,7 @@ const RegistrationSummary: React.FC = () => {
                                             </IconButton>
                                         </Tooltip>
                                     </TableCell>
+                                    <TableCell>{new Date(log.registeredAt).toLocaleString()}</TableCell>
                                     <TableCell>{new Date(log.processedAt).toLocaleString()}</TableCell>
                                 </TableRow>
                             ))

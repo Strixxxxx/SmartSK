@@ -10,9 +10,11 @@ const { authMiddleware } = require('../session/session');
 router.get('/users', authMiddleware, routeGuard.isAdmin, async (req, res) => {
   try {
     const pool = await getConnection();
+    const userBarangay = req.user.barangay; // Get barangay from the authenticated user
     
-    // Get all users from userInfo table
+    // Get users from the user's barangay
     const result = await pool.request()
+      .input('userBarangay', sql.Int, userBarangay)
       .query(`
         SELECT 
           u.userID, 
@@ -26,7 +28,7 @@ router.get('/users', authMiddleware, routeGuard.isAdmin, async (req, res) => {
         FROM userInfo u
         LEFT JOIN roles r ON u.position = r.roleID
         LEFT JOIN barangays b ON u.barangay = b.barangayID
-        WHERE u.isArchived = 0
+        WHERE u.isArchived = 0 AND u.barangay = @userBarangay
         ORDER BY u.fullName
       `);
 

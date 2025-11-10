@@ -70,6 +70,7 @@ CREATE TABLE [preUserInfoEx] (
     attachmentPath NVARCHAR(MAX) NOT NULL,
     status NVARCHAR(50) DEFAULT 'pending' NOT NULL,
     rejectionReason NVARCHAR(MAX) NULL,
+    registeredAt DATETIME NOT NULL DEFAULT GETDATE();
     CONSTRAINT FK_preUserInfoEx_preUserInfo FOREIGN KEY (userID) REFERENCES preUserInfo(userID) ON DELETE CASCADE
 );
 
