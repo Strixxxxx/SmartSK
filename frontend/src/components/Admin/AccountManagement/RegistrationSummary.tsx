@@ -1,21 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
     Box, Typography, Paper, Button, Dialog, DialogActions, DialogContent, DialogTitle, 
     TextField, CircularProgress, Table, TableBody, TableCell, TableContainer, 
-    TableHead, TableRow, IconButton, Tooltip 
+    TableHead, TableRow, IconButton, Tooltip, Chip
 } from '@mui/material';
-import { Visibility, ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
+import { Visibility, ArrowBackIosNew, ArrowForwardIos, Edit } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../../backend connection/axiosConfig';
+import AuditSummaryModal from './AuditSummaryModal'; // Import the new modal
 
 interface AuditLog {
     userID: number;
     username: string;
     fullName: string;
+    emailAddress: string;
+    dateOfBirth: string;
     verificationReport: string;
     processedAt: string;
     status: string;
     registeredAt: string;
+    validatedBy: string;
+    attachmentPath: string;
+    attachmentPathBack: string;
 }
 
 const RegistrationSummary: React.FC = () => {
@@ -34,31 +40,35 @@ const RegistrationSummary: React.FC = () => {
     const [currentAttachmentIndex, setCurrentAttachmentIndex] = useState(0);
     const [modalLoading, setModalLoading] = useState(false);
 
-    useEffect(() => {
-        const fetchInitialData = async () => {
-            setPageLoading(true);
-            try {
-                const [officialsRes, auditRes] = await Promise.all([
-                    axiosInstance.get('/api/admin/audit/officials'),
-                    axiosInstance.get('/api/admin/audit/registrations')
-                ]);
+    // State for the new Audit Summary Modal
+    const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
+    const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
 
-                if (officialsRes.data.success) {
-                    setOfficialsList(officialsRes.data.content || '');
-                }
-                if (auditRes.data.success) {
-                    setLogs(auditRes.data.data);
-                }
-            } catch (error) {
-                toast.error('Failed to fetch initial data.');
-                console.error("Error fetching initial data:", error);
-            } finally {
-                setPageLoading(false);
+    const fetchInitialData = useCallback(async () => {
+        setPageLoading(true);
+        try {
+            const [officialsRes, auditRes] = await Promise.all([
+                axiosInstance.get('/api/admin/audit/officials'),
+                axiosInstance.get('/api/admin/audit/registrations')
+            ]);
+
+            if (officialsRes.data.success) {
+                setOfficialsList(officialsRes.data.content || '');
             }
-        };
-
-        fetchInitialData();
+            if (auditRes.data.success) {
+                setLogs(auditRes.data.data);
+            }
+        } catch (error) {
+            toast.error('Failed to fetch initial data.');
+            console.error("Error fetching initial data:", error);
+        } finally {
+            setPageLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        fetchInitialData();
+    }, [fetchInitialData]);
 
     const handleOpenListModal = () => {
         if (officialsList.trim() === '') setOfficialsList('- ');
@@ -125,11 +135,27 @@ const RegistrationSummary: React.FC = () => {
         );
     };
 
+    // Handlers for the new Audit Summary Modal
+    const handleOpenAuditModal = (log: AuditLog) => {
+        setSelectedLog(log);
+        setIsAuditModalOpen(true);
+    };
+
+    const handleCloseAuditModal = () => {
+        setSelectedLog(null);
+        setIsAuditModalOpen(false);
+    };
+
+    const handleAuditSuccess = () => {
+        handleCloseAuditModal();
+        fetchInitialData(); // Re-fetch data to show the update
+    };
+
     return (
         <Paper elevation={0} sx={{ p: 2, backgroundColor: 'transparent' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h5" component="h3">
-                    AI Registration Report
+                    Registration Audit Report
                 </Typography>
                 <Button variant="contained" onClick={handleOpenListModal}>
                     Manage SK Official List
@@ -143,32 +169,40 @@ const RegistrationSummary: React.FC = () => {
                             <TableCell>Username</TableCell>
                             <TableCell>Full Name</TableCell>
                             <TableCell>Status</TableCell>
+                            <TableCell>Validated By</TableCell>
                             <TableCell>Verification Report</TableCell>
                             <TableCell align="center">Attachment</TableCell>
-                            <TableCell>Registered At</TableCell>
                             <TableCell>Processed At</TableCell>
+                            <TableCell align="center">Action</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {pageLoading ? (
                             <TableRow>
-                                <TableCell colSpan={7} align="center">
+                                <TableCell colSpan={8} align="center">
                                     <CircularProgress />
                                 </TableCell>
                             </TableRow>
                         ) : logs.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={7} align="center">
+                                <TableCell colSpan={8} align="center">
                                     No registration logs found.
                                 </TableCell>
                             </TableRow>
                         ) : (
                             logs.map((log) => (
-                                <TableRow key={log.userID}>
+                                <TableRow key={`${log.userID}-${log.processedAt}`}>
                                     <TableCell>{log.username}</TableCell>
                                     <TableCell>{log.fullName}</TableCell>
-                                    <TableCell>{log.status}</TableCell>
-                                    <TableCell sx={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                                    <TableCell>
+                                        <Chip 
+                                            label={log.status}
+                                            color={log.status === 'approved' ? 'success' : log.status === 'rejected' ? 'error' : 'warning'}
+                                            size="small"
+                                        />
+                                    </TableCell>
+                                    <TableCell>{log.validatedBy}</TableCell>
+                                    <TableCell sx={{ whiteSpace: 'pre-wrap', fontFamily: 'monospace', fontSize: '0.8rem', maxWidth: 300, overflow: 'auto' }}>
                                         {log.verificationReport}
                                     </TableCell>
                                     <TableCell align="center">
@@ -178,8 +212,14 @@ const RegistrationSummary: React.FC = () => {
                                             </IconButton>
                                         </Tooltip>
                                     </TableCell>
-                                    <TableCell>{new Date(log.registeredAt).toLocaleString()}</TableCell>
                                     <TableCell>{new Date(log.processedAt).toLocaleString()}</TableCell>
+                                    <TableCell align="center">
+                                        <Tooltip title="Manual Override">
+                                            <IconButton onClick={() => handleOpenAuditModal(log)}>
+                                                <Edit />
+                                            </IconButton>
+                                        </Tooltip>
+                                    </TableCell>
                                 </TableRow>
                             ))
                         )}
@@ -222,14 +262,7 @@ const RegistrationSummary: React.FC = () => {
                 onClose={handleCloseAttachmentModal} 
                 fullWidth 
                 maxWidth="lg"
-                PaperProps={{
-                    sx: {
-                        userSelect: 'none',
-                        WebkitUserSelect: 'none',
-                        MozUserSelect: 'none',
-                        msUserSelect: 'none'
-                    }
-                }}
+                PaperProps={{ sx: { userSelect: 'none' } }}
             >
                 <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     Attachment Viewer
@@ -275,6 +308,16 @@ const RegistrationSummary: React.FC = () => {
                     <Button onClick={handleCloseAttachmentModal}>Close</Button>
                 </DialogActions>
             </Dialog>
+
+            {/* Audit Summary Modal */}
+            {selectedLog && (
+                <AuditSummaryModal
+                    open={isAuditModalOpen}
+                    onClose={handleCloseAuditModal}
+                    log={selectedLog}
+                    onSuccess={handleAuditSuccess}
+                />
+            )}
         </Paper>
     );
 };

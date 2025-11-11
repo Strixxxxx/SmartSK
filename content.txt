@@ -1,2 +1,29 @@
-so i want you to scan the @console.txt because an error occured during the @backend/AI/accountAIJobs.py . Also, if you look on the @Screenshots/1762699550769-testReg-1st.png . the logo can be seen
-  so you need to make sure that the logo is transparent enough because if the AI scanned it, they cannot read the full name from the ID itself
+1.	System Requirements Analysis
+
+1.1	Functional Requirements
+
+The SmartSK platform successfully addresses the following functional requirements:
+
+•	Multi-User Role Management: The system supports four distinct user roles (Master Admin for San Bartolome, System Admin for Nagkaisang Nayon, SK Chairperson, and SK Official) with granular, role-based access control (RBAC) to ensure users only access features relevant to their barangay and position.
+
+•	AI-Powered Analytics: The platform integrates a Python-based AI module that uses Google's Gemini 2.0 Flash model for advanced analytics. This includes:
+
+•	Budget Forecasting: Predicts future budget needs based on historical project data.
+
+•	Predictive Analysis: Employs Retrieval-Augmented Generation (RAG) by using Google Programmable Search to fetch real-time data, which enriches prompts to generate actionable insights, success factors, risk mitigation strategies, and trend analysis.
+
+•	Project Lifecycle Management: Provides a complete workflow for project proposals, including submission by SK Officials, review and status updates (e.g., approval, denial, revision request) by SK Chairpersons, and secure document handling via Azure Blob Storage.
+
+•	Data and Content Management: Features a dedicated module for administrators to upload and manage raw historical project data via CSV files. It also includes a public- facing portfolio where officials can create posts with image and video attachments to showcase completed projects.
+ 
+•	System Administration: A comprehensive suite of tools for administrators, including:
+
+o	Backup and Restore: On-demand database backup (.bacpac files) and restoration functionality.
+
+•	Archiving: Manual archival and restoration of user accounts and projects.
+
+o	Audit Trail: Logs all significant user and system actions for security and accountability.
+
+o	Session Logging: Monitors active and past user login sessions.
+
+•	Real-time System Notifications: Uses WebSockets to deliver real-time alerts to all active users, such as broadcasting a warning before the server restarts for a database restore.

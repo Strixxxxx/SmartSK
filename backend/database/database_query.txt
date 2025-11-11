@@ -85,6 +85,17 @@ CREATE TABLE [registrationAudit] (
     CONSTRAINT FK_registrationAudit_preUserInfo FOREIGN KEY (userID) REFERENCES preUserInfo(userID) ON DELETE CASCADE
 );
 
+CREATE TABLE [registrationAuditManual] (
+    auditID INT PRIMARY KEY IDENTITY(1,1),
+    userID INT NOT NULL,
+    verificationReport NVARCHAR(MAX) NULL,
+    processedBy NVARCHAR(50) NULL,
+    attachmentPath NVARCHAR(MAX) NOT NULL,
+    attachmentPathBack NVARCHAR(MAX) NOT NULL,
+    processedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    CONSTRAINT FK_registrationAuditManual_preUserInfo FOREIGN KEY (userID) REFERENCES preUserInfo(userID) ON DELETE CASCADE
+);
+
 --Session Logs Table
 
 create table sessions(
@@ -509,6 +520,129 @@ BEGIN
             UPDATE preUserInfoEx
             SET status = 'approved', rejectionReason = 'User already existed in main table but was re-approved.'
             WHERE userID = @userID;
+        END
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        -- Re-throw the error to be caught by the calling application
+        THROW;
+    END CATCH
+END
+GO
+
+--Manually Approved Account Application 
+
+CREATE PROCEDURE [sp_ManuallyApprovePendingUser]
+    @userID INT,
+    @adminReport NVARCHAR(MAX),
+    @adminUsername NVARCHAR(50) -- To log who performed the action
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION;
+
+    DECLARE @attachmentPath NVARCHAR(MAX);
+    DECLARE @attachmentPathBack NVARCHAR(MAX);
+
+    BEGIN TRY
+        -- Get attachment paths from preUserInfoEx for logging
+        SELECT 
+            @attachmentPath = attachmentPath, 
+            @attachmentPathBack = attachmentPathBack
+        FROM preUserInfoEx 
+        WHERE userID = @userID;
+
+        -- Ensure the user is not already in the main userInfo table
+        IF NOT EXISTS (SELECT 1 FROM userInfo WHERE userID = @userID)
+        BEGIN
+            -- Use SET IDENTITY_INSERT to keep the same userID
+            SET IDENTITY_INSERT userInfo ON;
+
+            -- Insert the approved user's data into the main table
+            INSERT INTO userInfo (
+                userID, username, passKey, fullName, position, barangay, 
+                emailAddress, phoneNumber, isDefaultPassword, isArchived, 
+                emailHash, usernameHash, phoneHash
+            )
+            SELECT
+                p.userID, p.username, p.passKey, p.fullName, p.position, p.barangay,
+                p.emailAddress, p.phoneNumber, 0, p.isArchived, -- Set isDefaultPassword to 0
+                p.emailHash, p.usernameHash, p.phoneHash
+            FROM preUserInfo p
+            WHERE p.userID = @userID;
+
+            SET IDENTITY_INSERT userInfo OFF;
+        END
+
+        -- Update the status in the extension table to 'approved'
+        UPDATE preUserInfoEx
+        SET status = 'approved', rejectionReason = NULL -- Clear any previous rejection reason
+        WHERE userID = @userID;
+
+        -- Log the manual approval action
+        INSERT INTO registrationAuditManual (userID, verificationReport, attachmentPath, attachmentPathBack, processedBy)
+        VALUES (@userID, @adminReport, @attachmentPath, @attachmentPathBack, @adminUsername);
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        -- Re-throw the error to be caught by the calling application
+        THROW;
+    END CATCH
+END
+GO
+
+--Manually Rejected Account Application
+
+CREATE PROCEDURE [sp_ManuallyRejectApprovedUser]
+    @userID INT,
+    @adminReport NVARCHAR(MAX),
+    @adminUsername NVARCHAR(50) -- To log who performed the action
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION;
+
+    DECLARE @attachmentPath NVARCHAR(MAX);
+    DECLARE @attachmentPathBack NVARCHAR(MAX);
+
+    BEGIN TRY
+        -- Get attachment paths from preUserInfoEx for logging
+        SELECT 
+            @attachmentPath = attachmentPath, 
+            @attachmentPathBack = attachmentPathBack
+        FROM preUserInfoEx 
+        WHERE userID = @userID;
+
+        -- Log the manual rejection action first
+        INSERT INTO registrationAuditManual (userID, verificationReport, attachmentPath, attachmentPathBack, processedBy)
+        VALUES (@userID, @adminReport, @attachmentPath, @attachmentPathBack, @adminUsername);
+
+        -- Update the status in the preUserInfoEx table to 'rejected'
+        UPDATE preUserInfoEx
+        SET status = 'rejected', rejectionReason = @adminReport
+        WHERE userID = @userID;
+
+        -- If the user exists in the main userInfo table, delete them and all their related data.
+        IF EXISTS (SELECT 1 FROM userInfo WHERE userID = @userID)
+        BEGIN
+            -- Delete dependent records before deleting the main user record.
+            -- The order is important to respect foreign key constraints.
+            DELETE FROM otpStore WHERE userID = @userID;
+            DELETE FROM sessions WHERE userID = @userID;
+            DELETE FROM [audit trail] WHERE userID = @userID;
+            DELETE FROM postComment WHERE userID = @userID;
+            DELETE FROM posts WHERE userID = @userID; -- Assumes posts table has ON DELETE CASCADE for its children
+            DELETE FROM projects WHERE userID = @userID;
+            DELETE FROM BackupJobs WHERE UserID = @userID;
+            DELETE FROM PostUploadJobs WHERE UserID = @userID;
+            DELETE FROM rawDataUpTrack WHERE uploadedByUserID = @userID;
+            
+            -- Finally, delete the user from the main table
+            DELETE FROM userInfo WHERE userID = @userID;
         END
 
         COMMIT TRANSACTION;

@@ -62,23 +62,18 @@ router.post('/', async (req, res) => {
         FROM userInfo u
         LEFT JOIN roles r ON u.position = r.roleID
         LEFT JOIN barangays b ON u.barangay = b.barangayID
-        ${userQuery}
+        ${userQuery} AND u.isArchived = 0
       `);
 
     const user = result.recordset[0];
     userForAudit = user;
 
     if (!user) {
-      logAudit({ actor: 'S', module: 'L', userID: null, actions: 'login-failure', descriptions: `Login attempt for non-existent user: ${identifier}` });
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      logAudit({ actor: 'S', module: 'L', userID: null, actions: 'login-failure', descriptions: `Login attempt for non-existent or archived user: ${identifier}` });
+      return res.status(401).json({ success: false, message: 'Invalid credentials or account is archived.' });
     }
 
     const decryptedUsername = decrypt(user.username);
-
-    if (user.isArchived) {
-      logAudit({ actor: 'S', module: 'L', userID: user.userID, actions: 'login-failure', descriptions: `Login attempt for archived account: ${decryptedUsername}` });
-      return res.status(401).json({ success: false, message: 'This account has been archived. Please contact an administrator.' });
-    }
 
     if (!isValidBcryptHash(user.passKey)) {
       console.error(`Login failed: Invalid hash format in database for user ID: ${user.userID}`);

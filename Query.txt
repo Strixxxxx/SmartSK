@@ -1,2 +1,0 @@
-
-ALTER TABLE registrationAudit ADD attachmentPathBack NVARCHAR(MAX) NULL;

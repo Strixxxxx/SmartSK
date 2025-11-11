@@ -5,6 +5,7 @@ const { authMiddleware } = require('../session/session');
 const { addAuditTrail } = require('../audit/auditService');
 const { decrypt } = require('../utils/crypto');
 const { uploadTextToBlob, downloadBlobAsText, generateSasUrl, registerContainerName } = require('../Storage/storage');
+const { sendRegistrationApprovalEmail, sendRegistrationRejectionEmail } = require('../Email/email');
 
 // --- SK Official List Endpoints ---
 
@@ -86,34 +87,64 @@ router.post('/officials', authMiddleware, async (req, res) => {
 
 /**
  * GET /registrations
- * Fetches the registration audit trail.
+ * Fetches the combined registration audit trail from both AI and manual sources.
  */
 router.get('/registrations', authMiddleware, async (req, res) => {
     try {
         const pool = await getConnection();
-        const userBarangay = req.user.barangay; // Get barangay from authenticated user
+        const userBarangay = req.user.barangay;
+
+        const query = `
+            -- AI Audits
+            SELECT 
+                ra.auditID,
+                ra.userID,
+                pui.username,
+                pui.fullName,
+                pui.emailAddress,
+                puie.dateOfBirth,
+                ra.verificationReport,
+                ra.attachmentPath,
+                ra.attachmentPathBack,
+                ra.processedAt,
+                puie.status,
+                puie.rejectionReason,
+                puie.registeredAt,
+                'Google Gemini AI' AS validatedBy
+            FROM registrationAudit ra
+            JOIN preUserInfo pui ON ra.userID = pui.userID
+            JOIN preUserInfoEx puie ON ra.userID = puie.userID
+            WHERE pui.barangay = @userBarangay
+
+            UNION ALL
+
+            -- Manual Admin Audits
+            SELECT 
+                ram.auditID,
+                ram.userID,
+                pui.username,
+                pui.fullName,
+                pui.emailAddress,
+                puie.dateOfBirth,
+                ram.verificationReport,
+                ram.attachmentPath,
+                ram.attachmentPathBack,
+                ram.processedAt,
+                puie.status,
+                puie.rejectionReason,
+                puie.registeredAt,
+                ram.processedBy AS validatedBy
+            FROM registrationAuditManual ram
+            JOIN preUserInfo pui ON ram.userID = pui.userID
+            JOIN preUserInfoEx puie ON ram.userID = puie.userID
+            WHERE pui.barangay = @userBarangay
+
+            ORDER BY processedAt DESC;
+        `;
 
         const result = await pool.request()
             .input('userBarangay', sql.Int, userBarangay)
-            .query(`
-                SELECT 
-                    ra.auditID,
-                    ra.userID,
-                    pui.username,
-                    pui.fullName,
-                    pui.emailAddress,
-                    ra.verificationReport,
-                    ra.attachmentPath,
-                    ra.processedAt,
-                    puie.status,
-                    puie.rejectionReason,
-                    puie.registeredAt
-                FROM registrationAudit ra
-                JOIN preUserInfo pui ON ra.userID = pui.userID
-                JOIN preUserInfoEx puie ON ra.userID = puie.userID
-                WHERE pui.barangay = @userBarangay
-                ORDER BY ra.processedAt DESC
-            `);
+            .query(query);
 
         const decryptedLogs = result.recordset.map(log => ({
             ...log,
@@ -129,6 +160,61 @@ router.get('/registrations', authMiddleware, async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to fetch registration audit logs.' });
     }
 });
+
+/**
+ * POST /override
+ * Allows an admin to manually approve or reject a registration application.
+ */
+router.post('/override', authMiddleware, async (req, res) => {
+    const { userID, verdict, report } = req.body;
+    const adminUsername = req.user.fullName; // The admin performing the action
+
+    if (!userID || !verdict || !report) {
+        return res.status(400).json({ success: false, message: 'User ID, verdict, and report are required.' });
+    }
+
+    if (!['approved', 'rejected'].includes(verdict)) {
+        return res.status(400).json({ success: false, message: 'Invalid verdict. Must be "approved" or "rejected".' });
+    }
+
+    try {
+        const pool = await getConnection();
+        const request = pool.request()
+            .input('userID', sql.Int, userID)
+            .input('adminReport', sql.NVarChar(sql.MAX), report)
+            .input('adminUsername', sql.NVarChar(50), adminUsername);
+
+        if (verdict === 'approved') {
+            await request.execute('sp_ManuallyApprovePendingUser');
+            addAuditTrail({
+                actor: 'A',
+                module: 'I',
+                userID: req.user.userID,
+                actions: 'manual-approve-registration',
+                descriptions: `Admin ${adminUsername} manually approved registration for user ID ${userID}.`
+            });
+            // Send email but don't block the response if it fails
+            sendRegistrationApprovalEmail(userID).catch(err => console.error("Failed to send approval email:", err));
+            res.json({ success: true, message: 'User successfully approved.' });
+        } else { // verdict === 'rejected'
+            await request.execute('sp_ManuallyRejectApprovedUser');
+            addAuditTrail({
+                actor: 'A',
+                module: 'I',
+                userID: req.user.userID,
+                actions: 'manual-reject-registration',
+                descriptions: `Admin ${adminUsername} manually rejected registration for user ID ${userID}.`
+            });
+            // Send email but don't block the response if it fails
+            sendRegistrationRejectionEmail(userID, report).catch(err => console.error("Failed to send rejection email:", err));
+            res.json({ success: true, message: 'User successfully rejected.' });
+        }
+    } catch (error) {
+        console.error(`Error during manual override for user ID ${userID}:`, error);
+        res.status(500).json({ success: false, message: 'An error occurred during the override process.', error: error.message });
+    }
+});
+
 
 /**
  * GET /attachment/:userId
@@ -160,7 +246,7 @@ router.get('/attachment/:userId', authMiddleware, async (req, res) => {
         // Proceed if check passes
         const result = await pool.request()
             .input('userID', sql.Int, userId)
-            .query('SELECT attachmentPath, attachmentPathBack FROM registrationAudit WHERE userID = @userID');
+            .query('SELECT attachmentPath, attachmentPathBack FROM preUserInfoEx WHERE userID = @userID');
 
         if (result.recordset.length === 0) {
             return res.status(404).json({ success: false, message: 'Attachment record not found for this user.' });
