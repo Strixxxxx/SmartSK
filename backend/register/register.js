@@ -14,7 +14,7 @@ const bcrypt = require('bcrypt');
 
 // Use in-memory storage for multer to handle the file as a buffer
 const storage = multer.memoryStorage();
-const upload = multer({ 
+const upload = multer({
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 }, // 10MB file size limit
     fileFilter: (req, file, cb) => {
@@ -26,7 +26,7 @@ const upload = multer({
         }
         cb(new Error('File type not supported. Please upload a JPG, PNG, or PDF.'));
     }
-});
+}).fields([{ name: 'attachment', maxCount: 1 }, { name: 'attachmentBack', maxCount: 1 }]);
 
 /**
  * Event handler for when the AI processing script finishes.
@@ -134,13 +134,19 @@ router.post('/validate-field', async (req, res) => {
 });
 
 // POST /api/register
-router.post('/', upload.single('attachment'), async (req, res) => {
+router.post('/', upload, async (req, res) => {
     const { username, fullName, barangay, emailAddress, phoneNumber, dateOfBirth, password } = req.body;
-    const file = req.file;
+    const { attachment: files, attachmentBack: filesBack } = req.files;
 
-    if (!file) {
+    if (!files || files.length === 0) {
         return res.status(400).json({ success: false, message: 'Attachment file is required.' });
     }
+    if (!filesBack || filesBack.length === 0) {
+        return res.status(400).json({ success: false, message: 'Back of ID is required.' });
+    }
+
+    const file = files[0];
+    const fileBack = filesBack[0];
 
     let newUserId;
 
@@ -172,6 +178,32 @@ router.post('/', upload.single('attachment'), async (req, res) => {
                 .toBuffer();
         }
 
+        // Watermark the back image
+        let fileBufferBack = fileBack.buffer;
+        if (fileBack.mimetype.startsWith('image/')) {
+            const metadata = await sharp(fileBack.buffer).metadata();
+            const width = metadata.width;
+            const height = metadata.height;
+
+            const textWatermarkSvg = `
+                <svg width="${width}" height="${height}">
+                    <text x="50%" y="50%" text-anchor="middle" style="font-size: ${Math.max(40, width / 12)}px; fill: rgba(0, 0, 0, 0.3); font-weight: bold; font-family: Arial, sans-serif;">
+                        FOR VERIFICATION ONLY
+                    </text>
+                    <text x="50%" y="50%" dy="1.8em" text-anchor="middle" style="font-size: ${Math.max(16, width / 35)}px; fill: rgba(0, 0, 0, 0.5); font-family: Arial, sans-serif;">
+                        smartSK © 2025
+                    </text>
+                </svg>`;
+            
+            const textWatermarkBuffer = Buffer.from(textWatermarkSvg);
+
+            fileBufferBack = await sharp(fileBack.buffer)
+                .composite([
+                    { input: textWatermarkBuffer, gravity: 'center' }
+                ])
+                .toBuffer();
+        }
+
         // 2. Encrypt PII, hash password, and generate lookup hashes
         const encryptedUsername = encrypt(username);
         const encryptedFullName = encrypt(fullName);
@@ -183,10 +215,14 @@ router.post('/', upload.single('attachment'), async (req, res) => {
         const emailHash = generateEmailHash(emailAddress);
         const phoneHash = generatePhoneNumberHash(phoneNumber);
 
-        // 3. Upload watermarked file to the correct Azure container
+        // 3. Upload watermarked files to the correct Azure container
         const blobName = `${Date.now()}-${username}-${file.originalname}`;
         const attachmentPath = await uploadBlob(registerContainerName, blobName, fileBuffer, file.mimetype);
         console.log(`File uploaded to Azure container '${registerContainerName}'. Blob Name: ${attachmentPath}`);
+
+        const blobNameBack = `${Date.now()}-${username}-back-${fileBack.originalname}`;
+        const attachmentPathBack = await uploadBlob(registerContainerName, blobNameBack, fileBufferBack, fileBack.mimetype);
+        console.log(`Back of ID uploaded to Azure container '${registerContainerName}'. Blob Name: ${attachmentPathBack}`);
 
         // 4. Insert all data into preUserInfo and preUserInfoEx
         const pool = await getConnection();
@@ -219,10 +255,11 @@ router.post('/', upload.single('attachment'), async (req, res) => {
                 .input('userID', sql.Int, newUserId)
                 .input('dateOfBirth', sql.Date, new Date(dateOfBirth))
                 .input('attachmentPath', sql.NVarChar(sql.MAX), attachmentPath)
+                .input('attachmentPathBack', sql.NVarChar(sql.MAX), attachmentPathBack)
                 .input('registeredAt', sql.DateTime, registeredAt)
                 .query(`
-                    INSERT INTO preUserInfoEx (userID, dateOfBirth, attachmentPath, registeredAt)
-                    VALUES (@userID, @dateOfBirth, @attachmentPath, @registeredAt);
+                    INSERT INTO preUserInfoEx (userID, dateOfBirth, attachmentPath, attachmentPathBack, registeredAt)
+                    VALUES (@userID, @dateOfBirth, @attachmentPath, @attachmentPathBack, @registeredAt);
                 `);
 
             await transaction.commit();

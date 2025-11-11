@@ -160,16 +160,26 @@ router.get('/attachment/:userId', authMiddleware, async (req, res) => {
         // Proceed if check passes
         const result = await pool.request()
             .input('userID', sql.Int, userId)
-            .query('SELECT attachmentPath FROM registrationAudit WHERE userID = @userID');
+            .query('SELECT attachmentPath, attachmentPathBack FROM registrationAudit WHERE userID = @userID');
 
-        if (result.recordset.length === 0 || !result.recordset[0].attachmentPath) {
-            return res.status(404).json({ success: false, message: 'Attachment not found for this user.' });
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ success: false, message: 'Attachment record not found for this user.' });
         }
 
-        const blobName = result.recordset[0].attachmentPath;
-        const sasUrl = await generateSasUrl(registerContainerName, blobName);
+        const { attachmentPath, attachmentPathBack } = result.recordset[0];
 
-        res.json({ success: true, url: sasUrl });
+        if (!attachmentPath) {
+            return res.status(404).json({ success: false, message: 'Primary attachment not found.' });
+        }
+
+        const frontUrl = await generateSasUrl(registerContainerName, attachmentPath);
+        let backUrl = null;
+
+        if (attachmentPathBack) {
+            backUrl = await generateSasUrl(registerContainerName, attachmentPathBack);
+        }
+
+        res.json({ success: true, frontUrl, backUrl });
 
     } catch (error) {
         console.error(`Error generating SAS URL for user ${userId}:`, error);

@@ -4,7 +4,7 @@ import {
     TextField, CircularProgress, Table, TableBody, TableCell, TableContainer, 
     TableHead, TableRow, IconButton, Tooltip 
 } from '@mui/material';
-import { Visibility } from '@mui/icons-material';
+import { Visibility, ArrowBackIosNew, ArrowForwardIos } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../../backend connection/axiosConfig';
 
@@ -30,7 +30,8 @@ const RegistrationSummary: React.FC = () => {
 
     // State for Attachment Viewer Modal
     const [isAttachmentModalOpen, setIsAttachmentModalOpen] = useState(false);
-    const [attachmentUrl, setAttachmentUrl] = useState('');
+    const [attachmentUrls, setAttachmentUrls] = useState<string[]>([]);
+    const [currentAttachmentIndex, setCurrentAttachmentIndex] = useState(0);
     const [modalLoading, setModalLoading] = useState(false);
 
     useEffect(() => {
@@ -87,11 +88,17 @@ const RegistrationSummary: React.FC = () => {
     const handleViewAttachment = async (userId: number) => {
         setIsAttachmentModalOpen(true);
         setModalLoading(true);
-        setAttachmentUrl('');
+        setAttachmentUrls([]);
+        setCurrentAttachmentIndex(0);
         try {
             const response = await axiosInstance.get(`/api/admin/audit/attachment/${userId}`);
             if (response.data.success) {
-                setAttachmentUrl(response.data.url);
+                const { frontUrl, backUrl } = response.data;
+                const urls = [frontUrl];
+                if (backUrl) {
+                    urls.push(backUrl);
+                }
+                setAttachmentUrls(urls);
             } else {
                 throw new Error(response.data.message);
             }
@@ -105,6 +112,18 @@ const RegistrationSummary: React.FC = () => {
     };
 
     const handleCloseAttachmentModal = () => setIsAttachmentModalOpen(false);
+
+    const handlePrevAttachment = () => {
+        setCurrentAttachmentIndex((prevIndex) =>
+            prevIndex === 0 ? attachmentUrls.length - 1 : prevIndex - 1
+        );
+    };
+
+    const handleNextAttachment = () => {
+        setCurrentAttachmentIndex((prevIndex) =>
+            prevIndex === attachmentUrls.length - 1 ? 0 : prevIndex + 1
+        );
+    };
 
     return (
         <Paper elevation={0} sx={{ p: 2, backgroundColor: 'transparent' }}>
@@ -212,17 +231,44 @@ const RegistrationSummary: React.FC = () => {
                     }
                 }}
             >
-                <DialogTitle>Attachment Viewer</DialogTitle>
-                <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    Attachment Viewer
+                    {attachmentUrls.length > 1 && (
+                        <Typography variant="body1">
+                            {currentAttachmentIndex + 1} / {attachmentUrls.length}
+                        </Typography>
+                    )}
+                </DialogTitle>
+                <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
                     {modalLoading ? (
                         <CircularProgress />
+                    ) : attachmentUrls.length > 0 ? (
+                        <>
+                            {attachmentUrls.length > 1 && (
+                                <IconButton
+                                    onClick={handlePrevAttachment}
+                                    sx={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(0,0,0,0.3)', '&:hover': { backgroundColor: 'rgba(0,0,0,0.5)'} }}
+                                >
+                                    <ArrowBackIosNew sx={{ color: 'white' }} />
+                                </IconButton>
+                            )}
+                            <img 
+                                src={attachmentUrls[currentAttachmentIndex]} 
+                                alt={`Registration Attachment ${currentAttachmentIndex + 1}`}
+                                style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain' }} 
+                                onContextMenu={(e) => e.preventDefault()}
+                            />
+                            {attachmentUrls.length > 1 && (
+                                <IconButton
+                                    onClick={handleNextAttachment}
+                                    sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(0,0,0,0.3)', '&:hover': { backgroundColor: 'rgba(0,0,0,0.5)'} }}
+                                >
+                                    <ArrowForwardIos sx={{ color: 'white' }} />
+                                </IconButton>
+                            )}
+                        </>
                     ) : (
-                        <img 
-                            src={attachmentUrl} 
-                            alt="Registration Attachment" 
-                            style={{ maxWidth: '100%', maxHeight: '80vh' }} 
-                            onContextMenu={(e) => e.preventDefault()}
-                        />
+                        <Typography>No attachment found.</Typography>
                     )}
                 </DialogContent>
                 <DialogActions>

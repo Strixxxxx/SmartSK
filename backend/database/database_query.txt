@@ -68,6 +68,7 @@ CREATE TABLE [preUserInfoEx] (
     userID INT NOT NULL,
     dateOfBirth DATE NOT NULL,
     attachmentPath NVARCHAR(MAX) NOT NULL,
+    attachmentPathBack NVARCHAR(MAX) NOT NULL,
     status NVARCHAR(50) DEFAULT 'pending' NOT NULL,
     rejectionReason NVARCHAR(MAX) NULL,
     registeredAt DATETIME NOT NULL DEFAULT GETDATE();
@@ -79,6 +80,7 @@ CREATE TABLE [registrationAudit] (
     userID INT NOT NULL,
     verificationReport NVARCHAR(MAX) NULL,
     attachmentPath NVARCHAR(MAX) NOT NULL,
+    attachmentPathBack NVARCHAR(MAX) NOT NULL,
     processedAt DATETIME NOT NULL DEFAULT GETDATE(),
     CONSTRAINT FK_registrationAudit_preUserInfo FOREIGN KEY (userID) REFERENCES preUserInfo(userID) ON DELETE CASCADE
 );

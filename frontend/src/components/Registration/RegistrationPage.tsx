@@ -36,6 +36,7 @@ const RegistrationPage: React.FC = () => {
     dateOfBirth: '',
   });
   const [attachment, setAttachment] = useState<File | null>(null);
+  const [attachmentBack, setAttachmentBack] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<any>({});
   
@@ -83,10 +84,15 @@ const RegistrationPage: React.FC = () => {
         const piiErrors: any = {};
         if (!formData.fullName) piiErrors.fullName = 'Full name is required.';
         if (!formData.barangay) piiErrors.barangay = 'Barangay is required.';
-        if (!formData.emailAddress) piiErrors.emailAddress = 'Email address is required.';
+        if (!formData.emailAddress) {
+          piiErrors.emailAddress = 'Email address is required.';
+        } else if (!/\S+@\S+\.\S+/.test(formData.emailAddress)) {
+          piiErrors.emailAddress = 'Email address is invalid.';
+        }
         if (!formData.phoneNumber) piiErrors.phoneNumber = 'Phone number is required.';
         if (!formData.dateOfBirth) piiErrors.dateOfBirth = 'Date of birth is required.';
         if (!attachment) piiErrors.attachment = 'ID attachment is required.';
+        if (!attachmentBack) piiErrors.attachmentBack = 'Back of ID is required.';
         
         setErrors(piiErrors);
         isValid = Object.keys(piiErrors).length === 0;
@@ -110,6 +116,9 @@ const RegistrationPage: React.FC = () => {
     });
     if (attachment) {
       data.append('attachment', attachment);
+    }
+    if (attachmentBack) {
+      data.append('attachmentBack', attachmentBack);
     }
 
     try {
@@ -150,6 +159,8 @@ const RegistrationPage: React.FC = () => {
                     setFormData={setFormData}
                     attachment={attachment}
                     setAttachment={setAttachment}
+                    attachmentBack={attachmentBack}
+                    setAttachmentBack={setAttachmentBack}
                     errors={errors}
                     setErrors={setErrors}
                 />;

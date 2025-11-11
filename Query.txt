@@ -1,15 +1,2 @@
--- Query 1: Create the manual registration audit table to distinguish admin-processed applications
-CREATE TABLE manualRegistrationAudit (
-    manualAuditID INT PRIMARY KEY IDENTITY(1,1),
-    userID INT NOT NULL,
-    verificationReport NVARCHAR(MAX),
-    processedAt DATETIME DEFAULT GETDATE() NOT NULL,
-    processedByUserID INT NOT NULL, -- The admin who did the action
-    decision VARCHAR(10) NOT NULL,
-    FOREIGN KEY (userID) REFERENCES preUserInfo(userID),
-    FOREIGN KEY (processedByUserID) REFERENCES userInfo(userID)
-);
 
--- Query 2: Add registeredAt column to preUserInfoEx to track initial registration time
-ALTER TABLE preUserInfoEx
-ADD registeredAt DATETIME NOT NULL DEFAULT GETDATE();
+ALTER TABLE registrationAudit ADD attachmentPathBack NVARCHAR(MAX) NULL;

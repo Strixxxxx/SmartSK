@@ -8,12 +8,15 @@ interface InfoStepProps {
   setFormData: (data: any) => void;
   attachment: File | null;
   setAttachment: (file: File | null) => void;
+  attachmentBack: File | null;
+  setAttachmentBack: (file: File | null) => void;
   errors: any;
   setErrors: (errors: any) => void;
 }
 
-const InfoStep: React.FC<InfoStepProps> = ({ formData, setFormData, attachment, setAttachment, errors, setErrors }) => {
+const InfoStep: React.FC<InfoStepProps> = ({ formData, setFormData, attachment, setAttachment, attachmentBack, setAttachmentBack, errors, setErrors }) => {
   const [preview, setPreview] = useState<string | null>(null);
+  const [previewBack, setPreviewBack] = useState<string | null>(null);
 
   const handleFileChange = (files: FileList | null) => {
     const file = files?.[0];
@@ -42,6 +45,30 @@ const InfoStep: React.FC<InfoStepProps> = ({ formData, setFormData, attachment, 
     // Free memory when the component is unmounted
     return () => URL.revokeObjectURL(objectUrl);
   }, [attachment]);
+
+  const handleFileChangeBack = (files: FileList | null) => {
+    const file = files?.[0];
+    if (file) {
+      setAttachmentBack(file);
+    }
+  };
+
+  const onDropBack = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    handleFileChangeBack(e.dataTransfer.files);
+  };
+
+  useEffect(() => {
+    if (!attachmentBack) {
+      setPreviewBack(null);
+      return;
+    }
+    const objectUrl = URL.createObjectURL(attachmentBack);
+    setPreviewBack(objectUrl);
+
+    // Free memory when the component is unmounted
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [attachmentBack]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -154,6 +181,29 @@ const InfoStep: React.FC<InfoStepProps> = ({ formData, setFormData, attachment, 
           )}
         </div>
         {errors.attachment && <Typography variant="caption" color="error">{errors.attachment}</Typography>}
+      </Box>
+      <Box mt={2}>
+        <Typography variant="subtitle1" gutterBottom>Back of ID</Typography>
+        <div
+          className="dropzone"
+          onDragOver={onDragOver}
+          onDrop={onDropBack}
+          onClick={() => document.getElementById('file-input-back')?.click()}
+        >
+          <input
+            id="file-input-back"
+            type="file"
+            hidden
+            onChange={(e) => handleFileChangeBack(e.target.files)}
+            accept="image/jpeg,image/png,application/pdf"
+          />
+          {previewBack ? (
+            <img src={previewBack} alt="Back of ID Preview" className="preview-image" />
+          ) : (
+            <p>Drag & drop the back of your ID here, or click to select a file.</p>
+          )}
+        </div>
+        {errors.attachmentBack && <Typography variant="caption" color="error">{errors.attachmentBack}</Typography>}
       </Box>
     </Box>
   );

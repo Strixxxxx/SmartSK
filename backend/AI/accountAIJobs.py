@@ -68,6 +68,7 @@ def get_user_data(cursor, user_id):
             p.fullName, 
             p.emailAddress, 
             pe.attachmentPath,
+            pe.attachmentPathBack,
             pe.dateOfBirth,
             b.barangayName
         FROM preUserInfo p
@@ -92,6 +93,7 @@ def get_user_data(cursor, user_id):
         "fullName": decrypted_full_name,
         "emailAddress": decrypted_email,
         "attachmentPath": user_data.attachmentPath,
+        "attachmentPathBack": user_data.attachmentPathBack,
         "dateOfBirth": user_data.dateOfBirth,
         "barangayName": user_data.barangayName
     }
@@ -115,7 +117,7 @@ def download_blob_to_memory(container_name, blob_name):
 
 # --- Verification Implementations ---
 
-def verify_id_format(user_id_image_data):
+def verify_id_format(user_id_image_data, user_id_image_data_back):
     """Uses Gemini to identify the type of the user's submitted ID."""
     logging.info("Verifying ID format via Gemini...")
     if not gemini_model:
@@ -123,13 +125,14 @@ def verify_id_format(user_id_image_data):
     
     try:
         user_img = Image.open(io.BytesIO(user_id_image_data))
+        user_img_back = Image.open(io.BytesIO(user_id_image_data_back))
 
         prompt = """
-        Analyze the following image of an ID card and identify its type.
+        Analyze the following two images, which represent the front and back of an ID card, and identify the card's type.
 
-        1. First, determine if it is a 'QCID' (Quezon City ID).
-        2. If it is not a QCID, identify it from this list of other official Philippine IDs: ['Philippine National ID', 'Driver\'s License', 'Passport', 'UMID', 'Postal ID'].
-        3. If the ID does not match any of the types listed above, classify it as 'Unknown'.
+        1.  First, determine if it is a 'QCID' (Quezon City ID).
+        2.  If it is not a QCID, identify it from this list of other official Philippine IDs: ['Philippine National ID', 'Driver\'s License', 'Passport', 'UMID', 'Postal ID'].
+        3.  If the ID does not match any of the types listed above, classify it as 'Unknown'.
 
         Respond with ONLY a JSON object containing a single key 'id_type' with the identified type as its value.
 
@@ -143,7 +146,7 @@ def verify_id_format(user_id_image_data):
         {"id_type": "Unknown"}
         """
         
-        response = gemini_model.generate_content([prompt, user_img])
+        response = gemini_model.generate_content([prompt, user_img, user_img_back])
         
         json_str = response.text.strip().replace("```json", "").replace("```", "").strip()
         id_info = json.loads(json_str)
@@ -158,7 +161,7 @@ def verify_id_format(user_id_image_data):
         logging.error("Gemini ID format verification failed.", exc_info=True)
         return False, "An error occurred during AI ID format verification."
 
-def extract_id_data(user_id_image_data):
+def extract_id_data(user_id_image_data, user_id_image_data_back):
     """Uses Gemini for OCR to extract structured data from the ID."""
     logging.info("Extracting data from ID via Gemini...")
     if not gemini_model:
@@ -166,16 +169,18 @@ def extract_id_data(user_id_image_data):
         
     try:
         user_img = Image.open(io.BytesIO(user_id_image_data))
+        user_img_back = Image.open(io.BytesIO(user_id_image_data_back))
         
         prompt = """
-        Analyze the following ID card image and extract the person's full name (Last Name, First Name, Middle Name), date of birth, and the full address. 
+        Analyze the following two ID card images (front and back) and extract the person's full name (Last Name, First Name, Middle Name), date of birth, and the full address. 
+        The address might be on the back of the card.
         Return the data as a JSON object with the keys 'last_name', 'first_name', 'middle_name', 'dob_str', and 'address'.
         For the date of birth, use YYYY/MM/DD format.
         If a field cannot be found, return null for its value.
         The name might be in 'Last, First, Middle' format.
         """
         
-        response = gemini_model.generate_content([prompt, user_img])
+        response = gemini_model.generate_content([prompt, user_img, user_img_back])
         
         json_str = response.text.strip().replace("```json", "").replace("```", "").strip()
         
@@ -292,10 +297,11 @@ def main(user_id):
 
         # 2. Download necessary files from Azure Blob Storage
         user_id_image_data = download_blob_to_memory(REGISTER_CONTAINER, user_data["attachmentPath"])
+        user_id_image_data_back = download_blob_to_memory(REGISTER_CONTAINER, user_data["attachmentPathBack"])
         sk_officials_list_blob_name = f"SK OFFICIAL - {user_data['barangayName']}.txt"
         sk_officials_list_data = download_blob_to_memory(REGISTER_CONTAINER, sk_officials_list_blob_name)
 
-        if not all([user_id_image_data, sk_officials_list_data]):
+        if not all([user_id_image_data, user_id_image_data_back, sk_officials_list_data]):
              raise Exception("Failed to download one or more required files for verification.")
         
         sk_officials_list_str = sk_officials_list_data.decode('utf-8')
@@ -305,11 +311,11 @@ def main(user_id):
         all_checks_passed = True
 
         # Criterion 1: ID Format
-        passed, reason = verify_id_format(user_id_image_data)
+        passed, reason = verify_id_format(user_id_image_data, user_id_image_data_back)
         report_lines.append(f"- ID Format Check: {'PASSED' if passed else 'FAILED'}. {reason}")
         if not passed: all_checks_passed = False
 
-        id_data = extract_id_data(user_id_image_data)
+        id_data = extract_id_data(user_id_image_data, user_id_image_data_back)
         if not id_data:
             all_checks_passed = False
             report_lines.append("- Data Extraction: FAILED. Could not extract data from ID.")
@@ -344,7 +350,7 @@ def main(user_id):
             cursor.execute("UPDATE preUserInfoEx SET status = ?, rejectionReason = ? WHERE userID = ?", 'rejected', final_rejection_reason, user_id)
 
         logging.info(f"Inserting audit record for userID: {user_id}")
-        cursor.execute("INSERT INTO registrationAudit (userID, verificationReport, attachmentPath) VALUES (?, ?, ?)", user_id, verification_report, user_data["attachmentPath"])
+        cursor.execute("INSERT INTO registrationAudit (userID, verificationReport, attachmentPath, attachmentPathBack) VALUES (?, ?, ?, ?)", user_id, verification_report, user_data["attachmentPath"], user_data["attachmentPathBack"])
 
         conn.commit()
         logging.info(f"Successfully processed and committed changes for userID: {user_id}")
