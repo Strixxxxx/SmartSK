@@ -8,6 +8,8 @@ const { addAuditTrail } = require('../audit/auditService');
 const { uploadFile, getFileSasUrl } = require('../Storage/storage');
 const { encrypt, decrypt } = require('../utils/crypto');
 
+const { spawn } = require('child_process');
+
 // Multer configuration for in-memory storage
 const storage = multer.memoryStorage();
 
@@ -64,6 +66,25 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
       `);
     
     const projectId = result.recordset[0].projectID;
+
+    // --- Trigger AI Analysis ---
+    if (projectId && (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development')) {
+        console.log(`Spawning AI analysis for projectID: ${projectId}`);
+        const pythonProcess = spawn('python', ['./AI/projectAIJobs.py', projectId]);
+
+        pythonProcess.stdout.on('data', (data) => {
+            console.log(`AI Job (PID: ${pythonProcess.pid}) STDOUT: ${data}`);
+        });
+
+        pythonProcess.stderr.on('data', (data) => {
+            console.error(`AI Job (PID: ${pythonProcess.pid}) STDERR: ${data}`);
+        });
+
+        pythonProcess.on('close', (code) => {
+            console.log(`AI Job (PID: ${pythonProcess.pid}) exited with code ${code}`);
+        });
+    }
+    // --- End AI Trigger ---
 
     const projectResult = await pool.request()
       .input('projectID', sql.Int, projectId)

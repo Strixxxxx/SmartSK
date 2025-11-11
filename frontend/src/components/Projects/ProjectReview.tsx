@@ -192,13 +192,12 @@ const ProjectReview: React.FC<ProjectReviewProps> = ({ userFullName, userRole })
               <th>Title & Description</th>
               <th>Proposer's Name</th>
               <th>Status</th>
-              <th>Documents</th>
-              {userRole === 'SKC' && <th>Actions</th>}
+              <th style={{ textAlign: 'center' }}>Documents & Actions</th>
             </tr>
           </thead>
           <tbody>
-            {loading ? (<tr><td colSpan={userRole === 'SKC' ? 6 : 5}><Loading /></td></tr>) 
-            : error ? (<tr><td colSpan={userRole === 'SKC' ? 6 : 5} className="error-message">{error}</td></tr>) 
+            {loading ? (<tr><td colSpan={5}><Loading /></td></tr>)  
+            : error ? (<tr><td colSpan={5} className="error-message">{error}</td></tr>) 
             : projects.map(project => (
                 <React.Fragment key={project.id}>
                   <tr>
@@ -213,39 +212,42 @@ const ProjectReview: React.FC<ProjectReviewProps> = ({ userFullName, userRole })
                         {project.status}
                       </span>
                     </td>
-                    <td className="document-actions-cell">
-                      {project.fileUrl && (
-                        <>
-                          {project.fileName?.toLowerCase().endsWith('.pdf') ? (
-                            <Tooltip title="View Document">
-                              <IconButton onClick={() => handleViewFile(project.fileUrl, project.fileName)}>
-                                <VisibilityIcon />
-                              </IconButton>
-                            </Tooltip>
-                          ) : (
-                            <Tooltip title="Download Document">
-                              <IconButton onClick={() => handleDownloadFile(project.fileUrl, project.fileName)}>
-                                <FileDownloadIcon />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                        </>
-                      )}
+                    <td className="actions-cell">
+                      <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+                        {project.fileUrl ? (
+                          <>
+                            {project.fileName?.toLowerCase().endsWith('.pdf') ? (
+                              <Tooltip title="View Document">
+                                <IconButton onClick={() => handleViewFile(project.fileUrl, project.fileName)}>
+                                  <VisibilityIcon />
+                                </IconButton>
+                              </Tooltip>
+                            ) : (
+                              <Tooltip title="Download Document">
+                                <IconButton onClick={() => handleDownloadFile(project.fileUrl, project.fileName)}>
+                                  <FileDownloadIcon />
+                                </IconButton>
+                              </Tooltip>
+                            )}
+                          </>
+                        ) : (
+                          <div style={{ width: '40px' }} /> // Placeholder for alignment
+                        )}
+
+                        {userRole === 'SKC' && (
+                          <button 
+                            className="review-button"
+                            onClick={() => handleReviewClick(project)}
+                          >
+                            Update Status
+                          </button>
+                        )}
+                      </div>
                     </td>
-                    {userRole === 'SKC' && (
-                      <td className="document-actions-cell">
-                        <button 
-                          className="review-button"
-                          onClick={() => handleReviewClick(project)}
-                        >
-                          Update Status
-                        </button>
-                      </td>
-                    )}
                   </tr>
                   {editingProjectId === project.id && (
                     <tr>
-                      <td colSpan={userRole === 'SKC' ? 6 : 5}>
+                      <td colSpan={5}>
                         <form onSubmit={handleSubmitReview} className="review-form">
                           <div className="form-group">
                             <label htmlFor="reviewStatus">New Status:</label>

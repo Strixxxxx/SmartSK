@@ -1,29 +1,79 @@
-1.	System Requirements Analysis
+  Project Plan: AI-Powered Project Proposal Review (Revised)
 
-1.1	Functional Requirements
+  The goal is to reconstruct the project review system by introducing an automated AI process that analyzes submitted project proposals against a set of rules defined by the SK Chairperson. This
+  plan incorporates your feedback for better code organization and dynamic, barangay-specific file naming.
 
-The SmartSK platform successfully addresses the following functional requirements:
+  ---
 
-•	Multi-User Role Management: The system supports four distinct user roles (Master Admin for San Bartolome, System Admin for Nagkaisang Nayon, SK Chairperson, and SK Official) with granular, role-based access control (RBAC) to ensure users only access features relevant to their barangay and position.
+  Phase 1: Database Setup (User Action)
 
-•	AI-Powered Analytics: The platform integrates a Python-based AI module that uses Google's Gemini 2.0 Flash model for advanced analytics. This includes:
+  As per our rules, you will need to execute the following SQL queries manually on your database. I will place them in D:\Projects\Projects\smartSK\Query.txt.
 
-•	Budget Forecasting: Predicts future budget needs based on historical project data.
+    1 -- To be placed in Query.txt
+    2 CREATE TABLE projectAudit (
+    3     auditID INT PRIMARY KEY IDENTITY(1,1),
+    4     projectID INT NOT NULL,
+    5     verificationReport NVARCHAR(MAX) NOT NULL,
+    6     decision VARCHAR(20) NOT NULL, -- 'approved', 'rejected'
+    7     processedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    8     FOREIGN KEY (projectID) REFERENCES projects(projectID)
+    9 );
+   10 
+   11 CREATE TABLE projectAuditManual (
+   12     manualAuditID INT PRIMARY KEY IDENTITY(1,1),
+   13     auditID INT NOT NULL,
+   14     userID INT NOT NULL,
+   15     previousDecision VARCHAR(20) NOT NULL,
+   16     newDecision VARCHAR(20) NOT NULL,
+   17     justification NVARCHAR(1000) NOT NULL,
+   18     overriddenAt DATETIME NOT NULL DEFAULT GETDATE(),
+   19     FOREIGN KEY (auditID) REFERENCES projectAudit(auditID),
+   20     FOREIGN KEY (userID) REFERENCES userInfo(userID)
+   21 );
 
-•	Predictive Analysis: Employs Retrieval-Augmented Generation (RAG) by using Google Programmable Search to fetch real-time data, which enriches prompts to generate actionable insights, success factors, risk mitigation strategies, and trend analysis.
+  ---
 
-•	Project Lifecycle Management: Provides a complete workflow for project proposals, including submission by SK Officials, review and status updates (e.g., approval, denial, revision request) by SK Chairpersons, and secure document handling via Azure Blob Storage.
+  Phase 2: Backend Implementation (Node.js & Python)
 
-•	Data and Content Management: Features a dedicated module for administrators to upload and manage raw historical project data via CSV files. It also includes a public- facing portfolio where officials can create posts with image and video attachments to showcase completed projects.
- 
-•	System Administration: A comprehensive suite of tools for administrators, including:
+   1. Environment Setup:
+       * Add the new environment variable to the .env file in the backend directory:
+   1         AIPROJ_CONTAINER="aiproj-rules"
 
-o	Backup and Restore: On-demand database backup (.bacpac files) and restoration functionality.
+   2. Create the AI Python Script (`projectAIJobs.py`):
+       * Create a new file: backend/AI/projectAIJobs.py.
+       * This script will:
+           * Accept a projectID as a command-line argument.
+           * Connect to the database to get the project's file_path and the submitter's barangayName.
+           * Download the project document (PDF/DOCX) and the dynamically named rules file (e.g., PROJECT RULES - [barangayName].txt) from Azure Blob Storage.
+           * Use libraries like pypdf and python-docx to extract text content.
+           * Send the extracted text and rules to the Gemini API for analysis.
+           * Save the AI's report and decision into the projectAudit table.
 
-•	Archiving: Manual archival and restoration of user accounts and projects.
+   3. Update Project Submission Logic:
+       * Modify backend/projectSubmission/projectSubmission.js to use child_process.spawn to execute projectAIJobs.py asynchronously after a project is successfully submitted.
 
-o	Audit Trail: Logs all significant user and system actions for security and accountability.
+   4. Create New Project Audit API (`projectAudit.js`):
+       * Create a new file: backend/projectaudit/projectAudit.js.
+       * This file will contain all new endpoints for the AI project audit process (/api/projectaudit/ai-rules [GET, POST], /api/projectaudit/audit [GET], and /api/projectaudit/manual-override
+         [POST]).
 
-o	Session Logging: Monitors active and past user login sessions.
+   5. Register New Route in `main.js`:
+       * Modify backend/main.js to import and use the new projectAudit.js router under the /api/projectaudit path.
 
-•	Real-time System Notifications: Uses WebSockets to deliver real-time alerts to all active users, such as broadcasting a warning before the server restarts for a database restore.
+  ---
+
+  Phase 3: Frontend Implementation (React & TypeScript)
+
+   1. Create New Component (`AIProjSummary.tsx`):
+       * Create frontend/src/components/Projects/AIProjSummary.tsx.
+       * This component will feature the "Rules for AI Process" modal and the AI audit log table.
+       * It will communicate with the new /api/projectaudit endpoints.
+
+   2. Update Main Projects View (`Projects.tsx`):
+       * Modify frontend/src/components/Projects/Projects.tsx to render a tabbed interface for the SK Chairperson role:
+           * Tab 1: "AI Review" (renders AIProjSummary.tsx)
+           * Tab 2: "Manual Review" (renders the existing ProjectReview.tsx)
+
+  ---
+
+  This completes the planning stage. The documentation has been updated, and the implementation plan is ready.

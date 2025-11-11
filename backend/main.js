@@ -59,6 +59,7 @@ const managePostRouter = require('./Posting/managePost');
 const commentRouter = require('./Posting/comment');
 const protectedCommentRouter = require('./Posting/commentProtected');
 const reportsRouter = require('./AIDataRetrieval/reports');
+const projectAuditRoutes = require('./projectaudit/projectAudit');
 
 
 // Load environment variables
@@ -312,6 +313,10 @@ if (rawDataRouter && typeof rawDataRouter === 'function') {
 
 if (reportsRouter && typeof reportsRouter === 'function') {
   app.use('/api/reports', reportsRouter);
+}
+
+if (projectAuditRoutes && typeof projectAuditRoutes === 'function') {
+  app.use('/api/projectaudit', projectAuditRoutes);
 }
 
 if (protectedCommentRouter && typeof protectedCommentRouter === 'function') {

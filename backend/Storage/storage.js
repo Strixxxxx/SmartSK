@@ -13,6 +13,7 @@ const eAttachContainerName = process.env.E_ATTACHMENTS;
 const jsonContainerName = process.env.JSON_CONTAINER; // For AI-generated JSON reports
 const haContainerName = process.env.HA_CONTAINER;     // For historical analysis data
 const registerContainerName = process.env.REGISTER_CONTAINER; // For registration ID attachments
+const aiProjContainerName = process.env.AIPROJ_CONTAINER; // For AI Project Rules
 
 // Primary credentials
 const primaryConnectionString = process.env.STORAGE_CONNECTION_STRING_1;
@@ -396,4 +397,5 @@ module.exports = {
     jsonContainerName,
     haContainerName,
     registerContainerName,
+    aiProjContainerName,
 };

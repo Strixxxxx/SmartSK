@@ -158,6 +158,30 @@ CREATE TABLE projects (
     CONSTRAINT FK_ProjectStatus FOREIGN KEY (status) REFERENCES StatusLookup(StatusID)
 );
 
+-- Results of the AI's analysis for each project proposal.
+CREATE TABLE projectAudit (
+    auditID INT PRIMARY KEY IDENTITY(1,1),
+    projectID INT NOT NULL,
+    verificationReport NVARCHAR(MAX) NOT NULL,
+    decision VARCHAR(20) NOT NULL, -- 'approved', 'rejected'
+    processedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (projectID) REFERENCES projects(projectID)
+);
+
+-- Manual overrides of AI's Analysis performed by the SK Chairperson.
+CREATE TABLE projectAuditManual (
+    manualAuditID INT PRIMARY KEY IDENTITY(1,1),
+    auditID INT NOT NULL,
+    userID INT NOT NULL,
+    previousDecision VARCHAR(20) NOT NULL,
+    newDecision VARCHAR(20) NOT NULL,
+    justification NVARCHAR(1000) NOT NULL,
+    overriddenAt DATETIME NOT NULL DEFAULT GETDATE(),
+    FOREIGN KEY (auditID) REFERENCES projectAudit(auditID),
+    FOREIGN KEY (userID) REFERENCES userInfo(userID)
+);
+
+
 --Raw Data Tables(Including rawDataDetails, rawData, & rawDataTrack)
 
 CREATE TABLE rawDataDetails (

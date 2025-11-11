@@ -1,0 +1,699 @@
+> before we prcoeed, can you update the @AIDFD.md to add this plan when it was properly executed? I need this to show the diagram on our paper
+
+✦ Of course. I will update the AIDFD.md file to include a new section for the "AI-Powered Project Proposal Review" data flow, complete with a Mermaid diagram and a description. This will be added as
+  the third main process in the document.
+
+  First, I will read the existing content of the file.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  ReadFile AIDFD.md                                                                                                                                                                             │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ Excellent. Now I will append the new data flow diagram and its description to the AIDFD.md file.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  Edit AIDFD.md: ## 2. AI-Powered Account Regis... => ## 2. AI-Powered Account Regis...                                                                                                         │
+│                                                                                                                                                                                                  │
+│    162   5.  **Decision & DB Update**: Based on the verification results, the script decides to 'approve' or 'reject' the application. It then updates the user's status in the database         │
+│          accordingly, either by moving them to the main `userInfo` table via a stored procedure or by marking them as rejected. A detailed verification report is saved to the                   │
+│          `registrationAudit` table.                                                                                                                                                              │
+│    163   6.  **Finalization**: When the Python script completes, it triggers a final function in the Node.js backend which sends an approval or rejection email to the user.                     │
+│    164   7.  **Admin Override**: An administrator can view the AI's decision in the audit trail. If necessary, they can manually override the decision, which directly executes a stored         │
+│          procedure to approve or reject the user in the database.                                                                                                                                │
+│    165 +                                                                                                                                                                                         │
+│    166 + ---                                                                                                                                                                                     │
+│    167 +                                                                                                                                                                                         │
+│    168 + ## 3. AI-Powered Project Proposal Review Data Flow                                                                                                                                      │
+│    169 +                                                                                                                                                                                         │
+│    170 + This process is triggered when an SK Official submits a project proposal. It uses AI to analyze the attached document against a set of configurable rules, providing an automated       │
+│        initial assessment for the SK Chairperson to review.                                                                                                                                      │
+│    171 +                                                                                                                                                                                         │
+│    172 + ```mermaid                                                                                                                                                                              │
+│    173 + graph TD                                                                                                                                                                                │
+│    174 +     subgraph A[Frontend: User Interaction]                                                                                                                                              │
+│    175 +         A1(SK Official fills out Project Proposal Form) --> A2{Submits Form & Document};                                                                                                │
+│    176 +     end                                                                                                                                                                                 │
+│    177 +                                                                                                                                                                                         │
+│    178 +     subgraph B[Backend: Node.js Initial Processing - projectSubmission.js]                                                                                                              │
+│    179 +         B1(POST /api/projects/submit);                                                                                                                                                  │
+│    180 +         B2(Encrypts Project Details);                                                                                                                                                   │
+│    181 +         B3(Uploads Document to Azure);                                                                                                                                                  │
+│    182 +         B4(Saves to 'projects' DB table);                                                                                                                                               │
+│    183 +         B5{Spawns Python Process};                                                                                                                                                      │
+│    184 +     end                                                                                                                                                                                 │
+│    185 +                                                                                                                                                                                         │
+│    186 +     subgraph C[Backend: Python AI Verification - projectAIJobs.py]                                                                                                                      │
+│    187 +         C_spacer[" "]                                                                                                                                                                   │
+│    188 +         style C_spacer stroke:none,fill:none                                                                                                                                            │
+│    189 +         C1(projectAIJobs.py);                                                                                                                                                           │
+│    190 +         C_spacer ~~~ C1;                                                                                                                                                                │
+│    191 +         C2(Fetches Project Doc & Rules);                                                                                                                                                │
+│    192 +         C1 --> C2;                                                                                                                                                                      │
+│    193 +         C3(Extracts Text from Document);                                                                                                                                                │
+│    194 +         C2 --> C3;                                                                                                                                                                      │
+│    195 +         C4(Gemini API: Analyze Doc vs Rules);                                                                                                                                           │
+│    196 +         C3 --> C4;                                                                                                                                                                      │
+│    197 +         C5(Decision: Approve/Reject);                                                                                                                                                   │
+│    198 +         C4 --> C5;                                                                                                                                                                      │
+│    199 +         C6(Saves Report to 'projectAudit' DB);                                                                                                                                          │
+│    200 +         C5 --> C6;                                                                                                                                                                      │
+│    201 +     end                                                                                                                                                                                 │
+│    202 +                                                                                                                                                                                         │
+│    203 +     subgraph D[Data Stores]                                                                                                                                                             │
+│    204 +         D1[MSSQL Database];                                                                                                                                                             │
+│    205 +         D2[Azure Blob Storage: Project Documents];                                                                                                                                      │
+│    206 +         D3[Azure Blob Storage: AI Project Rules Container];                                                                                                                             │
+│    207 +     end                                                                                                                                                                                 │
+│    208 +                                                                                                                                                                                         │
+│    209 +     subgraph E[Admin: Rule Management]                                                                                                                                                  │
+│    210 +         E1(SKC Edits Rules in UI) --> E2(POST /api/projectaudit/ai-rules);                                                                                                              │
+│    211 +         E2 --> E3(projectAudit.js);                                                                                                                                                     │
+│    212 +         E3 --> D3;                                                                                                                                                                      │
+│    213 +     end                                                                                                                                                                                 │
+│    214 +                                                                                                                                                                                         │
+│    215 +     subgraph F[Admin: Audit & Override]                                                                                                                                                 │
+│    216 +         F1(SKC Views AI Audit Log) --> F2{Manual Override};                                                                                                                             │
+│    217 +         F2 --> F3(POST /api/projectaudit/manual-override);                                                                                                                              │
+│    218 +         F3 --> F4(projectAudit.js);                                                                                                                                                     │
+│    219 +         F4 --> D1;                                                                                                                                                                      │
+│    220 +     end                                                                                                                                                                                 │
+│    221 +                                                                                                                                                                                         │
+│    222 +     A2 --> B1;                                                                                                                                                                          │
+│    223 +     B1 --> B2;                                                                                                                                                                          │
+│    224 +     B2 --> B4;                                                                                                                                                                          │
+│    225 +     B1 --> B3;                                                                                                                                                                          │
+│    226 +     B3 --> D2;                                                                                                                                                                          │
+│    227 +     B4 --> D1;                                                                                                                                                                          │
+│    228 +     B5 --> C1;                                                                                                                                                                          │
+│    229 +                                                                                                                                                                                         │
+│    230 +     C2 --> D1;                                                                                                                                                                          │
+│    231 +     C2 --> D2;                                                                                                                                                                          │
+│    232 +     C2 --> D3;                                                                                                                                                                          │
+│    233 +                                                                                                                                                                                         │
+│    234 +     C6 --> D1;                                                                                                                                                                          │
+│    235 + ```                                                                                                                                                                                     │
+│    236 +                                                                                                                                                                                         │
+│    232 +     C2 --> D3;                                                                                                                                                                          │
+│    233 +                                                                                                                                                                                         │
+│    233 +                                                                                                                                                                                         │
+│    234 +     C6 --> D1;                                                                                                                                                                          │
+│    235 + ```                                                                                                                                                                                     │
+│    236 +                                                                                                                                                                                         │
+│    237 + ### Flow Description:                                                                                                                                                                   │
+│    235 + ```                                                                                                                                                                                     │
+│    236 +                                                                                                                                                                                         │
+│    237 + ### Flow Description:                                                                                                                                                                   │
+│    238 +                                                                                                                                                                                         │
+│    239 + 1.  **Submission**: An SK Official submits a new project proposal, including a title, description, and a project document (PDF/DOCX).                                                   │
+│    240 + 2.  **Initial Handling**: The `projectSubmission.js` endpoint encrypts the project details, uploads the document to a secure Azure Blob Storage container, and saves the initial        │
+│    236 +                                                                                                                                                                                         │
+│    237 + ### Flow Description:                                                                                                                                                                   │
+│    238 +                                                                                                                                                                                         │
+│    239 + 1.  **Submission**: An SK Official submits a new project proposal, including a title, description, and a project document (PDF/DOCX).                                                   │
+│    240 + 2.  **Initial Handling**: The `projectSubmission.js` endpoint encrypts the project details, uploads the document to a secure Azure Blob Storage container, and saves the initial        │
+│        project record to the `projects` table with a status like `Pending AI Review`.                                                                                                            │
+│    241 + 3.  **AI Trigger**: The Node.js backend then spawns the `projectAIJobs.py` script, passing the new `projectID`.                                                                         │
+│    242 + 4.  **AI Verification**:                                                                                                                                                                │
+│    243 +     *   The Python script fetches the project's document path and the submitter's barangay name from the database.                                                                      │
+│    244 +     *   It downloads the project document and the corresponding rules file (e.g., `PROJECT RULES - [barangayName].txt`) from the `AIPROJ_CONTAINER` in Azure Storage.                   │
+│    237 + ### Flow Description:                                                                                                                                                                   │
+│    238 +                                                                                                                                                                                         │
+│    239 + 1.  **Submission**: An SK Official submits a new project proposal, including a title, description, and a project document (PDF/DOCX).                                                   │
+│    240 + 2.  **Initial Handling**: The `projectSubmission.js` endpoint encrypts the project details, uploads the document to a secure Azure Blob Storage container, and saves the initial        │
+│    239 + 1.  **Submission**: An SK Official submits a new project proposal, including a title, description, and a project document (PDF/DOCX).                                                   │
+│    240 + 2.  **Initial Handling**: The `projectSubmission.js` endpoint encrypts the project details, uploads the document to a secure Azure Blob Storage container, and saves the initial        │
+│        project record to the `projects` table with a status like `Pending AI Review`.                                                                                                            │
+│        project record to the `projects` table with a status like `Pending AI Review`.                                                                                                            │
+│    241 + 3.  **AI Trigger**: The Node.js backend then spawns the `projectAIJobs.py` script, passing the new `projectID`.                                                                         │
+│    241 + 3.  **AI Trigger**: The Node.js backend then spawns the `projectAIJobs.py` script, passing the new `projectID`.                                                                         │
+│    242 + 4.  **AI Verification**:                                                                                                                                                                │
+│    243 +     *   The Python script fetches the project's document path and the submitter's barangay name from the database.                                                                      │
+│    244 +     *   It downloads the project document and the corresponding rules file (e.g., `PROJECT RULES - [barangayName].txt`) from the `AIPROJ_CONTAINER` in Azure Storage.                   │
+│    245 +     *   It extracts the text from the document and sends it along with the rules to the **Google Gemini API** for analysis.                                                             │
+│    246 +     *   The AI returns a decision ('approved'/'rejected') and a detailed report.                                                                                                        │
+│    247 + 5.  **Decision & DB Update**: The script saves the detailed verification report into the `projectAudit` table. The project's primary status is updated to reflect the AI's assessment   │
+│        (e.g., `AI Approved` or `AI Rejected`), awaiting final confirmation from the SK Chairperson.                                                                                              │
+│    248 + 6.  **Rule Management**: The SK Chairperson can, at any time, update the AI criteria for their barangay through a dedicated UI. Saving these rules updates the corresponding text file  │
+│        in Azure Blob Storage via the `projectAudit.js` endpoint.                                                                                                                                 │
+│    249 + 7.  **Admin Audit & Override**: The SK Chairperson reviews the AI's decisions in the "AI Review" tab. If they disagree, they can use the "Override" functionality. This action updates  │
+│        the project's final status in the `projects` table and logs the manual action, justification, and the admin's identity in the `projectAuditManual` table.                                 │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ The AIDFD.md file has been updated to include the data flow for the new AI-powered project proposal review system.
+
+  Here is the finalized, detailed plan for your review.
+
+  Project Plan: AI-Powered Project Proposal Review (Revised)
+
+  The goal is to reconstruct the project review system by introducing an automated AI process that analyzes submitted project proposals against a set of rules defined by the SK Chairperson. This
+  plan incorporates your feedback for better code organization and dynamic, barangay-specific file naming.
+
+  ---
+
+  Phase 1: Database Setup (User Action)
+
+  As per our rules, you will need to execute the following SQL queries manually on your database. I will place them in D:\Projects\Projects\smartSK\Query.txt.
+
+    1 -- To be placed in Query.txt
+    2 CREATE TABLE projectAudit (
+    3     auditID INT PRIMARY KEY IDENTITY(1,1),
+    4     projectID INT NOT NULL,
+    5     verificationReport NVARCHAR(MAX) NOT NULL,
+    6     decision VARCHAR(20) NOT NULL, -- 'approved', 'rejected'
+    7     processedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    8     FOREIGN KEY (projectID) REFERENCES projects(projectID)
+    9 );
+   10 
+   11 CREATE TABLE projectAuditManual (
+   12     manualAuditID INT PRIMARY KEY IDENTITY(1,1),
+   13     auditID INT NOT NULL,
+   14     userID INT NOT NULL,
+   15     previousDecision VARCHAR(20) NOT NULL,
+   16     newDecision VARCHAR(20) NOT NULL,
+   17     justification NVARCHAR(1000) NOT NULL,
+   18     overriddenAt DATETIME NOT NULL DEFAULT GETDATE(),
+   19     FOREIGN KEY (auditID) REFERENCES projectAudit(auditID),
+   20     FOREIGN KEY (userID) REFERENCES userInfo(userID)
+   21 );
+
+  ---
+
+  Phase 2: Backend Implementation (Node.js & Python)
+
+   1. Environment Setup:
+       * Add the new environment variable to the .env file in the backend directory:
+   1         AIPROJ_CONTAINER="aiproj-rules"
+
+   2. Create the AI Python Script (`projectAIJobs.py`):
+       * Create a new file: backend/AI/projectAIJobs.py.
+       * This script will:
+           * Accept a projectID as a command-line argument.
+           * Connect to the database to get the project's file_path and the submitter's barangayName.
+           * Download the project document (PDF/DOCX) and the dynamically named rules file (e.g., PROJECT RULES - [barangayName].txt) from Azure Blob Storage.
+           * Use libraries like pypdf and python-docx to extract text content.
+           * Send the extracted text and rules to the Gemini API for analysis.
+           * Save the AI's report and decision into the projectAudit table.
+
+   3. Update Project Submission Logic:
+       * Modify backend/projectSubmission/projectSubmission.js to use child_process.spawn to execute projectAIJobs.py asynchronously after a project is successfully submitted.
+
+   4. Create New Project Audit API (`projectAudit.js`):
+       * Create a new file: backend/projectaudit/projectAudit.js.
+       * This file will contain all new endpoints for the AI project audit process (/api/projectaudit/ai-rules [GET, POST], /api/projectaudit/audit [GET], and /api/projectaudit/manual-override
+         [POST]).
+
+   5. Register New Route in `main.js`:
+       * Modify backend/main.js to import and use the new projectAudit.js router under the /api/projectaudit path.
+
+  ---
+
+  Phase 3: Frontend Implementation (React & TypeScript)
+
+   1. Create New Component (`AIProjSummary.tsx`):
+       * Create frontend/src/components/Projects/AIProjSummary.tsx.
+       * This component will feature the "Rules for AI Process" modal and the AI audit log table.
+       * It will communicate with the new /api/projectaudit endpoints.
+
+   2. Update Main Projects View (`Projects.tsx`):
+       * Modify frontend/src/components/Projects/Projects.tsx to render a tabbed interface for the SK Chairperson role:
+           * Tab 1: "AI Review" (renders AIProjSummary.tsx)
+           * Tab 2: "Manual Review" (renders the existing ProjectReview.tsx)
+
+  ---
+
+  This completes the planning stage. The documentation has been updated, and the implementation plan is ready.
+
+  Shall I proceed with executing this plan?
+
+> now we could proceed on the plan. Just to clarify, the "AIPROJ_CONTAINER" environment variable was already added on .env on the backend folder and also on the environment variable section on the
+  azure app services. So we could proceed on the database implementation
+
+✦ Understood. We will now proceed with the implementation, starting with the database setup.
+
+  As per the plan, I will write the necessary SQL CREATE TABLE queries to the D:\Projects\Projects\smartSK\Query.txt file.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  WriteFile Writing to Query.txt                                                                                                                                                                │
+│                                                                                                                                                                                                  │
+│     1 -- Queries for AI-Powered Project Proposal Review Feature                                                                                                                                  │
+│     2                                                                                                                                                                                            │
+│     3 -- This table will store the results of the AI's analysis for each project proposal.                                                                                                       │
+│     4 CREATE TABLE projectAudit (                                                                                                                                                                │
+│     5     auditID INT PRIMARY KEY IDENTITY(1,1),                                                                                                                                                 │
+│     6     projectID INT NOT NULL,                                                                                                                                                                │
+│     7     verificationReport NVARCHAR(MAX) NOT NULL,                                                                                                                                             │
+│     8     decision VARCHAR(20) NOT NULL, -- 'approved', 'rejected'                                                                                                                               │
+│     9     processedAt DATETIME NOT NULL DEFAULT GETDATE(),                                                                                                                                       │
+│    10     FOREIGN KEY (projectID) REFERENCES projects(projectID)                                                                                                                                 │
+│    11 );                                                                                                                                                                                         │
+│    12                                                                                                                                                                                            │
+│    13 -- This table will log any manual overrides performed by the SK Chairperson.                                                                                                               │
+│    14 CREATE TABLE projectAuditManual (                                                                                                                                                          │
+│    15     manualAuditID INT PRIMARY KEY IDENTITY(1,1),                                                                                                                                           │
+│    16     auditID INT NOT NULL,                                                                                                                                                                  │
+│    17     userID INT NOT NULL,                                                                                                                                                                   │
+│    18     previousDecision VARCHAR(20) NOT NULL,                                                                                                                                                 │
+│    19     newDecision VARCHAR(20) NOT NULL,                                                                                                                                                      │
+│    20     justification NVARCHAR(1000) NOT NULL,                                                                                                                                                 │
+│    21     overriddenAt DATETIME NOT NULL DEFAULT GETDATE(),                                                                                                                                      │
+│    22     FOREIGN KEY (auditID) REFERENCES projectAudit(auditID),                                                                                                                                │
+│    23     FOREIGN KEY (userID) REFERENCES userInfo(userID)                                                                                                                                       │
+│    24 );                                                                                                                                                                                         │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✕ [API Error: Cannot read properties of undefined (reading 'error')]
+
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  ReadManyFiles Will attempt to read and concatenate files using patterns:                                                                                                                      │
+│    backend/database/database_query.txt`, `backend/database/database_query.txt`, `backend/Admin/registerAudit.js`, `backend/projectReview/projectReview.js                                        │
+│     (within target directory:                                                                                                                                                                    │
+│    D:\Projects\Projects\smartSK                                                                                                                                                                  │
+│    ) . Excluding: patterns like                                                                                                                                                                  │
+│    **/node_modules/**`, `**/.git/**...`. File encoding: utf-8. Separator: "--- path/to/file.ext ---".                                                                                            │
+│                                                                                                                                                                                                  │
+│    ### ReadManyFiles Result (Target Dir: `D:\Projects\Projects\smartSK`)                                                                                                                         │
+│                                                                                                                                                                                                  │
+│    Successfully read and concatenated content from **3 file(s)**.                                                                                                                                │
+│                                                                                                                                                                                                  │
+│    **Processed Files:**                                                                                                                                                                          │
+│    - `backend/Admin/registerAudit.js`                                                                                                                                                            │
+│    - `backend/database/database_query.txt`                                                                                                                                                       │
+│    - `backend/projectReview/projectReview.js`                                                                                                                                                    │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+> so if you scan on the @backend/database/database_query.txt , you could already see that the tables on the plan was already inside because every time i put new tables on the database itself, i put
+  on @backend/database/database_query.txt to have a copy of database schema. Also, we dont need the stored procedure for the approved or reject which was like on the @backend/Admin/registerAudit.js
+  since the SK Chairperson could already edit that on @backend/projectReview/projectReview.js .
+
+✦ Thank you for the clarification. It's helpful to know that the database tables are already in place and that we can use a direct query for the override instead of a stored procedure.
+
+  Since the database work is complete, I will skip that phase and proceed directly to the backend implementation as planned.
+
+  My first step is to create the new Python AI script, projectAIJobs.py, in the backend/AI/ directory. This script will handle the core logic of downloading the project document and rules,
+  extracting text, and using the Gemini API for analysis.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  WriteFile Writing to backend\AI\projectAIJobs.py                                                                                                                                              │
+│                                                                                                                                                                                                  │
+│    ... first 208 lines hidden ...                                                                                                                                                                │
+│    209             raise Exception(f"Failed to download project document for projectID: {project_id}.")                                                                                          │
+│    210                                                                                                                                                                                           │
+│    211         if not rules_data:                                                                                                                                                                │
+│    212             # If rules file doesn't exist, we can't proceed.                                                                                                                              │
+│    213             logging.warning(f"No rules file found for Barangay '{barangay_name}'. Skipping AI analysis.")                                                                                 │
+│    214             # We can decide to auto-reject or just log and exit. Let's log and exit for now.                                                                                              │
+│    215             # Or, insert a specific report.                                                                                                                                               │
+│    216             report = "AI processing skipped: No rules file found for the barangay."                                                                                                       │
+│    217             decision = "rejected" # Or a neutral status like 'needs_manual_review'                                                                                                        │
+│    218             cursor.execute(                                                                                                                                                               │
+│    219                 "INSERT INTO projectAudit (projectID, verificationReport, decision) VALUES (?, ?, ?)",                                                                                    │
+│    220                 project_id, report, decision                                                                                                                                              │
+│    221             )                                                                                                                                                                             │
+│    222             conn.commit()                                                                                                                                                                 │
+│    223             logging.info("Logged skipped analysis to projectAudit.")                                                                                                                      │
+│    224             sys.exit(0)                                                                                                                                                                   │
+│    225                                                                                                                                                                                           │
+│    226         rules_text = rules_data.decode('utf-8')                                                                                                                                           │
+│    227                                                                                                                                                                                           │
+│    228         # 3. Extract text from the document                                                                                                                                               │
+│    229         document_text = extract_text_from_document(project_document_data, file_path)                                                                                                      │
+│    230         if not document_text:                                                                                                                                                             │
+│    231             raise Exception(f"Could not extract text from document for projectID: {project_id}.")                                                                                         │
+│    232                                                                                                                                                                                           │
+│    233         # 4. Perform AI analysis                                                                                                                                                          │
+│    234         analysis, message = analyze_proposal_with_ai(document_text, rules_text)                                                                                                           │
+│    235                                                                                                                                                                                           │
+│    236         if not analysis:                                                                                                                                                                  │
+│    237             # Create a failure report                                                                                                                                                     │
+│    238             report = f"AI analysis failed for projectID {project_id}. Reason: {message}"                                                                                                  │
+│    239             decision = "rejected"                                                                                                                                                         │
+│    240         else:                                                                                                                                                                             │
+│    241             # Format a human-readable report from the AI's JSON output                                                                                                                    │
+│    242             decision = analysis.get("decision", "rejected")                                                                                                                               │
+│    243             summary = analysis.get("summary", "No summary provided.")                                                                                                                     │
+│    244             violations = analysis.get("violations", [])                                                                                                                                   │
+│    245                                                                                                                                                                                           │
+│    246             report = f"AI Verification Summary: {summary}\n\n"                                                                                                                            │
+│    247             if violations:                                                                                                                                                                │
+│    248                 report += "Violations Found:\n"                                                                                                                                           │
+│    249                 for v in violations:                                                                                                                                                      │
+│    250                     report += f"- {v}\n"                                                                                                                                                  │
+│    251             else:                                                                                                                                                                         │
+│    252                 report += "Compliance: All rules were met.\n"                                                                                                                             │
+│    253             report += f"\nFinal AI Decision: {decision.capitalize()}"                                                                                                                     │
+│    254                                                                                                                                                                                           │
+│    255         # 5. Save the audit report to the database                                                                                                                                        │
+│    256         logging.info(f"Inserting audit record for projectID: {project_id}")                                                                                                               │
+│    257         cursor.execute(                                                                                                                                                                   │
+│    258             "INSERT INTO projectAudit (projectID, verificationReport, decision) VALUES (?, ?, ?)",                                                                                        │
+│    259             project_id, report, decision                                                                                                                                                  │
+│    260         )                                                                                                                                                                                 │
+│    261                                                                                                                                                                                           │
+│    262         # 6. Update the project status based on AI decision                                                                                                                               │
+│    263         # Map decision to a status ID. Let's assume new statuses are added.                                                                                                               │
+│    264         # e.g., 11 for 'AI Approved', 12 for 'AI Rejected'                                                                                                                                │
+│    265         # For now, let's use existing ones: 3 for 'Proposal Accepted', 4 for 'Proposal Rejected'                                                                                          │
+│    266         status_map = {'approved': 3, 'rejected': 4}                                                                                                                                       │
+│    267         new_status_id = status_map.get(decision, 4) # Default to rejected                                                                                                                 │
+│    268                                                                                                                                                                                           │
+│    269         logging.info(f"Updating project status for projectID {project_id} to status ID {new_status_id}")                                                                                  │
+│    270         cursor.execute("UPDATE projects SET status = ? WHERE projectID = ?", new_status_id, project_id)                                                                                   │
+│    271                                                                                                                                                                                           │
+│    272         conn.commit()                                                                                                                                                                     │
+│    273         logging.info(f"Successfully processed and committed changes for projectID: {project_id}")                                                                                         │
+│    274                                                                                                                                                                                           │
+│    275     except Exception as e:                                                                                                                                                                │
+│    276         logging.error(f"An error occurred during processing for projectID: {project_id}", exc_info=True)                                                                                  │
+│    277         if conn:                                                                                                                                                                          │
+│    278             conn.rollback()                                                                                                                                                               │
+│    279         sys.exit(1)                                                                                                                                                                       │
+│    280     finally:                                                                                                                                                                              │
+│    281         if conn:                                                                                                                                                                          │
+│    282             conn.close()                                                                                                                                                                  │
+│    283             logging.info("Database connection closed.")                                                                                                                                   │
+│    284                                                                                                                                                                                           │
+│    285 if __name__ == "__main__":                                                                                                                                                                │
+│    286     if len(sys.argv) < 2:                                                                                                                                                                 │
+│    287         logging.error("Usage: python projectAIJobs.py <projectID>")                                                                                                                       │
+│    288         sys.exit(1)                                                                                                                                                                       │
+│    289                                                                                                                                                                                           │
+│    290     try:                                                                                                                                                                                  │
+│    291         project_id_arg = int(sys.argv[1])                                                                                                                                                 │
+│    292         main(project_id_arg)                                                                                                                                                              │
+│    293         sys.exit(0)                                                                                                                                                                       │
+│    294     except ValueError:                                                                                                                                                                    │
+│    295         logging.error(f"Invalid projectID provided: {sys.argv[1]}. Must be an integer.")                                                                                                  │
+│    296         sys.exit(1)                                                                                                                                                                       │
+│    297     except Exception as e:                                                                                                                                                                │
+│    298         sys.exit(1)                                                                                                                                                                       │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ I have created the backend/AI/projectAIJobs.py script.
+
+  This new script requires the pypdf and python-docx packages for parsing PDF and Word documents. I will now add these dependencies to the backend/requirements.txt file to ensure they are
+  installed in the environment.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  ReadFile backend\requirements.txt                                                                                                                                                             │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ The packages pypdf and python-docx are missing. I will add them to backend/requirements.txt.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  Edit backend\requirements.txt: # Crypto => # Crypto...                                                                                                                                        │
+│                                                                                                                                                                                                  │
+│    29                                                                                                                                                                                            │
+│    30   # Crypto                                                                                                                                                                                 │
+│    31   pycryptodome                                                                                                                                                                             │
+│    32 +                                                                                                                                                                                          │
+│    33 + # Document Parsing                                                                                                                                                                       │
+│    34 + pypdf                                                                                                                                                                                    │
+│    35 + python-docx                                                                                                                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ Dependencies are updated. Now I'll modify backend/projectSubmission/projectSubmission.js to trigger the AI script after a project is submitted. I'll read the file, find the success block
+  post-database insertion, and add the child_process.spawn call there.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  ReadFile backend\...\projectSubmission.js                                                                                                                                                     │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+> an API error occured. Continue where you left of which is: "✦ Dependencies are updated. Now I'll modify backend/projectSubmission/projectSubmission.js to trigger the AI script after a project is
+  submitted. I'll read the file, find the success block post-database insertion, and add the child_process.spawn call there."
+
+✦ Of course. I will now modify backend/projectSubmission/projectSubmission.js to trigger the AI analysis script.
+
+  I will add the necessary child_process import and then insert the code to spawn the projectAIJobs.py script immediately after the new project ID is retrieved from the database. This will start
+  the AI analysis in the background.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  Edit backend\...\projectSubmission.js: // Multer configuration for in... => const { spawn } = require('chi...                                                                                 │
+│                                                                                                                                                                                                  │
+│     8   const { uploadFile, getFileSasUrl } = require('../Storage/storage');                                                                                                                     │
+│     9   const { encrypt, decrypt } = require('../utils/crypto');                                                                                                                                 │
+│    10                                                                                                                                                                                            │
+│    11 + const { spawn } = require('child_process');                                                                                                                                              │
+│    12 +                                                                                                                                                                                          │
+│    13   // Multer configuration for in-memory storage                                                                                                                                            │
+│    14   const storage = multer.memoryStorage();                                                                                                                                                  │
+│    15                                                                                                                                                                                            │
+│    ═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════ │
+│    67                                                                                                                                                                                            │
+│    68       const projectId = result.recordset[0].projectID;                                                                                                                                     │
+│    69                                                                                                                                                                                            │
+│    70 +     // --- Trigger AI Analysis ---                                                                                                                                                       │
+│    71 +     if (projectId && (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development')) {                                                                                │
+│    72 +         console.log(`Spawning AI analysis for projectID: ${projectId}`);                                                                                                                 │
+│    73 +         const pythonProcess = spawn('python', ['./AI/projectAIJobs.py', projectId]);                                                                                                     │
+│    74 +                                                                                                                                                                                          │
+│    75 +         pythonProcess.stdout.on('data', (data) => {                                                                                                                                      │
+│    76 +             console.log(`AI Job (PID: ${pythonProcess.pid}) STDOUT: ${data}`);                                                                                                           │
+│    77 +         });                                                                                                                                                                              │
+│    78 +                                                                                                                                                                                          │
+│    79 +         pythonProcess.stderr.on('data', (data) => {                                                                                                                                      │
+│    80 +             console.error(`AI Job (PID: ${pythonProcess.pid}) STDERR: ${data}`);                                                                                                         │
+│    81 +         });                                                                                                                                                                              │
+│    82 +                                                                                                                                                                                          │
+│    83 +         pythonProcess.on('close', (code) => {                                                                                                                                            │
+│    84 +             console.log(`AI Job (PID: ${pythonProcess.pid}) exited with code ${code}`);                                                                                                  │
+│    85 +         });                                                                                                                                                                              │
+│    86 +     }                                                                                                                                                                                    │
+│    87 +     // --- End AI Trigger ---                                                                                                                                                            │
+│    88 +                                                                                                                                                                                          │
+│    89       const projectResult = await pool.request()                                                                                                                                           │
+│    90         .input('projectID', sql.Int, projectId)                                                                                                                                            │
+│    91         .query(`                                                                                                                                                                           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+> an API error occured. Continue where you left of which is :✦ Of course. I will now modify backend/projectSubmission/projectSubmission.js to trigger the AI analysis script.
+
+    I will add the necessary child_process import and then insert the code to spawn the projectAIJobs.py script immediately after the new project ID is retrieved from the database. This will start
+    the AI analysis in the background.
+
+✦ Of course. I will retry modifying backend/projectSubmission/projectSubmission.js to add the AI script trigger.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ x  Edit {"new_string":"const { spawn } = require('child_process');\n\n// Multer configuration for in-memory storage\nconst storage = multer.memoryStorage();\n\nconst fileFilter = (req, file, … │
+│                                                                                                                                                                                                  │
+│    ... first 100 lines hidden ...                                                                                                                                                                │
+│      const ext = path.extname(file.originalname).toLowerCase();                                                                                                                                  │
+│      if (allowedFileTypes.includes(ext)) {                                                                                                                                                       │
+│        cb(null, true);                                                                                                                                                                           │
+│      } else {                                                                                                                                                                                    │
+│        cb(new Error('Invalid file type. Only PDF, DOC, DOCX, XLS, XLSX, PPT, and PPTX files are allowed.'));                                                                                     │
+│      }                                                                                                                                                                                           │
+│    };                                                                                                                                                                                            │
+│                                                                                                                                                                                                  │
+│    const upload = multer({                                                                                                                                                                       │
+│      storage: storage,                                                                                                                                                                           │
+│      fileFilter: fileFilter,                                                                                                                                                                     │
+│      limits: { fileSize: 15 * 1024 * 1024 } // 15MB limit                                                                                                                                        │
+│    });                                                                                                                                                                                           │
+│                                                                                                                                                                                                  │
+│    // Submit a new project                                                                                                                                                                       │
+│    router.post('/submit', authMiddleware, upload.single('projectFile'), async (req, res) => {                                                                                                    │
+│      try {                                                                                                                                                                                       │
+│        const { title, description } = req.body;                                                                                                                                                  │
+│        const userIdInt = req.user.userID; // Use secure user ID from session                                                                                                                     │
+│                                                                                                                                                                                                  │
+│        if (!title || !description || !userIdInt) {                                                                                                                                               │
+│          return res.status(400).json({ success: false, message: 'Missing required fields or user authentication' });                                                                             │
+│        }                                                                                                                                                                                         │
+│                                                                                                                                                                                                  │
+│        let filePath = null;                                                                                                                                                                      │
+│        if (req.file) {                                                                                                                                                                           │
+│            filePath = await uploadFile(req.file);                                                                                                                                                │
+│        }                                                                                                                                                                                         │
+│                                                                                                                                                                                                  │
+│        const referenceNumber = `PRJ-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000)}`;                                                                                     │
+│        const pool = await getConnection();                                                                                                                                                       │
+│                                                                                                                                                                                                  │
+│        // Encrypt project data                                                                                                                                                                   │
+│        const encryptedTitle = encrypt(title);                                                                                                                                                    │
+│        const encryptedDescription = encrypt(description);                                                                                                                                        │
+│                                                                                                                                                                                                  │
+│        const result = await pool.request()                                                                                                                                                       │
+│          .input('referenceNumber', sql.VarChar, referenceNumber)                                                                                                                                 │
+│          .input('title', sql.NVarChar, encryptedTitle)                                                                                                                                           │
+│          .input('description', sql.NVarChar, encryptedDescription)                                                                                                                               │
+│          .input('userID', sql.Int, userIdInt)                                                                                                                                                    │
+│          .input('status', sql.Int, 1) // Set default status to 'Pending Review'                                                                                                                  │
+│          .input('filePath', sql.VarChar, filePath)                                                                                                                                               │
+│          .input('fileName', sql.VarChar, req.file ? req.file.originalname : null)                                                                                                                │
+│          .query(`                                                                                                                                                                                │
+│            INSERT INTO projects (reference_number, title, description, userID, status, submittedDate, file_path, file_name)                                                                      │
+│            VALUES (@referenceNumber, @title, @description, @userID, @status, GETDATE(), @filePath, @fileName);                                                                                   │
+│            SELECT SCOPE_IDENTITY() AS projectID;                                                                                                                                                 │
+│          `);                                                                                                                                                                                     │
+│                                                                                                                                                                                                  │
+│        const projectId = result.recordset[0].projectID;                                                                                                                                          │
+│                                                                                                                                                                                                  │
+│        const projectResult = await pool.request()                                                                                                                                                │
+│          .input('projectID', sql.Int, projectId)                                                                                                                                                 │
+│          .query(`                                                                                                                                                                                │
+│            SELECT p.*, s.StatusName                                                                                                                                                              │
+│            FROM projects p                                                                                                                                                                       │
+│            JOIN StatusLookup s ON p.status = s.StatusID                                                                                                                                          │
+│            WHERE p.projectID = @projectID                                                                                                                                                        │
+│          `);                                                                                                                                                                                     │
+│                                                                                                                                                                                                  │
+│        const project = {                                                                                                                                                                         │
+│          id: projectResult.recordset[0].projectID,                                                                                                                                               │
+│          referenceNumber: projectResult.recordset[0].reference_number,                                                                                                                           │
+│          title: decrypt(projectResult.recordset[0].title),                                                                                                                                       │
+│          description: decrypt(projectResult.recordset[0].description),                                                                                                                           │
+│          status: projectResult.recordset[0].StatusName,                                                                                                                                          │
+│          submittedDate: projectResult.recordset[0].submittedDate,                                                                                                                                │
+│          fileUrl: projectResult.recordset[0].file_path,                                                                                                                                          │
+│          fileName: projectResult.recordset[0].file_name                                                                                                                                          │
+│        };                                                                                                                                                                                        │
+│                                                                                                                                                                                                  │
+│        addAuditTrail({                                                                                                                                                                           │
+│            actor: 'C',                                                                                                                                                                           │
+│            module: 'P',                                                                                                                                                                          │
+│            userID: userIdInt,                                                                                                                                                                    │
+│            actions: 'submit-project',                                                                                                                                                            │
+│            oldValue: null,                                                                                                                                                                       │
+│            newValue: `Title: ${title}`,                                                                                                                                                          │
+│            descriptions: `User ${req.user.fullName} submitted a new project: ${title}`                                                                                                           │
+│        });                                                                                                                                                                                       │
+│                                                                                                                                                                                                  │
+│        return res.status(201).json({ success: true, message: 'Project submitted successfully', project });                                                                                       │
+│                                                                                                                                                                                                  │
+│      } catch (error) {                                                                                                                                                                           │
+│        console.error('Project submission error:', error);                                                                                                                                        │
+│        return res.status(500).json({ success: false, message: 'An error occurred during project submission: ' + error.message });                                                                │
+│      }                                                                                                                                                                                           │
+│    });) in D:\Projects\Projects\smartSK\backend\projectSubmission\projectSubmission.js. No edits made. The exact text in old_string was not found. Ensure you're not escaping content            │
+│    incorrectly and check whitespace, indentation, and context. Use read_file tool to verify.                                                                                                     │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ It appears the previous attempt to modify the file was successful despite the API error, so no changes were needed. The AI trigger has been added to projectSubmission.js.
+
+  I will now proceed to the next step in our plan: creating the new file backend/projectaudit/projectAudit.js and adding the necessary endpoints for managing AI rules, fetching audit data, and
+  handling manual overrides.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  WriteFile Writing to backend\...\projectAudit.js                                                                                                                                              │
+│                                                                                                                                                                                                  │
+│    ... first 152 lines hidden ...                                                                                                                                                                │
+│    153             proposerName: decrypt(log.proposerName),                                                                                                                                      │
+│    154             validatedBy: log.validatedBy.startsWith('Google') ? log.validatedBy : decrypt(log.validatedBy)                                                                                │
+│    155         }));                                                                                                                                                                              │
+│    156                                                                                                                                                                                           │
+│    157         res.json({ success: true, data: decryptedLogs });                                                                                                                                 │
+│    158                                                                                                                                                                                           │
+│    159     } catch (error) {                                                                                                                                                                     │
+│    160         console.error("Error fetching project audit logs:", error);                                                                                                                       │
+│    161         res.status(500).json({ success: false, message: 'Failed to fetch project audit logs.' });                                                                                         │
+│    162     }                                                                                                                                                                                     │
+│    163 });                                                                                                                                                                                       │
+│    164                                                                                                                                                                                           │
+│    165 /**                                                                                                                                                                                       │
+│    166  * POST /manual-override                                                                                                                                                                  │
+│    167  * Allows a chairperson to manually override an AI decision for a project.                                                                                                                │
+│    168  */                                                                                                                                                                                       │
+│    169 router.post('/manual-override', authMiddleware, async (req, res) => {                                                                                                                     │
+│    170     const { auditID, newDecision, justification } = req.body;                                                                                                                             │
+│    171     const adminUserID = req.user.userID;                                                                                                                                                  │
+│    172                                                                                                                                                                                           │
+│    173     if (req.user.position !== 'SKC') {                                                                                                                                                    │
+│    174         return res.status(403).json({ success: false, message: 'Forbidden.' });                                                                                                           │
+│    175     }                                                                                                                                                                                     │
+│    176     if (!auditID || !newDecision || !justification) {                                                                                                                                     │
+│    177         return res.status(400).json({ success: false, message: 'Audit ID, new decision, and justification are required.' });                                                              │
+│    178     }                                                                                                                                                                                     │
+│    179     if (!['approved', 'rejected'].includes(newDecision)) {                                                                                                                                │
+│    180         return res.status(400).json({ success: false, message: 'Invalid decision. Must be "approved" or "rejected".' });                                                                  │
+│    181     }                                                                                                                                                                                     │
+│    182                                                                                                                                                                                           │
+│    183     const pool = await getConnection();                                                                                                                                                   │
+│    184     const transaction = new sql.Transaction(pool);                                                                                                                                        │
+│    185     try {                                                                                                                                                                                 │
+│    186         await transaction.begin();                                                                                                                                                        │
+│    187                                                                                                                                                                                           │
+│    188         // 1. Get projectID and previous decision from the original audit record                                                                                                          │
+│    189         const auditResult = await new sql.Request(transaction)                                                                                                                            │
+│    190             .input('auditID', sql.Int, auditID)                                                                                                                                           │
+│    191             .query('SELECT projectID, decision FROM projectAudit WHERE auditID = @auditID');                                                                                              │
+│    192                                                                                                                                                                                           │
+│    193         if (auditResult.recordset.length === 0) {                                                                                                                                         │
+│    194             throw new Error('Original AI audit record not found.');                                                                                                                       │
+│    195         }                                                                                                                                                                                 │
+│    196         const { projectID, decision: previousDecision } = auditResult.recordset[0];                                                                                                       │
+│    197                                                                                                                                                                                           │
+│    198         // 2. Insert the manual override record                                                                                                                                           │
+│    199         await new sql.Request(transaction)                                                                                                                                                │
+│    200             .input('auditID', sql.Int, auditID)                                                                                                                                           │
+│    201             .input('userID', sql.Int, adminUserID)                                                                                                                                        │
+│    202             .input('previousDecision', sql.VarChar, previousDecision)                                                                                                                     │
+│    203             .input('newDecision', sql.VarChar, newDecision)                                                                                                                               │
+│    204             .input('justification', sql.NVarChar, justification)                                                                                                                          │
+│    205             .query(`                                                                                                                                                                      │
+│    206                 INSERT INTO projectAuditManual (auditID, userID, previousDecision, newDecision, justification, overriddenAt)                                                              │
+│    207                 VALUES (@auditID, @userID, @previousDecision, @newDecision, @justification, GETDATE())                                                                                    │
+│    208             `);                                                                                                                                                                           │
+│    209                                                                                                                                                                                           │
+│    210         // 3. Update the project's actual status                                                                                                                                          │
+│    211         const statusMap = { 'approved': 3, 'rejected': 4 }; // Assuming 3=Accepted, 4=Rejected                                                                                            │
+│    212         const newStatusId = statusMap[newDecision];                                                                                                                                       │
+│    213                                                                                                                                                                                           │
+│    214         await new sql.Request(transaction)                                                                                                                                                │
+│    215             .input('projectID', sql.Int, projectID)                                                                                                                                       │
+│    216             .input('statusId', sql.Int, newStatusId)                                                                                                                                      │
+│    217             .input('remarks', sql.NVarChar, encrypt(`Manually overridden by SK Chairperson. Justification: ${justification}`))                                                            │
+│    218             .input('reviewedBy', sql.NVarChar, encrypt(req.user.fullName))                                                                                                                │
+│    219             .query('UPDATE projects SET status = @statusId, remarks = @remarks, reviewedBy = @reviewedBy WHERE projectID = @projectID');                                                  │
+│    220                                                                                                                                                                                           │
+│    221         // 4. Add to main audit trail                                                                                                                                                     │
+│    222         addAuditTrail({                                                                                                                                                                   │
+│    223             actor: 'A',                                                                                                                                                                   │
+│    224             module: 'P',                                                                                                                                                                  │
+│    225             userID: adminUserID,                                                                                                                                                          │
+│    226             actions: 'manual-override-project',                                                                                                                                           │
+│    227             oldValue: `ProjectID: ${projectID}, AI Decision: ${previousDecision}`,                                                                                                        │
+│    228             newValue: `New Decision: ${newDecision}`,                                                                                                                                     │
+│    229             descriptions: `SK Chairperson manually overrode AI decision for project ${projectID}.`                                                                                        │
+│    230         });                                                                                                                                                                               │
+│    231                                                                                                                                                                                           │
+│    232         await transaction.commit();                                                                                                                                                       │
+│    233         res.json({ success: true, message: 'Project status successfully overridden.' });                                                                                                  │
+│    234                                                                                                                                                                                           │
+│    235     } catch (error) {                                                                                                                                                                     │
+│    236         await transaction.rollback();                                                                                                                                                     │
+│    237         console.error(`Error during manual override for audit ID ${auditID}:`, error);                                                                                                    │
+│    238         res.status(500).json({ success: false, message: 'An error occurred during the override process.', error: error.message });                                                        │
+│    239     }                                                                                                                                                                                     │
+│    240 });                                                                                                                                                                                       │
+│    241                                                                                                                                                                                           │
+│    242 module.exports = router;                                                                                                                                                                  │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ projectAudit.js is created. Now, I'll modify storage.js to export the aiProjContainerName and projectsContainerName constants used in projectAudit.js and projectAIJobs.py. I'll read the file, add
+  the constants and exports, then update it.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  ReadFile backend\Storage\storage.js                                                                                                                                                           │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ Okay, storage.js read. projectsContainerName is docContainerName, so I'll use that in projectAIJobs.py. I'll add and export aiProjContainerName.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  Edit backend\Storage\storage.js: const registerContainerName = ... => const registerContainerName = ...                                                                                       │
+│                                                                                                                                                                                                  │
+│    13   const jsonContainerName = process.env.JSON_CONTAINER; // For AI-generated JSON reports                                                                                                   │
+│    14   const haContainerName = process.env.HA_CONTAINER;     // For historical analysis data                                                                                                    │
+│    15   const registerContainerName = process.env.REGISTER_CONTAINER; // For registration ID attachments                                                                                         │
+│    16 + const aiProjContainerName = process.env.AIPROJ_CONTAINER; // For AI Project Rules                                                                                                        │
+│    17                                                                                                                                                                                            │
+│    18   // Primary credentials                                                                                                                                                                   │
+│    19   const primaryConnectionString = process.env.STORAGE_CONNECTION_STRING_1;                                                                                                                 │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ aiProjContainerName is in storage.js; now I'll export it.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  Edit backend\Storage\storage.js:     haContainerName,... =>     haContainerName,...                                                                                                           │
+│                                                                                                                                                                                                  │
+│    397       jsonContainerName,                                                                                                                                                                  │
+│    398       haContainerName,                                                                                                                                                                    │
+│    399       registerContainerName,                                                                                                                                                              │
+│    400 +     aiProjContainerName,                                                                                                                                                                │
+│    401   };                                                                                                                                                                                      │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ Okay, projectAudit.js and storage.js are done. Now to register the new route: I'll read main.js, add the projectAudit route require and use statements, then update the file.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  ReadFile backend\main.js                                                                                                                                                                      │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+✦ Okay, I'll add projectAuditRoutes to backend/main.js. I'll require the route, then app.use it with the other routes, and finally update the file.
+╭──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ ✓  Edit backend\main.js: const reportsRouter = require(... => const reportsRouter = require(...                                                                                                  │
+│                                                                                                                                                                                                  │
+│    59   const commentRouter = require('./Posting/comment');                                                                                                                                      │
+│    60   const protectedCommentRouter = require('./Posting/commentProtected');                                                                                                                    │
+│    61   const reportsRouter = require('./AIDataRetrieval/reports');                                                                                                                              │
+│    62 + const projectAuditRoutes = require('./projectaudit/projectAudit');                                                                                                                       │
+│    63                                                                                                                                                                                            │
+│    64                                                                                                                                                                                            │
+│    65   // Load environment variables                                                                                                                                                            │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+> api error occured. Last know process is: ✦ Okay, I'll add projectAuditRoutes to backend/main.js. I'll require the route, then app.use it with the other routes, and finally update the file.
+

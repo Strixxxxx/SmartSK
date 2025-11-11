@@ -29,3 +29,7 @@ Pillow
 
 # Crypto
 pycryptodome
+
+# Document Parsing
+pypdf
+python-docx
