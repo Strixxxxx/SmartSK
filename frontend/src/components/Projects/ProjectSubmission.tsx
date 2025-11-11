@@ -53,14 +53,14 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
 
   useEffect(() => {
     const fetchStatuses = async () => {
-        try {
-            const response = await axiosInstance.get('/api/projects/statuses');
-            if (response.data.success) {
-                setStatusList(response.data.statuses);
-            }
-        } catch (error) {
-            if (import.meta.env.DEV) console.error('Failed to fetch statuses', error);
+      try {
+        const response = await axiosInstance.get('/api/projects/statuses');
+        if (response.data.success) {
+          setStatusList(response.data.statuses);
         }
+      } catch (error) {
+        if (import.meta.env.DEV) console.error('Failed to fetch statuses', error);
+      }
     };
     fetchStatuses();
   }, []);
@@ -113,12 +113,12 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
       return;
     }
     if (!projectFile) {
-      toast.error('No attachment detected.Please try again');
+      toast.error('No attachment detected. Please try again');
       return;
     }
     if (!userId) {
-        toast.error('Authentication error. Please log in again.');
-        return;
+      toast.error('Authentication error. Please log in again.');
+      return;
     }
 
     const formData = new FormData();
@@ -150,13 +150,20 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
       toast.error(`Submission Error: ${err.message}`);
     }
   };
-  
+
   const handleViewRemarks = (project: Project) => {
     const remarks = project.remarks || 'No remarks provided.';
     const reviewedBy = project.reviewedBy || 'N/A';
-    toast.info(<div><h4>{project.title}</h4><p>{remarks}</p><p>Reviewed By: {reviewedBy}</p></div>, { autoClose: false });
+    toast.info(
+      <div>
+        <h4>{project.title}</h4>
+        <p>{remarks}</p>
+        <p>Reviewed By: {reviewedBy}</p>
+      </div>,
+      { autoClose: false }
+    );
   };
-  
+
   const handleCloseFileViewer = () => {
     setShowFileViewer(false);
     if (viewingFileUrl) {
@@ -183,11 +190,11 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
       } else {
         toast.error(response.data.message || 'Could not get file URL for download.');
       }
-    } catch(err) {
+    } catch (err) {
       toast.error('Could not download the file.');
     }
   };
-  
+
   const handleViewFile = async (fileUrl = '', fileName = '') => {
     if (!fileUrl) return;
     const filename = fileUrl.split(/[\/]/).pop();
@@ -207,17 +214,18 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
     }
   };
 
+  const getStatusClassName = (status: string) => {
+    return `status-badge status-${status.replace(/\s+/g, '-').toLowerCase()}`;
+  };
+
   return (
     <div className="project-submission-container">
       <h3>Proposed Project Submissions</h3>
       <p>Track and manage newly proposed projects.</p>
-      
+
       <div className="project-actions">
         {userRole !== 'MA' && (
-          <button 
-            className="submit-project-btn" 
-            onClick={() => setShowSubmitForm(true)}
-          >
+          <button className="submit-project-btn" onClick={() => setShowSubmitForm(true)}>
             Propose New Project
           </button>
         )}
@@ -228,124 +236,177 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
           <div className="modal-content project-form-modal">
             <div className="modal-header">
               <h3>Submit New Project</h3>
-              <button className="close-btn" onClick={() => setShowSubmitForm(false)}>×</button>
+              <button className="close-btn" onClick={() => setShowSubmitForm(false)}>
+                ×
+              </button>
             </div>
             <form onSubmit={handleSubmitProject} className="modal-body">
-                <div className="form-group">
-                  <label htmlFor="projectTitle">Project Title</label>
-                  <input type="text" id="projectTitle" value={projectTitle} onChange={(e) => setProjectTitle(e.target.value)} required />
+              <div className="form-group">
+                <label htmlFor="projectTitle">Project Title</label>
+                <input
+                  type="text"
+                  id="projectTitle"
+                  value={projectTitle}
+                  onChange={(e) => setProjectTitle(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="projectDescription">Project Description</label>
+                <textarea
+                  id="projectDescription"
+                  value={projectDescription}
+                  onChange={(e) => setProjectDescription(e.target.value)}
+                  rows={5}
+                  required
+                ></textarea>
+              </div>
+              <div className="form-group">
+                <label htmlFor="projectFile">Project Document (PDF, DOC, DOCX only)</label>
+                <div className="file-input-container">
+                  <input
+                    type="file"
+                    id="projectFile"
+                    onChange={handleFileChange}
+                    accept=".pdf,.doc,.docx"
+                    className="file-input"
+                  />
+                  <label htmlFor="projectFile" className="file-input-label">
+                    {projectFile ? projectFile.name : 'Choose File'}
+                  </label>
                 </div>
-                <div className="form-group">
-                  <label htmlFor="projectDescription">Project Description</label>
-                  <textarea id="projectDescription" value={projectDescription} onChange={(e) => setProjectDescription(e.target.value)} rows={5} required></textarea>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="projectFile">Project Document (PDF, DOC, DOCX only)</label>
-                   <div className="file-input-container">
-                    <input type="file" id="projectFile" onChange={handleFileChange} accept=".pdf,.doc,.docx" className="file-input"/>
-                     <label htmlFor="projectFile" className="file-input-label">
-                       {projectFile ? projectFile.name : 'Choose File'}
-                     </label>
-                  </div>
-                  {fileError && <p className="error-message" style={{ color: '#d32f2f', fontSize: '0.8rem', marginTop: '5px' }}>{fileError}</p>}
-                </div>
-                <div className="form-actions">
-                  <button type="button" className="cancel-btn" onClick={() => setShowSubmitForm(false)}>Cancel</button>
-                  <button type="submit" className="submit-btn" disabled={!!fileError}>Submit Proposal</button>
-                </div>
+                {fileError && <p className="error-message">{fileError}</p>}
+              </div>
+              <div className="form-actions">
+                <button type="button" className="cancel-btn" onClick={() => setShowSubmitForm(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className="submit-btn" disabled={!!fileError}>
+                  Submit Proposal
+                </button>
+              </div>
             </form>
           </div>
         </div>
       )}
 
       <div className="projects-table-container">
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <button ref={infoIconRef} onClick={() => setShowStatusLegend(!showStatusLegend)} style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#646cff', padding: '0 10px'}}>
-              <FaInfoCircle />
-            </button>
-          </div>
+        <div className="info-icon-wrapper">
+          <button
+            ref={infoIconRef}
+            onClick={() => setShowStatusLegend(!showStatusLegend)}
+            className="info-icon-btn"
+          >
+            <FaInfoCircle />
+          </button>
+        </div>
         <table className="projects-table">
-            <thead>
+          <thead>
+            <tr>
+              <th>Reference Number</th>
+              <th>Title & Description</th>
+              <th>Status</th>
+              <th>Documents</th>
+              <th>Remarks</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loading ? (
               <tr>
-                <th>Reference Number</th>
-                <th>Title & Description</th>
-                <th>Status</th>
-                <th>Documents</th>
-                <th>Remarks</th>
+                <td colSpan={5}>
+                  <Loading />
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {loading ? ( <tr><td colSpan={5}><Loading /></td></tr>)
-              : error ? (<tr><td colSpan={5} className="error-message">{error}</td></tr>)
-              : projects.length === 0 ? (<tr><td colSpan={5} className="no-projects-message">No projects submitted yet.</td></tr>)
-              : (
-                projects.map(project => (
-                  <tr key={project.id}>
-                    <td>{project.referenceNumber}</td>
-                    <td>
-                      <strong>{project.title}</strong>
-                      <p className="project-description">{project.description}</p>
-                    </td>
-                    <td>
-                      <span className={`status-badge status-${project.status.replace(/\s+/g, '-').toLowerCase()}`}>
-                        {project.status}
-                      </span>
+            ) : error ? (
+              <tr>
+                <td colSpan={5} className="error-message">
+                  {error}
+                </td>
+              </tr>
+            ) : projects.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="no-projects-message">
+                  No projects submitted yet.
+                </td>
+              </tr>
+            ) : (
+              projects.map((project) => (
+                <tr key={project.id}>
+                  <td>{project.referenceNumber}</td>
+                  <td>
+                    <h4 className="project-title">{project.title}</h4>
+                    <p className="project-description">{project.description}</p>
+                  </td>
+                  <td>
+                    <div className="status-cell">
+                      <span className={getStatusClassName(project.status)}>{project.status}</span>
                       {project.status !== 'Pending Review' && (
                         <div className="reviewer-name">By: {project.reviewedBy || 'N/A'}</div>
                       )}
-                    </td>
-                    <td className="document-actions-cell">
-                      {project.fileUrl && (
-                        <>
-                          {project.fileName?.toLowerCase().endsWith('.pdf') ? (
-                            <Tooltip title="View File">
-                              <IconButton onClick={() => handleViewFile(project.fileUrl, project.fileName)}>
-                                <VisibilityIcon />
-                              </IconButton>
-                            </Tooltip>
-                          ) : (
-                            <Tooltip title="Download File">
-                              <IconButton onClick={() => handleDownloadFile(project.fileUrl, project.fileName)}>
-                                <FileDownloadIcon />
-                              </IconButton>
-                            </Tooltip>
-                          )}
-                        </>
-                      )}
-                    </td>
-                    <td>
-                      {project.remarks ? (
-                        <button className="view-remarks-btn" onClick={() => handleViewRemarks(project)}>View</button>
-                      ) : (
-                        <span className="no-remarks">No remarks</span>
-                      )}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
+                    </div>
+                  </td>
+                  <td className="document-actions-cell">
+                    {project.fileUrl && (
+                      <div className="document-icon-wrapper">
+                        {project.fileName?.toLowerCase().endsWith('.pdf') ? (
+                          <Tooltip title="View File">
+                            <IconButton
+                              onClick={() => handleViewFile(project.fileUrl, project.fileName)}
+                              size="small"
+                            >
+                              <VisibilityIcon />
+                            </IconButton>
+                          </Tooltip>
+                        ) : (
+                          <Tooltip title="Download File">
+                            <IconButton
+                              onClick={() => handleDownloadFile(project.fileUrl, project.fileName)}
+                              size="small"
+                            >
+                              <FileDownloadIcon />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                      </div>
+                    )}
+                  </td>
+                  <td>
+                    {project.remarks ? (
+                      <button className="view-remarks-btn" onClick={() => handleViewRemarks(project)}>
+                        View
+                      </button>
+                    ) : (
+                      <span className="no-remarks">No remarks</span>
+                    )}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
         </table>
       </div>
 
       {showFileViewer && (
         <div className="modal-overlay">
-            <div className="file-viewer-modal">
-                <div className="file-viewer-header">
-                    <h3 className="file-viewer-title">{viewingFileName}</h3>
-                    <button className="file-viewer-close" onClick={handleCloseFileViewer}>×</button>
-                </div>
-                <div className="file-viewer-content">
-                    <iframe className="file-viewer-iframe" src={viewingFileUrl} title="File Viewer"></iframe>
-                </div>
+          <div className="file-viewer-modal">
+            <div className="file-viewer-header">
+              <h3 className="file-viewer-title">{viewingFileName}</h3>
+              <button className="file-viewer-close" onClick={handleCloseFileViewer}>
+                ×
+              </button>
             </div>
+            <div className="file-viewer-content">
+              <iframe className="file-viewer-iframe" src={viewingFileUrl} title="File Viewer"></iframe>
+            </div>
+          </div>
         </div>
       )}
 
       {showStatusLegend && (
-        <StatusLegend 
-          statusList={statusList} 
-          onClose={() => setShowStatusLegend(false)} 
-          triggerRef={infoIconRef} 
+        <StatusLegend
+          statusList={statusList}
+          onClose={() => setShowStatusLegend(false)}
+          triggerRef={infoIconRef}
         />
       )}
     </div>

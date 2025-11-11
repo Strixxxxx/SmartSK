@@ -4,54 +4,6 @@
 
 --Frontend (Browser's Console)
 
-AIProjSummary.tsx:120 
- POST http://localhost:8080/projectaudit/ai-rules 404 (Not Found)
-Promise.then		
-handleSaveRules	@	AIProjSummary.tsx:120
-
-axiosConfig.ts:98 Client error: 404 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Error</title>
-</head>
-<body>
-<pre>Cannot POST /projectaudit/ai-rules</pre>
-</body>
-</html>
-(anonymous)	@	axiosConfig.ts:98
-Promise.then		
-handleSaveRules	@	AIProjSummary.tsx:120
-AIProjSummary.tsx:124 
-AxiosError {message: 'Request failed with status code 404', name: 'AxiosError', code: 'ERR_BAD_REQUEST', config: {…}, request: XMLHttpRequest, …}
-code
-: 
-"ERR_BAD_REQUEST"
-config
-: 
-{transitional: {…}, adapter: Array(3), transformRequest: Array(1), transformResponse: Array(1), timeout: 300000, …}
-message
-: 
-"Request failed with status code 404"
-name
-: 
-"AxiosError"
-request
-: 
-XMLHttpRequest {onreadystatechange: null, readyState: 4, timeout: 300000, withCredentials: true, upload: XMLHttpRequestUpload, …}
-response
-: 
-{data: '<!DOCTYPE html>\n<html lang="en">\n<head>\n<meta char…OST /projectaudit/ai-rules</pre>\n</body>\n</html>\n', status: 404, statusText: 'Not Found', headers: AxiosHeaders, config: {…}, …}
-status
-: 
-404
-stack
-: 
-"AxiosError: Request failed with status code 404\n    at settle (http://localhost:5173/node_modules/.vite/deps/axios.js?v=9a7d5c2a:1229:12)\n    at XMLHttpRequest.onloadend (http://localhost:5173/node_modules/.vite/deps/axios.js?v=9a7d5c2a:1561:7)\n    at Axios.request (http://localhost:5173/node_modules/.vite/deps/axios.js?v=9a7d5c2a:2119:41)\n    at async handleSaveRules (http://localhost:5173/src/components/Projects/AIProjSummary.tsx?t=1762875749666:123:7)"
-[[Prototype]]
-: 
-Error
-handleSaveRules	@	AIProjSummary.tsx:124
 
 
 --Frontend (VSC Terminal)
@@ -60,34 +12,24 @@ handleSaveRules	@	AIProjSummary.tsx:124
 
 --Backend(VSC Terminal)
 
-Failed to get content of blob 'PROJECT RULES - San Bartolome.txt' from container 'project-rules': Error: Blob 'PROJECT RULES - San Bartolome.txt' not found in container 'project-rules'.
-    at getBlobContent (D:\Projects\Projects\smartSK\backend\Storage\storage.js:73:25)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async downloadBlobAsText (D:\Projects\Projects\smartSK\backend\Storage\storage.js:324:12)
-    at async D:\Projects\Projects\smartSK\backend\projectaudit\projectAudit.js:33:25 {
-  statusCode: 404
-}
-Failed to get content of blob 'PROJECT RULES - San Bartolome.txt' from container 'project-rules': Error: Blob 'PROJECT RULES - San Bartolome.txt' not found in container 'project-rules'.
-    at getBlobContent (D:\Projects\Projects\smartSK\backend\Storage\storage.js:73:25)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async downloadBlobAsText (D:\Projects\Projects\smartSK\backend\Storage\storage.js:324:12)
-    at async D:\Projects\Projects\smartSK\backend\projectaudit\projectAudit.js:33:25 {
-  statusCode: 404
-}
-Failed to get content of blob 'PROJECT RULES - San Bartolome.txt' from container 'project-rules': Error: Blob 'PROJECT RULES - San Bartolome.txt' not found in container 'project-rules'.
-    at getBlobContent (D:\Projects\Projects\smartSK\backend\Storage\storage.js:73:25)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async downloadBlobAsText (D:\Projects\Projects\smartSK\backend\Storage\storage.js:324:12)
-    at async D:\Projects\Projects\smartSK\backend\projectaudit\projectAudit.js:33:25 {
-  statusCode: 404
-}
-Failed to get content of blob 'PROJECT RULES - San Bartolome.txt' from container 'project-rules': Error: Blob 'PROJECT RULES - San Bartolome.txt' not found in container 'project-rules'.
-    at getBlobContent (D:\Projects\Projects\smartSK\backend\Storage\storage.js:73:25)
-    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
-    at async downloadBlobAsText (D:\Projects\Projects\smartSK\backend\Storage\storage.js:324:12)
-    at async D:\Projects\Projects\smartSK\backend\projectaudit\projectAudit.js:33:25 {
-  statusCode: 404
-}
+PS D:\Projects\Projects\smartSK\backend> node main.js
+Initializing Azure Storage with primary credentials.
+Initializing active sessions from database...
+Job management system initialized with database storage.
+Post upload job management system initialized.
+[WebSocket] Server initialized.
+Server is running on port 8080
+Hourly AI job with retry logic has been scheduled.
+Monthly cloud backup job has been scheduled.
+Initialized active sessions.
+[WebSocket] Client connected.
+[WebSocket] Client connected.
+[WebSocket] Unauthenticated client disconnected.
+[WebSocket] Unauthenticated client disconnected.
+[WebSocket] Client connected.
+[WebSocket] Client connected.
+Uploading file with mimetype: application/pdf, isPublic: true
+Selected container: documents
 
 --Backend(Azure Portal's Log Stream in Platform)
 

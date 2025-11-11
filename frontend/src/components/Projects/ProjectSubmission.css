@@ -28,37 +28,118 @@
 .projects-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .projects-table th,
 .projects-table td {
-  padding: 12px 15px;
+  padding: 16px 12px;
   text-align: left;
   border-bottom: 1px solid #ddd;
+  vertical-align: top;
 }
 
 .projects-table th {
   background-color: #f8f9fa;
   font-weight: 600;
+  vertical-align: middle;
+}
+
+/* Column widths */
+.projects-table th:nth-child(1),
+.projects-table td:nth-child(1) {
+  width: 140px;
+}
+
+.projects-table th:nth-child(2),
+.projects-table td:nth-child(2) {
+  width: auto;
+  min-width: 250px;
+}
+
+.projects-table th:nth-child(3),
+.projects-table td:nth-child(3) {
+  width: 140px;
+}
+
+.projects-table th:nth-child(4),
+.projects-table td:nth-child(4) {
+  width: 100px;
+  text-align: center;
+}
+
+.projects-table th:nth-child(5),
+.projects-table td:nth-child(5) {
+  width: 120px;
+  text-align: center;
+}
+
+.project-title {
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+  line-height: 1.4;
 }
 
 .project-description {
-  margin: 5px 0 0;
+  margin: 0;
   font-size: 0.9em;
   color: #666;
+  line-height: 1.5;
+}
+
+.status-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
 }
 
 .status-badge {
   display: inline-block;
-  padding: 4px 8px;
+  padding: 5px 10px;
   border-radius: 12px;
-  font-size: 0.8em;
+  font-size: 0.85em;
   font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-pending-review {
+  background-color: #fff4e5;
+  color: #f57c00;
 }
 
 .status-submitted {
   background-color: #e8f5e9;
   color: #2e7d32;
+}
+
+.status-approved {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.status-rejected {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.reviewer-name {
+  font-size: 0.75em;
+  color: #666;
+  margin-top: 4px;
+}
+
+.document-actions-cell {
+  text-align: center;
+  vertical-align: middle !important;
+  padding: 12px !important;
+}
+
+.document-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-overlay {
@@ -105,6 +186,11 @@
   font-size: 24px;
   cursor: pointer;
   color: #666;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: #333;
 }
 
 .modal-body {
@@ -129,6 +215,12 @@
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 14px;
+  box-sizing: border-box;
+}
+
+.form-group textarea {
+  resize: vertical;
+  font-family: inherit;
 }
 
 .file-input-container {
@@ -154,6 +246,17 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: left;
+}
+
+.file-input-label:hover {
+  background-color: #eeeeee;
+}
+
+.error-message {
+  color: #d32f2f;
+  font-size: 0.8rem;
+  margin-top: 5px;
 }
 
 .form-actions {
@@ -172,6 +275,10 @@
   font-size: 14px;
 }
 
+.cancel-btn:hover {
+  background-color: #eeeeee;
+}
+
 .submit-btn {
   padding: 10px 16px;
   background-color: #4285f4;
@@ -180,6 +287,15 @@
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: #3367d6;
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .file-viewer-modal {
@@ -213,6 +329,11 @@
   font-size: 24px;
   cursor: pointer;
   color: #555;
+  line-height: 1;
+}
+
+.file-viewer-close:hover {
+  color: #333;
 }
 
 .file-viewer-content {
@@ -237,7 +358,42 @@
   font-size: 14px;
 }
 
+.view-remarks-btn:hover {
+  background-color: #3367d6;
+}
+
 .no-remarks {
   color: #888;
   font-style: italic;
+  font-size: 0.9em;
+}
+
+.no-projects-message {
+  text-align: center;
+  color: #666;
+  padding: 40px 20px !important;
+  font-style: italic;
+}
+
+.info-icon-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+}
+
+.info-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #646cff;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.info-icon-btn:hover {
+  color: #4c54d9;
 }

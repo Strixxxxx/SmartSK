@@ -8,7 +8,7 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import io
 import json
-from crypto import decrypt
+from crypto import decrypt, encrypt
 from pypdf import PdfReader
 from docx import Document
 
@@ -259,15 +259,18 @@ def main(project_id):
             project_id, report, decision
         )
         
-        # 6. Update the project status based on AI decision
-        # Map decision to a status ID. Let's assume new statuses are added.
-        # e.g., 11 for 'AI Approved', 12 for 'AI Rejected'
-        # For now, let's use existing ones: 3 for 'Proposal Accepted', 4 for 'Proposal Rejected'
+        # 6. Update the project status and remarks based on AI decision
         status_map = {'approved': 3, 'rejected': 4}
         new_status_id = status_map.get(decision, 4) # Default to rejected
 
-        logging.info(f"Updating project status for projectID {project_id} to status ID {new_status_id}")
-        cursor.execute("UPDATE projects SET status = ? WHERE projectID = ?", new_status_id, project_id)
+        # Encrypt the report to be stored as remarks
+        encrypted_report = encrypt(report)
+
+        logging.info(f"Updating project status for projectID {project_id} to status ID {new_status_id} and setting remarks.")
+        cursor.execute(
+            "UPDATE projects SET status = ?, remarks = ? WHERE projectID = ?",
+            new_status_id, encrypted_report, project_id
+        )
 
         conn.commit()
         logging.info(f"Successfully processed and committed changes for projectID: {project_id}")

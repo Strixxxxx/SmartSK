@@ -41,7 +41,7 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
 
     let filePath = null;
     if (req.file) {
-        filePath = await uploadFile(req.file);
+        filePath = await uploadFile(req.file, true);
     }
 
     const referenceNumber = `PRJ-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 1000)}`;
@@ -68,7 +68,7 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
     const projectId = result.recordset[0].projectID;
 
     // --- Trigger AI Analysis ---
-    if (projectId && (process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'development')) {
+    if (projectId) {
         console.log(`Spawning AI analysis for projectID: ${projectId}`);
         const pythonProcess = spawn('python', ['./AI/projectAIJobs.py', projectId]);
 
