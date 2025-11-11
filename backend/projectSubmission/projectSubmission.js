@@ -29,6 +29,35 @@ const upload = multer({
   limits: { fileSize: 15 * 1024 * 1024 } // 15MB limit
 });
 
+const handleAIProjectJobCompletion = async (projectId) => {
+    console.log(`AI project analysis job completed for projectID: ${projectId}.`);
+    try {
+        const pool = await getConnection();
+        const result = await pool.request()
+            .input('projectID', sql.Int, projectId)
+            .query(`
+                SELECT 
+                    p.title,
+                    s.StatusName
+                FROM projects p
+                JOIN StatusLookup s ON p.status = s.StatusID
+                WHERE p.projectID = @projectID
+            `);
+
+        if (result.recordset.length > 0) {
+            const { title, StatusName } = result.recordset[0];
+            const decryptedTitle = decrypt(title);
+            console.log(`Final status for project '${decryptedTitle}' (ID: ${projectId}) is '${StatusName}'.`);
+
+            // In the future, a WebSocket broadcast could be added here to inform the user.
+        } else {
+             console.error(`Could not find status for projectID ${projectId} after AI job completion.`);
+        }
+    } catch (error) {
+        console.error(`Error in handleAIProjectJobCompletion for projectID ${projectId}:`, error);
+    }
+};
+
 // Submit a new project
 router.post('/submit', authMiddleware, upload.single('projectFile'), async (req, res) => {
   try {
@@ -69,42 +98,31 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
 
     // --- Trigger AI Analysis ---
     if (projectId) {
-        console.log(`Spawning AI analysis for projectID: ${projectId}`);
-        const pythonProcess = spawn('python', ['./AI/projectAIJobs.py', projectId]);
+        const pythonScriptPath = path.join(__dirname, '..', 'AI', 'projectAIJobs.py');
+        const childProcess = spawn('python', [pythonScriptPath, projectId]);
 
-        pythonProcess.stdout.on('data', (data) => {
-            console.log(`AI Job (PID: ${pythonProcess.pid}) STDOUT: ${data}`);
+        childProcess.stdout.on('data', (data) => console.log(`[AI_PROJ_JOB_${projectId}] stdout: ${data}`));
+        childProcess.stderr.on('data', (data) => console.error(`[AI_PROJ_JOB_${projectId}] stderr: ${data}`));
+
+        childProcess.on('close', (code) => {
+            console.log(`[AI_PROJ_JOB_${projectId}] child process exited with code ${code}`);
+            if (code === 0) {
+                handleAIProjectJobCompletion(projectId);
+            }
         });
-
-        pythonProcess.stderr.on('data', (data) => {
-            console.error(`AI Job (PID: ${pythonProcess.pid}) STDERR: ${data}`);
-        });
-
-        pythonProcess.on('close', (code) => {
-            console.log(`AI Job (PID: ${pythonProcess.pid}) exited with code ${code}`);
+        
+        childProcess.on('error', (err) => {
+            console.error(`[AI_PROJ_JOB_${projectId}] Failed to start subprocess:`, err);
         });
     }
     // --- End AI Trigger ---
 
-    const projectResult = await pool.request()
-      .input('projectID', sql.Int, projectId)
-      .query(`
-        SELECT p.*, s.StatusName 
-        FROM projects p
-        JOIN StatusLookup s ON p.status = s.StatusID
-        WHERE p.projectID = @projectID
-      `);
-
-    const project = {
-      id: projectResult.recordset[0].projectID,
-      referenceNumber: projectResult.recordset[0].reference_number,
-      title: decrypt(projectResult.recordset[0].title),
-      description: decrypt(projectResult.recordset[0].description),
-      status: projectResult.recordset[0].StatusName,
-      submittedDate: projectResult.recordset[0].submittedDate,
-      fileUrl: projectResult.recordset[0].file_path,
-      fileName: projectResult.recordset[0].file_name
-    };
+    // Immediately respond that the project is being processed
+    res.status(202).json({ 
+        success: true, 
+        message: 'Project submitted successfully and is now being processed by AI.',
+        projectId: projectId
+    });
 
     addAuditTrail({
         actor: 'C',
@@ -115,8 +133,6 @@ router.post('/submit', authMiddleware, upload.single('projectFile'), async (req,
         newValue: `Title: ${title}`,
         descriptions: `User ${req.user.fullName} submitted a new project: ${title}`
     });
-
-    return res.status(201).json({ success: true, message: 'Project submitted successfully', project });
 
   } catch (error) {
     console.error('Project submission error:', error);
