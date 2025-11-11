@@ -154,7 +154,8 @@ CREATE TABLE projects (
     file_name VARCHAR(255),
     remarks NVARCHAR(MAX),
     reviewedBy NVARCHAR(50),
-    isArchived BIT NOT NULL DEFAULT 0;
+    isArchived BIT NOT NULL DEFAULT 0,
+    retentionPeriond DATETIME,
     CONSTRAINT FK_ProjectStatus FOREIGN KEY (status) REFERENCES StatusLookup(StatusID)
 );
 

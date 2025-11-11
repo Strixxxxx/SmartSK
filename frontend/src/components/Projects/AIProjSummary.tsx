@@ -198,7 +198,7 @@ const AIProjSummary = () => {
                     <TableBody>
                         {auditLogs.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((log) => (
                             <TableRow key={log.auditID}>
-                                <TableCell>{log.projectTitle}</TableCell>
+                                <TableCell>{log.title}</TableCell>
                                 <TableCell>{log.proposerName}</TableCell>
                                 <TableCell>
                                     <Typography color={log.decision === 'approved' ? 'green' : 'red'}>
@@ -281,9 +281,9 @@ const AIProjSummary = () => {
             {/* Manual Override Modal */}
             <Modal open={overrideModalOpen} onClose={() => setOverrideModalOpen(false)}>
                 <Box sx={modalStyle}>
-                    <Typography variant="h6">Manual Override</Typography>
-                    <Typography sx={{ mt: 2 }}>
-                        You are about to manually change the status of project "{selectedLog?.projectTitle}" to <strong>{newDecision.toUpperCase()}</strong>.
+                    <Typography variant="h6" color="text.primary">Manual Override</Typography>
+                    <Typography sx={{ mt: 2 }} color="text.primary">
+                        You are about to manually change the status of project "{selectedLog?.title}" to <strong>{newDecision.toUpperCase()}</strong>.
                     </Typography>
                     <TextField
                         label="Justification"

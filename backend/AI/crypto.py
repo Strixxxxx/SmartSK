@@ -1,5 +1,5 @@
 import os
-from base64 import b64decode
+from base64 import b64decode, b64encode
 from Crypto.Cipher import AES
 from dotenv import load_dotenv
 
@@ -19,6 +19,34 @@ if len(bytes.fromhex(KEY)) != 32:
 
 # Convert hex key to bytes
 key_bytes = bytes.fromhex(KEY)
+
+def encrypt(text: str) -> str:
+    """
+    Encrypts a plaintext string using AES-256-GCM.
+    This function is a Python port of the encryption logic in crypto.js.
+    """
+    if text is None:
+        return None
+
+    try:
+        # Generate a random IV
+        iv = os.urandom(IV_LENGTH)
+
+        # Create AES cipher
+        cipher = AES.new(key_bytes, AES.MODE_GCM, nonce=iv)
+
+        # Encrypt and get the authentication tag
+        ciphertext, auth_tag = cipher.encrypt_and_digest(str(text).encode('utf-8'))
+
+        # Combine IV, ciphertext, and auth tag
+        encrypted_data = iv + ciphertext + auth_tag
+
+        # Base64 encode the result
+        return b64encode(encrypted_data).decode('utf-8')
+
+    except Exception as e:
+        print(f"Encryption failed: {e}")
+        return None
 
 def decrypt(encrypted_text: str) -> str:
     """

@@ -23,7 +23,7 @@ DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_DRIVER = os.getenv('DB_DRIVER', '{ODBC Driver 17 for SQL Server}')
 
 AZURE_CONNECTION_STRING = os.getenv("STORAGE_CONNECTION_STRING_1")
-PROJECTS_CONTAINER = os.getenv("PROJECTS_CONTAINER")
+DOCS_CONTAINER = os.getenv("DOCS_CONTAINER")
 AIPROJ_CONTAINER = os.getenv("AIPROJ_CONTAINER")
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -46,8 +46,8 @@ if AZURE_CONNECTION_STRING:
 gemini_model = None
 if GEMINI_API_KEY:
     try:
-        logging.info("Initializing model: gemini-1.5-flash")
-        gemini_model = genai.GenerativeModel('gemini-1.5-flash')
+        logging.info("Initializing model: gemini-2.5-flash")
+        gemini_model = genai.GenerativeModel('gemini-2.5-flash')
     except Exception as e:
         logging.error("Failed to initialize Gemini model.", exc_info=True)
 
@@ -195,12 +195,21 @@ def main(project_id):
             logging.error(f"No data found for projectID: {project_id}. Exiting.")
             sys.exit(1)
         
-        file_path = project_data["filePath"]
+        file_path = project_data.get("filePath")
         barangay_name = project_data["barangayName"]
         logging.info(f"Fetched data for projectID: {project_id} in Barangay: {barangay_name}")
 
+        if not file_path:
+            logging.error(f"Project {project_id} has no associated file path in the database. Cannot proceed.")
+            cursor.execute(
+                "UPDATE projects SET status = ?, remarks = ? WHERE projectID = ?",
+                4, "AI processing failed: Project submission is missing the document file path.", project_id
+            )
+            conn.commit()
+            sys.exit(1)
+
         # 2. Download document and rules file
-        project_document_data = download_blob_to_memory(PROJECTS_CONTAINER, file_path)
+        project_document_data = download_blob_to_memory(DOCS_CONTAINER, file_path)
         
         rules_blob_name = f"PROJECT RULES - {barangay_name}.txt"
         rules_data = download_blob_to_memory(AIPROJ_CONTAINER, rules_blob_name)
