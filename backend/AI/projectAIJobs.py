@@ -275,10 +275,14 @@ def main(project_id):
         # Encrypt the report to be stored as remarks
         encrypted_report = encrypt(report)
 
-        logging.info(f"Updating project status for projectID {project_id} to status ID {new_status_id} and setting remarks.")
+        # Encrypt the reviewer name
+        reviewer_name = "Google Gemini AI"
+        encrypted_reviewer_name = encrypt(reviewer_name)
+
+        logging.info(f"Updating project status for projectID {project_id} to status ID {new_status_id}, setting remarks, and reviewer.")
         cursor.execute(
-            "UPDATE projects SET status = ?, remarks = ? WHERE projectID = ?",
-            new_status_id, encrypted_report, project_id
+            "UPDATE projects SET status = ?, remarks = ?, reviewedBy = ? WHERE projectID = ?",
+            new_status_id, encrypted_report, encrypted_reviewer_name, project_id
         )
 
         conn.commit()

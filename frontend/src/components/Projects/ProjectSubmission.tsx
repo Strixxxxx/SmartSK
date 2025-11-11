@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import './ProjectSubmission.css';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import FileDownloadIcon from '@mui/icons-material/FileDownload';
@@ -39,6 +39,9 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
   const [error, setError] = useState<string | null>(null);
   const [showSubmitForm, setShowSubmitForm] = useState<boolean>(false);
 
+  const [showRemarksModal, setShowRemarksModal] = useState<boolean>(false);
+  const [selectedProjectForRemarks, setSelectedProjectForRemarks] = useState<Project | null>(null);
+
   const [projectTitle, setProjectTitle] = useState<string>('');
   const [projectDescription, setProjectDescription] = useState<string>('');
   const [projectFile, setProjectFile] = useState<File | null>(null);
@@ -50,6 +53,28 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
   const [showStatusLegend, setShowStatusLegend] = useState<boolean>(false);
   const [statusList, setStatusList] = useState<Status[]>([]);
   const infoIconRef = useRef<HTMLButtonElement>(null);
+
+  const fetchProjects = useCallback(async () => {
+    if (!userId) {
+      setError('User ID not found. Cannot fetch projects.');
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      const response = await axiosInstance.get(`/api/projects/user/${userId}`);
+      const data = response.data;
+      if (data.success) {
+        setProjects(Array.isArray(data.projects) ? data.projects : []);
+      } else {
+        throw new Error(data.message || 'An unknown error occurred');
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [userId]);
 
   useEffect(() => {
     const fetchStatuses = async () => {
@@ -63,32 +88,8 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
       }
     };
     fetchStatuses();
-  }, []);
-
-  useEffect(() => {
-    const fetchProjects = async () => {
-      if (!userId) {
-        setError('User ID not found. Cannot fetch projects.');
-        setLoading(false);
-        return;
-      }
-      try {
-        setLoading(true);
-        const response = await axiosInstance.get(`/api/projects/user/${userId}`);
-        const data = response.data;
-        if (data.success) {
-          setProjects(Array.isArray(data.projects) ? data.projects : []);
-        } else {
-          throw new Error(data.message || 'An unknown error occurred');
-        }
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchProjects();
-  }, [userId]);
+  }, [userId, fetchProjects]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -135,33 +136,44 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
         },
       });
       const data = response.data;
-      if (data.success && data.project) {
-        setProjects(prevProjects => [...prevProjects, data.project]);
+      if (data.success) {
+        // Handle the two types of success responses
+        if (data.project) { // Case 1: Full project object returned
+            setProjects(prevProjects => [...prevProjects, data.project]);
+            toast.success('Proposal submitted successfully!');
+        } else if (data.message && data.message.includes('processed by AI')) { // Case 2: AI processing message
+            toast.info(data.message); // Use info toast
+        } else {
+            toast.success(data.message || 'Project submitted!');
+        }
+
+        // Common success actions
         setShowSubmitForm(false);
         setProjectTitle('');
         setProjectDescription('');
         setProjectFile(null);
         setFileError(null);
-        toast.success('Proposal submitted successfully!');
+        
+        // Refresh the project list to show the new submission
+        fetchProjects();
       } else {
+        // This will handle cases where backend explicitly returns { success: false, message: '...' }
         throw new Error(data.message || 'Failed to submit project.');
       }
     } catch (err: any) {
-      toast.error(`Submission Error: ${err.message}`);
+        const errorMessage = err.response?.data?.message || err.message;
+        toast.error(`Submission Error: ${errorMessage}`);
     }
   };
 
   const handleViewRemarks = (project: Project) => {
-    const remarks = project.remarks || 'No remarks provided.';
-    const reviewedBy = project.reviewedBy || 'N/A';
-    toast.info(
-      <div>
-        <h4>{project.title}</h4>
-        <p>{remarks}</p>
-        <p>Reviewed By: {reviewedBy}</p>
-      </div>,
-      { autoClose: false }
-    );
+    setSelectedProjectForRemarks(project);
+    setShowRemarksModal(true);
+  };
+
+  const handleCloseRemarksModal = () => {
+    setShowRemarksModal(false);
+    setSelectedProjectForRemarks(null);
   };
 
   const handleCloseFileViewer = () => {
@@ -408,6 +420,29 @@ const ProjectSubmission: React.FC<ProjectSubmissionProps> = ({ userId, userRole 
           onClose={() => setShowStatusLegend(false)}
           triggerRef={infoIconRef}
         />
+      )}
+
+      {showRemarksModal && selectedProjectForRemarks && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Remarks for: {selectedProjectForRemarks.title}</h3>
+              <button className="close-btn" onClick={handleCloseRemarksModal}>
+                ×
+              </button>
+            </div>
+            <div className="modal-body">
+              <p>{selectedProjectForRemarks.remarks}</p>
+              <br />
+              <p><strong>Reviewed By:</strong> {selectedProjectForRemarks.reviewedBy || 'N/A'}</p>
+            </div>
+            <div className="form-actions">
+                <button type="button" className="cancel-btn" onClick={handleCloseRemarksModal}>
+                  Close
+                </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
