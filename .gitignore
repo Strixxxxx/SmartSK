@@ -1,4 +1,10 @@
-.env
+# Dependencies
+/node_modules
+
+# Build outputs
+dist
+dist-ssr
+
 # Logs
 logs
 *.log
@@ -7,10 +13,11 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-node_modules
-dist
-dist-ssr
+
+# Local files and environment variables
+.env
 *.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -21,5 +28,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-/node_modules
-.env
+
+# Temporary and project-specific files
+Audit Layout.txt
+backend.txt
+ClaudeAI.txt
+console.txt
+content.txt
+frontend.txt
+GeminiCLI.txt
+RSC.md
+UserManual.md
+Query.txt
+
+# Backups and screenshots
+database_backup/
+Screenshots/
