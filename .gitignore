@@ -44,3 +44,6 @@ Query.txt
 # Backups and screenshots
 database_backup/
 Screenshots/
+
+# Ignore GitHub workflows
+.github/
