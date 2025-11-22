@@ -6,150 +6,132 @@ SmartSK is a web application designed to assist Sangguniang Kabataan (SK) counci
 
 ## Tech Stack
 
-### Backend
+### Backend (Node.js)
 
--   **Node.js**: A JavaScript runtime environment for the server-side.
--   **Express.js**: A web application framework for Node.js, used to build the RESTful APIs.
--   **mssql**: A Microsoft SQL Server client for Node.js.
--   **jsonwebtoken (JWT)**: For generating and verifying JSON Web Tokens for authentication.
--   **bcrypt**: A library for hashing passwords.
--   **nodemailer**: For sending emails (e.g., for account creation and password recovery).
--   **multer**: A middleware for handling `multipart/form-data`, used for file uploads.
--   **pdf-parse**: A library for parsing PDF files.
--   **dotenv**: For managing environment variables.
+-   **Express.js**: A web application framework for building the RESTful APIs.
+-   **mssql**: Microsoft SQL Server client for Node.js.
+-   **jsonwebtoken (JWT)**: For user authentication.
+-   **bcrypt**: For hashing passwords.
+-   **nodemailer**: For sending emails (account creation, password recovery, etc.).
+-   **multer**: Middleware for handling file uploads.
 -   **cors**: For enabling Cross-Origin Resource Sharing.
+-   **dotenv**: For managing environment variables.
+-   **ws**: For real-time communication via WebSockets.
+-   **node-cron**: For scheduling background jobs (AI tasks, database backups).
+-   **archiver**: For creating compressed backup files.
+-   **sharp**: For image processing (watermarking).
+-   **fluent-ffmpeg**: For video compression.
 
-### Frontend
+### Frontend (React)
 
--   **React**: A JavaScript library for building user interfaces.
--   **TypeScript**: A typed superset of JavaScript that compiles to plain JavaScript.
--   **Vite**: A fast build tool and development server for modern web projects.
--   **React Router**: For handling routing in the application.
--   **Axios**: A promise-based HTTP client for making requests to the backend.
--   **Material-UI (MUI)**: A popular React UI framework for faster and easier web development.
+-   **React & TypeScript**: A library for building user interfaces with type safety.
+-   **Vite**: A fast build tool and development server.
+-   **React Router**: For handling client-side routing.
+-   **Axios**: A promise-based HTTP client for making API requests.
+-   **Material-UI (MUI)**: A React UI framework for building the user interface.
 -   **Chart.js** & **react-chartjs-2**: For creating charts and graphs.
--   **react-toastify**: For displaying notifications.
--   **Day.js**: A minimalist JavaScript library for parsing, validating, manipulating, and displaying dates and times.
--   **Emotion**: A library for writing CSS styles with JavaScript.
+-   **react-toastify**: For displaying toast notifications.
+-   **react-hook-form**: For managing complex forms.
+-   **Day.js**: A lightweight library for date and time manipulation.
+
+### AI (Python)
+
+-   **TensorFlow & scikit-learn**: For machine learning models, including LSTM for forecasting.
+-   **Pandas & NumPy**: For data manipulation and analysis.
+-   **Google Generative AI (Gemini)**: For generating textual analysis, reports, and handling AI-driven verification.
+-   **pycryptodome**: For performing encryption and decryption in Python scripts.
+-   **pypdf & python-docx**: For extracting text from uploaded PDF and DOCX files.
+-   **Azure Storage Blob**: For interacting with file storage from Python scripts.
 
 ### Database
 
--   **Microsoft SQL Server**: The relational database management system used to store the application's data.
-
-### AI
-
--   **Python**: Used for the AI and data analysis scripts.
--   **Pandas**: A data manipulation and analysis library for Python.
--   **pyodbc**: For connecting to the SQL Server database from Python.
--   **Google Generative AI (Gemini)**: Used for generating textual analysis and reports.
--   **Google API Python Client**: For interacting with Google APIs, including the Programmable Search Engine for web trend analysis.
--   **requests**: For making HTTP requests from Python.
+-   **Microsoft SQL Server**: The relational database management system.
 
 ## Backend Functionalities
 
 ### `main.js`
 
-The entry point of the backend application. It initializes the Express server, sets up middleware (CORS, JSON parsing, etc.), and defines the API routes. It also includes a bridge to the Python scripts for AI-powered features.
+The entry point of the backend application. It initializes the Express server, sets up middleware, defines all API routes, and configures scheduled jobs using `node-cron` for hourly AI analysis and monthly database backups.
 
 ### `Admin/`
 
 -   **`accountCreation.js`**: Handles the creation of new user accounts by administrators.
--   **`backup.js`**: Manages the creation and restoration of database backups.
+-   **`backup.js` & `backupJob.js`**: Manage the asynchronous creation and restoration of database backups, tracking job status in the database.
+-   **`archive.js`, `accArchive.js`, `projArchive.js`**: Provide routes for archiving and restoring user accounts and projects.
 -   **`roles.js`**: Defines and manages user roles and permissions.
 -   **`sessionlog.js`**: Logs user session activities.
+-   **`projList.js`**: Fetches a list of all non-archived projects for the admin's barangay.
+-   **`registerAudit.js`**: Manages the list of official SK members (for AI verification) and provides endpoints to view registration audit logs.
 
 ### `AI/`
 
-Contains the Python scripts for the AI and data analysis features.
+-   **`aiJobs.py`**: A master script that orchestrates the hourly generation of all AI reports (forecasting, trends, and predictive analysis). It fetches data, reshapes it, and runs the various logic modules.
+-   **`accountAIJobs.py`**: An AI-driven script for verifying new user registrations by analyzing uploaded IDs for format, data consistency (name, DOB), and cross-referencing against the official SK members list.
+-   **`projectAIJobs.py`**: An AI-driven script that reviews submitted project proposals against a set of predefined rules for compliance.
+-   **`forecast.py`**: Generates budget forecast charts using an LSTM model and textual analysis using Google Gemini.
+-   **`pa_logic.py` & `trends_logic.py`**: Contain the core logic for generating predictive analysis reports and project trend suggestions.
+-   **`crypto.py`**: A Python port of the Node.js crypto utility for decrypting data within the AI environment.
 
--   **`forecast.py`**: Generates budget forecast charts based on historical data and provides a high-level analysis of the data using Google Gemini.
--   **`pa.py`**: Performs general predictive analysis using historical data and real-time web search results from the Google Programmable Search Engine API.
--   **`paCstm.py`**: Generates customized predictive analysis reports based on user-selected components (e.g., budget, risks, trends).
--   **`paTrends.py`**: Identifies general project trends by combining historical data with web search results.
--   **`paCstmTrends.py`**: Identifies project trends for a specific category or year, also using historical data and web searches.
+### `AIDataRetrieval/`
+
+-   **`reports.js`**: Exposes API endpoints (`/api/reports/...`) for the frontend to fetch the pre-generated JSON reports created by the hourly AI jobs.
 
 ### `audit/`
 
--   **`auditService.js`**: Provides services for logging and retrieving audit trail data.
+-   **`auditService.js`**: Provides a centralized service for logging and retrieving audit trail data.
 
-### `config/`
+### `Posting/`
 
--   **`jwt.js`**: Contains the configuration for JWT, such as the secret key.
+-   **`post.js` & `postJob.js`**: Handle the asynchronous, job-based creation of new posts, including file uploads and processing.
+-   **`managePost.js`**: Provides authenticated users with endpoints to edit, archive, restore, and delete their own posts.
+-   **`postPublic.js`**: Exposes public-facing API endpoints for viewing posts, as well as the main feed for authenticated users.
+-   **`comment.js` & `commentProtected.js`**: Manage the creation and editing of comments on posts.
+-   **`taggedProjects.js`**: Routes for fetching projects that a user can tag in a post.
 
-### `database/`
+### `projectSubmission/` & `projectReview/`
 
--   **`database.js`**: Manages the connection to the Microsoft SQL Server database.
+-   **`projectSubmission.js`**: Manages the submission of new projects, including file uploads and triggering the AI analysis job.
+-   **`projectReview.js`**: Allows authorized users (like the SK Chairperson) to manually review and update the status of submitted projects.
 
-### `Email/`
+### `session/` & `routeGuard/`
 
--   **`email.js`**: Handles the sending of emails for various purposes, such as account creation and password resets.
+-   **`session.js`**: Manages user sessions, including creation, logout, and token validation via middleware.
+-   **`permission.js`**: Provides role-based access control middleware to protect routes.
 
-### `forgotpassword/`
+### `Storage/` & `utils/`
 
--   **`forgotPassword.js`**: Implements the logic for the "forgot password" feature, including sending reset links and updating passwords.
-
-### `login/`
-
--   **`login.js`**: Handles user authentication and generates a JWT upon successful login.
-
-### `projectlSubmission/`
-
--   **`projectSubmission.js`**: Manages the submission of new projects by users.
-
-### `projectReview/`
-
--   **`projectReview.js`**: Handles the review and approval process for submitted projects.
-
-### `pyBridge/`
-
--   **`pyBridgeFC.js`**: Acts as a bridge between the Node.js backend and the Python forecasting scripts (`forecast.py`).
--   **`pyBridgePA.js`**: Acts as a bridge for predictive analysis and trends scripts (`pa.py`, `paCstm.py`, `paTrends.py`, `paCstmTrends.py`).
-
-### `rawdata/`
-
--   **`rawData.js`**: Manages the handling and uploading of raw CSV data for AI analysis.
-
-### `routeGuard/`
-
--   **`routeGuard.js`**: A middleware to protect routes that require authentication and authorization.
-
-### `session/`
-
--   **`session.js`**: Manages user sessions, including login, logout, and token validation.
+-   **`storage.js`**: A centralized module for interacting with Azure Blob Storage, handling uploads, downloads, SAS URL generation, and deletion across different containers.
+-   **`utils/`**: Contains utility functions for cryptography (`crypto.js`) and time management (`time.js`).
 
 ## Frontend Functionalities
 
 ### `src/`
 
-The main source code directory for the frontend application.
+The main source directory for the React application.
 
--   **`App.tsx`**: The main component of the application. It sets up the router and the authentication provider.
--   **`AppRoutes.tsx`**: Defines all the routes for the application, including public routes, client routes, and admin routes.
+-   **`App.tsx`**: The root component that sets up routing, authentication context, and WebSocket providers. It also includes the high-level `MaintenanceHandler`.
+-   **`AppRoutes.tsx`**: Defines all client-side routes, using `AdminGuard` to protect admin-only sections and conditionally rendering layouts based on user roles.
 -   **`main.tsx`**: The entry point of the React application.
 
 ### `components/`
 
-Contains all the React components used in the application, organized by feature.
+Contains all React components, organized by feature domains.
 
--   **`Admin/`**: Components for the admin dashboard, including account creation, roles management, audit trail, session logs, and database backup.
--   **`Client/`**: Components for the client dashboard, including project forecasting and predictive analysis.
--   **`Login/`**: The login component and new account setup.
--   **`Projects/`**: Components for submitting and reviewing projects.
--   **`RouteGuard/`**: Components for protecting routes based on user roles.
-
-### `backend connection/`
-
--   **`axiosConfig.ts`**: Configures the Axios instance for making HTTP requests to the backend, including interceptors for adding authentication tokens and handling errors.
--   **`auth.ts`**: Contains functions for handling authentication-related API calls.
--   **`config.ts`**: Contains configuration for the backend connection, such as the base URL.
+-   **`Admin/`**: Components for the administrator dashboard, including account management, project review, raw data upload, audit trail viewer, session logs, and the database backup/restore interface.
+-   **`Client/`**: Components for the standard user dashboard, including the main post feed (`Dashboard`), project submission forms (`Projects`), and the AI-powered `Forecast` and `PredictiveAnalysis` pages.
+-   **`Portfolio/`**: The public-facing landing page and project list.
+-   **`Login/` & `Registration/`**: User-facing forms for authentication and multi-step new user registration.
+-   **`RouteGuard/`**: Contains the `AdminGuard` component to protect admin routes based on the user's role.
 
 ### `context/`
 
--   **`AuthContext.tsx`**: Provides an authentication context to the application, allowing components to access the current user's authentication state.
+-   **`AuthContext.tsx`**: A React context that provides global authentication state (user, loading status) and functions (`login`, `logout`) to the entire application.
+-   **`WebSocketContext.tsx`**: Manages the WebSocket connection to the backend, listening for and broadcasting real-time messages like maintenance alerts and post updates.
 
-### `assets/`
+### `backend connection/`
 
-Contains static assets such as images and logos.
+-   **`axiosConfig.ts`**: Configures the global Axios instance with interceptors to automatically add authentication tokens to requests and handle global errors (like 401 Unauthorized).
+-   **`auth.ts`**: Provides a clean interface for authentication-related API calls, managing user data caching and session state.
 
 ## Getting Started
 
@@ -176,14 +158,14 @@ Contains static assets such as images and logos.
     npm install
     ```
 4.  **Set up environment variables:**
-    *   Create a `.env` file in the `backend` directory and add the necessary environment variables (e.g., database credentials, JWT secret, Gemini API Key, Google PSE API Key and CX ID).
+    *   Create a `.env` file in the `backend` directory and add the necessary environment variables (e.g., database credentials, JWT secret, storage keys, and Gemini API Key).
 
 ### Running the application
 
 1.  **Start the backend server:**
     ```bash
     cd backend
-    node main.js
+    npm start
     ```
 2.  **Start the frontend development server:**
     ```bash
@@ -193,10 +175,14 @@ Contains static assets such as images and logos.
 
 ## Key Features
 
--   **User Authentication**: Secure login and registration system with JWT.
--   **Role-Based Access Control**: Different dashboards and functionalities for administrators and regular users.
--   **Project Management**: Users can submit, review, and manage projects.
--   **AI-Powered Forecasting**: Provides budget forecasts based on historical data.
--   **Predictive Analysis**: Offers insights and predictions to aid in decision-making, enhanced with real-time web search data.
--   **Audit Trail**: Logs user activities for security and accountability.
--   **Database Backup**: Allows administrators to create backups of the database.
+-   **Secure Authentication**: Robust login and registration system with JWT, password hashing, and secure session management.
+-   **AI-Powered Registration**: New user sign-ups are verified by an AI that analyzes the submitted ID for authenticity and data consistency.
+-   **Role-Based Access Control**: Separate, tailored dashboards and functionalities for Administrators (MA, SA), SK Chairpersons (SKC), and regular SK Officials (SKO).
+-   **Asynchronous Job Processing**: Post creation and database backups are handled as background jobs to prevent UI blocking and improve user experience.
+-   **Project Management**: A full lifecycle for projects, from AI-assisted proposal submission and review to status tracking.
+-   **AI-Powered Analytics**:
+    -   **Forecasting**: Provides budget forecasts using LSTM models based on historical data.
+    -   **Predictive Analysis**: Offers insights, trends, and recommendations generated by Google's Gemini AI.
+-   **Real-time Notifications**: WebSockets provide real-time updates for system maintenance events.
+-   **Comprehensive Auditing**: A detailed audit trail logs all significant user and system actions for security and accountability.
+-   **Secure Database Management**: Features secure, encrypted database backup and restore functionality, including an automated monthly backup job.
