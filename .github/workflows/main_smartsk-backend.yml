@@ -71,6 +71,9 @@ jobs:
           az webapp config container set \
             --name smartsk-backend \
             --resource-group smartSK-RG \
+            --docker-registry-server-url https://smartskacr.azurecr.io \
+            --docker-registry-server-user "${{ secrets.ACR_USERNAME }}" \
+            --docker-registry-server-password "${{ secrets.ACR_PASSWORD }}" \
             --multicontainer-config-type compose \
             --multicontainer-config-file backend/docker-compose.yml
 

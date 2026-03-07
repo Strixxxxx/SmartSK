@@ -94,7 +94,6 @@ const projectBatchRouter = require('./Projects/projectBatch');
 const projectNotesRouter = require('./Projects/projectNotes');
 const { initializeWebSocketServer, broadcast } = require('./websockets/websocket');
 
-
 // Load environment variables
 dotenv.config();
 
