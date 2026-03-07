@@ -21,7 +21,7 @@ import PasswordStep from './steps/PasswordStep';
 import InfoStep from './steps/InfoStep';
 import TermsStep from './steps/TermsStep';
 
-const steps = ['Choose Username', 'Set Password', 'Your Information', 'Terms & Conditions'];
+const steps = ['Terms & Conditions', 'Choose Username', 'Set Password', 'Your Information'];
 
 const RegistrationPage: React.FC = () => {
   const [activeStep, setActiveStep] = useState(0);
@@ -60,7 +60,10 @@ const RegistrationPage: React.FC = () => {
     setLoading(true);
     let isValid = false;
 
-    if (activeStep === 0) { // Username Step
+    if (activeStep === 0) { // Terms Step
+      // Validation handled by isNextDisabled
+      isValid = termsAccepted && policyAccepted;
+    } else if (activeStep === 1) { // Username Step
       if (!formData.username) {
         setErrors({ username: 'Username is required.' });
         setLoading(false);
@@ -77,26 +80,10 @@ const RegistrationPage: React.FC = () => {
       } catch (error) {
         toast.error('Could not verify username. Please try again later.');
       }
-    } else if (activeStep === 1) { // Password Step
-        // Validation is handled by disabling the button, so if we get here, it's valid.
+    } else if (activeStep === 2) { // Password Step
+        // Validation is handled by disabling the button
         isValid = Object.values(passwordCriteria).every(Boolean);
-    } else if (activeStep === 2) { // Info Step
-        const piiErrors: any = {};
-        if (!formData.fullName) piiErrors.fullName = 'Full name is required.';
-        if (!formData.barangay) piiErrors.barangay = 'Barangay is required.';
-        if (!formData.emailAddress) {
-          piiErrors.emailAddress = 'Email address is required.';
-        } else if (!/\S+@\S+\.\S+/.test(formData.emailAddress)) {
-          piiErrors.emailAddress = 'Email address is invalid.';
-        }
-        if (!formData.phoneNumber) piiErrors.phoneNumber = 'Phone number is required.';
-        if (!formData.dateOfBirth) piiErrors.dateOfBirth = 'Date of birth is required.';
-        if (!attachment) piiErrors.attachment = 'ID attachment is required.';
-        if (!attachmentBack) piiErrors.attachmentBack = 'Back of ID is required.';
-        
-        setErrors(piiErrors);
-        isValid = Object.keys(piiErrors).length === 0;
-    }
+    } 
 
     setLoading(false);
     if (isValid) {
@@ -109,6 +96,25 @@ const RegistrationPage: React.FC = () => {
   };
 
   const handleSubmit = async () => {
+    // Final validation for Information step (now the last step before submit)
+    const piiErrors: any = {};
+    if (!formData.fullName) piiErrors.fullName = 'Full name is required.';
+    if (!formData.barangay) piiErrors.barangay = 'Barangay is required.';
+    if (!formData.emailAddress) {
+      piiErrors.emailAddress = 'Email address is required.';
+    } else if (!/\S+@\S+\.\S+/.test(formData.emailAddress)) {
+      piiErrors.emailAddress = 'Email address is invalid.';
+    }
+    if (!formData.phoneNumber) piiErrors.phoneNumber = 'Phone number is required.';
+    if (!formData.dateOfBirth) piiErrors.dateOfBirth = 'Date of birth is required.';
+    if (!attachment) piiErrors.attachment = 'ID attachment is required.';
+    if (!attachmentBack) piiErrors.attachmentBack = 'Back of ID is required.';
+    
+    if (Object.keys(piiErrors).length > 0) {
+      setErrors(piiErrors);
+      return;
+    }
+
     setLoading(true);
     const data = new FormData();
     Object.keys(formData).forEach(key => {
@@ -140,12 +146,19 @@ const RegistrationPage: React.FC = () => {
   const getStepContent = (step: number) => {
     switch (step) {
       case 0:
+        return <TermsStep 
+                    termsAccepted={termsAccepted}
+                    setTermsAccepted={setTermsAccepted}
+                    policyAccepted={policyAccepted}
+                    setPolicyAccepted={setPolicyAccepted}
+                />;
+      case 1:
         return <UsernameStep 
                     username={formData.username} 
                     setUsername={(username) => setFormData({...formData, username})}
                     error={errors.username} 
                 />;
-      case 1:
+      case 2:
         return <PasswordStep 
                     password={formData.password}
                     confirmPassword={formData.confirmPassword}
@@ -153,7 +166,7 @@ const RegistrationPage: React.FC = () => {
                     criteria={passwordCriteria}
                     setCriteria={setPasswordCriteria}
                 />;
-      case 2:
+      case 3:
         return <InfoStep 
                     formData={formData}
                     setFormData={setFormData}
@@ -164,29 +177,25 @@ const RegistrationPage: React.FC = () => {
                     errors={errors}
                     setErrors={setErrors}
                 />;
-      case 3:
-        return <TermsStep 
-                    termsAccepted={termsAccepted}
-                    setTermsAccepted={setTermsAccepted}
-                    policyAccepted={policyAccepted}
-                    setPolicyAccepted={setPolicyAccepted}
-                />;
       default:
         return 'Unknown step';
     }
   };
 
   const isNextDisabled = () => {
-      if (activeStep === 1) {
+      if (activeStep === 0) {
+          return !termsAccepted || !policyAccepted;
+      }
+      if (activeStep === 2) {
           return !Object.values(passwordCriteria).every(Boolean);
       }
-      // Add logic for other steps if needed
       return false;
   }
 
   const isSubmitDisabled = () => {
-      // Final submission disabled until all fields are valid and terms are accepted
-      return !termsAccepted || !policyAccepted || loading;
+      // Info step is now the last step, so we just check loading
+      // (Validation is handled in handleSubmit)
+      return loading;
   }
 
   return (

@@ -1,0 +1,38 @@
+# Core Data
+pandas
+numpy
+
+# Database
+pyodbc
+
+# Google & AI
+google-generativeai
+google-api-python-client
+
+# Profanity Filter
+better-profanity
+
+# Web
+requests
+fastapi
+uvicorn[standard]
+
+# Config
+python-dotenv
+azure-storage-blob
+
+# Machine Learning
+tensorflow==2.20.0
+scikit-learn
+
+# Utilities
+python-dateutil
+Pillow
+openpyxl
+
+# Crypto
+pycryptodome
+
+# Document Parsing
+pypdf
+python-docx

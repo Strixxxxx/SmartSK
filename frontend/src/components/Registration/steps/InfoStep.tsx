@@ -121,6 +121,29 @@ const InfoStep: React.FC<InfoStepProps> = ({ formData, setFormData, attachment, 
         <MenuItem value="Nagkaisang Nayon">Nagkaisang Nayon</MenuItem>
       </TextField>
       <TextField
+        label="Position"
+        name="position"
+        value={formData.position}
+        onChange={handleChange}
+        error={!!errors.position}
+        helperText={errors.position}
+        fullWidth
+        margin="normal"
+        required
+        select
+      >
+        <MenuItem value={2}>SK Chairperson</MenuItem>
+        <MenuItem value={3}>SK Secretary</MenuItem>
+        <MenuItem value={4}>SK Treasurer</MenuItem>
+        <MenuItem value={5}>SK Kagawad I</MenuItem>
+        <MenuItem value={6}>SK Kagawad II</MenuItem>
+        <MenuItem value={7}>SK Kagawad III</MenuItem>
+        <MenuItem value={8}>SK Kagawad IV</MenuItem>
+        <MenuItem value={9}>SK Kagawad V</MenuItem>
+        <MenuItem value={10}>SK Kagawad VI</MenuItem>
+        <MenuItem value={11}>SK Kagawad VII</MenuItem>
+      </TextField>
+      <TextField
         label="Email Address"
         name="emailAddress"
         type="email"
@@ -161,17 +184,17 @@ const InfoStep: React.FC<InfoStepProps> = ({ formData, setFormData, attachment, 
       />
       <Box mt={2}>
         <Typography variant="subtitle1" gutterBottom>ID Attachment (Recommended to use QCID for much faster approval)</Typography>
-        <div 
+        <div
           className="dropzone"
           onDragOver={onDragOver}
           onDrop={onDrop}
           onClick={() => document.getElementById('file-input')?.click()}
         >
-          <input 
+          <input
             id="file-input"
-            type="file" 
-            hidden 
-            onChange={(e) => handleFileChange(e.target.files)} 
+            type="file"
+            hidden
+            onChange={(e) => handleFileChange(e.target.files)}
             accept="image/jpeg,image/png,application/pdf"
           />
           {preview ? (

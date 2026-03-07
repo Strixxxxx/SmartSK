@@ -22,7 +22,7 @@ import RegistrationPage from './components/Registration/RegistrationPage';
 
 // Client Pages
 import Dashboard from './components/Client/Dashboard/Dashboard';
-import Projects from './components/Projects/Projects';
+import ProjectWorkspacePage from './components/Client/Projects/ProjectWorkspacePage';
 import Forecast from './components/Client/Forecast/Forecast';
 import Predictive from './components/Client/PredictiveAnalysis/pa';
 import RawDataList from './components/Client/RawData/RawDataList';
@@ -63,11 +63,11 @@ const AppRoutes: React.FC = () => {
       <Routes>
         {/* Root redirects to home on mobile */}
         <Route path="/" element={<Navigate to="/home" replace />} />
-        
+
         {/* Only these two public routes are accessible on mobile */}
         <Route path="/home" element={<Portfolio />} />
         <Route path="/project-list" element={<ProjectList />} />
-        
+
         {/* All other routes (including login) show ComingSoon on mobile */}
         <Route path="*" element={<ComingSoon />} />
       </Routes>
@@ -83,7 +83,7 @@ const AppRoutes: React.FC = () => {
 
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-      <Route path="/change-password" element={<NewAccount open={true} onClose={() => {}} userID={0} currentUsername={''} />} />
+      <Route path="/change-password" element={<NewAccount open={true} onClose={() => { }} userID={0} currentUsername={''} />} />
 
       {/* Conditional Root Route based on user role */}
       <Route path="/" element={
@@ -102,13 +102,20 @@ const AppRoutes: React.FC = () => {
           <>
             <Route index element={<Navigate to="dashboard" />} />
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="projects" element={<Projects />} />
             <Route path="raw-data-list" element={<RawDataList />} />
             <Route path="forecast" element={<Forecast />} />
             <Route path="predictive-analytics" element={<Predictive />} />
           </>
         )}
       </Route>
+
+      {/* Projects Workspace - Full screen, outside main layout (no ClientSidebar) */}
+      {user && (user.position !== 'MA' && user.position !== 'SA') && (
+        <>
+          <Route path="/projects" element={<ProjectWorkspacePage />} />
+          <Route path="/projects/:batchID" element={<ProjectWorkspacePage />} />
+        </>
+      )}
 
       {/* Admin Routes (protected by AdminGuard) */}
       <Route element={<AdminGuard />}>

@@ -16,9 +16,8 @@ const AdminGuard: React.FC = () => {
   }
 
   // Check if user is admin by position or role
-  const isAdmin = user.position === 'MA' || 
-                  user.position === 'SA' ||
-                  user.position?.toLowerCase().includes('admin');
+  const isAdmin = user.position === 'Admin' ||
+    user.position?.toLowerCase().includes('admin');
 
   // If user is not an admin, redirect to dashboard
   if (!isAdmin) {

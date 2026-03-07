@@ -7,7 +7,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
-/node_modules
+/backend-node/node_modules
 dist
 dist-ssr
 *.local
@@ -33,3 +33,6 @@ AI/token.json
 # Uploads and raw data
 uploads/
 rawdata/
+
+#local storage
+/backend-node/File_Storage

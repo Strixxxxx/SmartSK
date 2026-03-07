@@ -13,6 +13,8 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@fortune-sheet/core": "^1.0.4",
+    "@fortune-sheet/react": "^1.0.4",
     "@mui/icons-material": "^7.0.2",
     "@mui/material": "^7.0.2",
     "@mui/x-date-pickers": "^7.28.3",
@@ -21,6 +23,7 @@
     "chart.js": "^4.5.0",
     "chartjs-plugin-datalabels": "^2.2.0",
     "dayjs": "^1.11.13",
+    "luckyexcel": "^1.0.1",
     "react": "^19.1.1",
     "react-bootstrap": "^2.10.9",
     "react-bootstrap-icons": "^1.11.6",

@@ -23,12 +23,11 @@ const RouteGuard: React.FC<RouteGuardProps> = ({ requiredRole }) => {
   // If a specific role is required and user doesn't have it, check position
   if (requiredRole) {
     const hasRequiredRole = user.position === requiredRole ||
-                           (requiredRole === 'admin' && (
-                             user.position === 'MA' || 
-                             user.position === 'SA' ||
-                             user.position?.toLowerCase().includes('admin')
-                           ));
-    
+      (requiredRole === 'admin' && (
+        user.position === 'Admin' ||
+        user.position?.toLowerCase().includes('admin')
+      ));
+
     if (!hasRequiredRole) {
       // Redirect to an unauthorized page or a generic dashboard
       return <Navigate to="/unauthorized" replace />;
