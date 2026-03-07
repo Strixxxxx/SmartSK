@@ -66,16 +66,6 @@ jobs:
           docker push $AI_IMAGE:$GIT_SHA
           docker push $AI_IMAGE:latest
 
-      - name: Deploy Main Container (Node.js)
-        run: |
-          az webapp config container set \
-            --name smartsk-backend \
-            --resource-group smartSK-RG \
-            --docker-custom-image-name smartskacr.azurecr.io/smartsk-backend:latest \
-            --docker-registry-server-url https://smartskacr.azurecr.io \
-            --docker-registry-server-user "${{ secrets.ACR_USERNAME }}" \
-            --docker-registry-server-password "${{ secrets.ACR_PASSWORD }}"
-
 
       - name: Restart Azure Web App
         run: az webapp restart --name smartsk-backend --resource-group smartSK-RG

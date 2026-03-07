@@ -29,7 +29,7 @@ if (!fs.existsSync(backupDir)) {
 const upload = multer({ dest: backupDir });
 
 // --- Environment Variable Validation ---
-const requiredEnv = ['DB_SERVER', 'DB_DATABASE', 'DB_USER', 'DB_PASSWORD', 'EMAIL_USER', 'EMAIL_PASS', 'ZIP_LOCK', 'BACKUP_CONTAINER'];
+const requiredEnv = ['DB_SERVER', 'DB_DATABASE', 'DB_USER', 'DB_PASSWORD', 'EMAIL_USER', 'EMAIL_PASS', 'ZIP_LOCK'];
 for (const envVar of requiredEnv) {
     if (!process.env[envVar]) {
         throw new Error(`Missing required environment variable: ${envVar}. Please check your .env file.`);
@@ -214,7 +214,7 @@ async function executeBackup(jobId) {
     const phTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
     const date = phTime.toISOString().slice(0, 10);
     const time = phTime.toTimeString().slice(0, 8).replace(/:/g, '-');
-    
+
     // Use the job's FileName if it exists, otherwise generate a new one.
     const bacpacFileName = FileName ? FileName : `smartSK_${date}_${time}.bacpac`;
     const bacpacFilePath = path.join(backupDir, bacpacFileName);
@@ -284,7 +284,7 @@ async function executeBackup(jobId) {
     } catch (error) {
         console.error(`[Job ${jobId}] Backup process failed:`, error.message);
         const duration = Math.round((Date.now() - startTime) / 1000);
-        await updateJob(jobId, 'failed', `Backup failed: ${error.message}`, { 
+        await updateJob(jobId, 'failed', `Backup failed: ${error.message}`, {
             ErrorMessage: error.stack,
             Duration: duration
         });
@@ -315,7 +315,7 @@ async function cleanupOrphanedRestoreDatabases() {
             }
         };
         connection = await sql.connect(masterDbConfig);
-        
+
         const result = await connection.request()
             .input('pattern', sql.NVarChar, dbToCleanPattern)
             .query('SELECT name FROM sys.databases WHERE name LIKE @pattern');
@@ -408,13 +408,13 @@ router.post('/restore', authMiddleware, upload.single('backupFile'), async (req,
 
     } catch (error) {
         console.error("[Restore] Failed to create restore job:", error);
-        
+
         // Clean up maintenance flag if job creation fails
         const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
         if (fs.existsSync(maintenanceFlagPath)) {
             fs.unlinkSync(maintenanceFlagPath);
         }
-        
+
         res.status(500).json({ message: "Failed to initiate restore process." });
     }
 });
@@ -462,7 +462,7 @@ async function synchronizeCriticalTables(jobId, tempDbName) {
             if (missingRows.length > 0) {
                 console.log(`[Job ${jobId}] Copying ${missingRows.length} rows to BackupJobs.`);
                 const table = new sql.Table('BackupJobs');
-                
+
                 table.columns.add('JobID', sql.NVarChar(50), { nullable: false, primary: true });
                 table.columns.add('BackupType', sql.NVarChar(20), { nullable: false });
                 table.columns.add('Status', sql.NVarChar(20), { nullable: false });
@@ -545,7 +545,7 @@ async function synchronizeCriticalTables(jobId, tempDbName) {
 
             if (missingRows.length > 0) {
                 console.log(`[Job ${jobId}] Bulk inserting ${missingRows.length} new audit trail entries.`);
-                
+
                 const table = new sql.Table('[audit trail]');
                 table.columns.add('auditID', sql.NVarChar(16), { nullable: false, primary: true });
                 table.columns.add('userID', sql.Int, { nullable: true });
@@ -832,7 +832,7 @@ async function executeRestore(jobId, localFile) {
         await updateJob(jobId, 'failed', `Restore failed: ${error.message}`, { ErrorMessage: error.stack, Duration: duration });
         console.error(`[Job ${jobId}] Restore process failed:`, error);
         cleanup();
-        
+
         // Clean up maintenance flag on failure
         const maintenanceFlagPath = path.join(__dirname, '..', 'maintenance.flag');
         if (fs.existsSync(maintenanceFlagPath)) {
@@ -851,21 +851,21 @@ router.post('/maintenance-start', authMiddleware, async (req, res) => {
             startedBy: req.user.fullName,
             userId: req.user.userId
         }));
-        
+
         console.log('[Maintenance] Maintenance mode activated by:', req.user.fullName);
-        
+
         // Broadcast to all connected clients
         broadcast({ type: 'maintenance_starting' });
-        
-        res.status(200).json({ 
-            success: true, 
-            message: 'Maintenance mode activated' 
+
+        res.status(200).json({
+            success: true,
+            message: 'Maintenance mode activated'
         });
     } catch (error) {
         console.error('[Maintenance] Failed to activate maintenance mode:', error);
-        res.status(500).json({ 
-            success: false, 
-            message: 'Failed to activate maintenance mode' 
+        res.status(500).json({
+            success: false,
+            message: 'Failed to activate maintenance mode'
         });
     }
 });
