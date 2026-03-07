@@ -9,6 +9,7 @@ RUN python3 --version && pip --version
 
 # Install build tools and ODBC development libraries
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     build-essential \
     gcc \
     unixodbc-dev \
@@ -35,6 +36,7 @@ WORKDIR /app
 
 # Install runtime dependencies including ODBC
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     curl \
     gnupg2 \
     unixodbc \

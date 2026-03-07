@@ -19,6 +19,7 @@ WORKDIR /app
 
 # Install runtime dependencies: curl, gnupg2, ffmpeg, unzip, p7zip-full, libicu67, libunwind8 (for sqlpackage)
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
     curl \
     gnupg2 \
     ffmpeg \
