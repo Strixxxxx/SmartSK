@@ -66,20 +66,32 @@ jobs:
           docker push $AI_IMAGE:$GIT_SHA
           docker push $AI_IMAGE:latest
 
-      - name: Update Azure Web App Configuration (Docker Compose)
+      - name: Deploy Main Container (Node.js)
         run: |
           az webapp config container set \
             --name smartsk-backend \
             --resource-group smartSK-RG \
+            --docker-custom-image-name smartskacr.azurecr.io/smartsk-backend:latest \
             --docker-registry-server-url https://smartskacr.azurecr.io \
             --docker-registry-server-user "${{ secrets.ACR_USERNAME }}" \
-            --docker-registry-server-password "${{ secrets.ACR_PASSWORD }}" \
-            --multicontainer-config-type compose \
-            --multicontainer-config-file backend/docker-compose.yml
+            --docker-registry-server-password "${{ secrets.ACR_PASSWORD }}"
+
+      - name: Deploy Sidecar Container (AI Service)
+        run: |
+          # Note: 'az webapp container sidecar add' is used for the very first time, 
+          # but 'update' is used for subsequent deployments. 
+          # We use a script to try update first, then add if it doesn't exist.
+          az webapp container sidecar update \
+            --name smartsk-backend \
+            --resource-group smartSK-RG \
+            --sidecar-name backend-python \
+            --container-image smartskacr.azurecr.io/smartsk-ai:latest || \
+          az webapp container sidecar add \
+            --name smartsk-backend \
+            --resource-group smartSK-RG \
+            --sidecar-name backend-python \
+            --container-image smartskacr.azurecr.io/smartsk-ai:latest \
+            --container-port 8080
 
       - name: Restart Azure Web App
-        run: |
-          echo "Restarting Web App to pull new images..."
-          az webapp restart \
-            --name smartsk-backend \
-            --resource-group smartSK-RG
+        run: az webapp restart --name smartsk-backend --resource-group smartSK-RG
