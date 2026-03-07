@@ -100,8 +100,20 @@ dotenv.config();
 // Create Express app
 const app = express();
 
+const allowedOrigins = process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : [];
+
 const corsOptions = {
-  origin: process.env.CORS_ORIGIN,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps, curl, or server-to-server)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      console.warn(`[CORS] Request from origin ${origin} blocked. Allowed: ${process.env.CORS_ORIGIN}`);
+      callback(null, false); // Block origin but don't throw hard error for better stability
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   credentials: true,
