@@ -76,14 +76,6 @@ jobs:
             --docker-registry-server-user "${{ secrets.ACR_USERNAME }}" \
             --docker-registry-server-password "${{ secrets.ACR_PASSWORD }}"
 
-      - name: Deploy Sidecar Container (AI Service)
-        run: |
-          # Using 'sitecontainers' which is the correct command group for sidecars in the current Azure CLI
-          az webapp sitecontainers add \
-            --name smartsk-backend \
-            --resource-group smartSK-RG \
-            --container-name backend-python \
-            --image smartskacr.azurecr.io/smartsk-ai:latest
 
       - name: Restart Azure Web App
         run: az webapp restart --name smartsk-backend --resource-group smartSK-RG
