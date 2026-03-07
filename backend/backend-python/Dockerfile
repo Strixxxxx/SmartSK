@@ -8,7 +8,7 @@ WORKDIR /app
 RUN python3 --version && pip --version
 
 # Install build tools and ODBC development libraries
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get -o Acquire::Retries=3 update && apt-get -o Acquire::Retries=3 install -y --no-install-recommends \
     ca-certificates \
     build-essential \
     gcc \
@@ -20,8 +20,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install Microsoft ODBC Driver 17 for SQL Server (build stage)
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
     && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/debian/11/prod bullseye main" > /etc/apt/sources.list.d/mssql-release.list \
-    && apt-get update \
-    && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
+    && apt-get -o Acquire::Retries=3 update \
+    && ACCEPT_EULA=Y apt-get -o Acquire::Retries=3 install -y msodbcsql17 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -35,7 +35,7 @@ FROM python:3.12-slim-bullseye
 WORKDIR /app
 
 # Install runtime dependencies including ODBC
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get -o Acquire::Retries=3 update && apt-get -o Acquire::Retries=3 install -y --no-install-recommends \
     ca-certificates \
     curl \
     gnupg2 \
@@ -45,8 +45,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install Microsoft ODBC Driver 17 for SQL Server (runtime)
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor -o /usr/share/keyrings/microsoft-prod.gpg \
     && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft-prod.gpg] https://packages.microsoft.com/debian/11/prod bullseye main" > /etc/apt/sources.list.d/mssql-release.list \
-    && apt-get update \
-    && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
+    && apt-get -o Acquire::Retries=3 update \
+    && ACCEPT_EULA=Y apt-get -o Acquire::Retries=3 install -y msodbcsql17 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python packages to the system's Python path
