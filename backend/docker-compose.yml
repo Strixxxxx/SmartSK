@@ -3,31 +3,22 @@ version: '3.8'
 services:
   backend-node:
     image: smartskacr.azurecr.io/smartsk-backend:latest
-    container_name: backend-node
     restart: always
     ports:
       - "8000:8000"
     environment:
       - NODE_PORT=8000
-      - AI_SERVICE_URL=http://localhost:8080
-    env_file:
-      - ./.env
+      - AI_SERVICE_URL=http://ai-service:8080
     depends_on:
-      ai-service:
-        condition: service_healthy
+      - ai-service
     networks:
       - smartsk-net
 
   ai-service:
     image: smartskacr.azurecr.io/smartsk-ai:latest
-    container_name: ai-service
     restart: always
-    # Port 8080 is NOT exposed to the host to ensure it's "Private" as requested.
-    # It is accessible internally by 'backend-node' via http://ai-service:8080
     environment:
       - PY_PORT=8080
-    env_file:
-      - ./.env
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
       interval: 30s
