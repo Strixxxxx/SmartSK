@@ -47,4 +47,4 @@ database_backup/
 Screenshots/
 
 # Ignore GitHub workflows
-.github/
+# .github/

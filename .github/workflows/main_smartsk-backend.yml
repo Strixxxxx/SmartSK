@@ -1,0 +1,82 @@
+name: Build and Deploy Backend
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+  actions: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old workflow runs
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository }}/actions/runs --paginate -q '.workflow_runs[].id' | \
+          tail -n +51 | \
+          xargs -I {} gh api repos/${{ github.repository }}/actions/runs/{} -X DELETE --silent || echo "No old runs to delete"
+
+  build-and-deploy:
+    needs: cleanup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Azure CLI - show account
+        run: az account show
+
+      - name: Login to Azure Container Registry
+        run: |
+          ACR_SERVER=smartskacr.azurecr.io
+          echo "Attempting login with ACR_PASSWORD..."
+          if ! echo "${{ secrets.ACR_PASSWORD }}" | docker login $ACR_SERVER -u "${{ secrets.ACR_USERNAME }}" --password-stdin; then
+            echo "Login with ACR_PASSWORD failed, attempting fallback with ACR_PASSWORD_2..."
+            echo "${{ secrets.ACR_PASSWORD_2 }}" | docker login $ACR_SERVER -u "${{ secrets.ACR_USERNAME }}" --password-stdin
+          fi
+
+      - name: Build and Push Docker images
+        run: |
+          ACR_SERVER=smartskacr.azurecr.io
+          GIT_SHA=${{ github.sha }}
+          
+          # 1. Build and Push Node.js Image
+          NODE_IMAGE=$ACR_SERVER/smartsk-backend
+          echo "Building Node.js image..."
+          docker build -f backend/backend-node/Dockerfile -t $NODE_IMAGE:$GIT_SHA -t $NODE_IMAGE:latest ./backend/backend-node
+          docker push $NODE_IMAGE:$GIT_SHA
+          docker push $NODE_IMAGE:latest
+
+          # 2. Build and Push Python (AI) Image
+          AI_IMAGE=$ACR_SERVER/smartsk-ai
+          echo "Building AI (Python) image..."
+          docker build -f backend/backend-python/Dockerfile -t $AI_IMAGE:$GIT_SHA -t $AI_IMAGE:latest ./backend/backend-python
+          docker push $AI_IMAGE:$GIT_SHA
+          docker push $AI_IMAGE:latest
+
+      - name: Update Azure Web App Configuration (Docker Compose)
+        run: |
+          az webapp config container set \
+            --name smartsk-backend \
+            --resource-group smartSK-RG \
+            --multicontainer-config-type compose \
+            --multicontainer-config-file backend/docker-compose.yml
+
+      - name: Restart Azure Web App
+        run: |
+          echo "Restarting Web App to pull new images..."
+          az webapp restart \
+            --name smartsk-backend \
+            --resource-group smartSK-RG
