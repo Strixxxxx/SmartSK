@@ -29,8 +29,8 @@ const connectionString = useSecondary ? secondaryConnectionString : primaryConne
 const key = useSecondary ? secondaryKey : primaryKey;
 
 // Validate that at least one set of credentials and essential info are present
-if (!storageName || !imageContainerName || !videoContainerName || !docContainerName || !backupContainerName || !eAttachContainerName || !jsonContainerName || !haContainerName || !registerContainerName || !connectionString || !key) {
-    throw new Error('Azure Storage environment variables are not sufficiently configured. Please check STORAGE_NAME, all container names (IMAGE, VIDEO, DOCS, BACKUP, E_ATTACHMENTS, JSON, HA, REGISTER), and at least one set of connection strings/keys.');
+if (!storageName || !connectionString || !key) {
+    throw new Error('Azure Storage environment variables are not sufficiently configured. Please check STORAGE_NAME, and at least one set of connection strings/keys.');
 }
 
 console.log(`Initializing Azure Storage with ${useSecondary ? 'secondary' : 'primary'} credentials.`);
@@ -91,7 +91,7 @@ async function getBlobContent(containerName, blobName) {
  */
 async function uploadFile(file, isPublic) {
     console.log(`Uploading file with mimetype: ${file.mimetype}, isPublic: ${isPublic}`);
-    
+
     let containerName;
     const mimetype = file.mimetype;
 
@@ -113,7 +113,7 @@ async function uploadFile(file, isPublic) {
     }
 
     console.log(`Selected container: ${containerName}`);
-    
+
     const containerClient = blobServiceClient.getContainerClient(containerName);
     await containerClient.createIfNotExists();
 
@@ -156,7 +156,7 @@ async function getFileSasUrl(blobName, fileType, isPublic, source = 'post') {
     if (!containerName) {
         throw new Error(`Could not determine container for blob: ${blobName} with source: ${source} and mimetype: ${mimetype}`);
     }
-    
+
     console.log(`Determined container: ${containerName}`);
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const blobClient = containerClient.getBlobClient(blobName);
