@@ -34,7 +34,7 @@ async function initializeActiveSessions() {
       .query(`
         SELECT sessionID, userID FROM sessions WHERE expires_at IS NULL
       `);
-    
+
     const now = new Date(getPhilippineTime());
     for (const session of result.recordset) {
       activeSessions.set(session.sessionID, { lastSeen: now, userID: session.userID });
@@ -45,18 +45,23 @@ async function initializeActiveSessions() {
   }
 }
 
-// Background job to clean up expired sessions - Updated timeout and interval
+// Background job to clean up expired sessions - Optimized to reduce DB wake-ups
 setInterval(async () => {
   try {
+    // Memory-only guard: If no sessions are active, don't wake up the database
+    if (activeSessions.size === 0) {
+      return;
+    }
+
     const now = new Date(getPhilippineTime());
     const pool = await getConnection();
-    
+
     for (const [sessionID, sessionData] of activeSessions.entries()) {
       const timeSinceLastSeen = now - sessionData.lastSeen;
-      
+
       if (timeSinceLastSeen > SESSION_TIMEOUT) {
         console.log('Session timed out due to inactivity.');
-        
+
         await pool.request()
           .input('sessionID', sql.VarChar, sessionID)
           .input('currentTime', sql.DateTime2, now)
@@ -65,30 +70,30 @@ setInterval(async () => {
             SET expires_at = @currentTime 
             WHERE sessionID = @sessionID AND expires_at IS NULL
           `);
-        
+
         activeSessions.delete(sessionID);
       }
     }
   } catch (error) {
     console.error('Error in session cleanup job', error);
   }
-}, 5 * 60 * 1000); // Check every 5 minutes
+}, 60 * 60 * 1000); // Check every hour
 
 // Create session function
 async function createSession(userID) {
   try {
     const sessionID = uuidv4();
     const currentTime = new Date(getPhilippineTime());
-    
+
     const pool = await getConnection();
-    
+
     await pool.request()
       .input('userID', sql.Int, userID)
       .input('currentTime', sql.DateTime2, currentTime)
       .query(`
         UPDATE sessions SET expires_at = @currentTime WHERE userID = @userID AND expires_at IS NULL
       `);
-    
+
     await pool.request()
       .input('sessionID', sql.VarChar, sessionID)
       .input('userID', sql.Int, userID)
@@ -96,9 +101,9 @@ async function createSession(userID) {
       .query(`
         INSERT INTO sessions (sessionID, userID, created_at, expires_at) VALUES (@sessionID, @userID, @created_at, NULL)
       `);
-    
+
     activeSessions.set(sessionID, { lastSeen: currentTime, userID: userID });
-    
+
     return sessionID;
   } catch (error) {
     console.error('Error creating session', error);
@@ -143,11 +148,11 @@ const authMiddleware = async (req, res, next) => {
     try {
       const decryptedUsername = decrypt(user.username);
       const decryptedFullName = decrypt(user.fullName);
-      
+
       activeSessions.set(decoded.sessionID, { lastSeen: new Date(getPhilippineTime()), userID: user.userID });
 
       req.sessionID = decoded.sessionID;
-      
+
       req.user = {
         userID: user.userID,
         username: decryptedUsername,
@@ -163,8 +168,8 @@ const authMiddleware = async (req, res, next) => {
     } catch (decryptError) {
       console.error('❌ DECRYPTION ERROR:', decryptError);
       res.set('X-Auth-Status', 'invalid');
-      return res.status(500).json({ 
-        success: false, 
+      return res.status(500).json({
+        success: false,
         message: 'Error processing user data'
       });
     }
@@ -172,9 +177,9 @@ const authMiddleware = async (req, res, next) => {
     console.error('Auth middleware error:', error);
     res.set('X-Auth-Status', 'invalid');
     const isJwtError = error instanceof jwt.JsonWebTokenError;
-    return res.status(isJwtError ? 401 : 500).json({ 
-      success: false, 
-      message: isJwtError ? 'Invalid token' : 'An error occurred during authentication' 
+    return res.status(isJwtError ? 401 : 500).json({
+      success: false,
+      message: isJwtError ? 'Invalid token' : 'An error occurred during authentication'
     });
   }
 };
@@ -200,16 +205,16 @@ async function logout(req, res) {
         .input('sessionID', sql.VarChar, sessionID)
         .input('currentTime', sql.DateTime2, new Date(getPhilippineTime()))
         .query('UPDATE sessions SET expires_at = @currentTime WHERE sessionID = @sessionID AND expires_at IS NULL');
-      
+
       activeSessions.delete(sessionID);
     }
     if (res && !res.headersSent) {
-        res.json({ success: true, message: 'Logged out successfully' });
+      res.json({ success: true, message: 'Logged out successfully' });
     }
   } catch (error) {
     console.error('Error during logout process:', error);
     if (res && !res.headersSent) {
-        res.status(500).json({ success: false, message: 'Logout failed' });
+      res.status(500).json({ success: false, message: 'Logout failed' });
     }
   }
 }

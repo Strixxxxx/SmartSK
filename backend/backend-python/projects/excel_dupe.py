@@ -27,46 +27,26 @@ def resize_image_proportional(img_path, target_width_px):
         ox_img.height = target_height_px
         return ox_img
 
-def duplicate_and_init_excel(batch_id: int, barangay_id: int, proj_type: str, target_year: str) -> bool:
+def duplicate_and_init_excel(batch_id: int, barangay_id: int, proj_type: str, target_year: str, file_path: str, sk_logo_path: str, brgy_logo_path: str) -> bool:
     """
-    Duplicates the template, updates target years across all sheets,
+    Updates target years across all sheets in the provided Excel file,
     and programmatically re-inserts SK and Barangay logos with proportional resizing.
+    The file is expected to already be a copy of the template.
     """
     try:
         abbr = "SB" if barangay_id == 1 else "NN"
-        base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        
-        template_dir = os.path.join(base_path, "backend-node", "File_Storage", "templates")
-        logo_dir = os.path.join(template_dir, "logos")
-        output_dir = os.path.join(base_path, "backend-node", "File_Storage", "project-batch")
-        
-        os.makedirs(output_dir, exist_ok=True)
-        
-        # 1. Define Paths and Widths
-        template_name = f"{proj_type}_TEMPLATE_{abbr}.xlsx"
-        template_path = os.path.join(template_dir, template_name)
-        
-        sk_logo_path = os.path.join(logo_dir, "sk_logo.png")
-        brgy_logo_filename = "SB.png" if barangay_id == 1 else "NN.png"
-        brgy_logo_path = os.path.join(logo_dir, brgy_logo_filename)
         
         # Target width based on user feedback 
         # CBYDP: 0.9" ~ 86px
         # ABYIP: 1.15" ~ 100px (Already good)
         target_width = 86 if proj_type == 'CBYDP' else 100
         
-        if not os.path.exists(template_path):
-            logger.error(f"Template not found: {template_path}")
+        if not os.path.exists(file_path):
+            logger.error(f"Target Excel file not found: {file_path}")
             return False
             
-        new_file_name = f"{proj_type}_{abbr}_{target_year}.xlsx"
-        new_file_path = os.path.join(output_dir, new_file_name)
-        
-        # 2. Duplicate file
-        shutil.copy2(template_path, new_file_path)
-        
         # 3. Load with openpyxl
-        wb = load_workbook(new_file_path)
+        wb = load_workbook(file_path)
         
         # 4. Iterate through all sheets
         for sheet_name in wb.sheetnames:
@@ -117,8 +97,8 @@ def duplicate_and_init_excel(batch_id: int, barangay_id: int, proj_type: str, ta
                 ws.add_image(img_sk)
 
         # 5. Save Final File
-        wb.save(new_file_path)
-        logger.info(f"Successfully initialized Excel with resized logos: {new_file_name}")
+        wb.save(file_path)
+        logger.info(f"Successfully initialized Excel with resized logos: {os.path.basename(file_path)}")
         return True
         
     except Exception as e:

@@ -1,19 +1,12 @@
-const fs = require('fs');
-const path = require('path');
 const { getConnection, sql } = require('../database/database');
+const { getBlobProperties, projectBatchContainerName } = require('../Storage/storage');
 
 /**
  * Handle Phase 3 Template Automation
  */
 class TemplateService {
     constructor() {
-        this.templateDir = path.join(__dirname, '..', 'File_Storage', 'templates');
-        this.projectDocDir = path.join(__dirname, '..', 'File_Storage', 'project-batch');
-
-        // Ensure destination directory exists
-        if (!fs.existsSync(this.projectDocDir)) {
-            fs.mkdirSync(this.projectDocDir, { recursive: true });
-        }
+        // We now rely on Azure Blob Storage containers, not local directories.
     }
 
     /**
@@ -45,11 +38,13 @@ class TemplateService {
             const { projType, targetYear, barangayID } = batchResult.recordset[0];
             const abbr = this.getBarangayAbbr(barangayID);
             const fileName = `${projType}_${abbr}_${targetYear}.xlsx`;
-            const filePath = path.join(this.projectDocDir, fileName);
 
-            if (!fs.existsSync(filePath)) {
+            // Check if file exists in Azure
+            const blobProps = await getBlobProperties(projectBatchContainerName, fileName);
+
+            if (!blobProps) {
                 // If it doesn't exist, we must sync it
-                console.log(`File not found, triggering sync for batch ${batchID}`);
+                console.log(`File not found in Azure, triggering sync for batch ${batchID}`);
                 return await this.triggerPythonSync(batchID);
             }
 
@@ -58,9 +53,8 @@ class TemplateService {
                 .input('batchID', sql.Int, batchID)
                 .query('SELECT TOP 1 [timestamp] FROM projectAuditTrail WHERE batchID = @batchID ORDER BY [timestamp] DESC');
 
-            // 3. Get File Mtime
-            const stats = fs.statSync(filePath);
-            const fileMtime = stats.mtime;
+            // 3. Get File Mtime from Azure properties
+            const fileMtime = new Date(blobProps.lastModified);
 
             // 4. Compare
             if (auditResult.recordset.length) {
@@ -71,7 +65,7 @@ class TemplateService {
                 }
             }
 
-            console.log(`Excel file for batch ${batchID} is up-to-date.`);
+            console.log(`Excel file for batch ${batchID} is up-to-date in Azure.`);
             return true;
         } catch (error) {
             console.error('Error in ensureExcelUpToDate:', error);
@@ -83,14 +77,54 @@ class TemplateService {
      * Trigger the Python Microservice to sync the Excel file
      */
     async triggerPythonSync(batchID) {
+        const os = require('os');
+        const fs = require('fs');
+        const path = require('path');
         const axios = require('axios');
+        const { downloadBlobToBuffer, uploadBlob, projectBatchContainerName } = require('../Storage/storage');
+        let tempFilePath = null;
+
         try {
-            const response = await axios.post('http://localhost:8000/sync-project', {
-                batch_id: batchID
+            const pool = await getConnection();
+            const batchResult = await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .query('SELECT projType, targetYear, barangayID FROM projectBatch WHERE batchID = @batchID');
+
+            if (batchResult.recordset.length === 0) return false;
+
+            const { projType, targetYear, barangayID } = batchResult.recordset[0];
+            const abbr = this.getBarangayAbbr(barangayID);
+            const fileName = `${projType}_${abbr}_${targetYear}.xlsx`;
+
+            // 1. Download existing blob to temp file
+            const fileBuffer = await downloadBlobToBuffer(projectBatchContainerName, fileName);
+            tempFilePath = path.join(os.tmpdir(), `sync_${Date.now()}_${fileName}`);
+            fs.writeFileSync(tempFilePath, fileBuffer);
+
+            // 2. Trigger Python
+            const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+            const response = await axios.post(`${aiServiceUrl}/sync-project`, {
+                batch_id: batchID,
+                file_path: tempFilePath
             });
-            return response.data.status === 'ok';
+
+            if (response.data.status !== 'ok') {
+                throw new Error('Python sync failed');
+            }
+
+            // 3. Upload modified file back to Azure
+            const modifiedBuffer = fs.readFileSync(tempFilePath);
+            await uploadBlob(projectBatchContainerName, fileName, modifiedBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+            // 4. Cleanup
+            fs.unlinkSync(tempFilePath);
+
+            return true;
         } catch (error) {
             console.error('Failed to trigger Python sync:', error.message);
+            if (tempFilePath && fs.existsSync(tempFilePath)) {
+                try { fs.unlinkSync(tempFilePath); } catch (e) { }
+            }
             return false;
         }
     }
@@ -106,7 +140,7 @@ class TemplateService {
             // 1. Generate naming convention
             const abbr = this.getBarangayAbbr(barangayID);
             const newFileName = `${projType}_${abbr}_${targetYear}.xlsx`;
-            const destinationPath = path.join(this.projectDocDir, newFileName);
+            const destinationPath = `azure:${projectBatchContainerName}/${newFileName}`;
 
             // 2. Call Stored Procedure to create DB entries (projectBatch + initial projectTracker)
             const result = await pool.request()
@@ -131,24 +165,62 @@ class TemplateService {
             const batchID = result.recordset[0].batchID;
 
             // 3. Trigger Python microservice to handle duplication and modification
+            const os = require('os');
+            const fs = require('fs');
+            const path = require('path');
             const axios = require('axios');
+            const { downloadBlobToBuffer, uploadBlob, templateContainerName } = require('../Storage/storage');
+
+            // Download template from Azure TEMPLATE_CONTAINER
+            const templateName = `${projType}_TEMPLATE_${abbr}.xlsx`;
+            const templateBuffer = await downloadBlobToBuffer(templateContainerName, templateName);
+
+            // Download SK logo and Barangay logo from Azure TEMPLATE_CONTAINER
+            const skLogoName = `logos/sk_logo.png`;
+            const brgyLogoName = `logos/${abbr}.png`;
+            const skLogoBuffer = await downloadBlobToBuffer(templateContainerName, skLogoName);
+            const brgyLogoBuffer = await downloadBlobToBuffer(templateContainerName, brgyLogoName);
+
+            tempFilePath = path.join(os.tmpdir(), `init_${Date.now()}_${newFileName}`);
+            tempSkLogoPath = path.join(os.tmpdir(), `init_sk_${Date.now()}.png`);
+            tempBrgyLogoPath = path.join(os.tmpdir(), `init_brgy_${Date.now()}.png`);
+
+            fs.writeFileSync(tempFilePath, templateBuffer);
+            fs.writeFileSync(tempSkLogoPath, skLogoBuffer);
+            fs.writeFileSync(tempBrgyLogoPath, brgyLogoBuffer);
+
             const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
             const aiResponse = await axios.post(`${aiServiceUrl}/initialize-project`, {
                 batch_id: batchID,
                 barangay_id: barangayID,
                 proj_type: projType,
-                target_year: targetYear
+                target_year: targetYear,
+                file_path: tempFilePath,
+                sk_logo_path: tempSkLogoPath,
+                brgy_logo_path: tempBrgyLogoPath
             });
 
+            // Cleanup local logo temps
+            if (tempSkLogoPath && fs.existsSync(tempSkLogoPath)) fs.unlinkSync(tempSkLogoPath);
+            if (tempBrgyLogoPath && fs.existsSync(tempBrgyLogoPath)) fs.unlinkSync(tempBrgyLogoPath);
+
             if (aiResponse.data.status !== 'ok') {
+                if (tempFilePath && fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
                 throw new Error('Python microservice failed to initialize project.');
             }
+
+            // Upload the modified initialized file to PROJECT_BATCH_CONTAINER
+            const modifiedBuffer = fs.readFileSync(tempFilePath);
+            await uploadBlob(projectBatchContainerName, newFileName, modifiedBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+
+            // Cleanup local temp for excel file
+            if (tempFilePath && fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
 
             return {
                 success: true,
                 batchID: batchID,
                 fileName: newFileName,
-                filePath: destinationPath
+                filePath: destinationPath // Reference string for frontend/logging purposes
             };
 
         } catch (error) {

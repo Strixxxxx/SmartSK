@@ -9,7 +9,7 @@ const { v4: uuidv4 } = require('uuid');
 const createJob = async (details = {}) => {
     const jobId = uuidv4();
     const pool = await getConnection();
-    
+
     const request = pool.request()
         .input('JobID', sql.NVarChar(50), jobId)
         .input('BackupType', sql.NVarChar(20), details.backupType || 'cloud-only')
@@ -33,7 +33,7 @@ const createJob = async (details = {}) => {
         INSERT INTO BackupJobs (${columns})
         VALUES (${values})
     `);
-    
+
     console.log(`[Job ${jobId}] Created in database: ${JSON.stringify(details)}`);
     return jobId;
 };
@@ -48,7 +48,7 @@ const getJob = async (jobId) => {
     const result = await pool.request()
         .input('JobID', sql.NVarChar(50), jobId)
         .query('SELECT * FROM BackupJobs WHERE JobID = @JobID');
-    
+
     return result.recordset[0];
 };
 
@@ -80,18 +80,18 @@ const updateJob = async (jobId, status, message, data = {}) => {
         request.input('ErrorMessage', sql.NVarChar(sql.MAX), data.ErrorMessage);
         updateFields.push('ErrorMessage = @ErrorMessage');
     }
-    
+
     // Handle direct properties
     if (data.FileName) {
         request.input('FileName', sql.NVarChar(255), data.FileName);
         updateFields.push('FileName = @FileName');
     }
-    
+
     if (data.FilePath) {
         request.input('FilePath', sql.NVarChar(500), data.FilePath);
         updateFields.push('FilePath = @FilePath');
     }
-    
+
     if (data.BlobName) {
         request.input('BlobName', sql.NVarChar(255), data.BlobName);
         updateFields.push('BlobName = @BlobName');
@@ -118,7 +118,7 @@ const updateJob = async (jobId, status, message, data = {}) => {
     }
 
     await request.query(`UPDATE BackupJobs SET ${updateFields.join(', ')} WHERE JobID = @JobID`);
-    
+
     console.log(`[Job ${jobId}] Updated in database to ${status}: ${message}`);
 };
 
@@ -134,7 +134,7 @@ const cleanupJobs = async () => {
                 WHERE ExpiresAt < GETDATE() 
                 AND Status IN ('completed', 'failed')
             `);
-        
+
         if (result.rowsAffected[0] > 0) {
             console.log(`[Cleanup] Removed ${result.rowsAffected[0]} expired job(s) from database.`);
         }
@@ -143,8 +143,8 @@ const cleanupJobs = async () => {
     }
 };
 
-// Run cleanup every hour
-setInterval(cleanupJobs, 60 * 60 * 1000);
+// Run cleanup every week (7 days)
+setInterval(cleanupJobs, 7 * 24 * 60 * 60 * 1000);
 
 console.log('Job management system initialized with database storage.');
 

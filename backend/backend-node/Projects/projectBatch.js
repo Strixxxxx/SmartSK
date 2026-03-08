@@ -3,6 +3,10 @@ const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const templateService = require('../utils/templateService');
 const { authMiddleware } = require('../session/session');
+const { getBlobProperties, listBlobs, downloadBlobToBuffer, projectBatchContainerName } = require('../Storage/storage');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 
 /**
  * Phase 3: Project Batch Management Router
@@ -127,8 +131,8 @@ router.get('/files/:batchID', authMiddleware, async (req, res) => {
         }
 
         const { projName, projType, targetYear } = result.recordset[0];
-        const filePath = require('path').join(__dirname, '..', 'File_Storage', 'project-batch', projName);
-        const exists = require('fs').existsSync(filePath);
+        const blobProps = await getBlobProperties(projectBatchContainerName, projName);
+        const exists = !!blobProps;
 
         res.json({
             success: true,
@@ -144,20 +148,20 @@ router.get('/files/:batchID', authMiddleware, async (req, res) => {
 router.get('/all-files', authMiddleware, async (req, res) => {
     try {
         const { barangay: barangayID } = req.user;
-        const fs = require('fs');
-        const path = require('path');
-        const projectBatchDir = path.join(__dirname, '..', 'File_Storage', 'project-batch');
 
         const pool = await getConnection();
         const result = await pool.request()
             .input('barangayID', sql.Int, barangayID)
             .execute('sp_GetBarangayDashboard');
 
+        // Fetch all blobs in the container once for efficiency
+        const azureBlobs = await listBlobs(projectBatchContainerName);
+        const blobSet = new Set(azureBlobs);
+
         const batches = result.recordset.map((batch) => {
-            const filePath = path.join(projectBatchDir, batch.projName || '');
             return {
                 ...batch,
-                fileExists: batch.projName ? fs.existsSync(filePath) : false
+                fileExists: batch.projName ? blobSet.has(batch.projName) : false
             };
         });
 
@@ -170,19 +174,27 @@ router.get('/all-files', authMiddleware, async (req, res) => {
 
 // 7. Get high-fidelity JSON for an XLSX file (via Python bridge)
 router.get('/excel-json/:fileName', authMiddleware, async (req, res) => {
+    let tempFilePath = null;
     try {
         const { fileName } = req.params;
-        const path = require('path');
         const axios = require('axios');
 
-        const filePath = path.join(__dirname, '..', 'File_Storage', 'project-batch', fileName);
-        if (!require('fs').existsSync(filePath)) {
-            return res.status(404).json({ success: false, message: 'Excel file not found.' });
+        const blobProps = await getBlobProperties(projectBatchContainerName, fileName);
+        if (!blobProps) {
+            return res.status(404).json({ success: false, message: 'Excel file not found in Azure Storage.' });
         }
 
-        // Call Python service
+        // 1. Download from Azure to a temporary local file
+        const fileBuffer = await downloadBlobToBuffer(projectBatchContainerName, fileName);
+        tempFilePath = path.join(os.tmpdir(), `temp_${Date.now()}_${fileName}`);
+        fs.writeFileSync(tempFilePath, fileBuffer);
+
+        // 2. Call Python service
         const pythonUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8000'}/xlsx-to-json`;
-        const response = await axios.post(pythonUrl, { filePath });
+        const response = await axios.post(pythonUrl, { filePath: tempFilePath });
+
+        // 3. Cleanup local temp file
+        fs.unlinkSync(tempFilePath);
 
         if (response.data && response.data.status === 'ok') {
             res.json({
@@ -193,6 +205,9 @@ router.get('/excel-json/:fileName', authMiddleware, async (req, res) => {
             res.status(500).json({ success: false, message: 'Failed to convert XLSX via Python service.' });
         }
     } catch (error) {
+        if (tempFilePath && fs.existsSync(tempFilePath)) {
+            try { fs.unlinkSync(tempFilePath); } catch (e) { }
+        }
         console.error('Error fetching Excel JSON:', error.response?.data || error.message);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }

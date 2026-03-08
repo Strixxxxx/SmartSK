@@ -18,7 +18,7 @@ def get_conn():
     conn_str = f'DRIVER={DB_DRIVER};SERVER={DB_SERVER};DATABASE={DB_DATABASE};UID={DB_USER};PWD={DB_PASSWORD}'
     return pyodbc.connect(conn_str)
 
-def sync_excel_from_db(batch_id):
+def sync_excel_from_db(batch_id, file_path):
     """
     Syncs a specific project's Excel file from the database entries.
     """
@@ -36,13 +36,7 @@ def sync_excel_from_db(batch_id):
         proj_type, target_year, barangay_id = batch
         abbr = "SB" if barangay_id == 1 else "NN"
         
-        # 2. Construct File Path
-        # Target: backend-node/File_Storage/documents/projects/[Type]_[Abbr]_[Year].xlsx
-        # current file is in backend-python/AI/
-        base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        file_name = f"{proj_type}_{abbr}_{target_year}.xlsx"
-        file_path = os.path.join(base_path, "backend-node", "File_Storage", "documents", "projects", file_name)
-        
+        # 2. Use the provided File Path
         if not os.path.exists(file_path):
             logger.error(f"Excel file not found: {file_path}")
             return False
@@ -91,7 +85,7 @@ def sync_excel_from_db(batch_id):
                 cell.font = openpyxl.styles.Font(name='Calibri', size=12)
 
         wb.save(file_path)
-        logger.info(f"Successfully synced {len(rows)} rows to {file_name}")
+        logger.info(f"Successfully synced {len(rows)} rows to {os.path.basename(file_path)}")
         return True
 
     except Exception as e:

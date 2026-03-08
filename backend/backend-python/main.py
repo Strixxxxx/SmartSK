@@ -21,6 +21,9 @@ class InitializeProjectRequest(BaseModel):
     barangay_id: int
     proj_type: str
     target_year: str
+    file_path: str
+    sk_logo_path: str
+    brgy_logo_path: str
 
 class JsonRequest(BaseModel):
     filePath: str
@@ -82,11 +85,12 @@ app = FastAPI(title="smartSK AI Service", description="FastAPI Microservice for 
 
 class SyncBatchRequest(BaseModel):
     batch_id: int
+    file_path: str
 
 @app.post("/sync-project")
 def trigger_sync_project(req: SyncBatchRequest):
     try:
-        success = sync_excel_from_db(req.batch_id)
+        success = sync_excel_from_db(req.batch_id, req.file_path)
         if success:
             return {"status": "ok", "message": f"Excel file for batch {req.batch_id} synchronized."}
         else:
@@ -123,7 +127,10 @@ def trigger_initialize_project(req: InitializeProjectRequest):
             batch_id=req.batch_id,
             barangay_id=req.barangay_id,
             proj_type=req.proj_type,
-            target_year=req.target_year
+            target_year=req.target_year,
+            file_path=req.file_path,
+            sk_logo_path=req.sk_logo_path,
+            brgy_logo_path=req.brgy_logo_path
         )
         if success:
             return {"status": "ok", "message": f"Project {req.batch_id} initialized successfully."}

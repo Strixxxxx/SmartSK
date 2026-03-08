@@ -5,15 +5,19 @@ const path = require('path');
 // --- Azure Storage Configuration with Fallback ---
 
 const storageName = process.env.STORAGE_NAME;
+const backupContainerName = process.env.BACKUP_CONTAINER;
+const docContainerName = process.env.DOCUMENTS_CONTAINER;
+const jsonContainerName = process.env.JSON_CONTAINER;
+const projectBatchContainerName = process.env.PROJECT_BATCH_CONTAINER;
+const registerContainerName = process.env.REGISTER_CONTAINER;
+const templateContainerName = process.env.TEMPLATE_CONTAINER;
+
+// Legacy / Unspecified mappings (keeping for backward compatibility if needed, but unused in new mapping)
 const imageContainerName = process.env.IMAGE_CONTAINER;
 const videoContainerName = process.env.VIDEO_CONTAINER;
-const docContainerName = process.env.DOCS_CONTAINER;
-const backupContainerName = process.env.BACKUP_CONTAINER;
 const eAttachContainerName = process.env.E_ATTACHMENTS;
-const jsonContainerName = process.env.JSON_CONTAINER; // For AI-generated JSON reports
-const haContainerName = process.env.HA_CONTAINER;     // For historical analysis data
-const registerContainerName = process.env.REGISTER_CONTAINER; // For registration ID attachments
-const aiProjContainerName = process.env.AIPROJ_CONTAINER; // For AI Project Rules
+const haContainerName = process.env.HA_CONTAINER;
+const aiProjContainerName = process.env.AIPROJ_CONTAINER;
 
 // Primary credentials
 const primaryConnectionString = process.env.STORAGE_CONNECTION_STRING_1;
@@ -96,15 +100,10 @@ async function uploadFile(file, isPublic) {
     const mimetype = file.mimetype;
 
     if (isPublic) {
-        if (mimetype.startsWith('image')) {
-            containerName = imageContainerName;
-        } else if (mimetype.startsWith('video')) {
-            containerName = videoContainerName;
-        } else {
-            containerName = docContainerName;
-        }
+        // Public documents go to DOCUMENTS_CONTAINER
+        containerName = docContainerName;
     } else {
-        // All secure files go to the encrypted attachments container
+        // Secure documents (like encrypted attachments)
         containerName = eAttachContainerName;
     }
 
@@ -139,18 +138,11 @@ async function getFileSasUrl(blobName, fileType, isPublic, source = 'post') {
     console.log(`Generating SAS URL for blob: ${blobName}, isPublic: ${isPublic}, source: ${source}`);
 
     if (source === 'project') {
-        // Project attachments are always public documents
         containerName = docContainerName;
     } else if (!isPublic) {
-        // Secure post attachments can be any file type and are always in the encrypted container
         containerName = eAttachContainerName;
     } else {
-        // Public post attachments can only be images or videos
-        if (mimetype.startsWith('image')) {
-            containerName = imageContainerName;
-        } else if (mimetype.startsWith('video')) {
-            containerName = videoContainerName;
-        }
+        containerName = docContainerName;
     }
 
     if (!containerName) {
@@ -271,13 +263,7 @@ async function deleteFile(blobName, fileType, isPublic) {
     if (!isPublic) {
         containerName = eAttachContainerName;
     } else {
-        if (mimetype.startsWith('image')) {
-            containerName = imageContainerName;
-        } else if (mimetype.startsWith('video')) {
-            containerName = videoContainerName;
-        } else {
-            containerName = docContainerName;
-        }
+        containerName = docContainerName;
     }
 
     if (!containerName) {
@@ -374,6 +360,21 @@ async function generateSasUrl(containerName, blobName) {
     return `${blobClient.url}?${sasToken}`;
 }
 
+/**
+ * Gets the properties of a blob, including last modified time.
+ * @param {string} containerName - The name of the container.
+ * @param {string} blobName - The name of the blob.
+ * @returns {Promise<any>} The properties of the blob.
+ */
+async function getBlobProperties(containerName, blobName) {
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobClient = containerClient.getBlobClient(blobName);
+    if (!(await blobClient.exists())) {
+        return null;
+    }
+    return await blobClient.getProperties();
+}
+
 module.exports = {
     uploadFile,
     getFileSasUrl,
@@ -388,14 +389,19 @@ module.exports = {
     downloadBlobAsText,
     downloadBlobToBuffer,
     generateSasUrl,
+    getBlobProperties,
     // Export container names for centralized access
+    backupContainerName,
+    docContainerName,
+    jsonContainerName,
+    projectBatchContainerName,
+    registerContainerName,
+    templateContainerName,
+
+    // Legacy containers
     imageContainerName,
     videoContainerName,
-    docContainerName,
-    backupContainerName,
     eAttachContainerName,
-    jsonContainerName,
     haContainerName,
-    registerContainerName,
     aiProjContainerName,
 };
