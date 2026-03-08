@@ -18,7 +18,7 @@ interface AuditLog {
     attachmentPath: string;
     attachmentPathBack: string;
     processedAt: string;
-    status: string;
+    verdict: string;
     registeredAt: string;
     validatedBy: string;
 }

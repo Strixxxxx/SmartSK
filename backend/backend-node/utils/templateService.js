@@ -165,29 +165,11 @@ class TemplateService {
             const batchID = result.recordset[0].batchID;
 
             // 3. Trigger Python microservice to handle duplication and modification
-            const os = require('os');
-            const fs = require('fs');
-            const path = require('path');
             const axios = require('axios');
-            const { downloadBlobToBuffer, uploadBlob, templateContainerName } = require('../Storage/storage');
 
-            // Download template from Azure TEMPLATE_CONTAINER
             const templateName = `${projType}_TEMPLATE_${abbr}.xlsx`;
-            const templateBuffer = await downloadBlobToBuffer(templateContainerName, templateName);
-
-            // Download SK logo and Barangay logo from Azure TEMPLATE_CONTAINER
             const skLogoName = `logos/sk_logo.png`;
             const brgyLogoName = `logos/${abbr}.png`;
-            const skLogoBuffer = await downloadBlobToBuffer(templateContainerName, skLogoName);
-            const brgyLogoBuffer = await downloadBlobToBuffer(templateContainerName, brgyLogoName);
-
-            tempFilePath = path.join(os.tmpdir(), `init_${Date.now()}_${newFileName}`);
-            tempSkLogoPath = path.join(os.tmpdir(), `init_sk_${Date.now()}.png`);
-            tempBrgyLogoPath = path.join(os.tmpdir(), `init_brgy_${Date.now()}.png`);
-
-            fs.writeFileSync(tempFilePath, templateBuffer);
-            fs.writeFileSync(tempSkLogoPath, skLogoBuffer);
-            fs.writeFileSync(tempBrgyLogoPath, brgyLogoBuffer);
 
             const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
             const aiResponse = await axios.post(`${aiServiceUrl}/initialize-project`, {
@@ -195,26 +177,15 @@ class TemplateService {
                 barangay_id: barangayID,
                 proj_type: projType,
                 target_year: targetYear,
-                file_path: tempFilePath,
-                sk_logo_path: tempSkLogoPath,
-                brgy_logo_path: tempBrgyLogoPath
+                file_path: newFileName,
+                template_name: templateName,
+                sk_logo_path: skLogoName,
+                brgy_logo_path: brgyLogoName
             });
 
-            // Cleanup local logo temps
-            if (tempSkLogoPath && fs.existsSync(tempSkLogoPath)) fs.unlinkSync(tempSkLogoPath);
-            if (tempBrgyLogoPath && fs.existsSync(tempBrgyLogoPath)) fs.unlinkSync(tempBrgyLogoPath);
-
             if (aiResponse.data.status !== 'ok') {
-                if (tempFilePath && fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
                 throw new Error('Python microservice failed to initialize project.');
             }
-
-            // Upload the modified initialized file to PROJECT_BATCH_CONTAINER
-            const modifiedBuffer = fs.readFileSync(tempFilePath);
-            await uploadBlob(projectBatchContainerName, newFileName, modifiedBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
-            // Cleanup local temp for excel file
-            if (tempFilePath && fs.existsSync(tempFilePath)) fs.unlinkSync(tempFilePath);
 
             return {
                 success: true,

@@ -1,13 +1,34 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { 
-    Box, Typography, Paper, Button, Dialog, DialogActions, DialogContent, DialogTitle, 
-    TextField, CircularProgress, Table, TableBody, TableCell, TableContainer, 
+import {
+    Box, Typography, Paper, Button, Dialog, DialogActions, DialogContent, DialogTitle,
+    TextField, CircularProgress, Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, IconButton, Tooltip, Chip
 } from '@mui/material';
 import { Visibility, ArrowBackIosNew, ArrowForwardIos, Edit } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import AuditSummaryModal from './AuditSummaryModal'; // Import the new modal
+import { Save, Edit as EditIcon, Cancel } from '@mui/icons-material';
+
+const POSITION_MAPPING: Record<string, string> = {
+    'SKC': 'SK Chairperson',
+    'SKS': 'SK Secretary',
+    'SKT': 'SK Treasurer',
+    'SKK1': 'SK Kagawad I',
+    'SKK2': 'SK Kagawad II',
+    'SKK3': 'SK Kagawad III',
+    'SKK4': 'SK Kagawad IV',
+    'SKK5': 'SK Kagawad V',
+    'SKK6': 'SK Kagawad VI',
+    'SKK7': 'SK Kagawad VII',
+};
+
+const OFFICIAL_POSITIONS = Object.keys(POSITION_MAPPING);
+
+interface OfficialMember {
+    position: string;
+    fullName: string;
+}
 
 interface AuditLog {
     userID: number;
@@ -17,7 +38,7 @@ interface AuditLog {
     dateOfBirth: string;
     verificationReport: string;
     processedAt: string;
-    status: string;
+    verdict: string;
     registeredAt: string;
     validatedBy: string;
     attachmentPath: string;
@@ -27,7 +48,8 @@ interface AuditLog {
 const RegistrationSummary: React.FC = () => {
     // State for SK Officials List Modal
     const [isListModalOpen, setIsListModalOpen] = useState(false);
-    const [officialsList, setOfficialsList] = useState('');
+    const [officialsList, setOfficialsList] = useState<OfficialMember[]>([]);
+    const [isEditMode, setIsEditMode] = useState(false);
     const [saving, setSaving] = useState(false);
 
     // State for the main component data
@@ -53,7 +75,13 @@ const RegistrationSummary: React.FC = () => {
             ]);
 
             if (officialsRes.data.success) {
-                setOfficialsList(officialsRes.data.content || '');
+                const data = officialsRes.data.content;
+                // Ensure all 11 positions are present, preserving existing data if any
+                const mergedList = OFFICIAL_POSITIONS.map(pos => {
+                    const existing = Array.isArray(data) ? data.find((item: OfficialMember) => item.position === pos) : null;
+                    return { position: pos, fullName: existing ? existing.fullName : '' };
+                });
+                setOfficialsList(mergedList);
             }
             if (auditRes.data.success) {
                 setLogs(auditRes.data.data);
@@ -71,11 +99,14 @@ const RegistrationSummary: React.FC = () => {
     }, [fetchInitialData]);
 
     const handleOpenListModal = () => {
-        if (officialsList.trim() === '') setOfficialsList('- ');
+        setIsEditMode(false);
         setIsListModalOpen(true);
     };
 
-    const handleCloseListModal = () => setIsListModalOpen(false);
+    const handleCloseListModal = () => {
+        setIsListModalOpen(false);
+        setIsEditMode(false);
+    };
 
     const handleSaveList = async () => {
         setSaving(true);
@@ -83,7 +114,7 @@ const RegistrationSummary: React.FC = () => {
             const response = await axiosInstance.post('/api/admin/audit/officials', { officialsList });
             if (response.data.success) {
                 toast.success('SK Officials list saved successfully!');
-                handleCloseListModal();
+                setIsEditMode(false);
             } else {
                 throw new Error(response.data.message || 'Failed to save list.');
             }
@@ -93,6 +124,20 @@ const RegistrationSummary: React.FC = () => {
         } finally {
             setSaving(false);
         }
+    };
+
+    const handleToggleEdit = () => {
+        if (isEditMode) {
+            handleSaveList();
+        } else {
+            setIsEditMode(true);
+        }
+    };
+
+    const handleNameChange = (position: string, newName: string) => {
+        setOfficialsList(prev => prev.map(item =>
+            item.position === position ? { ...item, fullName: newName } : item
+        ));
     };
 
     const handleViewAttachment = async (userId: number) => {
@@ -195,9 +240,9 @@ const RegistrationSummary: React.FC = () => {
                                     <TableCell>{log.username}</TableCell>
                                     <TableCell>{log.fullName}</TableCell>
                                     <TableCell>
-                                        <Chip 
-                                            label={log.status}
-                                            color={log.status === 'approved' ? 'success' : log.status === 'rejected' ? 'error' : 'warning'}
+                                        <Chip
+                                            label={log.verdict}
+                                            color={log.verdict === 'Approved' ? 'success' : log.verdict === 'Rejected' ? 'error' : 'warning'}
                                             size="small"
                                         />
                                     </TableCell>
@@ -228,39 +273,83 @@ const RegistrationSummary: React.FC = () => {
             </TableContainer>
 
             {/* SK Officials List Modal */}
-            <Dialog open={isListModalOpen} onClose={handleCloseListModal} fullWidth maxWidth="md">
-                <DialogTitle>Manage SK Official List</DialogTitle>
-                <DialogContent>
-                    <Typography variant="body2" sx={{ mb: 2 }}>
+            <Dialog
+                open={isListModalOpen}
+                onClose={handleCloseListModal}
+                fullWidth
+                maxWidth="lg"
+            >
+                <DialogTitle sx={{ borderBottom: '1px solid #eee', pb: 2, bgcolor: '#f9f9f9' }}>
+                    Manage SK Official List
+                </DialogTitle>
+                <DialogContent sx={{ overflowX: 'hidden' }}>
+                    <Typography variant="body2" sx={{ my: 2, color: 'text.secondary', fontWeight: 500 }}>
                         Enter the full names of all official SK members. This list will be used by the AI for verification.
                     </Typography>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="officials-list"
-                        label="SK Officials Full Names"
-                        type="text"
-                        fullWidth
-                        multiline
-                        rows={10}
-                        value={officialsList}
-                        onChange={(e) => setOfficialsList(e.target.value)}
-                        variant="outlined"
-                    />
+
+                    <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 500, overflowX: 'hidden' }}>
+                        <Table stickyHeader size="medium">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 'bold', width: '60%', bgcolor: '#f5f5f5' }}>Full Name</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold', width: '40%', bgcolor: '#f5f5f5' }}>Position</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {officialsList.map((official) => (
+                                    <TableRow key={official.position} hover>
+                                        <TableCell>
+                                            {isEditMode ? (
+                                                <TextField
+                                                    fullWidth
+                                                    size="small"
+                                                    value={official.fullName}
+                                                    onChange={(e) => handleNameChange(official.position, e.target.value)}
+                                                    placeholder="Enter Full Name"
+                                                    variant="outlined"
+                                                    autoComplete="off"
+                                                    sx={{ bgcolor: 'white' }}
+                                                />
+                                            ) : (
+                                                <Typography variant="body1" sx={{ color: official.fullName ? 'text.primary' : 'text.disabled', fontStyle: official.fullName ? 'normal' : 'italic', fontWeight: 500 }}>
+                                                    {official.fullName || 'Not set'}
+                                                </Typography>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography variant="body2" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                                                {POSITION_MAPPING[official.position] || official.position}
+                                            </Typography>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                 </DialogContent>
-                <DialogActions sx={{ p: 3 }}>
-                    <Button onClick={handleCloseListModal} disabled={saving}>Cancel</Button>
-                    <Button onClick={handleSaveList} variant="contained" disabled={saving}>
-                        {saving ? <CircularProgress size={24} /> : 'Save'}
+                <DialogActions sx={{ p: 3, borderTop: '1px solid #eee', bgcolor: '#f9f9f9' }}>
+                    <Button onClick={handleCloseListModal} disabled={saving} startIcon={<Cancel />} size="large">
+                        Close
+                    </Button>
+                    <Button
+                        onClick={handleToggleEdit}
+                        variant="contained"
+                        disabled={saving}
+                        startIcon={isEditMode ? (saving ? <CircularProgress size={20} /> : <Save />) : <EditIcon />}
+                        color={isEditMode ? "success" : "primary"}
+                        size="large"
+                        sx={{ px: 4 }}
+                    >
+                        {isEditMode ? 'Save Changes' : 'Edit List'}
                     </Button>
                 </DialogActions>
             </Dialog>
 
             {/* Attachment Viewer Modal */}
-            <Dialog 
-                open={isAttachmentModalOpen} 
-                onClose={handleCloseAttachmentModal} 
-                fullWidth 
+            <Dialog
+                open={isAttachmentModalOpen}
+                onClose={handleCloseAttachmentModal}
+                fullWidth
                 maxWidth="lg"
                 PaperProps={{ sx: { userSelect: 'none' } }}
             >
@@ -280,21 +369,21 @@ const RegistrationSummary: React.FC = () => {
                             {attachmentUrls.length > 1 && (
                                 <IconButton
                                     onClick={handlePrevAttachment}
-                                    sx={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(0,0,0,0.3)', '&:hover': { backgroundColor: 'rgba(0,0,0,0.5)'} }}
+                                    sx={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(0,0,0,0.3)', '&:hover': { backgroundColor: 'rgba(0,0,0,0.5)' } }}
                                 >
                                     <ArrowBackIosNew sx={{ color: 'white' }} />
                                 </IconButton>
                             )}
-                            <img 
-                                src={attachmentUrls[currentAttachmentIndex]} 
+                            <img
+                                src={attachmentUrls[currentAttachmentIndex]}
                                 alt={`Registration Attachment ${currentAttachmentIndex + 1}`}
-                                style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain' }} 
+                                style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain' }}
                                 onContextMenu={(e) => e.preventDefault()}
                             />
                             {attachmentUrls.length > 1 && (
                                 <IconButton
                                     onClick={handleNextAttachment}
-                                    sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(0,0,0,0.3)', '&:hover': { backgroundColor: 'rgba(0,0,0,0.5)'} }}
+                                    sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(0,0,0,0.3)', '&:hover': { backgroundColor: 'rgba(0,0,0,0.5)' } }}
                                 >
                                     <ArrowForwardIos sx={{ color: 'white' }} />
                                 </IconButton>

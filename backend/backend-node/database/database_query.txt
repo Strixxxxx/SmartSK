@@ -188,6 +188,7 @@ CREATE TABLE projectABYIP (
     CO MONEY DEFAULT 0,
     total MONEY DEFAULT 0,
     personResponsible NVARCHAR(255),
+    sheetRowIndex INT,
     CONSTRAINT FK_ABYIP_Batch FOREIGN KEY (projbatchID) REFERENCES projectBatch(batchID) ON DELETE CASCADE
 );
 
@@ -204,6 +205,7 @@ CREATE TABLE projectCBYDP (
     PPAs NVARCHAR(MAX),
     budget MONEY DEFAULT 0,
     personResponsible NVARCHAR(255),
+    sheetRowIndex INT,
     CONSTRAINT FK_CBYDP_Batch FOREIGN KEY (projbatchID) REFERENCES projectBatch(batchID) ON DELETE CASCADE
 );
 

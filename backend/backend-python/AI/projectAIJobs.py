@@ -3,13 +3,14 @@ import os
 import pyodbc
 import logging
 from datetime import datetime
-import google.generativeai as genai
+import google.genai as genai
 from dotenv import load_dotenv
 import io
 import json
 from crypto import decrypt, encrypt
 from pypdf import PdfReader
 from docx import Document
+from storage.storage import download_blob_to_memory
 
 # Load environment variables from .env file
 load_dotenv()
@@ -21,13 +22,10 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_DRIVER = os.getenv('DB_DRIVER', '{ODBC Driver 17 for SQL Server}')
 
-BASE_STORAGE_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'backend-node', 'File_Storage')
 DOCS_CONTAINER = os.getenv("DOCS_CONTAINER")
 AIPROJ_CONTAINER = os.getenv("AIPROJ_CONTAINER")
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+# genai.configure is now handled in get_gemini_client() in gemini_utils.py
 
 # --- Logging ---
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -69,14 +67,10 @@ def analyze_proposal_with_ai(document_text, rules_text):
     def is_valid_proposal_response(data):
         return 'decision' in data and 'summary' in data and 'violations' in data
 
-    # Initialize model (call_gemini_with_retry handles the model creation/fallback)
-    import google.generativeai as genai
-    model = genai.GenerativeModel(PRIMARY_MODEL)
-
+    # Use the retry utility
     analysis_result = call_gemini_with_retry(
-        model, 
-        prompt, 
-        is_valid_proposal_response, 
+        prompt=prompt, 
+        validation_func=is_valid_proposal_response, 
         model_name=PRIMARY_MODEL
     )
 
@@ -117,11 +111,11 @@ def main(project_id):
             conn.commit()
             sys.exit(1)
 
-        # 2. Read document and rules file from local storage
-        project_document_data = read_local_file_to_memory(DOCS_CONTAINER, file_path)
+        # 2. Read document and rules file from Azure Blob Storage
+        project_document_data = download_blob_to_memory(DOCS_CONTAINER, file_path)
         
         rules_blob_name = f"PROJECT RULES - {barangay_name}.txt"
-        rules_data = read_local_file_to_memory(AIPROJ_CONTAINER, rules_blob_name)
+        rules_data = download_blob_to_memory(AIPROJ_CONTAINER, rules_blob_name)
 
         if not project_document_data:
             raise Exception(f"Failed to read project document for projectID: {project_id}.")

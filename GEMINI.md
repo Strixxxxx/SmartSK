@@ -75,7 +75,7 @@ npm run dev
 -   **Rule1:** Gemini CLI must adhere to a prioritized workflow for development tasks. The order of operations is as follows: 1st - Database, 2nd - Backend, 3rd - Frontend, and 4th - Polishing (e.g., addressing minor errors, UI/UX adjustments).
 -   **Rule2:** Gemini CLI must make a plan that the user would read before implementing the change in the code structure.
 -   **Rule3:** Gemini CLI must properly understand the user's prompt to create a proper plan that was mentioned in Rule 1.
--   **Rule4:** The Gemini CLI must always ask if the Gemini CLI would proceed to the changes.
+-   **Rule4:** The Gemini CLI must always ask if the Gemini CLI would proceed to the changes & doesnt scan the .env files for security purposes.
 -   **Rule5:** Gemini CLI must provide production-ready code to make sure that nothing will happen when the system is deployed.
 -   **Rule6:** When Gemini CLI must change something on the database, instead of adding a query that would require the user to be executed, it would only provide a query that can be followed by the user.
 -   **Rule7:** The Gemini CLI must put all SQL-related queries inside of Query.txt.

@@ -10,6 +10,7 @@ sys.path.append(os.path.join(current_dir, "util"))
 sys.path.append(os.path.join(current_dir, "projects"))
 
 from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 
@@ -22,6 +23,7 @@ class InitializeProjectRequest(BaseModel):
     proj_type: str
     target_year: str
     file_path: str
+    template_name: str
     sk_logo_path: str
     brgy_logo_path: str
 
@@ -32,6 +34,7 @@ from projects.excel_to_json import excel_to_fortune_json
 
 from AI.accountAIJobs import main as verify_registration_job
 from AI.aiJobs import main as run_ai_batch_job
+from storage.storage import download_blob_to_memory, upload_blob_from_memory, blob_exists
 import uvicorn
 import requests
 import time
@@ -83,6 +86,18 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="smartSK AI Service", description="FastAPI Microservice for smartSK AI Tasks", lifespan=lifespan)
 
+# --- CORS Configuration ---
+cors_origin = os.getenv("CORS_ORIGIN", "")
+origins = [origin.strip() for origin in cors_origin.split(",") if origin.strip()]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 class SyncBatchRequest(BaseModel):
     batch_id: int
     file_path: str
@@ -123,30 +138,57 @@ from projects.excel_dupe import duplicate_and_init_excel
 @app.post("/initialize-project")
 def trigger_initialize_project(req: InitializeProjectRequest):
     try:
-        success = duplicate_and_init_excel(
-            batch_id=req.batch_id,
+        # 1. Configuration for containers
+        TEMPLATE_CONTAINER = os.getenv("TEMPLATE_CONTAINER", "template")
+        PROJECT_BATCH_CONTAINER = os.getenv("PROJECT_BATCH_CONTAINER", "project-batch")
+        
+        # 2. Download template and logos from Azure TEMPLATE_CONTAINER
+        template_data = download_blob_to_memory(TEMPLATE_CONTAINER, req.template_name)
+        sk_logo_data = download_blob_to_memory(TEMPLATE_CONTAINER, req.sk_logo_path)
+        brgy_logo_data = download_blob_to_memory(TEMPLATE_CONTAINER, req.brgy_logo_path)
+        
+        if not template_data:
+            raise HTTPException(status_code=404, detail=f"Template {req.template_name} not found in Azure.")
+
+        # 3. Process the duplication and initialization in memory
+        modified_excel_data = duplicate_and_init_excel(
+            file_data=template_data,
             barangay_id=req.barangay_id,
             proj_type=req.proj_type,
             target_year=req.target_year,
-            file_path=req.file_path,
-            sk_logo_path=req.sk_logo_path,
-            brgy_logo_path=req.brgy_logo_path
+            sk_logo_data=sk_logo_data,
+            brgy_logo_data=brgy_logo_data
         )
-        if success:
-            return {"status": "ok", "message": f"Project {req.batch_id} initialized successfully."}
+        
+        if modified_excel_data:
+            # 4. Upload the result back to Azure
+            success = upload_blob_from_memory(PROJECT_BATCH_CONTAINER, req.file_path, modified_excel_data)
+            if success:
+                return {"status": "ok", "message": f"Project {req.batch_id} initialized successfully on Azure."}
+            else:
+                raise HTTPException(status_code=500, detail="Failed to upload initialized Excel to Azure.")
         else:
-            raise HTTPException(status_code=500, detail="Failed to initialize project template.")
+            raise HTTPException(status_code=500, detail="Failed to initialize project template in memory.")
     except Exception as e:
+        print(f"Error in initialize-project: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/xlsx-to-json")
 def trigger_xlsx_to_json(req: JsonRequest):
     try:
-        # Check if file exists
-        if not os.path.exists(req.filePath):
-            raise HTTPException(status_code=404, detail="Excel file not found.")
+        # Check if it's a batch file on Azure
+        PROJECT_BATCH_CONTAINER = os.getenv("PROJECT_BATCH_CONTAINER", "project-batch")
+        
+        file_data = download_blob_to_memory(PROJECT_BATCH_CONTAINER, req.filePath)
+        if not file_data:
+            # Fallback to local for dev if strictly needed, but prioritize Azure
+            if os.path.exists(req.filePath):
+                with open(req.filePath, "rb") as f:
+                    file_data = f.read()
+            else:
+                raise HTTPException(status_code=404, detail="Excel file not found on Azure or locally.")
             
-        data = excel_to_fortune_json(req.filePath)
+        data = excel_to_fortune_json(file_data)
         return {"status": "ok", "data": data}
     except Exception as e:
         print(f"Error in xlsx-to-json conversion: {e}")

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { FaArrowLeft } from 'react-icons/fa';
-import { InsertDriveFile, History } from '@mui/icons-material';
+import { InsertDriveFile } from '@mui/icons-material';
 import {
     List, ListItem, ListItemIcon, ListItemText,
     Typography, Box, CircularProgress
@@ -10,14 +10,20 @@ import {
 import { formatRoleName } from '../../../utils/roleUtils';
 import logo from '../../../assets/logo_SB.png';
 import axiosInstance from '../../../backend connection/axiosConfig';
+import ProjectAuditTimeline from './ProjectAuditTimeline';
 import '../Sidebar/Sidebar.css';
 
 interface ProjectWorkspaceSidebarProps {
     selectedProject: any | null;
     onSelectProject: (project: any) => void;
+    auditRefreshTrigger?: number;
 }
 
-const ProjectWorkspaceSidebar: React.FC<ProjectWorkspaceSidebarProps> = ({ selectedProject, onSelectProject }) => {
+const ProjectWorkspaceSidebar: React.FC<ProjectWorkspaceSidebarProps> = ({
+    selectedProject,
+    onSelectProject,
+    auditRefreshTrigger
+}) => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
     const [batches, setBatches] = useState<any[]>([]);
@@ -134,23 +140,13 @@ const ProjectWorkspaceSidebar: React.FC<ProjectWorkspaceSidebarProps> = ({ selec
                     </List>
                 )}
 
-                {/* Audit Timeline */}
-                <Box sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', flexShrink: 0 }}>
-                    <Box sx={{ px: 2, py: 1, bgcolor: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <History sx={{ fontSize: 14, color: '#646cff' }} />
-                        <Typography variant="overline" sx={{ fontWeight: 'bold', color: '#646cff', fontSize: '0.65rem', letterSpacing: '0.1em' }}>
-                            AUDIT TIMELINE
-                        </Typography>
-                    </Box>
-                    <Box sx={{ px: 2, pb: 1.5 }}>
-                        <Typography variant="caption" sx={{ color: '#88939e' }}>
-                            {selectedProject
-                                ? `Showing logs for ${selectedProject.projType} ${selectedProject.targetYear}`
-                                : 'Select a project to view logs.'
-                            }
-                        </Typography>
-                    </Box>
-                </Box>
+                {/* Audit Timeline — live component */}
+                <ProjectAuditTimeline
+                    batchID={selectedProject?.batchID ?? null}
+                    projType={selectedProject?.projType}
+                    targetYear={selectedProject?.targetYear}
+                    auditRefreshTrigger={auditRefreshTrigger}
+                />
             </Box>
 
             {/* Footer: Logout */}

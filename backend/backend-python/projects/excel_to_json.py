@@ -38,16 +38,21 @@ def get_border_style(border_side):
     color = rgb_to_hex(border_side.color) or "#000000"
     return {"style": ls_style, "color": color}
 
-def excel_to_fortune_json(file_path):
+def excel_to_fortune_json(file_input):
     """
-    Converts an XLSX file to FortuneSheet (Luckysheet) compatible JSON.
+    Converts an XLSX file (path, bytes, or BytesIO) to FortuneSheet (Luckysheet) compatible JSON.
     Focuses on 1:1 fidelity for smartSK templates including logos and styles.
     """
     print(f"DEBUG: Executing excel_to_fortune_json from {__file__}")
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"File not found: {file_path}")
-
-    wb = load_workbook(file_path, data_only=True)
+    
+    if isinstance(file_input, (bytes, io.BytesIO)):
+        if isinstance(file_input, bytes):
+            file_input = io.BytesIO(file_input)
+        wb = load_workbook(file_input, data_only=True)
+    else:
+        if not os.path.exists(file_input):
+            raise FileNotFoundError(f"File not found: {file_input}")
+        wb = load_workbook(file_input, data_only=True)
     sheets_json = []
 
     for index, sheet_name in enumerate(wb.sheetnames):

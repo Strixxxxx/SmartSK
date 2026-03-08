@@ -204,4 +204,4 @@ function broadcast(message) {
     });
 }
 
-module.exports = { initializeWebSocketServer, broadcast, sendToUser };
+module.exports = { initializeWebSocketServer, broadcast, sendToUser, broadcastToRoom };

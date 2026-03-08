@@ -9,10 +9,10 @@ from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 
-from .gemini_utils import call_gemini_with_retry, get_gemini_model, PRIMARY_MODEL
+from .gemini_utils import call_gemini_with_retry, PRIMARY_MODEL
 
 try:
-    import google.generativeai as genai
+    import google.genai as genai
     gemini_available = True
 except ImportError:
     gemini_available = False
@@ -115,8 +115,7 @@ def _generate_gemini_analysis(chart_data: dict, view_by: str, api_key: str) -> d
     if not gemini_available or not api_key:
         raise ConnectionError("Gemini AI is not available or API key is not configured.")
 
-    genai.configure(api_key=api_key)
-    model = get_gemini_model(PRIMARY_MODEL)
+    # genai.configure is now handled in get_gemini_client() in gemini_utils.py
 
     # Create a simplified text preview of the chart data for the prompt
     data_preview = f"Chart Data for view: {view_by}\n"
@@ -152,7 +151,7 @@ def _generate_gemini_analysis(chart_data: dict, view_by: str, api_key: str) -> d
         return 'summary' in data and 'recommendations' in data
 
     # Call the utility
-    analysis_result = call_gemini_with_retry(model, prompt, is_valid_forecast_analysis)
+    analysis_result = call_gemini_with_retry(prompt, is_valid_forecast_analysis)
 
     if analysis_result:
         logger.info(f"Successfully generated Gemini analysis for forecast view: {view_by}")

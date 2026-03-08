@@ -39,9 +39,9 @@ frontend.txt
 GeminiCLI.txt
 RSC.md
 UserManual.md
-Query.txt
 .python-version
 actions.txt
+Query.txt
 
 # Backups and screenshots
 database_backup/

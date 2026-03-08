@@ -10,10 +10,10 @@ from sklearn.preprocessing import MinMaxScaler
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense
 
-from .gemini_utils import call_gemini_with_retry, get_gemini_model, PRIMARY_MODEL
+from .gemini_utils import call_gemini_with_retry, PRIMARY_MODEL
 
 try:
-    import google.generativeai as genai
+    import google.genai as genai
     gemini_available = True
 except ImportError:
     gemini_available = False
@@ -138,8 +138,7 @@ def generate_gemini_analysis(df, filters, api_key):
     if not gemini_available or not api_key:
         raise ConnectionError("Gemini AI is not available or API key is not configured.")
 
-    genai.configure(api_key=api_key)
-    model = get_gemini_model(PRIMARY_MODEL)
+    # genai.configure is now handled in get_gemini_client() in gemini_utils.py
 
     # --- Data Preparation for Prompt ---
     data_preview = df.head(15).to_string() if not df.empty else "No historical data available."
@@ -210,7 +209,7 @@ def generate_gemini_analysis(df, filters, api_key):
         return 'summary_report' in data and isinstance(data.get('summary_report'), str)
 
     # Call the utility
-    analysis_result = call_gemini_with_retry(model, prompt, is_valid_analysis_response)
+    analysis_result = call_gemini_with_retry(prompt, is_valid_analysis_response)
 
     if analysis_result:
         logger.info("Successfully generated and parsed analysis report from Gemini.")

@@ -104,10 +104,16 @@ const ProjectWorkspacePage: React.FC = () => {
         setRemoteNotes(prev => [...prev, note]);
     }, []);
 
+    const [auditRefreshTrigger, setAuditRefreshTrigger] = useState(0);
+    const handleAuditUpdate = useCallback(() => {
+        setAuditRefreshTrigger(prev => prev + 1);
+    }, []);
+
     const { collaborators, sendCursorMove, sendCellChange, sendNote } = useCollaborationSocket({
         batchID: selectedProject?.batchID ?? null,
         onCellChange: handleRemoteCellChange,
         onNote: handleRemoteNote,
+        onAuditUpdate: handleAuditUpdate,
     });
 
     // Build a Map for the collaborators (keyed by userID)
@@ -133,6 +139,8 @@ const ProjectWorkspacePage: React.FC = () => {
                 );
                 // Broadcast to collaborators
                 sendCellChange([{ rowID, field, value }]);
+                // Update local audit timeline
+                setAuditRefreshTrigger(prev => prev + 1);
             } catch (err) {
                 console.error('Failed to save cell:', err);
             }
@@ -142,20 +150,34 @@ const ProjectWorkspacePage: React.FC = () => {
     // ── Add row handler ───────────────────────────────────────────────────────
     const handleAddRow = useCallback(async (sectionType?: string) => {
         try {
+            let nextIndex = 1;
+            if (projType === 'ABYIP') {
+                const abyipRows = rows as AbyipRow[];
+                const maxIndex = Math.max(0, ...abyipRows.map(r => r.sheetRowIndex || 0));
+                nextIndex = maxIndex + 1;
+            } else {
+                const cbydpRows = rows as CbydpRow[];
+                const sectionRows = cbydpRows.filter(r => r.sectionType === (sectionType || 'FROM'));
+                const maxIndex = Math.max(0, ...sectionRows.map(r => r.sheetRowIndex || 0));
+                nextIndex = maxIndex + 1;
+            }
+
             const res = await axiosInstance.post(
                 `/api/project-batch/${selectedProject.batchID}/rows`,
-                { center: activeTab, sectionType: sectionType || 'FROM' }
+                { center: activeTab, sectionType: sectionType || 'FROM', sheetRowIndex: nextIndex }
             );
             const newRow = res.data.data;
             if (projType === 'ABYIP') {
-                setRows((prev) => [...prev, { rowID: newRow.rowID } as AbyipRow]);
+                setRows((prev) => [...prev, { rowID: newRow.rowID, sheetRowIndex: nextIndex } as AbyipRow]);
             } else {
-                setRows((prev) => [...prev, { rowID: newRow.rowID, sectionType: sectionType || 'FROM' } as CbydpRow]);
+                setRows((prev) => [...prev, { rowID: newRow.rowID, sectionType: sectionType || 'FROM', sheetRowIndex: nextIndex } as CbydpRow]);
             }
+            // Update local audit timeline
+            setAuditRefreshTrigger(prev => prev + 1);
         } catch (err) {
             console.error('Failed to add row:', err);
         }
-    }, [selectedProject?.batchID, activeTab, projType]);
+    }, [selectedProject?.batchID, activeTab, projType, rows]);
 
     // ── Tab change ────────────────────────────────────────────────────────────
     const handleTabChange = (tab: string) => {
@@ -174,6 +196,7 @@ const ProjectWorkspacePage: React.FC = () => {
                     setRows([]);
                     setActiveTab(CATEGORIES[0]);
                 }}
+                auditRefreshTrigger={auditRefreshTrigger}
             />
 
             {/* Content Area */}

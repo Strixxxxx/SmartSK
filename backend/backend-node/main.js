@@ -92,6 +92,7 @@ const registerAuditRouter = require('./Admin/registerAudit');
 const reportsRouter = require('./AIDataRetrieval/reports');
 const projectBatchRouter = require('./Projects/projectBatch');
 const projectNotesRouter = require('./Projects/projectNotes');
+const projectAuditRouter = require('./Projects/projectAudit');
 const { initializeWebSocketServer, broadcast } = require('./websockets/websocket');
 
 // Load environment variables
@@ -313,6 +314,13 @@ if (projectBatchRouter && typeof projectBatchRouter === 'function') {
   app.use('/api/project-batch', projectBatchRouter);
 } else {
   console.error('projectBatchRouter is not a valid middleware function');
+}
+
+// Project Audit router
+if (projectAuditRouter && typeof projectAuditRouter === 'function') {
+  app.use('/api/project-batch', projectAuditRouter);
+} else {
+  console.error('projectAuditRouter is not a valid middleware function');
 }
 
 // Project Notes router

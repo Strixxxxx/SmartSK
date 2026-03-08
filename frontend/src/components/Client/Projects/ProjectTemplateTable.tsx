@@ -18,6 +18,7 @@ export function parseYearRange(fileName: string): string[] {
 
 export interface AbyipRow {
     rowID: number;
+    sheetRowIndex?: number;
     referenceCode?: string;
     PPA?: string;
     Description?: string;
@@ -33,6 +34,7 @@ export interface AbyipRow {
 
 export interface CbydpRow {
     rowID: number;
+    sheetRowIndex?: number;
     YDC?: string;
     objective?: string;
     performanceIndicator?: string;

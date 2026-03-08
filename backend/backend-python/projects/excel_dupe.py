@@ -5,6 +5,7 @@ from openpyxl.drawing.image import Image as OpenpyxlImage
 from openpyxl.styles import Alignment
 from PIL import Image as PILImage
 import logging
+import io
 
 logger = logging.getLogger(__name__)
 
@@ -27,26 +28,15 @@ def resize_image_proportional(img_path, target_width_px):
         ox_img.height = target_height_px
         return ox_img
 
-def duplicate_and_init_excel(batch_id: int, barangay_id: int, proj_type: str, target_year: str, file_path: str, sk_logo_path: str, brgy_logo_path: str) -> bool:
+def duplicate_and_init_excel(file_data: bytes, barangay_id: int, proj_type: str, target_year: str, sk_logo_data: bytes, brgy_logo_data: bytes) -> bytes:
     """
-    Updates target years across all sheets in the provided Excel file,
+    Updates target years across all sheets in the provided Excel file data,
     and programmatically re-inserts SK and Barangay logos with proportional resizing.
-    The file is expected to already be a copy of the template.
+    Operates entirely in memory and returns the modified Excel data as bytes.
     """
     try:
-        abbr = "SB" if barangay_id == 1 else "NN"
-        
-        # Target width based on user feedback 
-        # CBYDP: 0.9" ~ 86px
-        # ABYIP: 1.15" ~ 100px (Already good)
-        target_width = 86 if proj_type == 'CBYDP' else 100
-        
-        if not os.path.exists(file_path):
-            logger.error(f"Target Excel file not found: {file_path}")
-            return False
-            
-        # 3. Load with openpyxl
-        wb = load_workbook(file_path)
+        # Load from bytes
+        wb = load_workbook(io.BytesIO(file_data))
         
         # 4. Iterate through all sheets
         for sheet_name in wb.sheetnames:
@@ -72,9 +62,12 @@ def duplicate_and_init_excel(batch_id: int, barangay_id: int, proj_type: str, ta
             from openpyxl.drawing.spreadsheet_drawing import OneCellAnchor, AnchorMarker
             from openpyxl.drawing.xdr import XDRPositiveSize2D
             
+            target_width = 86 if proj_type == 'CBYDP' else 100  # 0.9" vs 1.04"
+
             # Barangay Logo on D1
-            if os.path.exists(brgy_logo_path):
-                img_brgy = resize_image_proportional(brgy_logo_path, target_width)
+            if brgy_logo_data:
+                img_brgy_io = io.BytesIO(brgy_logo_data)
+                img_brgy = resize_image_proportional(img_brgy_io, target_width)
                 # D is col index 3
                 col_idx = 3 
                 col_offset = 13 * pixel_to_emu if proj_type == 'CBYDP' else 0
@@ -85,8 +78,9 @@ def duplicate_and_init_excel(batch_id: int, barangay_id: int, proj_type: str, ta
                 ws.add_image(img_brgy)
             
             # SK Logo on H1
-            if os.path.exists(sk_logo_path):
-                img_sk = resize_image_proportional(sk_logo_path, target_width)
+            if sk_logo_data:
+                img_sk_io = io.BytesIO(sk_logo_data)
+                img_sk = resize_image_proportional(img_sk_io, target_width)
                 # H is col index 7
                 col_idx = 7
                 col_offset = 13 * pixel_to_emu if proj_type == 'CBYDP' else 0
@@ -96,11 +90,12 @@ def duplicate_and_init_excel(batch_id: int, barangay_id: int, proj_type: str, ta
                 img_sk.anchor = OneCellAnchor(_from=marker, ext=size)
                 ws.add_image(img_sk)
 
-        # 5. Save Final File
-        wb.save(file_path)
-        logger.info(f"Successfully initialized Excel with resized logos: {os.path.basename(file_path)}")
-        return True
+        # 5. Save Final File to memory
+        output = io.BytesIO()
+        wb.save(output)
+        logger.info(f"Successfully initialized Excel in memory.")
+        return output.getvalue()
         
     except Exception as e:
-        logger.error(f"Error in Linux-safe Excel duplication for batch {batch_id}: {e}")
-        return False
+        logger.error(f"Error in in-memory Excel duplication: {e}")
+        return None

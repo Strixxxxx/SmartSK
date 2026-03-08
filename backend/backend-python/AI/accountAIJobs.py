@@ -4,7 +4,8 @@ import pyodbc
 import logging
 from datetime import datetime
 from dateutil.parser import parse as parse_date
-import google.generativeai as genai
+from google.genai import types
+import google.genai as genai
 from dotenv import load_dotenv
 from PIL import Image
 import io
@@ -12,8 +13,8 @@ import json
 from crypto import decrypt
 import traceback
 import re
-from google.api_core import exceptions
-from gemini_utils import get_gemini_model, PRIMARY_MODEL, FALLBACK_MODEL
+from gemini_utils import call_gemini_with_retry, PRIMARY_MODEL, FALLBACK_MODEL
+from storage.storage import download_blob_to_memory
 
 # Load environment variables explicitly from the backend directory root
 dotenv_path = os.path.join(os.path.dirname(__file__), '..', '..', '.env')
@@ -30,12 +31,9 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_DRIVER = os.getenv('DB_DRIVER', '{ODBC Driver 17 for SQL Server}')
 
-BASE_STORAGE_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'backend-node', 'File_Storage')
 REGISTER_CONTAINER = os.getenv("REGISTER_CONTAINER")
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
+# genai.configure is now handled in get_gemini_client() in gemini_utils.py
 
 # --- Centralized Constants ---
 ROLE_NAME_MAP = {
@@ -100,24 +98,7 @@ def get_user_data(cursor, user_id):
         "roleName": user_data.roleName
     }
 
-def read_local_file_to_memory(container_name, file_name):
-    """Reads a file from the local file system into memory."""
-    if not container_name or not file_name:
-        raise ValueError("Container name and file name are required.")
-    
-    file_path = os.path.join(BASE_STORAGE_PATH, container_name, file_name)
-    
-    try:
-        with open(file_path, 'rb') as f:
-            file_data = f.read()
-        logging.info(f"Successfully read file '{file_name}' from '{container_name}'.")
-        return file_data
-    except FileNotFoundError:
-        logging.error(f"File '{file_name}' not found in container '{container_name}' at path '{file_path}'.")
-        return None
-    except Exception as e:
-        logging.error(f"Failed to read file '{file_name}'.", exc_info=True)
-        return None
+# Local file reading is replaced by Azure Blob Storage via storage.py
 
 # --- Verification Implementations ---
 
@@ -153,53 +134,26 @@ def analyze_id_card(id_image_data, id_back_image_data):
     
     user_img = {"mime_type": "image/jpeg", "data": id_image_data}
     user_img_back = {"mime_type": "image/jpeg", "data": id_back_image_data}
+    logging.info(f"Using primary model: {PRIMARY_MODEL}")
     
-    models_to_try = [PRIMARY_MODEL, FALLBACK_MODEL]
+    # Using the new google-genai Part format
+    contents = [
+        prompt,
+        types.Part.from_bytes(data=id_image_data, mime_type="image/jpeg"),
+        types.Part.from_bytes(data=id_back_image_data, mime_type="image/jpeg")
+    ]
     
-    for model_name in models_to_try:
-        try:
-            model = get_gemini_model(model_name)
-            if not model:
-                continue
-                
-            logging.info(f"Using model: {model_name}")
-            response = model.generate_content([prompt, user_img, user_img_back])
-            
-            # Extract JSON from potential code block
-            json_str = response.text.strip()
-            if json_str.startswith("```json"):
-                json_str = re.sub(r'^```json\s*', '', json_str)
-            if json_str.endswith("```"):
-                json_str = re.sub(r'\s*```$', '', json_str)
-            
-            return json.loads(json_str)
-            
-        except exceptions.ResourceExhausted as e:
-            logging.error(f"Quota Exceeded (429) for model '{model_name}'.")
-            if model_name == PRIMARY_MODEL:
-                logging.warning(f"Retrying with fallback model: {FALLBACK_MODEL}...")
-                continue
-            else:
-                return {"error": "QUOTA_EXCEEDED"}
-                
-        except Exception as e:
-            error_msg = str(e)
-            logging.error("--- AI API ERROR DIAGNOSTICS ---")
-            logging.error(f"Error Type: {type(e).__name__}")
-            logging.error(f"Error Message: {error_msg}")
-            logging.error("Full Traceback:")
-            logging.error(traceback.format_exc())
-            
-            if "429" in error_msg or "quota" in error_msg.lower():
-                logging.error(f"Verdict: Gemini API Quota Exceeded (429) for {model_name}.")
-                if model_name == PRIMARY_MODEL:
-                    continue
-                return {"error": "QUOTA_EXCEEDED"}
-            
-            logging.error(f"Verdict: Gemini ID analysis failed for {model_name}.")
-            return {"error": "AI processing failed."}
-            
-    return {"error": "AI processing failed."}
+    # Use the retry utility (handles fallback internally)
+    response_json = call_gemini_with_retry(
+        prompt=contents,
+        validation_func=lambda x: "id_type" in x,
+        model_name=PRIMARY_MODEL
+    )
+    
+    if response_json:
+        return response_json
+    else:
+        return {"error": "AI processing failed."}
 
 def normalize_name_to_parts(name):
     """Normalizes name by lowercasing and splitting into alphanumeric parts."""
@@ -337,11 +291,11 @@ def main(user_id):
             raise RuntimeError(f"No data found for userID: {user_id}.")
         logging.info(f"Fetched data for user: {user_data['fullName']}")
 
-        # 2. Read necessary files from local storage
-        user_id_image_data = read_local_file_to_memory(REGISTER_CONTAINER, user_data["attachmentPath"])
-        user_id_image_data_back = read_local_file_to_memory(REGISTER_CONTAINER, user_data["attachmentPathBack"])
+        # 2. Read necessary files from Azure Blob Storage
+        user_id_image_data = download_blob_to_memory(REGISTER_CONTAINER, user_data["attachmentPath"])
+        user_id_image_data_back = download_blob_to_memory(REGISTER_CONTAINER, user_data["attachmentPathBack"])
         sk_officials_list_blob_name = f"SK OFFICIAL - {user_data['barangayName']}.json"
-        sk_officials_list_data = read_local_file_to_memory(REGISTER_CONTAINER, sk_officials_list_blob_name)
+        sk_officials_list_data = download_blob_to_memory(REGISTER_CONTAINER, sk_officials_list_blob_name)
 
         if not all([user_id_image_data, user_id_image_data_back, sk_officials_list_data]):
              raise Exception("Failed to read one or more required files for verification.")

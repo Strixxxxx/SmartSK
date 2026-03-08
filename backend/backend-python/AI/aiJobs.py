@@ -11,6 +11,7 @@ import io
 from .pa_logic import generate_project_analysis
 from .trends_logic import generate_trends_report
 from .forecast import generate_forecast_report
+from storage.storage import download_blob_to_memory, upload_blob_from_memory, list_blobs
 
 # ==============================================================================
 # Configuration
@@ -26,7 +27,6 @@ load_dotenv(dotenv_path=dotenv_path)
 logger.info(f"Attempting to load .env file from: {os.path.abspath(dotenv_path)}")
 
 # --- Local Storage and Database Credentials ---
-BASE_STORAGE_PATH = os.path.join(os.path.dirname(__file__), '..', '..', 'backend-node', 'File_Storage')
 HA_CONTAINER_NAME = os.getenv("HA_CONTAINER")
 JSON_CONTAINER_NAME = os.getenv("JSON_CONTAINER")
 
@@ -41,37 +41,34 @@ DB_CONN_STR = f'DRIVER={DB_DRIVER};SERVER={DB_SERVER};DATABASE={DB_DATABASE};UID
 # Data Sourcing
 # ==============================================================================
 
-def get_data_from_local():
-    """Fetches all CSVs from the local historical archive and merges them into a single DataFrame."""
-    logger.info("Attempting to fetch data from local file storage...")
+def get_data_from_azure():
+    """Fetches all CSVs from the Azure historical archive and merges them into a single DataFrame."""
+    logger.info("Attempting to fetch data from Azure Blob Storage...")
     if not HA_CONTAINER_NAME:
-        logger.error("Local storage configuration for data sourcing is missing (HA_CONTAINER).")
-        return pd.DataFrame()
-
-    container_path = os.path.join(BASE_STORAGE_PATH, HA_CONTAINER_NAME)
-    if not os.path.exists(container_path):
-        logger.warning(f"Local historical data directory not found: {container_path}")
+        logger.error("Azure storage configuration for data sourcing is missing (HA_CONTAINER).")
         return pd.DataFrame()
 
     try:
+        blob_names = list_blobs(HA_CONTAINER_NAME)
         all_dfs = []
-        for filename in os.listdir(container_path):
-            if filename.lower().endswith('.csv'):
-                logger.info(f"Reading and parsing {filename}...")
-                file_path = os.path.join(container_path, filename)
-                df = pd.read_csv(file_path)
-                all_dfs.append(df)
+        for blob_name in blob_names:
+            if blob_name.lower().endswith('.csv'):
+                logger.info(f"Downloading and parsing {blob_name}...")
+                file_data = download_blob_to_memory(HA_CONTAINER_NAME, blob_name)
+                if file_data:
+                    df = pd.read_csv(io.BytesIO(file_data))
+                    all_dfs.append(df)
         
         if not all_dfs:
-            logger.warning("No CSV files found in local historical data directory.")
+            logger.warning("No CSV files found in Azure historical data container.")
             return pd.DataFrame()
 
         master_df = pd.concat(all_dfs, ignore_index=True)
-        logger.info(f"Successfully merged {len(all_dfs)} files from local storage into a DataFrame with {len(master_df)} rows.")
+        logger.info(f"Successfully merged {len(all_dfs)} files from Azure storage into a DataFrame with {len(master_df)} rows.")
         return master_df
 
     except Exception as e:
-        logger.error(f"Error fetching data from local storage: {e}", exc_info=True)
+        logger.error(f"Error fetching data from Azure storage: {e}", exc_info=True)
         return pd.DataFrame()
 
 def get_data_from_sql():
@@ -93,26 +90,22 @@ def get_data_from_sql():
 # ==============================================================================
 
 def upload_master_report(report_name, report_data):
-    """Uploads a master report dictionary as a single JSON file to the local file system."""
-    logger.info(f"Uploading master report '{report_name}' to local storage...")
+    """Uploads a master report dictionary as a single JSON file to Azure Blob Storage."""
+    logger.info(f"Uploading master report '{report_name}' to Azure Storage...")
     if not JSON_CONTAINER_NAME:
-        raise ConnectionError("Local storage configuration for report upload is missing (JSON_CONTAINER).")
+        raise ConnectionError("Azure storage configuration for report upload is missing (JSON_CONTAINER).")
 
     try:
-        container_path = os.path.join(BASE_STORAGE_PATH, JSON_CONTAINER_NAME)
-        if not os.path.exists(container_path):
-            os.makedirs(container_path, exist_ok=True)
-        
-        file_path = os.path.join(container_path, report_name)
         report_json = json.dumps(report_data, indent=2)
+        success = upload_blob_from_memory(JSON_CONTAINER_NAME, report_name, report_json.encode('utf-8'))
         
-        with open(file_path, 'w') as f:
-            f.write(report_json)
-        
-        logger.info(f"Successfully uploaded {report_name} to {file_path}.")
+        if success:
+            logger.info(f"Successfully uploaded {report_name} to Azure container '{JSON_CONTAINER_NAME}'.")
+        else:
+            raise Exception(f"Failed to upload {report_name} to Azure.")
 
     except Exception as e:
-        logger.error(f"Error uploading report {report_name} to local storage: {e}", exc_info=True)
+        logger.error(f"Error uploading report {report_name} to Azure storage: {e}", exc_info=True)
         raise
 
 # ==============================================================================
@@ -224,9 +217,9 @@ def main():
     logger.info("--- Starting AI Job Orchestration ---")
     
     # 1. Source Data
-    master_df = get_data_from_local()
+    master_df = get_data_from_azure()
     if master_df.empty:
-        logger.warning("Local data source was empty or failed. Falling back to SQL.")
+        logger.warning("Azure data source was empty or failed. Falling back to SQL.")
         master_df = get_data_from_sql()
     
     if master_df.empty:
@@ -353,7 +346,7 @@ def main():
 
 
     # 8. Upload Master Reports
-    logger.info("--- Uploading Master Reports to Local Storage ---")
+    logger.info("--- Uploading Master Reports to Azure Storage ---")
     try:
         upload_master_report("forecast.json", master_forecast)
         upload_master_report("pa_trends.json", master_trends)

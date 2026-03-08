@@ -1,4 +1,5 @@
 const express = require('express');
+const { broadcastToRoom } = require('../websockets/websocket');
 const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const templateService = require('../utils/templateService');
@@ -240,7 +241,7 @@ router.get('/:batchID/rows', authMiddleware, async (req, res) => {
                 .input('center', sql.NVarChar, center || null)
                 .query(`
                     SELECT abyipID as rowID, referenceCode, PPA, [Description], expectedResult,
-                           performanceIndicator, period, PS, MOOE, CO, total, personResponsible, centerOfParticipation
+                           performanceIndicator, period, PS, MOOE, CO, total, personResponsible, centerOfParticipation, sheetRowIndex
                     FROM projectABYIP
                     WHERE projbatchID = @batchID
                     AND (@center IS NULL OR centerOfParticipation = @center)
@@ -252,7 +253,7 @@ router.get('/:batchID/rows', authMiddleware, async (req, res) => {
                 .input('center', sql.NVarChar, center || null)
                 .query(`
                     SELECT cbydpID as rowID, YDC, objective, performanceIndicator,
-                           target1, target2, target3, PPAs, budget, personResponsible, centerOfParticipation, sectionType
+                           target1, target2, target3, PPAs, budget, personResponsible, centerOfParticipation, sectionType, sheetRowIndex
                     FROM projectCBYDP
                     WHERE projbatchID = @batchID
                     AND (@center IS NULL OR centerOfParticipation = @center)
@@ -271,7 +272,7 @@ router.get('/:batchID/rows', authMiddleware, async (req, res) => {
 router.post('/:batchID/rows', authMiddleware, async (req, res) => {
     try {
         const { batchID } = req.params;
-        const { center, sectionType } = req.body;
+        const { center, sectionType, sheetRowIndex } = req.body;
 
         const pool = await getConnection();
 
@@ -290,23 +291,56 @@ router.post('/:batchID/rows', authMiddleware, async (req, res) => {
             const result = await pool.request()
                 .input('batchID', sql.Int, batchID)
                 .input('center', sql.NVarChar, center || null)
+                .input('sheetRowIndex', sql.Int, sheetRowIndex || null)
                 .query(`
-                    INSERT INTO projectABYIP (projbatchID, centerOfParticipation)
+                    INSERT INTO projectABYIP (projbatchID, centerOfParticipation, sheetRowIndex)
                     OUTPUT INSERTED.abyipID as rowID
-                    VALUES (@batchID, @center)
+                    VALUES (@batchID, @center, @sheetRowIndex)
                 `);
             newRow = result.recordset[0];
+
+            await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('rowID', sql.Int, newRow.rowID)
+                .input('userID', sql.Int, req.user.userID)
+                .input('action', sql.NVarChar, 'ADD_ROW')
+                .input('oldValue', sql.NVarChar, null)
+                .input('newValue', sql.NVarChar, 'User added a new row.')
+                .query(`
+                    INSERT INTO projectAuditTrail (batchID, rowID, userID, action, oldValue, newValue)
+                    VALUES (@batchID, @rowID, @userID, @action, @oldValue, @newValue)
+                `);
+
+            // Trigger real-time audit update
+            broadcastToRoom(batchID, { type: 'audit_update', batchID });
+
         } else {
             const result = await pool.request()
                 .input('batchID', sql.Int, batchID)
                 .input('center', sql.NVarChar, center || null)
                 .input('sectionType', sql.NVarChar, sectionType || 'FROM')
+                .input('sheetRowIndex', sql.Int, sheetRowIndex || null)
                 .query(`
-                    INSERT INTO projectCBYDP (projbatchID, centerOfParticipation, sectionType)
+                    INSERT INTO projectCBYDP (projbatchID, centerOfParticipation, sectionType, sheetRowIndex)
                     OUTPUT INSERTED.cbydpID as rowID
-                    VALUES (@batchID, @center, @sectionType)
+                    VALUES (@batchID, @center, @sectionType, @sheetRowIndex)
                 `);
             newRow = result.recordset[0];
+
+            await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('rowID', sql.Int, newRow.rowID)
+                .input('userID', sql.Int, req.user.userID)
+                .input('action', sql.NVarChar, 'ADD_ROW')
+                .input('oldValue', sql.NVarChar, null)
+                .input('newValue', sql.NVarChar, 'User added a new row.')
+                .query(`
+                    INSERT INTO projectAuditTrail (batchID, rowID, userID, action, oldValue, newValue)
+                    VALUES (@batchID, @rowID, @userID, @action, @oldValue, @newValue)
+                `);
+
+            // Trigger real-time audit update
+            broadcastToRoom(batchID, { type: 'audit_update', batchID });
         }
 
         res.json({ success: true, data: newRow });
@@ -333,18 +367,70 @@ router.patch('/:batchID/rows/:rowID', authMiddleware, async (req, res) => {
 
         const pool = await getConnection();
 
+        // Let's get the old value to log in Audit Trail
+        let oldValue = null;
+        let visualIdentifier = '';
+
         if (projType === 'ABYIP') {
+            const oldRes = await pool.request()
+                .input('rowID', sql.Int, rowID)
+                .input('batchID', sql.Int, batchID)
+                .query(`SELECT [${field}], sheetRowIndex FROM projectABYIP WHERE abyipID = @rowID AND projbatchID = @batchID`);
+            if (oldRes.recordset.length) {
+                oldValue = oldRes.recordset[0][field];
+                visualIdentifier = `MAIN Row ${oldRes.recordset[0].sheetRowIndex || ''}`;
+            }
+
             await pool.request()
                 .input('value', sql.NVarChar, String(value ?? ''))
                 .input('rowID', sql.Int, rowID)
                 .input('batchID', sql.Int, batchID)
                 .query(`UPDATE projectABYIP SET [${field}] = @value WHERE abyipID = @rowID AND projbatchID = @batchID`);
         } else {
+            const oldRes = await pool.request()
+                .input('rowID', sql.Int, rowID)
+                .input('batchID', sql.Int, batchID)
+                .query(`SELECT [${field}], sectionType, sheetRowIndex FROM projectCBYDP WHERE cbydpID = @rowID AND projbatchID = @batchID`);
+            if (oldRes.recordset.length) {
+                oldValue = oldRes.recordset[0][field];
+                visualIdentifier = `${oldRes.recordset[0].sectionType || 'FROM'} Row ${oldRes.recordset[0].sheetRowIndex || ''}`;
+            }
+
             await pool.request()
                 .input('value', sql.NVarChar, String(value ?? ''))
                 .input('rowID', sql.Int, rowID)
                 .input('batchID', sql.Int, batchID)
                 .query(`UPDATE projectCBYDP SET [${field}] = @value WHERE cbydpID = @rowID AND projbatchID = @batchID`);
+        }
+
+        // Insert Audit Log if value changed
+        const safeOldValue = String(oldValue ?? '');
+        const safeNewValue = String(value ?? '');
+        if (safeOldValue !== safeNewValue) {
+            // Determine sentence: new text (no old value) vs edit (had old value)
+            let auditSummary;
+            if (!safeOldValue) {
+                // New text was added to an empty cell
+                auditSummary = `User added a new text on ${visualIdentifier} of ${field} : ${safeNewValue}`;
+            } else {
+                // Existing text was changed
+                auditSummary = `User changed a text on ${visualIdentifier} of ${field} from "${safeOldValue}" to "${safeNewValue}".`;
+            }
+
+            await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('rowID', sql.Int, rowID)
+                .input('userID', sql.Int, req.user.userID)
+                .input('action', sql.NVarChar, safeOldValue ? 'EDIT' : 'ADD_TEXT')
+                .input('oldValue', sql.NVarChar, safeOldValue || null)
+                .input('newValue', sql.NVarChar, auditSummary)
+                .query(`
+                    INSERT INTO projectAuditTrail (batchID, rowID, userID, action, oldValue, newValue)
+                    VALUES (@batchID, @rowID, @userID, @action, @oldValue, @newValue)
+                `);
+
+            // Trigger real-time audit update
+            broadcastToRoom(batchID, { type: 'audit_update', batchID });
         }
 
         res.json({ success: true, message: 'Cell updated.' });

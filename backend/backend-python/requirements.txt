@@ -6,7 +6,7 @@ numpy
 pyodbc
 
 # Google & AI
-google-generativeai
+google-genai
 google-api-python-client
 
 # Profanity Filter

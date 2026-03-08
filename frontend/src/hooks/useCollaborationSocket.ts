@@ -23,6 +23,7 @@ interface UseCollaborationSocketOptions {
     batchID: number | null;
     onCellChange?: (changes: any[]) => void;
     onNote?: (note: any) => void;
+    onAuditUpdate?: (batchID: number) => void;
 }
 
 const WS_URL = (() => {
@@ -32,7 +33,7 @@ const WS_URL = (() => {
     return `${protocol}//${host}:${port}`;
 })();
 
-export function useCollaborationSocket({ batchID, onCellChange, onNote }: UseCollaborationSocketOptions) {
+export function useCollaborationSocket({ batchID, onCellChange, onNote, onAuditUpdate }: UseCollaborationSocketOptions) {
     const wsRef = useRef<WebSocket | null>(null);
     const [collaborators, setCollaborators] = useState<Map<number, CollaboratorInfo>>(new Map());
     const [isConnected, setIsConnected] = useState(false);
@@ -127,6 +128,12 @@ export function useCollaborationSocket({ batchID, onCellChange, onNote }: UseCol
                 else if (msg.type === 'project_note') {
                     if (onNote && msg.note) {
                         onNote(msg.note);
+                    }
+                }
+
+                else if (msg.type === 'audit_update') {
+                    if (onAuditUpdate) {
+                        onAuditUpdate(Number(msg.batchID));
                     }
                 }
 
