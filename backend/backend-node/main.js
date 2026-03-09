@@ -94,6 +94,7 @@ const projectBatchRouter = require('./Projects/projectBatch');
 const projectNotesRouter = require('./Projects/projectNotes');
 const projectAuditRouter = require('./Projects/projectAudit');
 const { initializeWebSocketServer, broadcast } = require('./websockets/websocket');
+const { sendProjectDeadlineEmail } = require('./Email/email');
 
 // Load environment variables
 dotenv.config();
@@ -407,4 +408,58 @@ server.listen(NODE_PORT, HOST, () => {
   });
 
   console.log('Monthly cloud backup job has been scheduled.');
+
+  // --- Daily Deadline Check at 10:00 AM PST ---
+  cron.schedule('0 10 * * *', async () => {
+    console.log('[Deadline Job] Running sp_CheckProjectDeadlines at 10:00 AM PST...');
+    try {
+      const pool = await getConnection();
+
+      // 1. Execute the stored procedure to insert new notifications
+      await pool.request().execute('sp_CheckProjectDeadlines');
+
+      // 2. Fetch the notifications created today (isRead=0) to send emails
+      const result = await pool.request().query(`
+        SELECT pn.notificationID, pn.batchID, pn.barangayID, pn.notifType, pn.message,
+               pb.projName, pb.projType,
+               sl.StatusName,
+               DATEDIFF(DAY, pt.updatedAt, GETDATE()) AS daysStuck
+        FROM projectNotifications pn
+        JOIN projectBatch pb ON pn.batchID = pb.batchID
+        JOIN (
+          SELECT t.batchID, t.statusID, t.updatedAt
+          FROM projectTracker t
+          INNER JOIN (
+            SELECT batchID, MAX(updatedAt) AS maxDate FROM projectTracker GROUP BY batchID
+          ) latest ON t.batchID = latest.batchID AND t.updatedAt = latest.maxDate
+        ) pt ON pn.batchID = pt.batchID
+        JOIN StatusLookup sl ON pt.statusID = sl.StatusID
+        WHERE CAST(pn.createdAt AS DATE) = CAST(GETDATE() AS DATE)
+          AND pn.isRead = 0
+          AND pn.notifType IN ('DEADLINE_WARNING', 'URGENT')
+      `);
+
+      // 3. Send an email per notification and broadcast via WebSocket
+      for (const notif of result.recordset) {
+        await sendProjectDeadlineEmail(
+          notif.barangayID,
+          notif.projName,
+          notif.projType,
+          notif.StatusName,
+          notif.daysStuck,
+          notif.notifType
+        );
+        broadcast({ type: 'new_notification', barangayID: notif.barangayID });
+      }
+
+      console.log(`[Deadline Job] Done. Sent ${result.recordset.length} deadline email(s).`);
+    } catch (error) {
+      console.error('[Deadline Job] Error during deadline check:', error.message);
+    }
+  }, {
+    scheduled: true,
+    timezone: 'Asia/Manila'
+  });
+
+  console.log('Daily 10:00 AM deadline check job has been scheduled (Asia/Manila).');
 });

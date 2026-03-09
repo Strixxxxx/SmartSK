@@ -8,6 +8,7 @@ const { getBlobProperties, listBlobs, downloadBlobToBuffer, projectBatchContaine
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { spawn } = require('child_process');
 
 /**
  * Phase 3: Project Batch Management Router
@@ -79,19 +80,67 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
 router.post('/update-status', authMiddleware, async (req, res) => {
     try {
         const { batchID, statusID } = req.body;
-        const { userID } = req.user;
+        const { userID, position } = req.user;
 
-        // sp_UpdateProjectStatus should be defined in database_query.txt/Query.txt
+        // RBAC: Only SK Chairperson (SKC) can update project milestones
+        if (position !== 'SKC') {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized: Only the SK Chairperson can update project milestones.'
+            });
+        }
+
         const pool = await getConnection();
+
+        // Fetch projType to check for ABYIP AI trigger
+        const batchResult = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query('SELECT projType FROM projectBatch WHERE batchID = @batchID');
+
+        if (!batchResult.recordset.length) {
+            return res.status(404).json({ success: false, message: 'Batch not found.' });
+        }
+
+        const { projType } = batchResult.recordset[0];
+
+        // Insert new status record into projectTracker
         await pool.request()
             .input('batchID', sql.Int, batchID)
             .input('statusID', sql.Int, statusID)
             .input('userID', sql.Int, userID)
-            .execute('sp_UpdateProjectStatus');
+            .query('INSERT INTO projectTracker (batchID, statusID, updatedBy) VALUES (@batchID, @statusID, @userID)');
+
+        // City Approval (statusID = 6) on ABYIP only -> trigger AI job
+        if (statusID === 6 && projType === 'ABYIP') {
+            console.log(`[AI Trigger] ABYIP batch ${batchID} reached City Approval. Launching aiJobs.py...`);
+            const aiJobsPath = path.join(__dirname, '..', '..', '..', 'backend-python', 'AI', 'aiJobs.py');
+            const pyProcess = spawn('python', ['-m', 'backend-python.AI.aiJobs'], {
+                cwd: path.join(__dirname, '..', '..', '..'),
+                detached: true,
+                stdio: 'ignore'
+            });
+            pyProcess.unref(); // Fire-and-forget
+
+            // Insert AI_TRIGGERED notification
+            await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('barangayID', sql.Int, req.user.barangay)
+                .input('notifType', sql.NVarChar, 'AI_TRIGGERED')
+                .input('message', sql.NVarChar,
+                    `AI historical data sync triggered for ABYIP project (Batch #${batchID}) upon City Approval. Reports will be updated shortly.`)
+                .query(`
+                    INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
+                    VALUES (@batchID, @barangayID, @notifType, @message)
+                `);
+
+            // Broadcast real-time update
+            broadcastToRoom(batchID, { type: 'ai_triggered', batchID });
+        }
 
         res.json({
             success: true,
-            message: `Project status updated to Step ${statusID}`
+            message: `Project status updated to Step ${statusID}`,
+            aiTriggered: statusID === 6 && projType === 'ABYIP'
         });
 
     } catch (error) {
@@ -252,8 +301,7 @@ router.get('/:batchID/rows', authMiddleware, async (req, res) => {
                 .input('batchID', sql.Int, batchID)
                 .input('center', sql.NVarChar, center || null)
                 .query(`
-                    SELECT cbydpID as rowID, YDC, objective, performanceIndicator,
-                           target1, target2, target3, PPAs, budget, personResponsible, centerOfParticipation, sectionType, sheetRowIndex
+                    SELECT cbydpID as rowID, YDC, objective, performanceIndicator, target1, target2, target3, PPAs, budget, personResponsible, centerOfParticipation, sectionType, sheetRowIndex
                     FROM projectCBYDP
                     WHERE projbatchID = @batchID
                     AND (@center IS NULL OR centerOfParticipation = @center)
@@ -261,14 +309,15 @@ router.get('/:batchID/rows', authMiddleware, async (req, res) => {
                 `);
         }
 
-        res.json({ success: true, data: result.recordset, projType });
+        res.json({ success: true, data: result.recordset });
+
     } catch (error) {
         console.error('Error fetching rows:', error);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 });
 
-// 9. Add a new blank row for a project batch
+// 9. Add a new row to a project batch
 router.post('/:batchID/rows', authMiddleware, async (req, res) => {
     try {
         const { batchID } = req.params;
@@ -276,6 +325,7 @@ router.post('/:batchID/rows', authMiddleware, async (req, res) => {
 
         const pool = await getConnection();
 
+        // Get projType
         const batchResult = await pool.request()
             .input('batchID', sql.Int, batchID)
             .query('SELECT projType FROM projectBatch WHERE batchID = @batchID');
@@ -283,7 +333,6 @@ router.post('/:batchID/rows', authMiddleware, async (req, res) => {
         if (!batchResult.recordset.length) {
             return res.status(404).json({ success: false, message: 'Batch not found.' });
         }
-
         const { projType } = batchResult.recordset[0];
 
         let newRow;
@@ -291,24 +340,25 @@ router.post('/:batchID/rows', authMiddleware, async (req, res) => {
             const result = await pool.request()
                 .input('batchID', sql.Int, batchID)
                 .input('center', sql.NVarChar, center || null)
-                .input('sheetRowIndex', sql.Int, sheetRowIndex || null)
+                .input('sheetRowIndex', sql.Int, sheetRowIndex || 1)
                 .query(`
                     INSERT INTO projectABYIP (projbatchID, centerOfParticipation, sheetRowIndex)
-                    OUTPUT INSERTED.abyipID as rowID
+                    OUTPUT INSERTED.abyipID as rowID, INSERTED.sheetRowIndex
                     VALUES (@batchID, @center, @sheetRowIndex)
                 `);
             newRow = result.recordset[0];
 
             await pool.request()
                 .input('batchID', sql.Int, batchID)
-                .input('rowID', sql.Int, newRow.rowID)
+                .input('abyipID', sql.Int, newRow.rowID)
                 .input('userID', sql.Int, req.user.userID)
                 .input('action', sql.NVarChar, 'ADD_ROW')
                 .input('oldValue', sql.NVarChar, null)
                 .input('newValue', sql.NVarChar, 'User added a new row.')
+                .input('center', sql.NVarChar, center || null)
                 .query(`
-                    INSERT INTO projectAuditTrail (batchID, rowID, userID, action, oldValue, newValue)
-                    VALUES (@batchID, @rowID, @userID, @action, @oldValue, @newValue)
+                    INSERT INTO projectAuditTrail (batchID, abyipID, userID, action, oldValue, newValue, centerOfParticipation)
+                    VALUES (@batchID, @abyipID, @userID, @action, @oldValue, @newValue, @center)
                 `);
 
             // Trigger real-time audit update
@@ -319,24 +369,25 @@ router.post('/:batchID/rows', authMiddleware, async (req, res) => {
                 .input('batchID', sql.Int, batchID)
                 .input('center', sql.NVarChar, center || null)
                 .input('sectionType', sql.NVarChar, sectionType || 'FROM')
-                .input('sheetRowIndex', sql.Int, sheetRowIndex || null)
+                .input('sheetRowIndex', sql.Int, sheetRowIndex || 1)
                 .query(`
                     INSERT INTO projectCBYDP (projbatchID, centerOfParticipation, sectionType, sheetRowIndex)
-                    OUTPUT INSERTED.cbydpID as rowID
+                    OUTPUT INSERTED.cbydpID as rowID, INSERTED.sectionType, INSERTED.sheetRowIndex
                     VALUES (@batchID, @center, @sectionType, @sheetRowIndex)
                 `);
             newRow = result.recordset[0];
 
             await pool.request()
                 .input('batchID', sql.Int, batchID)
-                .input('rowID', sql.Int, newRow.rowID)
+                .input('cbydpID', sql.Int, newRow.rowID)
                 .input('userID', sql.Int, req.user.userID)
                 .input('action', sql.NVarChar, 'ADD_ROW')
                 .input('oldValue', sql.NVarChar, null)
                 .input('newValue', sql.NVarChar, 'User added a new row.')
+                .input('center', sql.NVarChar, center || null)
                 .query(`
-                    INSERT INTO projectAuditTrail (batchID, rowID, userID, action, oldValue, newValue)
-                    VALUES (@batchID, @rowID, @userID, @action, @oldValue, @newValue)
+                    INSERT INTO projectAuditTrail (batchID, cbydpID, userID, action, oldValue, newValue, centerOfParticipation)
+                    VALUES (@batchID, @cbydpID, @userID, @action, @oldValue, @newValue, @center)
                 `);
 
             // Trigger real-time audit update
@@ -350,55 +401,54 @@ router.post('/:batchID/rows', authMiddleware, async (req, res) => {
     }
 });
 
-// 10. Update a specific cell in a row
+// 10. Update a cell in a row
 router.patch('/:batchID/rows/:rowID', authMiddleware, async (req, res) => {
     try {
         const { batchID, rowID } = req.params;
-        const { field, value, projType } = req.body;
-
-        // Whitelist allowed fields to prevent SQL injection
-        const abyipFields = ['referenceCode', 'PPA', 'Description', 'expectedResult', 'performanceIndicator', 'period', 'PS', 'MOOE', 'CO', 'total', 'personResponsible'];
-        const cbydpFields = ['YDC', 'objective', 'performanceIndicator', 'target1', 'target2', 'target3', 'PPAs', 'budget', 'personResponsible'];
-        const allowedFields = projType === 'ABYIP' ? abyipFields : cbydpFields;
-
-        if (!allowedFields.includes(field)) {
-            return res.status(400).json({ success: false, message: `Invalid field: ${field}` });
-        }
+        const { field, value, projType, center } = req.body;
 
         const pool = await getConnection();
 
-        // Let's get the old value to log in Audit Trail
-        let oldValue = null;
-        let visualIdentifier = '';
+        // Get row metadata for audit (including center if possible)
+        let oldResult;
+        let visualIdentifier = `Row ${rowID}`;
+        let rowCenter = null;
 
         if (projType === 'ABYIP') {
-            const oldRes = await pool.request()
+            oldResult = await pool.request()
                 .input('rowID', sql.Int, rowID)
-                .input('batchID', sql.Int, batchID)
-                .query(`SELECT [${field}], sheetRowIndex FROM projectABYIP WHERE abyipID = @rowID AND projbatchID = @batchID`);
-            if (oldRes.recordset.length) {
-                oldValue = oldRes.recordset[0][field];
-                visualIdentifier = `MAIN Row ${oldRes.recordset[0].sheetRowIndex || ''}`;
+                .query(`SELECT [${field}], sheetRowIndex, centerOfParticipation FROM projectABYIP WHERE abyipID = @rowID`);
+            if (oldResult.recordset.length) {
+                const r = oldResult.recordset[0];
+                visualIdentifier = `Row ${r.sheetRowIndex}`;
+                rowCenter = r.centerOfParticipation;
             }
-
-            await pool.request()
-                .input('value', sql.NVarChar, String(value ?? ''))
+        } else {
+            oldResult = await pool.request()
                 .input('rowID', sql.Int, rowID)
+                .query(`SELECT [${field}], sectionType, sheetRowIndex, centerOfParticipation FROM projectCBYDP WHERE cbydpID = @rowID`);
+            if (oldResult.recordset.length) {
+                const r = oldResult.recordset[0];
+                visualIdentifier = `${r.sectionType} Row ${r.sheetRowIndex}`;
+                rowCenter = r.centerOfParticipation;
+            }
+        }
+
+        // Use the center from DB if found; fallback to request center only if DB is NULL (unlikely for new rows)
+        const finalCenter = rowCenter || center || null;
+        const oldValue = oldResult.recordset.length ? oldResult.recordset[0][field] : null;
+
+        // Update value
+        if (projType === 'ABYIP') {
+            await pool.request()
+                .input('rowID', sql.Int, rowID)
+                .input('value', sql.NVarChar, value)
                 .input('batchID', sql.Int, batchID)
                 .query(`UPDATE projectABYIP SET [${field}] = @value WHERE abyipID = @rowID AND projbatchID = @batchID`);
         } else {
-            const oldRes = await pool.request()
-                .input('rowID', sql.Int, rowID)
-                .input('batchID', sql.Int, batchID)
-                .query(`SELECT [${field}], sectionType, sheetRowIndex FROM projectCBYDP WHERE cbydpID = @rowID AND projbatchID = @batchID`);
-            if (oldRes.recordset.length) {
-                oldValue = oldRes.recordset[0][field];
-                visualIdentifier = `${oldRes.recordset[0].sectionType || 'FROM'} Row ${oldRes.recordset[0].sheetRowIndex || ''}`;
-            }
-
             await pool.request()
-                .input('value', sql.NVarChar, String(value ?? ''))
                 .input('rowID', sql.Int, rowID)
+                .input('value', sql.NVarChar, value)
                 .input('batchID', sql.Int, batchID)
                 .query(`UPDATE projectCBYDP SET [${field}] = @value WHERE cbydpID = @rowID AND projbatchID = @batchID`);
         }
@@ -417,17 +467,29 @@ router.patch('/:batchID/rows/:rowID', authMiddleware, async (req, res) => {
                 auditSummary = `User changed a text on ${visualIdentifier} of ${field} from "${safeOldValue}" to "${safeNewValue}".`;
             }
 
-            await pool.request()
+            const auditRequest = pool.request()
                 .input('batchID', sql.Int, batchID)
-                .input('rowID', sql.Int, rowID)
                 .input('userID', sql.Int, req.user.userID)
                 .input('action', sql.NVarChar, safeOldValue ? 'EDIT' : 'ADD_TEXT')
                 .input('oldValue', sql.NVarChar, safeOldValue || null)
                 .input('newValue', sql.NVarChar, auditSummary)
-                .query(`
-                    INSERT INTO projectAuditTrail (batchID, rowID, userID, action, oldValue, newValue)
-                    VALUES (@batchID, @rowID, @userID, @action, @oldValue, @newValue)
-                `);
+                .input('center', sql.NVarChar, finalCenter);
+
+            if (projType === 'ABYIP') {
+                await auditRequest
+                    .input('abyipID', sql.Int, rowID)
+                    .query(`
+                        INSERT INTO projectAuditTrail (batchID, abyipID, userID, action, oldValue, newValue, centerOfParticipation)
+                        VALUES (@batchID, @abyipID, @userID, @action, @oldValue, @newValue, @center)
+                    `);
+            } else {
+                await auditRequest
+                    .input('cbydpID', sql.Int, rowID)
+                    .query(`
+                        INSERT INTO projectAuditTrail (batchID, cbydpID, userID, action, oldValue, newValue, centerOfParticipation)
+                        VALUES (@batchID, @cbydpID, @userID, @action, @oldValue, @newValue, @center)
+                    `);
+            }
 
             // Trigger real-time audit update
             broadcastToRoom(batchID, { type: 'audit_update', batchID });
@@ -436,6 +498,54 @@ router.patch('/:batchID/rows/:rowID', authMiddleware, async (req, res) => {
         res.json({ success: true, message: 'Cell updated.' });
     } catch (error) {
         console.error('Error updating cell:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+// 11. Get project notifications for the logged-in user's barangay
+router.get('/notifications', authMiddleware, async (req, res) => {
+    try {
+        const { barangay: barangayID } = req.user;
+        const pool = await getConnection();
+
+        const result = await pool.request()
+            .input('barangayID', sql.Int, barangayID)
+            .query(`
+                SELECT
+                    pn.notificationID, pn.batchID, pn.notifType, pn.message, pn.isRead, pn.createdAt,
+                    pb.projName, pb.projType
+                FROM projectNotifications pn
+                JOIN projectBatch pb ON pn.batchID = pb.batchID
+                WHERE pn.barangayID = @barangayID
+                ORDER BY pn.createdAt DESC
+            `);
+
+        res.json({ success: true, data: result.recordset });
+    } catch (error) {
+        console.error('Error fetching notifications:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+// 12. Mark a notification as read
+router.patch('/notifications/:notificationID/read', authMiddleware, async (req, res) => {
+    try {
+        const { notificationID } = req.params;
+        const { barangay: barangayID } = req.user;
+        const pool = await getConnection();
+
+        await pool.request()
+            .input('notificationID', sql.Int, notificationID)
+            .input('barangayID', sql.Int, barangayID)
+            .query(`
+                UPDATE projectNotifications
+                SET isRead = 1
+                WHERE notificationID = @notificationID AND barangayID = @barangayID
+            `);
+
+        res.json({ success: true, message: 'Notification marked as read.' });
+    } catch (error) {
+        console.error('Error marking notification as read:', error);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 });

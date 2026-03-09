@@ -146,6 +146,7 @@ INSERT INTO StatusLookup (StatusID, StatusName, [description]) VALUES
 (6, 'City Approval', 'Final LGU Approval - Triggers AI Analysis.'),
 (7, 'Procurement Phase', 'Bidding and Procurement process.'),
 (8, 'Project Execution', 'Implementation and execution of the project.');
+(9, 'Project Closure & Evaluation', 'All PPAs executed, liquidated, and evaluated for impact.');
 
 --Projects Table
 
@@ -178,6 +179,7 @@ CREATE TABLE projectABYIP (
     abyipID INT PRIMARY KEY IDENTITY(1,1),
     projbatchID INT NOT NULL,
     referenceCode NVARCHAR(50),
+    centerOfParticipation NVARCHAR(100) NULL,
     PPA NVARCHAR(MAX),
     [Description] NVARCHAR(MAX),
     expectedResult NVARCHAR(MAX),
@@ -196,6 +198,8 @@ CREATE TABLE projectABYIP (
 CREATE TABLE projectCBYDP (
     cbydpID INT PRIMARY KEY IDENTITY(1,1),
     projbatchID INT NOT NULL,
+    centerOfParticipation NVARCHAR(100) NULL,
+    sectionType NVARCHAR(50) NULL,
     YDC NVARCHAR(MAX),
     objective NVARCHAR(MAX),
     performanceIndicator NVARCHAR(MAX),
@@ -225,11 +229,13 @@ CREATE TABLE projectTracker (
 CREATE TABLE projectAuditTrail (
     auditID INT PRIMARY KEY IDENTITY(1,1),
     batchID INT NOT NULL,
-    rowID INT NOT NULL, -- The ID of the row being edited (abyipID or cbydpID)
+    abyipID INT NULL,
+    cbydpID INT NULL,
     userID INT NOT NULL,
     action NVARCHAR(50) NOT NULL, -- 'EDIT', 'DELETE', 'ADD'
     oldValue NVARCHAR(MAX),
     newValue NVARCHAR(MAX),
+    centerOfParticipation NVARCHAR(100) NULL,
     timestamp DATETIME DEFAULT GETDATE(),
     CONSTRAINT FK_Audit_Batch FOREIGN KEY (batchID) REFERENCES projectBatch(batchID) ON DELETE CASCADE,
     CONSTRAINT FK_Audit_User FOREIGN KEY (userID) REFERENCES userInfo(userID)
@@ -246,6 +252,21 @@ CREATE TABLE projectNotes (
     CONSTRAINT FK_Notes_User FOREIGN KEY (userID) REFERENCES userInfo(userID)
 );
 
+--Project Notifications
+
+CREATE TABLE projectNotifications (
+notificationID INT PRIMARY KEY IDENTITY(1,1),
+batchID INT NOT NULL,
+barangayID INT NOT NULL,
+notifType NVARCHAR(50) NOT NULL,
+message NVARCHAR(MAX) NOT NULL,
+isRead BIT NOT NULL DEFAULT 0,
+createdAt DATETIME NOT NULL DEFAULT GETDATE(),
+CONSTRAINT FK_Notif_Batch FOREIGN KEY (batchID) REFERENCES projectBatch(batchID) ON DELETE CASCADE,
+CONSTRAINT FK_Notif_Barangay FOREIGN KEY (barangayID) REFERENCES barangays(barangayID)
+);
+CREATE INDEX IX_ProjectNotifications_BarangayID ON projectNotifications(barangayID);
+CREATE INDEX IX_ProjectNotifications_IsRead ON projectNotifications(isRead);
 
 --Storing OTP
 
@@ -449,6 +470,60 @@ BEGIN
         THROW;
     END CATCH
 END
+GO
+
+--Checking for Project Deadlines
+
+DROP PROCEDURE IF EXISTS sp_CheckProjectDeadlines;
+GO
+
+CREATE PROCEDURE sp_CheckProjectDeadlines
+AS
+BEGIN
+SET NOCOUNT ON;
+
+-- CTE: Get the latest status and date for each batch
+WITH LatestStatus AS (
+    SELECT
+        pt.batchID,
+        pt.statusID,
+        pt.updatedAt,
+        DATEDIFF(DAY, pt.updatedAt, GETDATE()) AS daysStuck
+    FROM projectTracker pt
+    INNER JOIN (
+        SELECT batchID, MAX(updatedAt) AS maxDate
+        FROM projectTracker
+        GROUP BY batchID
+    ) latest ON pt.batchID = latest.batchID AND pt.updatedAt = latest.maxDate
+)
+INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
+SELECT
+    pb.batchID,
+    pb.barangayID,
+    CASE
+        WHEN ls.daysStuck >= 30 THEN 'URGENT'
+        ELSE 'DEADLINE_WARNING'
+    END,
+    CASE
+        WHEN ls.daysStuck >= 30 THEN
+            'URGENT: Project "' + pb.projName + '" (' + pb.projType + ') has been in "' + sl.StatusName + '" for ' + CAST(ls.daysStuck AS NVARCHAR) + ' days. Immediate action is required.'
+        ELSE
+            'REMINDER: Project "' + pb.projName + '" (' + pb.projType + ') has been in "' + sl.StatusName + '" for ' + CAST(ls.daysStuck AS NVARCHAR) + ' days. Please review and advance the status.'
+    END
+FROM LatestStatus ls
+JOIN projectBatch  pb ON ls.batchID  = pb.batchID
+JOIN StatusLookup  sl ON ls.statusID = sl.StatusID
+ WHERE
+    pb.isArchived = 0
+    AND ls.statusID NOT IN (8, 9)  -- Skip completed/closed projects
+    AND ls.daysStuck >= 15          -- Only flag if 15+ days stale
+    -- Avoid inserting a duplicate notification for same batch on same day
+    AND NOT EXISTS (
+        SELECT 1 FROM projectNotifications pn
+        WHERE pn.batchID = pb.batchID
+            AND CAST(pn.createdAt AS DATE) = CAST(GETDATE() AS DATE)
+    );
+END;
 GO
 
 --IMPORTANT NOTE: RUN THIS CODE AFTER RUNNING THE TABLE CREATION AND STORED PROCEDURE
@@ -870,3 +945,4 @@ BEGIN
     PRINT 'sectionType already exists in projectCBYDP';
 END
 GO
+

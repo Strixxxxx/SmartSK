@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
 import ProjectWorkspaceSidebar from './ProjectWorkspaceSidebar';
@@ -6,7 +6,8 @@ import ProjectWorkNotes from './ProjectWorkNotes';
 import ProjectTopNavbar from './ProjectTopNavbar';
 import CreateProjectModal from './CreateProjectModal';
 import ProjectTemplateHeader from './ProjectTemplateHeader';
-import ProjectTemplateTable, { AbyipRow, CbydpRow } from './ProjectTemplateTable';
+import ProjectTemplateTable from './ProjectTemplateTable';
+import { AbyipRow, CbydpRow } from './ProjectTemplateTypes';
 import ProjectSheetTabs from './ProjectSheetTabs';
 import { useAuth } from '../../../context/AuthContext';
 import { useCollaborationSocket } from '../../../hooks/useCollaborationSocket';
@@ -46,6 +47,7 @@ const ProjectWorkspacePage: React.FC = () => {
     const [activeTab, setActiveTab] = useState<string>(CATEGORIES[0]);
     const [rows, setRows] = useState<(AbyipRow | CbydpRow)[]>([]);
     const [isLoadingRows, setIsLoadingRows] = useState(false);
+    const [projectListRefreshTrigger, setProjectListRefreshTrigger] = useState(0);
     const { user } = useAuth();
 
     const canCreate = user?.role === 'SKC' ||
@@ -87,6 +89,12 @@ const ProjectWorkspacePage: React.FC = () => {
     }, [selectedProject?.batchID, activeTab]);
 
     // ── Collaboration ─────────────────────────────────────────────────────────
+    const [remoteNotes, setRemoteNotes] = useState<any[]>([]);
+
+    const handleRemoteNote = useCallback((note: any) => {
+        setRemoteNotes(prev => [...prev, note]);
+    }, []);
+
     const handleRemoteCellChange = useCallback((changes: any[]) => {
         changes.forEach(({ rowID, field, value }) => {
             setRows((prev) =>
@@ -95,13 +103,6 @@ const ProjectWorkspacePage: React.FC = () => {
                 )
             );
         });
-    }, []);
-
-    // ── Work Notes ────────────────────────────────────────────────────────────
-    const [remoteNotes, setRemoteNotes] = useState<any[]>([]);
-
-    const handleRemoteNote = useCallback((note: any) => {
-        setRemoteNotes(prev => [...prev, note]);
     }, []);
 
     const [auditRefreshTrigger, setAuditRefreshTrigger] = useState(0);
@@ -121,31 +122,33 @@ const ProjectWorkspacePage: React.FC = () => {
     collaborators.forEach((c: any) => collabMap.set(c.userID, c));
 
     // ── Cell change handler ───────────────────────────────────────────────────
-    const cellDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const handleCellChange = useCallback((rowID: number, field: string, value: string) => {
-        // Optimistic update
+        // 1. Optimistic update (Immediate UI feedback)
         setRows((prev) =>
             prev.map((r) => (r as any).rowID === rowID ? { ...r, [field]: value } : r)
         );
 
-        // Debounce API call
-        if (cellDebounceRef.current) clearTimeout(cellDebounceRef.current);
-        cellDebounceRef.current = setTimeout(async () => {
-            try {
-                await axiosInstance.patch(
-                    `/api/project-batch/${selectedProject.batchID}/rows/${rowID}`,
-                    { field, value, projType }
-                );
-                // Broadcast to collaborators
-                sendCellChange([{ rowID, field, value }]);
-                // Update local audit timeline
-                setAuditRefreshTrigger(prev => prev + 1);
-            } catch (err) {
-                console.error('Failed to save cell:', err);
-            }
-        }, 600);
-    }, [selectedProject?.batchID, projType, sendCellChange]);
+        // 2. Real-time sync (Broadcast to other users)
+        sendCellChange([{ rowID, field, value }]);
+    }, [sendCellChange]);
+
+    // ── Cell blur handler (Finalize Audit) ─────────────────────────────────────
+    const handleCellBlur = useCallback(async (rowID: number, field: string, value: string) => {
+        if (!selectedProject?.batchID) return;
+
+        try {
+            // Persistent save + Audit creation
+            await axiosInstance.patch(
+                `/api/project-batch/${selectedProject.batchID}/rows/${rowID}`,
+                { field, value, projType, center: activeTab }
+            );
+            // Update local audit timeline
+            setAuditRefreshTrigger(prev => prev + 1);
+        } catch (err) {
+            console.error('Failed to save finalized cell:', err);
+        }
+    }, [selectedProject?.batchID, projType, activeTab]);
 
     // ── Add row handler ───────────────────────────────────────────────────────
     const handleAddRow = useCallback(async (sectionType?: string) => {
@@ -179,6 +182,27 @@ const ProjectWorkspacePage: React.FC = () => {
         }
     }, [selectedProject?.batchID, activeTab, projType, rows]);
 
+    // ── Update Status handler ───────────────────────────────────────────────
+    const handleUpdateStatus = async (statusID: number) => {
+        if (!selectedProject?.batchID) return;
+        try {
+            const res = await axiosInstance.post('/api/project-batch/update-status', {
+                batchID: selectedProject.batchID,
+                statusID
+            });
+            if (res.data.success) {
+                setSelectedProject((prev: any) => ({
+                    ...prev,
+                    currentStatusID: statusID
+                }));
+                // Broadcast update if needed via socket or just rely on local state
+            }
+        } catch (err: any) {
+            console.error('Failed to update status:', err);
+            alert(err.response?.data?.message || 'Failed to update milestone.');
+        }
+    };
+
     // ── Tab change ────────────────────────────────────────────────────────────
     const handleTabChange = (tab: string) => {
         setActiveTab(tab);
@@ -197,6 +221,8 @@ const ProjectWorkspacePage: React.FC = () => {
                     setActiveTab(CATEGORIES[0]);
                 }}
                 auditRefreshTrigger={auditRefreshTrigger}
+                projectListRefreshTrigger={projectListRefreshTrigger}
+                center={activeTab}
             />
 
             {/* Content Area */}
@@ -209,6 +235,7 @@ const ProjectWorkspacePage: React.FC = () => {
                     collaborators={collaborators}
                     currentUser={user}
                     onCreateNew={() => setIsModalOpen(true)}
+                    onUpdateStatus={handleUpdateStatus}
                 />
 
                 {/* Main Row */}
@@ -244,6 +271,7 @@ const ProjectWorkspacePage: React.FC = () => {
                                             readOnly={isReadOnly}
                                             onAddRow={handleAddRow}
                                             onCellChange={handleCellChange}
+                                            onCellBlur={handleCellBlur}
                                             collaborators={collabMap}
                                             currentUserId={user?.id}
                                             sendCursorMove={sendCursorMove}
@@ -261,12 +289,13 @@ const ProjectWorkspacePage: React.FC = () => {
                         )}
                     </Box>
 
-                    {/* Work Notes */}
-                    <Box sx={{ width: 280, minWidth: 280, flexShrink: 0, display: 'flex', flexDirection: 'column', borderLeft: '1px solid #e0d9c4' }}>
+                    {/* Sidebar: Audit Timeline & Work Notes */}
+                    <Box sx={{ width: 280, minWidth: 280, flexShrink: 0, display: 'flex', flexDirection: 'column', borderLeft: '1px solid #e0d9c4', overflowY: 'auto' }}>
                         <ProjectWorkNotes
                             project={selectedProject}
                             remoteNotes={remoteNotes}
                             onPostNote={(note) => sendNote(note)}
+                            center={activeTab}
                         />
                     </Box>
                 </Box>
@@ -276,7 +305,10 @@ const ProjectWorkspacePage: React.FC = () => {
             <CreateProjectModal
                 open={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                onCreated={() => setIsModalOpen(false)}
+                onCreated={() => {
+                    setIsModalOpen(false);
+                    setProjectListRefreshTrigger(prev => prev + 1);
+                }}
             />
         </Box>
     );

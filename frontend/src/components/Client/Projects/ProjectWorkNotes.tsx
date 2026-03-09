@@ -17,9 +17,10 @@ interface ProjectWorkNotesProps {
     project: any;
     onPostNote?: (note: NoteItem) => void;
     remoteNotes?: NoteItem[];
+    center?: string | null;
 }
 
-const ProjectWorkNotes: React.FC<ProjectWorkNotesProps> = ({ project, onPostNote, remoteNotes }) => {
+const ProjectWorkNotes: React.FC<ProjectWorkNotesProps> = ({ project, onPostNote, remoteNotes, center }) => {
     const [notes, setNotes] = useState<NoteItem[]>([]);
     const [input, setInput] = useState('');
     const [isPosting, setIsPosting] = useState(false);
@@ -33,14 +34,16 @@ const ProjectWorkNotes: React.FC<ProjectWorkNotesProps> = ({ project, onPostNote
         }
         const fetchNotes = async () => {
             try {
-                const res = await axiosInstance.get(`/api/project-notes/${project.batchID}`);
+                const res = await axiosInstance.get(`/api/project-notes/${project.batchID}`, {
+                    params: { center }
+                });
                 setNotes(res.data.data ?? []);
             } catch (err) {
                 console.error('Failed to load notes:', err);
             }
         };
         fetchNotes();
-    }, [project?.batchID]);
+    }, [project?.batchID, center]);
 
     // Append remote notes received via WebSocket
     useEffect(() => {
@@ -64,7 +67,10 @@ const ProjectWorkNotes: React.FC<ProjectWorkNotesProps> = ({ project, onPostNote
         if (!input.trim() || !project?.batchID) return;
         setIsPosting(true);
         try {
-            const res = await axiosInstance.post(`/api/project-notes/${project.batchID}`, { content: input.trim() });
+            const res = await axiosInstance.post(`/api/project-notes/${project.batchID}`, {
+                content: input.trim(),
+                center
+            });
             const newNote: NoteItem = res.data.data;
             setNotes(prev => [...prev, newNote]);
             setInput('');
@@ -84,8 +90,6 @@ const ProjectWorkNotes: React.FC<ProjectWorkNotesProps> = ({ project, onPostNote
     };
 
     const formatTime = (iso: string) => {
-        // Since database is in PST, we want to display it as-is without UTC shifts.
-        // We replace 'Z' or 'T' if present to treat it as local-time string.
         const cleanIso = iso.replace('Z', '').replace('T', ' ');
         const d = new Date(cleanIso);
         return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' · ' +

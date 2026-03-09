@@ -36,16 +36,16 @@ ClaudeAI.txt
 console.txt
 content.txt
 frontend.txt
-GeminiCLI.txt
+gemini.docs
 RSC.md
 UserManual.md
 .python-version
 actions.txt
 Query.txt
+GEMINI.md
 
 # Backups and screenshots
 database_backup/
 Screenshots/
 
-# Ignore GitHub workflows
-# .github/
+

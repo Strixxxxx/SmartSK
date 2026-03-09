@@ -53,7 +53,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         // Authenticate the WebSocket connection
         const token = localStorage.getItem('token');
         if (token) {
-            ws.send(JSON.stringify({ type: 'auth', token }));
+          ws.send(JSON.stringify({ type: 'auth', token }));
         }
       };
 
@@ -61,14 +61,14 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         try {
           const message = JSON.parse(event.data);
           if (import.meta.env.DEV) console.log('[WebSocket] Message received:', message);
-          
+
           if (message.type === 'maintenance_starting' || message.type === 'maintenance_ended') {
             setMaintenanceMessage(message);
           } else if (message.type === 'job-update') {
             if (message.status === 'completed') {
-                toast.success(message.message);
+              toast.success(message.message);
             } else if (message.status === 'failed') {
-                toast.error(message.message);
+              toast.error(message.message);
             }
           } else if (message.type === 'POSTS_UPDATED') { // Handle the new message type
             if (import.meta.env.DEV) console.log('[WebSocket] Posts updated, triggering refresh.');
@@ -99,7 +99,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
         clearInterval(reconnectInterval);
       }
       if (ws) {
-        ws.close();
+        if (ws.readyState === WebSocket.CONNECTING) {
+          ws.onopen = () => ws.close();
+        } else {
+          ws.close();
+        }
       }
     };
   }, []);

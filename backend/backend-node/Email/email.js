@@ -115,7 +115,7 @@ const createProjectStatusEmail = (project, status, remarks) => {
   let subject = '';
   let statusText = '';
   let statusHeading = '';
-  
+
   if (status === 'approved') {
     subject = 'Project Proposal Status: Approved';
     statusText = 'approved';
@@ -129,7 +129,7 @@ const createProjectStatusEmail = (project, status, remarks) => {
     statusText = 'requires some revisions before it can be approved';
     statusHeading = 'Project Revision Required';
   }
-  
+
   return {
     subject,
     html: `
@@ -160,6 +160,31 @@ const createProjectStatusEmail = (project, status, remarks) => {
   };
 };
 
+const createProjectDeadlineEmail = (projName, projType, statusName, daysStuck, notifType) => {
+  const isUrgent = notifType === 'URGENT';
+  const headerColor = isUrgent ? '#c62828' : '#f57c00';
+  const title = isUrgent ? '⚠️ URGENT: Project Deadline Alert' : '📋 Project Status Reminder';
+  return `
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+    <div style="background-color: ${headerColor}; padding: 15px; text-align: center;">
+      <h2 style="color: white; margin: 0;">${title}</h2>
+    </div>
+    <div style="padding: 20px;">
+      <p>This is an automated reminder from the Smart SK system.</p>
+      <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid ${headerColor}; margin: 15px 0;">
+        <p><strong>Project:</strong> ${projName} (${projType})</p>
+        <p><strong>Current Status:</strong> ${statusName}</p>
+        <p><strong>Days in Current Status:</strong> ${daysStuck} day(s)</p>
+      </div>
+      ${isUrgent
+      ? '<p style="color: #c62828; font-weight: bold;">⚠️ IMMEDIATE ACTION REQUIRED: This project has been stalled for over 30 days. Failure to advance may result in legal non-compliance per RA 10742.</p>'
+      : '<p>Please log in to Smart SK and advance this project to its next milestone to stay on track with submission deadlines.</p>'}
+      <p>Best regards,<br>Smart SK System</p>
+    </div>
+  </div>
+  `;
+};
+
 // OTP Logic for Forgot Password
 
 const generateOTP = () => {
@@ -172,26 +197,26 @@ const sendPasswordResetEmail = async (email, userID) => {
   try {
     // Generate OTP
     const resetCode = generateOTP();
-    
+
     const htmlContent = createPasswordResetEmail(resetCode);
-    
+
     const mailOptions = {
       from: '"Smart SK" <smartsk2025@gmail.com>',
       to: email,
       subject: 'Smart SK Password Reset',
       html: htmlContent
     };
-    
+
     await transporter.sendMail(mailOptions);
 
     addAuditTrail({
-        actor: 'S',
-        module: 'E',
-        userID: userID,
-        actions: 'send-password-reset-email',
-        oldValue: null,
-        newValue: null,
-        descriptions: 'Password reset email sent'
+      actor: 'S',
+      module: 'E',
+      userID: userID,
+      actions: 'send-password-reset-email',
+      oldValue: null,
+      newValue: null,
+      descriptions: 'Password reset email sent'
     });
     return { success: true, message: 'Password reset email sent', otp: resetCode };
   } catch (error) {
@@ -207,30 +232,30 @@ const sendAccountApprovalEmail = async (userId) => {
     const userResult = await pool.request()
       .input('userId', sql.Int, userId)
       .query('SELECT * FROM pendingInfo WHERE userID = @userId');
-    
+
     if (userResult.recordset.length === 0) {
       throw new Error('User not found');
     }
-    
+
     const user = userResult.recordset[0];
     const htmlContent = createAccountApprovalEmail(user.userName);
-    
+
     const mailOptions = {
       from: '"Smart SK" <smartsk2025@gmail.com>',
       to: user.emailAddress,
       subject: 'Smart SK Account Status',
       html: htmlContent
     };
-    
+
     const info = await transporter.sendMail(mailOptions);
     addAuditTrail({
-        actor: 'S',
-        module: 'E',
-        userID: userId,
-        actions: 'send-account-approval-email',
-        oldValue: null,
-        newValue: null,
-        descriptions: 'Account approval email sent'
+      actor: 'S',
+      module: 'E',
+      userID: userId,
+      actions: 'send-account-approval-email',
+      oldValue: null,
+      newValue: null,
+      descriptions: 'Account approval email sent'
     });
     return { success: true, messageId: info.messageId };
   } catch (error) {
@@ -246,7 +271,7 @@ const sendAccountRejectionEmail = async (emailAddress, fullName, reason) => {
     }
 
     const htmlContent = createAccountRejectionEmail(fullName, reason);
-    
+
     const mailOptions = {
       from: '"Smart SK" <smartsk2025@gmail.com>',
       to: emailAddress,
@@ -256,15 +281,15 @@ const sendAccountRejectionEmail = async (emailAddress, fullName, reason) => {
 
     await transporter.sendMail(mailOptions);
     addAuditTrail({
-        actor: 'S',
-        module: 'E',
-        userID: null,
-        actions: 'send-account-rejection-email',
-        oldValue: null,
-        newValue: reason,
-        descriptions: 'Account rejection email sent'
+      actor: 'S',
+      module: 'E',
+      userID: null,
+      actions: 'send-account-rejection-email',
+      oldValue: null,
+      newValue: reason,
+      descriptions: 'Account rejection email sent'
     });
-    
+
     return {
       success: true,
       message: 'Account rejection email sent successfully'
@@ -282,23 +307,23 @@ const sendAccountRejectionEmail = async (emailAddress, fullName, reason) => {
 const sendAccountCreationEmail = async (username, emailAddress) => {
   try {
     const htmlContent = createAccountCreationEmail(username);
-    
+
     const mailOptions = {
       from: '"Smart SK" <smartsk2025@gmail.com>',
       to: emailAddress,
       subject: 'Welcome to Smart SK - Account Created',
       html: htmlContent
     };
-    
+
     const info = await transporter.sendMail(mailOptions);
     addAuditTrail({
-        actor: 'S',
-        module: 'E',
-        userID: null,
-        actions: 'send-account-creation-email',
-        oldValue: null,
-        newValue: null,
-        descriptions: 'Account creation email sent'
+      actor: 'S',
+      module: 'E',
+      userID: null,
+      actions: 'send-account-creation-email',
+      oldValue: null,
+      newValue: null,
+      descriptions: 'Account creation email sent'
     });
     return { success: true, messageId: info.messageId };
   } catch (error) {
@@ -319,30 +344,30 @@ const sendProjectStatusEmail = async (projectId, status, remarks) => {
         JOIN userInfo u ON p.userID = u.userID
         WHERE p.projectID = @projectId
       `);
-    
+
     if (projectResult.recordset.length === 0) {
       throw new Error('Project not found');
     }
-    
+
     const project = projectResult.recordset[0];
     const { subject, html } = createProjectStatusEmail(project, status, remarks);
-    
+
     const mailOptions = {
       from: '"Smart SK" <smartsk2025@gmail.com>',
       to: project.emailAddress,
       subject: subject,
       html: html
     };
-    
+
     const info = await transporter.sendMail(mailOptions);
     addAuditTrail({
-        actor: 'S',
-        module: 'E',
-        userID: project.userID,
-        actions: 'send-project-status-email',
-        oldValue: null,
-        newValue: `status: ${status}`,
-        descriptions: 'Project status email sent'
+      actor: 'S',
+      module: 'E',
+      userID: project.userID,
+      actions: 'send-project-status-email',
+      oldValue: null,
+      newValue: `status: ${status}`,
+      descriptions: 'Project status email sent'
     });
     return { success: true, messageId: info.messageId };
   } catch (error) {
@@ -357,24 +382,24 @@ const sendRegistrationApprovalEmail = async (userID) => {
     const userResult = await pool.request()
       .input('userID', sql.Int, userID)
       .query('SELECT fullName, emailAddress FROM preUserInfo WHERE userID = @userID');
-    
+
     if (userResult.recordset.length === 0) {
       throw new Error(`User with ID ${userID} not found in preUserInfo.`);
     }
-    
+
     const user = userResult.recordset[0];
     const decryptedFullName = decrypt(user.fullName);
     const decryptedEmail = decrypt(user.emailAddress);
 
     const htmlContent = createAccountApprovalEmail(decryptedFullName);
-    
+
     const mailOptions = {
       from: '"Smart SK" <smartsk2025@gmail.com>',
       to: decryptedEmail,
       subject: 'Your Smart SK Account has been Approved',
       html: htmlContent
     };
-    
+
     await transporter.sendMail(mailOptions);
     console.log(`Registration approval email sent to ${decryptedEmail}`);
     return { success: true };
@@ -400,7 +425,7 @@ const sendRegistrationRejectionEmail = async (userID, reason) => {
     const decryptedEmail = decrypt(user.emailAddress);
 
     const htmlContent = createAccountRejectionEmail(decryptedFullName, reason);
-    
+
     const mailOptions = {
       from: '"Smart SK" <smartsk2025@gmail.com>',
       to: decryptedEmail,
@@ -417,26 +442,73 @@ const sendRegistrationRejectionEmail = async (userID, reason) => {
   }
 };
 
+const sendProjectDeadlineEmail = async (barangayID, projName, projType, statusName, daysStuck, notifType) => {
+  try {
+    const pool = await getConnection();
+    // Fetch SK Chairperson and Secretary emails for this barangay
+    const userResult = await pool.request()
+      .input('barangayID', sql.Int, barangayID)
+      .query(`
+        SELECT u.emailAddress
+        FROM userInfo u
+        JOIN roles r ON u.position = r.roleID
+        WHERE u.barangay = @barangayID
+          AND r.roleName IN ('SKC', 'SKS')
+          AND u.isArchived = 0
+      `);
+
+    if (userResult.recordset.length === 0) {
+      console.warn(`[DeadlineEmail] No SKC/SKS found for barangayID ${barangayID}.`);
+      return { success: false, message: 'No recipients found.' };
+    }
+
+    const recipients = userResult.recordset
+      .map(r => decrypt(r.emailAddress))
+      .filter(Boolean)
+      .join(',');
+
+    const isUrgent = notifType === 'URGENT';
+    const subject = isUrgent
+      ? `⚠️ URGENT: Project "${projName}" Deadline Alert`
+      : `📋 Reminder: Project "${projName}" Status Update Needed`;
+
+    const htmlContent = createProjectDeadlineEmail(projName, projType, statusName, daysStuck, notifType);
+
+    await transporter.sendMail({
+      from: '"Smart SK" <smartsk2025@gmail.com>',
+      to: recipients,
+      subject,
+      html: htmlContent
+    });
+
+    console.log(`[DeadlineEmail] Sent "${notifType}" email for project ${projName} to ${recipients}.`);
+    return { success: true };
+  } catch (error) {
+    console.error('[DeadlineEmail] Error sending deadline email:', error.message);
+    return { success: false, error: error.message };
+  }
+};
+
 // API Routes for sending emails
 
 router.post('/send-password-reset', async (req, res) => {
   try {
     const { email } = req.body;
-    
+
     if (!email) {
       return res.status(400).json({
         success: false,
         message: 'Email is required'
       });
     }
-    
+
     const result = await sendPasswordResetEmail(email);
-    
+
     if (result.success) {
       return res.status(200).json({
         success: true,
         message: 'Password reset email sent successfully',
-        otp: result.otp 
+        otp: result.otp
       });
     } else {
       throw new Error(result.error);
@@ -461,5 +533,6 @@ module.exports = {
   sendAccountCreationEmail,
   sendRegistrationApprovalEmail,
   sendRegistrationRejectionEmail,
+  sendProjectDeadlineEmail,
   generateOTP
 };

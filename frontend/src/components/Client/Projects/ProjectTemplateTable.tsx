@@ -1,52 +1,6 @@
 import React, { useCallback } from 'react';
 import './ProjectTemplate.css';
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-/** Parse year range from filename, e.g. "CBYDP_SB_2023-2025.xlsx" → ["2023","2024","2025"] */
-export function parseYearRange(fileName: string): string[] {
-    const match = fileName.match(/(\d{4})-(\d{4})/);
-    if (!match) return ['Year 1', 'Year 2', 'Year 3'];
-    const start = parseInt(match[1], 10);
-    const end = parseInt(match[2], 10);
-    const years: string[] = [];
-    for (let y = start; y <= end; y++) years.push(String(y));
-    return years.slice(0, 3); // DB supports max 3
-}
-
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-export interface AbyipRow {
-    rowID: number;
-    sheetRowIndex?: number;
-    referenceCode?: string;
-    PPA?: string;
-    Description?: string;
-    expectedResult?: string;
-    performanceIndicator?: string;
-    period?: string;
-    PS?: string;
-    MOOE?: string;
-    CO?: string;
-    total?: string;
-    personResponsible?: string;
-}
-
-export interface CbydpRow {
-    rowID: number;
-    sheetRowIndex?: number;
-    YDC?: string;
-    objective?: string;
-    performanceIndicator?: string;
-    target1?: string;
-    target2?: string;
-    target3?: string;
-    PPAs?: string;
-    budget?: string;
-    personResponsible?: string;
-    sectionType?: 'FROM' | 'TO' | 'ADDITIONAL PROJECT';
-}
-
+import { AbyipRow, CbydpRow, parseYearRange } from './ProjectTemplateTypes';
 interface ProjectTemplateTableProps {
     projType: 'ABYIP' | 'CBYDP';
     projName: string;
@@ -56,6 +10,7 @@ interface ProjectTemplateTableProps {
     readOnly: boolean;
     onAddRow?: (sectionType?: string) => void;
     onCellChange?: (rowID: number, field: string, value: string) => void;
+    onCellBlur?: (rowID: number, field: string, value: string) => void;
     /** collaborators Map<userID, CollaboratorInfo> */
     collaborators?: Map<number, any>;
     currentUserId?: number;
@@ -63,12 +18,13 @@ interface ProjectTemplateTableProps {
 }
 
 const ABYIP_COLS = [
+    { key: 'sheetRowIndex', label: 'Rows', width: '4%' },
     { key: 'referenceCode', label: 'Reference Code', width: '9%' },
     { key: 'PPA', label: 'PPAs', width: '10%' },
-    { key: 'Description', label: 'Description', width: '13%' },
-    { key: 'expectedResult', label: 'Expected Result', width: '13%' },
-    { key: 'performanceIndicator', label: 'Performance Indicator', width: '13%' },
-    { key: 'period', label: 'Period of Implementation', width: '10%' },
+    { key: 'Description', label: 'Description', width: '12%' },
+    { key: 'expectedResult', label: 'Expected Result', width: '12%' },
+    { key: 'performanceIndicator', label: 'Performance Indicator', width: '12%' },
+    { key: 'period', label: 'Period of Implementation', width: '9%' },
     { key: 'PS', label: 'PS', width: '6%', budget: true },
     { key: 'MOOE', label: 'MOOE', width: '6%', budget: true },
     { key: 'CO', label: 'CO', width: '6%', budget: true },
@@ -77,6 +33,7 @@ const ABYIP_COLS = [
 ];
 
 const CBYDP_BASE_COLS = [
+    { key: 'sheetRowIndex', label: 'Rows', width: '4%' },
     { key: 'YDC', label: 'Youth Development Concern', width: '13%' },
     { key: 'objective', label: 'Objective', width: '13%' },
     { key: 'performanceIndicator', label: 'Performance Indicator', width: '13%' },
@@ -101,6 +58,7 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
     readOnly,
     onAddRow,
     onCellChange,
+    onCellBlur,
     collaborators = new Map(),
     currentUserId,
     sendCursorMove,
@@ -132,6 +90,14 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
         const cellId = `cell-${rowID}-${field}`;
         const activeCollab = getCellHighlight(cellId);
 
+        if (field === 'sheetRowIndex') {
+            return (
+                <td key={field} className="pt-cell pt-cell-secondary">
+                    <div className="pt-index-label">{value ?? ''}</div>
+                </td>
+            );
+        }
+
         return (
             <td
                 key={field}
@@ -149,8 +115,27 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
                     value={value ?? ''}
                     disabled={readOnly || !!activeCollab}
                     ref={(el) => { if (el) autoResize(el); }}
-                    onFocus={() => handleFocus(cellId)}
-                    onBlur={handleBlur}
+                    onFocus={() => {
+                        handleFocus(cellId);
+                        // Ensure textarea height is correct on focus
+                        const el = document.getElementById(cellId) as HTMLTextAreaElement;
+                        if (el) autoResize(el);
+                    }}
+                    onBlur={(e) => {
+                        handleBlur();
+                        onCellBlur?.(rowID, field, e.target.value);
+                    }}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            if (e.shiftKey) {
+                                // Shift+Enter: let it add new line (default)
+                            } else {
+                                // Enter only: blur and finalize
+                                e.preventDefault();
+                                (e.target as HTMLTextAreaElement).blur();
+                            }
+                        }
+                    }}
                     onChange={(e) => {
                         autoResize(e.target);
                         onCellChange?.(rowID, field, e.target.value);
@@ -169,19 +154,20 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
                 <table className="pt-table">
                     <thead>
                         {/* Title rows */}
-                        <tr><th colSpan={11} className="pt-title-row">ANNUAL BARANGAY YOUTH INVESTMENT PROGRAM (ABYIP)</th></tr>
-                        <tr><th colSpan={11} className="pt-title-row">FY {fiscalYear}</th></tr>
-                        <tr><th colSpan={11} className="pt-title-row">YOUTH DEVELOPMENT AND EMPOWERMENT PROGRAMS</th></tr>
-                        <tr><th colSpan={11} className="pt-title-row">CENTER FOR PARTICIPATION: {centerOfParticipation.toUpperCase()}</th></tr>
+                        <tr><th colSpan={12} className="pt-title-row">ANNUAL BARANGAY YOUTH INVESTMENT PROGRAM (ABYIP)</th></tr>
+                        <tr><th colSpan={12} className="pt-title-row">FY {fiscalYear}</th></tr>
+                        <tr><th colSpan={12} className="pt-title-row">YOUTH DEVELOPMENT AND EMPOWERMENT PROGRAMS</th></tr>
+                        <tr><th colSpan={12} className="pt-title-row">CENTER FOR PARTICIPATION: {centerOfParticipation.toUpperCase()}</th></tr>
 
                         {/* Column headers — row 1 */}
                         <tr className="pt-col-header">
+                            <th rowSpan={2} style={{ width: '4%' }}>Rows</th>
                             <th rowSpan={2} style={{ width: '9%' }}>Reference Code</th>
                             <th rowSpan={2} style={{ width: '10%' }}>PPAs</th>
-                            <th rowSpan={2} style={{ width: '13%' }}>Description</th>
-                            <th rowSpan={2} style={{ width: '13%' }}>Expected Result</th>
-                            <th rowSpan={2} style={{ width: '13%' }}>Performance Indicator</th>
-                            <th rowSpan={2} style={{ width: '10%' }}>Period of Implementation</th>
+                            <th rowSpan={2} style={{ width: '12%' }}>Description</th>
+                            <th rowSpan={2} style={{ width: '12%' }}>Expected Result</th>
+                            <th rowSpan={2} style={{ width: '12%' }}>Performance Indicator</th>
+                            <th rowSpan={2} style={{ width: '9%' }}>Period of Implementation</th>
                             <th colSpan={4} style={{ width: '24%' }}>Annual Budget</th>
                             <th rowSpan={2} style={{ width: '8%' }}>Person Responsible</th>
                         </tr>
@@ -220,9 +206,9 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
     const renderCbydpSection = (section: CbydpRow['sectionType']) => {
         const sectionRows = cbydpRows.filter((r) => r.sectionType === section);
         return (
-            <>
+            <React.Fragment key={section}>
                 <tr>
-                    <td colSpan={9} className="pt-section-divider">{section}</td>
+                    <td colSpan={10} className="pt-section-divider">{section}</td>
                 </tr>
                 {sectionRows.map((row) => (
                     <tr key={row.rowID}>
@@ -233,18 +219,18 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
                 ))}
                 {!readOnly && (
                     <tr>
-                        <td colSpan={9} className="pt-add-row-cell">
+                        <td colSpan={10} className="pt-add-row-cell">
                             <button className="pt-add-row-btn-inline" onClick={() => onAddRow?.(section)}>
                                 + Add Row
                             </button>
                         </td>
                     </tr>
                 )}
-            </>
+            </React.Fragment>
         );
     };
 
-    const colCount = CBYDP_BASE_COLS.length + 3 + CBYDP_TAIL_COLS.length; // 9
+    const colCount = CBYDP_BASE_COLS.length + 3 + CBYDP_TAIL_COLS.length; // 10
 
     return (
         <div className="pt-table-wrapper">
@@ -263,6 +249,7 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
 
                     {/* Column headers — row 1 */}
                     <tr className="pt-col-header">
+                        <th rowSpan={2} style={{ width: '4%' }}>Rows</th>
                         <th rowSpan={2}>Youth Development Concern</th>
                         <th rowSpan={2}>Objective</th>
                         <th rowSpan={2}>Performance Indicator</th>

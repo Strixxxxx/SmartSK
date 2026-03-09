@@ -61,7 +61,7 @@ const Projects: React.FC = () => {
                         onClick={() => setIsModalOpen(true)}
                         sx={{ borderRadius: 2, px: 4 }}
                     >
-                        Create New Project
+                        Create New Project Plan
                     </Button>
                 )}
             </Box>

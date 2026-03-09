@@ -10,6 +10,7 @@ interface ProjectTopNavbarProps {
     collaborators: Map<number, CollaboratorInfo>;
     currentUser?: any;
     onCreateNew: () => void;
+    onUpdateStatus?: (statusID: number) => void;
 }
 
 const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({ project, canCreate, collaborators, currentUser, onCreateNew }) => {
@@ -99,7 +100,7 @@ const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({ project, canCreate,
                         onClick={onCreateNew}
                         sx={{ textTransform: 'none', borderRadius: 2 }}
                     >
-                        Create New Project
+                        Create New Project Plan
                     </Button>
                 )}
             </Box>

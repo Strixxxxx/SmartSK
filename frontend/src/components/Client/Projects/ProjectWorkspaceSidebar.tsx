@@ -17,12 +17,16 @@ interface ProjectWorkspaceSidebarProps {
     selectedProject: any | null;
     onSelectProject: (project: any) => void;
     auditRefreshTrigger?: number;
+    projectListRefreshTrigger?: number;
+    center?: string;
 }
 
 const ProjectWorkspaceSidebar: React.FC<ProjectWorkspaceSidebarProps> = ({
     selectedProject,
     onSelectProject,
-    auditRefreshTrigger
+    auditRefreshTrigger,
+    projectListRefreshTrigger,
+    center
 }) => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
@@ -43,7 +47,7 @@ const ProjectWorkspaceSidebar: React.FC<ProjectWorkspaceSidebarProps> = ({
             }
         };
         fetchBatches();
-    }, []);
+    }, [projectListRefreshTrigger]);
 
     const handleLogout = async () => {
         try { logout(); } catch { logout(); }
@@ -139,15 +143,15 @@ const ProjectWorkspaceSidebar: React.FC<ProjectWorkspaceSidebarProps> = ({
                         ))}
                     </List>
                 )}
-
-                {/* Audit Timeline — live component */}
-                <ProjectAuditTimeline
-                    batchID={selectedProject?.batchID ?? null}
-                    projType={selectedProject?.projType}
-                    targetYear={selectedProject?.targetYear}
-                    auditRefreshTrigger={auditRefreshTrigger}
-                />
             </Box>
+
+            {/* Audit Timeline — live component (sheet-specific) */}
+            <ProjectAuditTimeline
+                batchID={selectedProject?.batchID ?? null}
+                projType={selectedProject?.projType}
+                center={center}
+                auditRefreshTrigger={auditRefreshTrigger}
+            />
 
             {/* Footer: Logout */}
             <div className="client-sidebar-footer">

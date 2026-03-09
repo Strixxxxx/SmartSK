@@ -12,24 +12,29 @@ const { decrypt } = require('../utils/crypto');
 router.get('/:batchID/audit', authMiddleware, async (req, res) => {
     try {
         const { batchID } = req.params;
+        const { center } = req.query;
 
         const pool = await getConnection();
         const result = await pool.request()
             .input('batchID', sql.Int, batchID)
+            .input('center', sql.NVarChar, center || null)
             .query(`
                 SELECT
                     a.auditID,
                     a.batchID,
-                    a.rowID,
+                    a.abyipID,
+                    a.cbydpID,
                     a.action,
                     a.oldValue,
                     a.newValue,
                     a.timestamp,
+                    a.centerOfParticipation,
                     u.fullName,
                     u.userID
                 FROM projectAuditTrail a
                 JOIN userInfo u ON a.userID = u.userID
                 WHERE a.batchID = @batchID
+                AND (@center IS NULL OR a.centerOfParticipation = @center)
                 ORDER BY a.timestamp DESC
             `);
 

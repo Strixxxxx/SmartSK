@@ -71,15 +71,35 @@ def get_data_from_azure():
         logger.error(f"Error fetching data from Azure storage: {e}", exc_info=True)
         return pd.DataFrame()
 
-def get_data_from_sql():
-    """Executes the [Raw Data] stored procedure as a fallback."""
-    logger.info("Attempting to fetch data from SQL database as fallback...")
+    logger.info("Retrieving finalized ABYIP data from SQL database...")
     try:
         import pyodbc
         with pyodbc.connect(DB_CONN_STR) as conn:
-            query = "EXEC [Raw Data]"
+            # Query targets ABYIP projects that have reached 'City Approval' (Status 6) or beyond.
+            # Groups content by batch/year for accurate forecasting.
+            query = """
+            SELECT 
+                pb.batchID,
+                pb.projName,
+                pb.targetYear,
+                pa.PPA,
+                pa.category,
+                pa.total,
+                pa.sheetRowIndex
+            FROM projectBatch pb
+            JOIN projectABYIP pa ON pb.batchID = pa.projbatchID
+            CROSS APPLY (
+                SELECT TOP 1 pt.statusID 
+                FROM projectTracker pt 
+                WHERE pt.batchID = pb.batchID 
+                ORDER BY pt.updatedAt DESC
+            ) latestStatus
+            WHERE pb.projType = 'ABYIP' 
+              AND latestStatus.statusID >= 6
+            ORDER BY pb.targetYear DESC, pa.sheetRowIndex ASC;
+            """
             df = pd.read_sql_query(query, conn)
-            logger.info(f"Successfully fetched {len(df)} rows from SQL database.")
+            logger.info(f"Successfully fetched {len(df)} finalized ABYIP rows from SQL database.")
             return df
     except Exception as e:
         logger.error(f"Error fetching data from SQL: {e}", exc_info=True)

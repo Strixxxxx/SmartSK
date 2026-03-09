@@ -129,6 +129,18 @@
     color: #111 !important;
 }
 
+.pt-cell-secondary {
+    background: #fafafa;
+}
+
+.pt-index-label {
+    text-align: center;
+    padding: 10px 2px;
+    font-weight: 700;
+    font-size: 10px;
+    color: #444;
+}
+
 .pt-cell-input {
     width: 100%;
     min-height: 36px;

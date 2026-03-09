@@ -27,10 +27,9 @@ interface UseCollaborationSocketOptions {
 }
 
 const WS_URL = (() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const host = import.meta.env.VITE_WS_HOST || window.location.hostname;
-    const port = import.meta.env.VITE_WS_PORT || '8080';
-    return `${protocol}//${host}:${port}`;
+    const backendHttpUrl = import.meta.env.VITE_BACKEND_SERVER;
+    if (!backendHttpUrl) return '';
+    return backendHttpUrl.replace(/^http/, 'ws');
 })();
 
 export function useCollaborationSocket({ batchID, onCellChange, onNote, onAuditUpdate }: UseCollaborationSocketOptions) {

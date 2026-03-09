@@ -2,8 +2,8 @@ const sql = require('mssql');
 const dotenv = require('dotenv');
 
 const path = require('path');
-//Configuration of local .env from backend root
-dotenv.config({ path: path.join(__dirname, '..', '.env') });
+//Configuration of local .env from backend root (two levels up)
+dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
 
 // Database configuration is loaded from environment variables provided by the platform.
 const dbConfig = {
