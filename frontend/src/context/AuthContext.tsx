@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { 
-  checkPotentialSession, 
-  isUserAuthenticated, 
-  getCachedUserData, 
+import {
+  checkPotentialSession,
+  isUserAuthenticated,
+  getCachedUserData,
   clearUserDataCache,
   login as authLogin,
   logout as authLogout
 } from '../backend connection/auth';
+import Loading from '../components/Loading/Loading';
 
 interface UserInfo {
   id: number;
@@ -54,13 +55,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const initializeAuth = async () => {
       try {
         setIsLoading(true);
-        
+
         const storedHasLoggedIn = sessionStorage.getItem('hasLoggedIn');
 
         if (storedHasLoggedIn === 'true') {
           // Check if there's an existing session
           const hasSession = await checkPotentialSession();
-          
+
           if (hasSession) {
             const userData = getCachedUserData();
             if (userData) {
@@ -103,12 +104,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (username: string, password: string) => {
     try {
       const result = await authLogin(username, password);
-      
+
       if (result.success && result.user) {
         setUser(result.user);
         setIsAuthenticated(true);
       }
-      
+
       return result;
     } catch (error) {
       if (import.meta.env.DEV) console.error('Login error:', error);
@@ -122,13 +123,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       setIsLoading(true);
-      
+
       await authLogout();
-      
+
       // Clear local state
       setUser(null);
       setIsAuthenticated(false);
-      
+
       // Redirect to login or home page
       window.location.href = '/';
     } catch (error) {
@@ -177,15 +178,15 @@ interface ProtectedRouteProps {
   requireAuth?: boolean;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
   fallback = <div>Please log in to access this page.</div>,
-  requireAuth = true 
+  requireAuth = true
 }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading fullPageSkeleton={true} />;
   }
 
   if (requireAuth && !isAuthenticated) {
@@ -213,6 +214,6 @@ export const withAuth = <P extends object>(
   };
 
   AuthenticatedComponent.displayName = `withAuth(${Component.displayName || Component.name})`;
-  
+
   return AuthenticatedComponent;
 };

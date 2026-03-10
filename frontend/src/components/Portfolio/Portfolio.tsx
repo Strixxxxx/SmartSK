@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import './Portfolio.css';
+import styles from './Portfolio.module.css';
 import logoUrl from '../../assets/logo.gif';
 import nnLogo from '../../assets/NN_LOGO.jpg';
 import sbLogo from '../../assets/SB_LOGO.jpg';
@@ -10,46 +10,23 @@ const Portfolio: React.FC = () => {
   const [teamView, setTeamView] = useState(0); // 0 = team, 1 = collaboration
 
   useEffect(() => {
-    // Create animated particles
-    const createParticles = () => {
-      const particles = document.getElementById('particles');
-      if (particles) {
-        particles.innerHTML = ''; // Clear existing particles
-        const particleCount = 50;
-        
-        for (let i = 0; i < particleCount; i++) {
-          const particle = document.createElement('div');
-          particle.className = 'particle';
-          particle.style.left = Math.random() * 100 + '%';
-          particle.style.animationDelay = Math.random() * 20 + 's';
-          particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-          particles.appendChild(particle);
-        }
-      }
-    };
-
-    // Scroll animations
-    const animateOnScroll = () => {
-      const elements = document.querySelectorAll('.animate-on-scroll');
-      
-      elements.forEach(element => {
-        const el = element as HTMLElement;
+    console.log('Smart SK Portfolio v2.0 (Modular) loaded');
+    // Simple reveal animation on scroll
+    const revealElements = () => {
+      const reveals = document.querySelectorAll(`.${styles.reveal}`);
+      reveals.forEach(el => {
         const elementTop = el.getBoundingClientRect().top;
         const windowHeight = window.innerHeight;
-        
         if (elementTop < windowHeight * 0.85) {
-          el.classList.add('visible');
+          el.classList.add(styles.revealVisible);
         }
       });
     };
 
-    createParticles();
-    animateOnScroll();
-    window.addEventListener('scroll', animateOnScroll);
-    
-    return () => {
-      window.removeEventListener('scroll', animateOnScroll);
-    };
+    window.addEventListener('scroll', revealElements);
+    revealElements(); // Initial check
+
+    return () => window.removeEventListener('scroll', revealElements);
   }, []);
 
   const handleNavClick = (targetId: string) => {
@@ -62,8 +39,6 @@ const Portfolio: React.FC = () => {
     }
   };
 
-
-
   const handlePrevView = () => {
     setTeamView((prev) => (prev === 0 ? 1 : 0));
   };
@@ -71,230 +46,194 @@ const Portfolio: React.FC = () => {
   const handleNextView = () => {
     setTeamView((prev) => (prev === 1 ? 0 : 1));
   };
-  
+
   return (
-    <>
-      <div className="portfolio">
-        <div className="particles" id="particles"></div>
+    <div className={styles.portfolio}>
+      <nav className={styles.nav}>
+        <ul className={styles.navList}>
+          <li className={styles.navItem}>
+            <button onClick={() => handleNavClick('#home')} type="button">Home</button>
+          </li>
+          <li className={styles.navItem}>
+            <a href="/project-list">Projects</a>
+          </li>
+          <li className={styles.navItem}>
+            <button className={styles.loginBtn} onClick={() => setIsLoginModalOpen(true)}>Login</button>
+          </li>
+        </ul>
+      </nav>
 
-        <nav>
-          <ul>
-            <li><button onClick={() => handleNavClick('#home')} type="button">Home</button></li>
-            <li><a href="/project-list">Projects</a></li>
-            <li><button onClick={() => setIsLoginModalOpen(true)}>Login</button></li>
-          </ul>
-        </nav>
-
-        <header id="home">
-          <div className="hero-content">
-            <div className="logo-wrapper">
-              <img src={logoUrl} alt="Smart SK Logo" />
+      <header id="home" className={styles.header}>
+        <div className={styles.heroContent}>
+          <div className={styles.reveal}>
+            <div className={styles.logoWrapper}>
+              <img src={logoUrl} alt="Smart SK Logo" className={styles.logoImg} />
             </div>
-            <h1>Smart SK</h1>
-            <p className="subtitle">Intelligent Project Monitoring System for Sangguniang Kabataan</p>
-            <div className="hero-stats">
-              <div className="stat">
-                <span className="stat-number">2</span>
-                <span className="stat-label">Barangays</span>
+            <h1 className={styles.title}>Smart SK</h1>
+            <p className={styles.subtitle}>Intelligent Project Monitoring System for Sangguniang Kabataan</p>
+            <div className={styles.heroStats}>
+              <div className={styles.statItem}>
+                <span className={styles.statNumber}>2</span>
+                <span className={styles.statLabel}>Barangays</span>
               </div>
-              <div className="stat">
-                <span className="stat-number">AI</span>
-                <span className="stat-label">Powered</span>
+              <div className={styles.statItem}>
+                <span className={styles.statNumber}>AI</span>
+                <span className={styles.statLabel}>Powered</span>
               </div>
-              <div className="stat">
-                <span className="stat-number">100%</span>
-                <span className="stat-label">Web-Based</span>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        <section id="about" className="animate-on-scroll">
-          <div className="section-header">
-            <h2 className="section-title">About Smart SK</h2>
-            <p className="section-subtitle">Transforming youth governance through intelligent project monitoring and predictive analytics</p>
-          </div>
-          <div className="about-content">
-            <div className="about-text">
-              <p>Smart SK revolutionizes how Sangguniang Kabataan monitor projects by providing a centralized, AI-powered platform that streamlines workflows and enhances decision-making through data-driven insights.</p>
-              <p>Our system integrates advanced forecasting capabilities with user-friendly interfaces, enabling SK officials across District 5 Quezon City to efficiently track proposals, manage budgets, and predict project outcomes.</p>
-              <div className="tech-stack">
-                <span className="tech-item">React + TypeScript</span>
-                <span className="tech-item">Node.js + Express</span>
-                <span className="tech-item">MSSQL Database</span>
-                <span className="tech-item">Python + Google Gemini AI</span>
-              </div>
-            </div>
-            <div className="about-visual">
-              <div className="code-preview">
-                <span className="code-line"><span className="comment">{"// AI-Powered Project Forecasting"}</span></span>
-                <span className="code-line"><span className="keyword">const</span> <span className="string">predictProjectSuccess</span> = <span className="keyword">async</span> (projectData) =&gt; {"{"}</span>
-                <span className="code-line">&nbsp;&nbsp;<span className="keyword">const</span> forecast = <span className="keyword">await</span> <span className="string">Prophet.predict</span>(projectData);</span>
-                <span className="code-line">&nbsp;&nbsp;<span className="keyword">const</span> aiInsights = <span className="keyword">await</span> <span className="string">Gemini.analyze</span>(forecast);</span>
-                <span className="code-line">&nbsp;&nbsp;</span>
-                <span className="code-line">&nbsp;&nbsp;<span className="keyword">return</span> {"{"}</span>
-                <span className="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span className="string">successRate</span>: forecast.probability,</span>
-                <span className="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span className="string">recommendations</span>: aiInsights.suggestions,</span>
-                <span className="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span className="string">budgetForecast</span>: forecast.budget</span>
-                <span className="code-line">&nbsp;&nbsp;{"}"};</span>
-                <span className="code-line">{"}"};</span>
+              <div className={styles.statItem}>
+                <span className={styles.statNumber}>100%</span>
+                <span className={styles.statLabel}>Web-Based</span>
               </div>
             </div>
           </div>
-        </section>
+        </div>
+      </header>
 
-        <section id="features" className="animate-on-scroll">
-          <div className="section-header">
-            <h2 className="section-title">Powerful Features</h2>
-            <p className="section-subtitle">Comprehensive tools designed to streamline SK project monitoring and enhance decision-making</p>
+      <section id="about" className={`${styles.section} ${styles.reveal}`}>
+        <div className={styles.aboutContent}>
+          <div className={styles.aboutText}>
+            <h2 className={styles.sectionTitle}>About Smart SK</h2>
+            <p>Smart SK revolutionizes how Sangguniang Kabataan monitor projects by providing a centralized, AI-powered platform that streamlines workflows and enhances decision-making through data-driven insights.</p>
+            <p>Our system integrates advanced forecasting capabilities with user-friendly interfaces, enabling SK officials across District 5 Quezon City to efficiently track proposals, manage budgets, and predict project outcomes.</p>
+            <div className={styles.techStack}>
+              <span className={styles.techItem}>React + TypeScript</span>
+              <span className={styles.techItem}>Node.js + Express</span>
+              <span className={styles.techItem}>MSSQL Database</span>
+              <span className={styles.techItem}>Python + Google Gemini AI</span>
+            </div>
           </div>
-          <div className="features-grid">
-              <div className="feature-card">
-                  <div className="feature-icon">🧠</div>
-                  <h3>AI-Powered Forecasting</h3>
-                  <p>Advanced machine learning algorithms analyze historical data to predict project budget requirements based on the historical data.</p>
-              </div>
-              <div className="feature-card">
-                  <div className="feature-icon">📊</div>
-                  <h3>Predictive Analysis</h3>
-                  <p>Leverage Google Gemini AI for intelligent insights, recommendations, and strategic guidance based on comprehensive data analysis.</p>
-              </div>
-              <div className="feature-card">
-                  <div className="feature-icon">🔒</div>
-                  <h3>Secure Authentication</h3>
-                  <p>Enterprise-grade security with JWT-based authentication, role-based access control, and comprehensive audit trails.</p>
-              </div>
-              <div className="feature-card">
-                  <div className="feature-icon">👥</div>
-                  <h3>Multi-Barangay Support</h3>
-                  <p>Centralized platform supporting 2 barangays in District 5, enabling collaboration and performance comparison.</p>
-              </div>
-              <div className="feature-card">
-                  <div className="feature-icon">📋</div>
-                  <h3>Project Lifecycle Monitoring</h3>
-                  <p>Complete project tracking from proposal submission to completion, with real-time status updates and notifications.</p>
-              </div>
-              <div className="feature-card">
-                  <div className="feature-icon">💾</div>
-                  <h3>Database Management</h3>
-                  <p>Robust MSSQL database with automated backups, data integrity checks, and seamless archival systems.</p>
-              </div>
+          <div className={styles.aboutVisual}>
+            <div className={styles.codePreview}>
+              <pre style={{ color: '#d4d4d4', margin: 0 }}>
+                {`// AI-Powered Forecasting
+const predictSuccess = async (data) => {
+  const forecast = await Prophet.predict(data);
+  const insights = await Gemini.analyze(forecast);
+  
+  return {
+    successRate: forecast.probability,
+    recommendations: insights.suggestions,
+    budget: forecast.budget
+  };
+};`}
+              </pre>
+            </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section id="team" className="animate-on-scroll">
-          <div className="section-header">
-            <h2 className="section-title">
-              {teamView === 0 ? 'Development Team' : 'Our Partners'}
-            </h2>
-            <p className="section-subtitle">
-              {teamView === 0 ? 'Meet the innovators behind Smart SK' : 'Building stronger communities together'}
-            </p>
+      <section id="features" className={`${styles.section} ${styles.reveal}`}>
+        <div className={styles.sectionHeader}>
+          <h2 className={styles.sectionTitle}>Powerful Features</h2>
+          <p className={styles.sectionSubtitle}>Comprehensive tools designed to streamline SK project monitoring and enhance decision-making</p>
+        </div>
+        <div className={styles.featuresGrid}>
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>🧠</div>
+            <h3>AI-Powered Forecasting</h3>
+            <p>Advanced machine learning algorithms analyze historical data to predict project budget requirements based on the historical data.</p>
           </div>
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>📊</div>
+            <h3>Predictive Analysis</h3>
+            <p>Leverage Google Gemini AI for intelligent insights, recommendations, and strategic guidance based on comprehensive data analysis.</p>
+          </div>
+          <div className={styles.featureCard}>
+            <div className={styles.featureIcon}>🔒</div>
+            <h3>Secure Authentication</h3>
+            <p>Enterprise-grade security with JWT-based authentication, role-based access control, and comprehensive audit trails.</p>
+          </div>
+        </div>
+      </section>
 
-          <div className="team-section-wrapper">
-            <button 
-              className="section-nav-btn section-nav-left" 
-              onClick={handlePrevView}
-              aria-label="Previous section"
-            >
-              &#8249;
-            </button>
+      <section id="team" className={`${styles.section} ${styles.reveal}`}>
+        {/* Synchronized Header Slider */}
+        <div className={`${styles.sliderContainer} ${styles.headerSlider}`}>
+          <div className={`${styles.sliderTrack} ${teamView === 0 ? styles.slideLeft : styles.slideRight}`}>
+            <div className={styles.slideView}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>Development Team</h2>
+                <p className={styles.sectionSubtitle}>Meet the innovators behind Smart SK</p>
+              </div>
+            </div>
+            <div className={styles.slideView}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>Our Partners</h2>
+                <p className={styles.sectionSubtitle}>Building stronger communities together</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-            <div className="team-content">
-              {teamView === 0 ? (
-                <div className="team-grid">
-                  <div className="team-card">
-                    <div className="team-avatar">JB</div>
-                    <h3 className="team-name">Jeff Aldreich S. Bontuyan</h3>
-                    <p className="team-role">Project Manager</p>
+        {/* Synchronized Card Slider with navigation buttons centered strictly on cards */}
+        <div className={styles.teamWrapper}>
+          <button className={styles.navBtn} onClick={handlePrevView}>&#8249;</button>
+
+          <div className={`${styles.sliderContainer} ${styles.cardSlider}`}>
+            <div className={`${styles.sliderTrack} ${teamView === 0 ? styles.slideLeft : styles.slideRight}`}>
+
+              {/* Slide 1: Development Team Members */}
+              <div className={styles.slideView}>
+                <div className={styles.teamGrid}>
+                  <div className={styles.teamCard}>
+                    <div className={styles.avatar}>JB</div>
+                    <h3>Jeff Bontuyan</h3>
+                    <p>Project Manager</p>
                   </div>
-                  <div className="team-card">
-                    <div className="team-avatar">LA</div>
-                    <h3 className="team-name">Luis Albert A. De Guzman</h3>
-                    <p className="team-role">Lead Programmer</p>
+                  <div className={styles.teamCard}>
+                    <div className={styles.avatar}>LA</div>
+                    <h3>Luis De Guzman</h3>
+                    <p>Lead Programmer</p>
                   </div>
-                  <div className="team-card">
-                    <div className="team-avatar">RB</div>
-                    <h3 className="team-name">Reign Kerstine A. Balagtas</h3>
-                    <p className="team-role">System Analyst</p>
+                  <div className={styles.teamCard}>
+                    <div className={styles.avatar}>RB</div>
+                    <h3>Reign Balagtas</h3>
+                    <p>System Analyst</p>
                   </div>
-                  <div className="team-card">
-                    <div className="team-avatar">YA</div>
-                    <h3 className="team-name">Yasmien M. Ando</h3>
-                    <p className="team-role">Quality Assurance</p>
+                  <div className={styles.teamCard}>
+                    <div className={styles.avatar}>YA</div>
+                    <h3>Yasmien Ando</h3>
+                    <p>Quality Assurance</p>
                   </div>
                 </div>
-              ) : (
-                <div className="collaboration-view">
-                  <div className="collaboration-header">
-                    <h3>In Proud Collaboration With</h3>
-                    <p>Partnering with local government units to empower youth governance and community development</p>
+              </div>
+
+              {/* Slide 2: Partners (Balanced 2-card layout) */}
+              <div className={styles.slideView}>
+                <div className={styles.partnersGrid}>
+                  <div className={styles.teamCard}>
+                    <img src={nnLogo} alt="Partner Logo" className={styles.logoImg} style={{ width: '100px', height: '100px', margin: '0 auto 1.5rem', display: 'block' }} />
+                    <h3>Barangay Nagkaisang Nayon</h3>
+                    <p>District 5, Quezon City</p>
                   </div>
-                  <div className="collaboration-logos">
-                    <div className="partner-card">
-                      <img src={nnLogo} alt="Barangay Nagkaisang Nayon Logo" className="partner-logo" />
-                      <h4>Barangay Nagkaisang Nayon</h4>
-                      <p>District 5, Quezon City</p>
-                    </div>
-                    <div className="partner-card">
-                      <img src={sbLogo} alt="Barangay San Bartolome Logo" className="partner-logo" />
-                      <h4>Barangay San Bartolome</h4>
-                      <p>District 5, Quezon City</p>
-                    </div>
+                  <div className={styles.teamCard}>
+                    <img src={sbLogo} alt="Partner Logo" className={styles.logoImg} style={{ width: '100px', height: '100px', margin: '0 auto 1.5rem', display: 'block' }} />
+                    <h3>Barangay San Bartolome</h3>
+                    <p>District 5, Quezon City</p>
                   </div>
                 </div>
-              )}
-            </div>
-
-            <button 
-              className="section-nav-btn section-nav-right" 
-              onClick={handleNextView}
-              aria-label="Next section"
-            >
-              &#8250;
-            </button>
-          </div>
-
-          <div className="section-indicators">
-            <button
-              className={`section-indicator ${teamView === 0 ? 'active' : ''}`}
-              onClick={() => setTeamView(0)}
-              aria-label="View development team"
-            />
-            <button
-              className={`section-indicator ${teamView === 1 ? 'active' : ''}`}
-              onClick={() => setTeamView(1)}
-              aria-label="View collaboration partners"
-            />
-          </div>
-        </section>
-
-        <footer id="contact">
-          <div className="footer-content">
-            <div className="section-header">
-              <h2 className="section-title">Get In Touch</h2>
-              <p className="section-subtitle">Ready to transform your SK project monitoring?</p>
-            </div>
-            <div className="contact-info">
-              <div className="contact-item">
-                <span>📧</span>
-                <span>smartsk2025@gmail.com</span>
               </div>
-              <div className="contact-item">
-                <span>🏫</span>
-                <span>STI College Novaliches</span>
-              </div>
+
             </div>
-            <p className="copyright">© 2025 Smart SK. Empowering youth governance through technology.</p>
           </div>
-        </footer>
-      </div>
-      <Login 
+
+          <button className={styles.navBtn} onClick={handleNextView}>&#8250;</button>
+        </div>
+      </section>
+
+      <footer className={styles.footer}>
+        <div className={styles.contactInfo}>
+          <div className={styles.contactItem}><span>📧</span> smartsk2025@gmail.com</div>
+          <div className={styles.contactItem}><span>🏫</span> STI College Novaliches</div>
+        </div>
+        <p className={styles.copyright}>© 2025 Smart SK. Empowering youth governance through technology.</p>
+      </footer>
+
+      <Login
         open={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
       />
-    </>
+    </div>
   );
 };
 

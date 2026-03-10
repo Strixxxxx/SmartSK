@@ -54,7 +54,7 @@ const AppRoutes: React.FC = () => {
   }, []);
 
   if (isLoading) {
-    return <Loading />;
+    return <Loading fullPageSkeleton={true} />;
   }
 
   // If mobile, only show home and project-list, everything else shows ComingSoon

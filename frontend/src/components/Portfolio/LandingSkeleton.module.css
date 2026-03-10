@@ -1,0 +1,105 @@
+.skeletonWrapper {
+    background: #ffffff;
+    min-height: 100vh;
+    padding: 2rem;
+    overflow: hidden;
+}
+
+.skeletonNav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto 4rem;
+    padding: 1rem 0;
+}
+
+.skeletonLogo {
+    width: 120px;
+    height: 120px;
+}
+
+.skeletonNavLinks {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.skeletonNavLink {
+    width: 80px;
+    height: 35px;
+}
+
+.skeletonHero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.skeletonHeroLogo {
+    width: 120px;
+    height: 120px;
+    border-radius: 30px;
+    margin-bottom: 3rem;
+}
+
+.skeletonHeroTitle {
+    width: 60%;
+    height: 60px;
+    margin-bottom: 1.5rem;
+}
+
+.skeletonHeroSubtitle {
+    width: 80%;
+    height: 30px;
+    margin-bottom: 3rem;
+}
+
+.skeletonHeroStats {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    width: 100%;
+}
+
+.skeletonStatCard {
+    width: 120px;
+    height: 60px;
+}
+
+.skeletonGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 5rem auto;
+}
+
+.skeletonFeatureCard {
+    height: 250px;
+}
+
+.skeletonPulse, .skeletonLogo, .skeletonNavLink, .skeletonHeroLogo, .skeletonHeroTitle, .skeletonHeroSubtitle, .skeletonStatCard, .skeletonFeatureCard {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+    border-radius: 8px;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+@media (max-width: 768px) {
+    .skeletonHeroStats {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+    }
+    .skeletonNavLinks {
+        display: none;
+    }
+}

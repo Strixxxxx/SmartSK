@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { publicAxiosInstance } from '../../backend connection/axiosConfig';
 import { useWebSocket } from '../../context/WebSocketContext';
 import Maintenance from './Maintenance';
+import Loading from '../Loading/Loading';
 
 interface MaintenanceHandlerProps {
     children: React.ReactNode;
@@ -41,7 +42,7 @@ const MaintenanceHandler: React.FC<MaintenanceHandlerProps> = ({ children }) => 
     }, [maintenanceMessage]);
 
     if (checkingMaintenance) {
-        return <div>Loading...</div>;
+        return <Loading fullPageSkeleton={true} />;
     }
 
     if (maintenanceMode) {
