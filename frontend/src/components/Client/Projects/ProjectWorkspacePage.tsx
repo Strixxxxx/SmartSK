@@ -67,7 +67,7 @@ const ProjectWorkspacePage: React.FC = () => {
         setAuditRefreshTrigger(prev => prev + 1);
     }, []);
 
-    // ── Load rows on project/tab change or audit update ──────────────────────
+    // ── Load rows on project/tab change (HARD REFRESH WITH SPINNER) ───────────
     useEffect(() => {
         if (!selectedProject?.batchID) {
             setRows([]);
@@ -91,7 +91,30 @@ const ProjectWorkspacePage: React.FC = () => {
         };
 
         fetchRows();
-    }, [selectedProject?.batchID, activeTab, auditRefreshTrigger]);
+    }, [selectedProject?.batchID, activeTab]);
+
+    // ── Load rows on audit update (SILENT REFRESH NO SPINNER) ────────────────
+    // We use a separate effect so `auditRefreshTrigger` doesn't unmount the table
+    useEffect(() => {
+        if (!selectedProject?.batchID) return;
+
+        // Skip the very first initial render trigger (0) since the hard refresh handles it
+        if (auditRefreshTrigger === 0) return;
+
+        const fetchRowsSilently = async () => {
+            try {
+                const res = await axiosInstance.get(
+                    `/api/project-batch/${selectedProject.batchID}/rows`,
+                    { params: { center: activeTab } }
+                );
+                setRows(res.data.data ?? []);
+            } catch (err) {
+                console.error('Failed to silently refresh rows:', err);
+            }
+        };
+
+        fetchRowsSilently();
+    }, [auditRefreshTrigger]); // Note: Depends ONLY on the trigger
 
     // ── Collaboration ─────────────────────────────────────────────────────────
     const [remoteNotes, setRemoteNotes] = useState<any[]>([]);
