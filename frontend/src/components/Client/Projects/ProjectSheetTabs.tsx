@@ -12,6 +12,8 @@ const CATEGORIES = [
     'Social Inclusion and Equity',
     'Education',
     'Health',
+    'General Administration Program',
+    'Maintenance and Other Operating Expenses',
 ];
 
 interface ProjectSheetTabsProps {

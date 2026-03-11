@@ -42,6 +42,8 @@ const THEMATIC_AREAS = [
     { key: 'SIE_pct', label: 'Social Inclusion & Equity' },
     { key: 'education_pct', label: 'Education' },
     { key: 'health_pct', label: 'Health' },
+    { key: 'GAP_pct', label: 'General Administration Program' },
+    { key: 'MOOE_pct', label: 'Maintenance and Other Operating Expenses' },
 ];
 
 const formatCurrency = (value: number): string => {

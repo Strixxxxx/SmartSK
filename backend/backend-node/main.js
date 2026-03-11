@@ -89,6 +89,7 @@ const accArchiveRouter = require('./Admin/accArchive');
 const projArchiveRouter = require('./Admin/projArchive');
 const projListRouter = require('./Admin/projList');
 const registerAuditRouter = require('./Admin/registerAudit');
+const dashboardRouter = require('./Admin/dashboard');
 const reportsRouter = require('./AIDataRetrieval/reports');
 const projectBatchRouter = require('./Projects/projectBatch');
 const projectNotesRouter = require('./Projects/projectNotes');
@@ -298,6 +299,12 @@ if (registerAuditRouter && typeof registerAuditRouter === 'function') {
   console.error('registerAuditRouter is not a valid middleware function');
 }
 
+if (dashboardRouter && typeof dashboardRouter === 'function') {
+  adminRouter.use('/dashboard', dashboardRouter);
+} else {
+  console.error('dashboardRouter is not a valid middleware function');
+}
+
 // Removed legacy routes
 
 // Mount the consolidated admin router to the app.
@@ -315,6 +322,13 @@ if (projectBatchRouter && typeof projectBatchRouter === 'function') {
   app.use('/api/project-batch', projectBatchRouter);
 } else {
   console.error('projectBatchRouter is not a valid middleware function');
+}
+
+// Reports router (Forecasting/Predictive Analysis)
+if (reportsRouter && typeof reportsRouter === 'function') {
+  app.use('/api/reports', reportsRouter);
+} else {
+  console.error('reportsRouter is not a valid middleware function');
 }
 
 // Project Audit router

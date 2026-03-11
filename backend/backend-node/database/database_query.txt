@@ -29,7 +29,7 @@ INSERT INTO roles (roleName) VALUES
 ('SKK4'),
 ('SKK5'),
 ('SKK6'),
-('SKK7'),
+('SKK7');
 
 --Account Table
 
@@ -145,7 +145,7 @@ INSERT INTO StatusLookup (StatusID, StatusName, [description]) VALUES
 (5, 'QCYDO Validation', 'Validation by QCYDO/LYDC.'),
 (6, 'City Approval', 'Final LGU Approval - Triggers AI Analysis.'),
 (7, 'Procurement Phase', 'Bidding and Procurement process.'),
-(8, 'Project Execution', 'Implementation and execution of the project.');
+(8, 'Project Execution', 'Implementation and execution of the project.'),
 (9, 'Project Closure & Evaluation', 'All PPAs executed, liquidated, and evaluated for impact.');
 
 --Projects Table
@@ -168,6 +168,8 @@ CREATE TABLE projectBatch (
     SIE_pct DECIMAL(5,2) DEFAULT 0,
     education_pct DECIMAL(5,2) DEFAULT 0,
     health_pct DECIMAL(5,2) DEFAULT 0,
+    GAP_pct DECIMAL(5,2) DEFAULT 0,
+    MOOE_pct DECIMAL(5,2) DEFAULT 0,
     total_pct DECIMAL(5,2) DEFAULT 0,
     isArchived BIT DEFAULT 0,
     createdAt DATETIME DEFAULT GETDATE()
@@ -324,207 +326,6 @@ CREATE INDEX IX_BackupJobs_Status ON BackupJobs(Status);
 CREATE INDEX IX_BackupJobs_CreatedAt ON BackupJobs(CreatedAt DESC);
 CREATE INDEX IX_BackupJobs_CreatedBy ON BackupJobs(CreatedBy);
 CREATE INDEX IX_BackupJobs_ExpiresAt ON BackupJobs(ExpiresAt) WHERE ExpiresAt IS NOT NULL;
-
---Stored Procedures
-
---Initialization of the Project Batch
-
-DROP PROCEDURE IF EXISTS sp_InitializeProjectBatch;
-GO
-
-CREATE PROCEDURE sp_InitializeProjectBatch
-    @barangayID INT,
-    @projType NVARCHAR(10),
-    @projName NVARCHAR(255),
-    @targetYear NVARCHAR(20),
-    @budget MONEY,
-    @userID INT,
-    @governance_pct DECIMAL(5,2) = 0,
-    @active_citizenship_pct DECIMAL(5,2) = 0,
-    @economic_empowerment_pct DECIMAL(5,2) = 0,
-    @global_mobility_pct DECIMAL(5,2) = 0,
-    @agriculture_pct DECIMAL(5,2) = 0,
-    @environment_pct DECIMAL(5,2) = 0,
-    @PBS_pct DECIMAL(5,2) = 0,
-    @SIE_pct DECIMAL(5,2) = 0,
-    @education_pct DECIMAL(5,2) = 0,
-    @health_pct DECIMAL(5,2) = 0
-AS
-BEGIN
-    SET NOCOUNT ON;
-    BEGIN TRANSACTION;
-    BEGIN TRY
-        DECLARE @total_pct DECIMAL(5,2) = 
-            @governance_pct + @active_citizenship_pct + @economic_empowerment_pct + 
-            @global_mobility_pct + @agriculture_pct + @environment_pct + 
-            @PBS_pct + @SIE_pct + @education_pct + @health_pct;
-
-        -- Insert into header with centralized barangayID, projName, and percentages
-        INSERT INTO projectBatch (
-            barangayID, projType, projName, targetYear, budget,
-            governance_pct, active_citizenship_pct, economic_empowerment_pct,
-            global_mobility_pct, agriculture_pct, environment_pct,
-            PBS_pct, SIE_pct, education_pct, health_pct, total_pct
-        )
-        VALUES (
-            @barangayID, @projType, @projName, @targetYear, @budget,
-            @governance_pct, @active_citizenship_pct, @economic_empowerment_pct,
-            @global_mobility_pct, @agriculture_pct, @environment_pct,
-            @PBS_pct, @SIE_pct, @education_pct, @health_pct, @total_pct
-        );
-        
-        DECLARE @newBatchID INT = SCOPE_IDENTITY();
-        
-        -- Start Project Tracker at Step 1 (Template Setup)
-        INSERT INTO projectTracker (batchID, statusID, updatedBy)
-        VALUES (@newBatchID, 1, @userID);
-        
-        SELECT @newBatchID AS batchID;
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        THROW;
-    END CATCH
-END;
-GO
-
-
---Fetching Data to be Displayed on Barangay Dashboard
-
-DROP PROCEDURE IF EXISTS sp_GetBarangayDashboard;
-GO
-
-CREATE PROCEDURE sp_GetBarangayDashboard
-    @barangayID INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    -- Returns unique batches with their latest status for a specific barangay
-    SELECT 
-        pb.*,
-        sl.StatusName,
-        sl.StatusID as currentStatusID
-    FROM projectBatch pb
-    CROSS APPLY (
-        SELECT TOP 1 pt.statusID 
-        FROM projectTracker pt 
-        WHERE pt.batchID = pb.batchID 
-        ORDER BY pt.updatedAt DESC
-    ) latestStatus
-    JOIN StatusLookup sl ON latestStatus.statusID = sl.StatusID
-    WHERE pb.barangayID = @barangayID
-    ORDER BY pb.createdAt DESC;
-END;
-GO
-
---Transfer of the Account from the preUserInfo to UserInfo Table
-
-CREATE PROCEDURE [sp_ApprovePendingUser]
-    @userID INT
-AS
-BEGIN
-    SET NOCOUNT ON;
-    BEGIN TRANSACTION;
-
-    BEGIN TRY
-        -- Ensure the user is not already in the main userInfo table
-        IF NOT EXISTS (SELECT 1 FROM userInfo WHERE userID = @userID)
-        BEGIN
-            -- Use SET IDENTITY_INSERT to keep the same userID
-            SET IDENTITY_INSERT userInfo ON;
-
-            -- Insert the approved user's data into the main table
-            INSERT INTO userInfo (
-                userID, username, passKey, fullName, position, barangay, 
-                emailAddress, phoneNumber, isDefaultPassword, isArchived, 
-                emailHash, usernameHash, phoneHash, encryptionKeyVersion
-            )
-            SELECT
-                p.userID, p.username, p.passKey, p.fullName, p.position, p.barangay,
-                p.emailAddress, p.phoneNumber, 0, p.isArchived, -- Set isDefaultPassword to 0 as per requirements
-                p.emailHash, p.usernameHash, p.phoneHash, encryptionKeyVersion
-            FROM preUserInfo p
-            WHERE p.userID = @userID;
-
-            SET IDENTITY_INSERT userInfo OFF;
-
-            -- Update the status in the extension table to 'approved'
-            UPDATE preUserInfoEx
-            SET status = 'approved'
-            WHERE userID = @userID;
-        END
-        ELSE
-        BEGIN
-            -- If user already exists, just ensure their status is marked as approved
-            UPDATE preUserInfoEx
-            SET status = 'approved', rejectionReason = 'User already existed in main table but was re-approved.'
-            WHERE userID = @userID;
-        END
-
-        COMMIT TRANSACTION;
-    END TRY
-    BEGIN CATCH
-        ROLLBACK TRANSACTION;
-        -- Re-throw the error to be caught by the calling application
-        THROW;
-    END CATCH
-END
-GO
-
---Checking for Project Deadlines
-
-DROP PROCEDURE IF EXISTS sp_CheckProjectDeadlines;
-GO
-
-CREATE PROCEDURE sp_CheckProjectDeadlines
-AS
-BEGIN
-SET NOCOUNT ON;
-
--- CTE: Get the latest status and date for each batch
-WITH LatestStatus AS (
-    SELECT
-        pt.batchID,
-        pt.statusID,
-        pt.updatedAt,
-        DATEDIFF(DAY, pt.updatedAt, GETDATE()) AS daysStuck
-    FROM projectTracker pt
-    INNER JOIN (
-        SELECT batchID, MAX(updatedAt) AS maxDate
-        FROM projectTracker
-        GROUP BY batchID
-    ) latest ON pt.batchID = latest.batchID AND pt.updatedAt = latest.maxDate
-)
-INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
-SELECT
-    pb.batchID,
-    pb.barangayID,
-    CASE
-        WHEN ls.daysStuck >= 30 THEN 'URGENT'
-        ELSE 'DEADLINE_WARNING'
-    END,
-    CASE
-        WHEN ls.daysStuck >= 30 THEN
-            'URGENT: Project "' + pb.projName + '" (' + pb.projType + ') has been in "' + sl.StatusName + '" for ' + CAST(ls.daysStuck AS NVARCHAR) + ' days. Immediate action is required.'
-        ELSE
-            'REMINDER: Project "' + pb.projName + '" (' + pb.projType + ') has been in "' + sl.StatusName + '" for ' + CAST(ls.daysStuck AS NVARCHAR) + ' days. Please review and advance the status.'
-    END
-FROM LatestStatus ls
-JOIN projectBatch  pb ON ls.batchID  = pb.batchID
-JOIN StatusLookup  sl ON ls.statusID = sl.StatusID
- WHERE
-    pb.isArchived = 0
-    AND ls.statusID NOT IN (8, 9)  -- Skip completed/closed projects
-    AND ls.daysStuck >= 15          -- Only flag if 15+ days stale
-    -- Avoid inserting a duplicate notification for same batch on same day
-    AND NOT EXISTS (
-        SELECT 1 FROM projectNotifications pn
-        WHERE pn.batchID = pb.batchID
-            AND CAST(pn.createdAt AS DATE) = CAST(GETDATE() AS DATE)
-    );
-END;
-GO
 
 --IMPORTANT NOTE: RUN THIS CODE AFTER RUNNING THE TABLE CREATION AND STORED PROCEDURE
 
@@ -783,7 +584,212 @@ PRINT '   - Projects: projectSubmission.js, projectReview.js,';
 PRINT '               projList.js, projArchive.js';
 PRINT '4. If you have existing data, create migration script to encrypt it';
 PRINT '5. Test thoroughly in development environment';
-PRINT '============================================================================';\
+PRINT '============================================================================';
+
+--Stored Procedures
+
+--Initialization of the Project Batch
+
+DROP PROCEDURE IF EXISTS sp_InitializeProjectBatch;
+GO
+
+CREATE PROCEDURE sp_InitializeProjectBatch
+    @barangayID INT,
+    @projType NVARCHAR(10),
+    @projName NVARCHAR(255),
+    @targetYear NVARCHAR(20),
+    @budget MONEY,
+    @userID INT,
+    @governance_pct DECIMAL(5,2) = 0,
+    @active_citizenship_pct DECIMAL(5,2) = 0,
+    @economic_empowerment_pct DECIMAL(5,2) = 0,
+    @global_mobility_pct DECIMAL(5,2) = 0,
+    @agriculture_pct DECIMAL(5,2) = 0,
+    @environment_pct DECIMAL(5,2) = 0,
+    @PBS_pct DECIMAL(5,2) = 0,
+    @SIE_pct DECIMAL(5,2) = 0,
+    @education_pct DECIMAL(5,2) = 0,
+    @health_pct DECIMAL(5,2) = 0,
+    @GAP_pct DECIMAL(5,2) = 0,
+    @MOOE_pct DECIMAL(5,2) = 0
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION;
+    BEGIN TRY
+        DECLARE @total_pct DECIMAL(5,2) = 
+            @governance_pct + @active_citizenship_pct + @economic_empowerment_pct + 
+            @global_mobility_pct + @agriculture_pct + @environment_pct + 
+            @PBS_pct + @SIE_pct + @education_pct + @health_pct +
+            @GAP_pct + @MOOE_pct;
+
+        -- Insert into header with centralized barangayID, projName, and percentages
+        INSERT INTO projectBatch (
+            barangayID, projType, projName, targetYear, budget,
+            governance_pct, active_citizenship_pct, economic_empowerment_pct,
+            global_mobility_pct, agriculture_pct, environment_pct,
+            PBS_pct, SIE_pct, education_pct, health_pct, 
+            GAP_pct, MOOE_pct, total_pct
+        )
+        VALUES (
+            @barangayID, @projType, @projName, @targetYear, @budget,
+            @governance_pct, @active_citizenship_pct, @economic_empowerment_pct,
+            @global_mobility_pct, @agriculture_pct, @environment_pct,
+            @PBS_pct, @SIE_pct, @education_pct, @health_pct,
+            @GAP_pct, @MOOE_pct, @total_pct
+        );
+        
+        DECLARE @newBatchID INT = SCOPE_IDENTITY();
+        
+        -- Start Project Tracker at Step 1 (Template Setup)
+        INSERT INTO projectTracker (batchID, statusID, updatedBy)
+        VALUES (@newBatchID, 1, @userID);
+        
+        SELECT @newBatchID AS batchID;
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        THROW;
+    END CATCH
+END;
+GO
+
+--Fetching Data to be Displayed on Barangay Dashboard
+
+DROP PROCEDURE IF EXISTS sp_GetBarangayDashboard;
+GO
+
+CREATE PROCEDURE sp_GetBarangayDashboard
+    @barangayID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    -- Returns unique batches with their latest status for a specific barangay
+    SELECT 
+        pb.*,
+        sl.StatusName,
+        sl.StatusID as currentStatusID
+    FROM projectBatch pb
+    CROSS APPLY (
+        SELECT TOP 1 pt.statusID 
+        FROM projectTracker pt 
+        WHERE pt.batchID = pb.batchID 
+        ORDER BY pt.updatedAt DESC
+    ) latestStatus
+    JOIN StatusLookup sl ON latestStatus.statusID = sl.StatusID
+    WHERE pb.barangayID = @barangayID
+    ORDER BY pb.createdAt DESC;
+END;
+GO
+
+--Transfer of the Account from the preUserInfo to UserInfo Table
+
+CREATE PROCEDURE [sp_ApprovePendingUser]
+    @userID INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRANSACTION;
+
+    BEGIN TRY
+        -- Ensure the user is not already in the main userInfo table
+        IF NOT EXISTS (SELECT 1 FROM userInfo WHERE userID = @userID)
+        BEGIN
+            -- Use SET IDENTITY_INSERT to keep the same userID
+            SET IDENTITY_INSERT userInfo ON;
+
+            -- Insert the approved user's data into the main table
+            INSERT INTO userInfo (
+                userID, username, passKey, fullName, position, barangay, 
+                emailAddress, phoneNumber, isDefaultPassword, isArchived, 
+                emailHash, usernameHash, phoneHash, encryptionKeyVersion
+            )
+            SELECT
+                p.userID, p.username, p.passKey, p.fullName, p.position, p.barangay,
+                p.emailAddress, p.phoneNumber, 0, p.isArchived, -- Set isDefaultPassword to 0 as per requirements
+                p.emailHash, p.usernameHash, p.phoneHash, encryptionKeyVersion
+            FROM preUserInfo p
+            WHERE p.userID = @userID;
+
+            SET IDENTITY_INSERT userInfo OFF;
+
+            -- Update the status in the extension table to 'approved'
+            UPDATE preUserInfoEx
+            SET status = 'approved'
+            WHERE userID = @userID;
+        END
+        ELSE
+        BEGIN
+            -- If user already exists, just ensure their status is marked as approved
+            UPDATE preUserInfoEx
+            SET status = 'approved', rejectionReason = 'User already existed in main table but was re-approved.'
+            WHERE userID = @userID;
+        END
+
+        COMMIT TRANSACTION;
+    END TRY
+    BEGIN CATCH
+        ROLLBACK TRANSACTION;
+        -- Re-throw the error to be caught by the calling application
+        THROW;
+    END CATCH
+END
+GO
+
+--Checking for Project Deadlines
+
+DROP PROCEDURE IF EXISTS sp_CheckProjectDeadlines;
+GO
+
+CREATE PROCEDURE sp_CheckProjectDeadlines
+AS
+BEGIN
+SET NOCOUNT ON;
+
+-- CTE: Get the latest status and date for each batch
+WITH LatestStatus AS (
+    SELECT
+        pt.batchID,
+        pt.statusID,
+        pt.updatedAt,
+        DATEDIFF(DAY, pt.updatedAt, GETDATE()) AS daysStuck
+    FROM projectTracker pt
+    INNER JOIN (
+        SELECT batchID, MAX(updatedAt) AS maxDate
+        FROM projectTracker
+        GROUP BY batchID
+    ) latest ON pt.batchID = latest.batchID AND pt.updatedAt = latest.maxDate
+)
+INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
+SELECT
+    pb.batchID,
+    pb.barangayID,
+    CASE
+        WHEN ls.daysStuck >= 30 THEN 'URGENT'
+        ELSE 'DEADLINE_WARNING'
+    END,
+    CASE
+        WHEN ls.daysStuck >= 30 THEN
+            'URGENT: Project "' + pb.projName + '" (' + pb.projType + ') has been in "' + sl.StatusName + '" for ' + CAST(ls.daysStuck AS NVARCHAR) + ' days. Immediate action is required.'
+        ELSE
+            'REMINDER: Project "' + pb.projName + '" (' + pb.projType + ') has been in "' + sl.StatusName + '" for ' + CAST(ls.daysStuck AS NVARCHAR) + ' days. Please review and advance the status.'
+    END
+FROM LatestStatus ls
+JOIN projectBatch  pb ON ls.batchID  = pb.batchID
+JOIN StatusLookup  sl ON ls.statusID = sl.StatusID
+ WHERE
+    pb.isArchived = 0
+    AND ls.statusID NOT IN (8, 9)  -- Skip completed/closed projects
+    AND ls.daysStuck >= 15          -- Only flag if 15+ days stale
+    -- Avoid inserting a duplicate notification for same batch on same day
+    AND NOT EXISTS (
+        SELECT 1 FROM projectNotifications pn
+        WHERE pn.batchID = pb.batchID
+            AND CAST(pn.createdAt AS DATE) = CAST(GETDATE() AS DATE)
+    );
+END;
+GO
 
 --IMPORTANT NOTE: MUST RUN THE STORED PROCEDURE BELOW HERE AFTER RUNNING THE MIGRATION SCRIPT FOR AES-256-GCM ENCRYPTION
 
@@ -946,3 +952,82 @@ BEGIN
 END
 GO
 
+-- ============================================================================
+-- ADMIN DASHBOARD STORED PROCEDURES (FOR OVERHAUL)
+-- ============================================================================
+
+-- 1. Get Admin Dashboard Overall Stats
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[sp_GetAdminDashboardStats]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE sp_GetAdminDashboardStats;
+GO
+
+CREATE PROCEDURE sp_GetAdminDashboardStats
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    -- Total Users (Non-archived)
+    DECLARE @TotalUsers INT;
+    SELECT @TotalUsers = COUNT(*) FROM userInfo WHERE isArchived = 0;
+
+    -- Pending Registrations
+    DECLARE @PendingRegs INT;
+    SELECT @PendingRegs = COUNT(*) FROM preUserInfoEx WHERE status = 'pending';
+
+    -- Ongoing Projects (Batches not in Status 9)
+    DECLARE @OngoingProjects INT;
+    SELECT @OngoingProjects = COUNT(DISTINCT pb.batchID)
+    FROM projectBatch pb
+    OUTER APPLY (
+        SELECT TOP 1 pt.statusID 
+        FROM projectTracker pt 
+        WHERE pt.batchID = pb.batchID 
+        ORDER BY pt.updatedAt DESC
+    ) latestStatus
+    WHERE pb.isArchived = 0 AND ISNULL(latestStatus.statusID, 0) < 9;
+
+    -- System Health (Node.js will combine this with AI health)
+    DECLARE @SystemHealth NVARCHAR(20) = 'Healthy';
+
+    SELECT 
+        @TotalUsers AS totalUsers,
+        @PendingRegs AS pendingRegistrations,
+        @OngoingProjects AS ongoingProjects,
+        @SystemHealth AS systemHealth;
+END;
+GO
+
+-- 2. Get Project Distribution (ABYIP vs CBYDP)
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[sp_GetProjectDistribution]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE sp_GetProjectDistribution;
+GO
+
+CREATE PROCEDURE sp_GetProjectDistribution
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT projType, COUNT(*) as count
+    FROM projectBatch
+    WHERE isArchived = 0
+    GROUP BY projType;
+END;
+GO
+
+-- 3. Get Registration Trends (Last 30 Days)
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[sp_GetRegistrationTrends]') AND type in (N'P', N'PC'))
+    DROP PROCEDURE sp_GetRegistrationTrends;
+GO
+
+CREATE PROCEDURE sp_GetRegistrationTrends
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT 
+        CAST(registeredAt AS DATE) as registrationDate,
+        COUNT(*) as count
+    FROM preUserInfoEx
+    WHERE registeredAt >= DATEADD(day, -30, GETDATE())
+    GROUP BY CAST(registeredAt AS DATE)
+    ORDER BY registrationDate ASC;
+END;
+GO

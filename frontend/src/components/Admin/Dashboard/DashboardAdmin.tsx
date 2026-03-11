@@ -1,110 +1,249 @@
-import React from 'react';
-import { useOutletContext } from 'react-router-dom';
-import './DashboardAdmin.css';
+import React, { useEffect, useState } from 'react';
+import { 
+  Chart as ChartJS, 
+  CategoryScale, 
+  LinearScale, 
+  PointElement, 
+  LineElement, 
+  ArcElement, 
+  Tooltip, 
+  Legend, 
+  Title 
+} from 'chart.js';
+import { Line, Doughnut } from 'react-chartjs-2';
+import { useNavigate } from 'react-router-dom';
+import { 
+  People, 
+  PendingActions, 
+  Engineering, 
+  CheckCircle, 
+  Notifications, 
+  ArrowForward 
+} from '@mui/icons-material';
+import { fetchDashboardStats, fetchDashboardCharts, fetchDashboardActivity } from '../../../backend connection/adminApi';
+import styles from './DashboardAdmin.module.css';
 
-interface DashboardAdminProps {}
+// Register ChartJS components
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  ArcElement,
+  Tooltip,
+  Legend,
+  Title
+);
 
-interface OutletContextType {
-  sidebarCollapsed: boolean;
-}
+const DashboardAdmin: React.FC = () => {
+  const navigate = useNavigate();
+  const [stats, setStats] = useState<any>(null);
+  const [chartData, setChartData] = useState<any>(null);
+  const [activity, setActivity] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-const DashboardAdmin: React.FC<DashboardAdminProps> = () => {
-  const { sidebarCollapsed } = useOutletContext<OutletContextType>();
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [statsRes, chartsRes, activityRes] = await Promise.all([
+          fetchDashboardStats(),
+          fetchDashboardCharts(),
+          fetchDashboardActivity()
+        ]);
+
+        if (statsRes.success) setStats(statsRes.stats);
+        if (chartsRes.success) setChartData(chartsRes);
+        if (activityRes.success) setActivity(activityRes.activity);
+      } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+    const interval = setInterval(loadData, 60000); // Refresh every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  if (loading) {
+    return <div className={styles.loading}>Initializing Government Dashboard...</div>;
+  }
+
+  // Chart Configurations
+  const doughnutData = {
+    labels: chartData?.distribution.map((d: any) => d.projType) || [],
+    datasets: [{
+      data: chartData?.distribution.map((d: any) => d.count) || [],
+      backgroundColor: ['#0056b3', '#4dabf7'],
+      borderWidth: 0,
+      cutout: '70%',
+    }]
+  };
+
+  const lineData = {
+    labels: chartData?.trends.map((t: any) => new Date(t.registrationDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })) || [],
+    datasets: [{
+      label: 'Registrations',
+      data: chartData?.trends.map((t: any) => t.count) || [],
+      fill: true,
+      borderColor: '#0056b3',
+      backgroundColor: 'rgba(0, 86, 179, 0.1)',
+      tension: 0.4,
+    }]
+  };
+
+  const lineOptions = {
+    responsive: true,
+    plugins: { legend: { display: false } },
+    scales: {
+      y: { beginAtZero: true, grid: { display: false } },
+      x: { grid: { display: false } }
+    }
+  };
+
   return (
-    <div className={`dashboard-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-      <div className="dashboard-content">
-        <div className="dashboard-header">
-          <h1 className="dashboard-title">Admin Dashboard</h1>
-          <div className="dashboard-subtitle">
-            Welcome to the Admin Dashboard! Manage your system with ease.
-          </div>
-        </div>
-        
-        <div className="dashboard-grid">
-          <div className="dashboard-card">
-            <div className="card-icon">📊</div>
-            <div className="card-content">
-              <h3>Analytics</h3>
-              <p>View system analytics and performance metrics</p>
-              <div className="card-stats">
-                <span className="stat-number">1,234</span>
-                <span className="stat-label">Total Users</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="dashboard-card">
-            <div className="card-icon">👥</div>
-            <div className="card-content">
-              <h3>User Management</h3>
-              <p>Manage user accounts and permissions</p>
-              <div className="card-stats">
-                <span className="stat-number">56</span>
-                <span className="stat-label">Active Sessions</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="dashboard-card">
-            <div className="card-icon">🔧</div>
-            <div className="card-content">
-              <h3>System Settings</h3>
-              <p>Configure system preferences and options</p>
-              <div className="card-stats">
-                <span className="stat-number">98%</span>
-                <span className="stat-label">System Health</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="dashboard-card">
-            <div className="card-icon">📈</div>
-            <div className="card-content">
-              <h3>Reports</h3>
-              <p>Generate and view detailed system reports</p>
-              <div className="card-stats">
-                <span className="stat-number">24</span>
-                <span className="stat-label">Reports Today</span>
-              </div>
+    <div className={styles.dashboardContainer}>
+      <header className={styles.dashboardHeader}>
+        <h1 className={styles.dashboardTitle}>Administrator Console</h1>
+        <p className={styles.dashboardSubtitle}>Real-time system oversight and Sk council analytics.</p>
+      </header>
+
+      {/* Analytics Cards */}
+      <div className={styles.statsGrid}>
+        <div className={styles.card}>
+          <div className={styles.cardContent}>
+            <h3>Total Registered Users</h3>
+            <div className={styles.cardStats}>
+              <span className={styles.statNumber}>{stats?.totalUsers || 0}</span>
+              <People sx={{ color: '#adb5bd', fontSize: 40 }} />
             </div>
           </div>
         </div>
-        
-        <div className="dashboard-widgets">
-          <div className="widget-large">
-            <h3>Recent Activity</h3>
-            <div className="activity-list">
-              <div className="activity-item">
-                <div className="activity-icon">✅</div>
-                <div className="activity-details">
-                  <div className="activity-title">User account created</div>
-                  <div className="activity-time">2 minutes ago</div>
-                </div>
-              </div>
-              <div className="activity-item">
-                <div className="activity-icon">🔄</div>
-                <div className="activity-details">
-                  <div className="activity-title">System backup completed</div>
-                  <div className="activity-time">15 minutes ago</div>
-                </div>
-              </div>
-              <div className="activity-item">
-                <div className="activity-icon">⚠️</div>
-                <div className="activity-details">
-                  <div className="activity-title">Security alert resolved</div>
-                  <div className="activity-time">1 hour ago</div>
-                </div>
-              </div>
+
+        <div className={styles.card}>
+          <div className={styles.cardContent}>
+            <h3>Pending Registrations</h3>
+            <div className={styles.cardStats}>
+              <span className={`${styles.statNumber} ${stats?.pendingRegistrations > 0 ? styles.pulseText : ''}`}>
+                {stats?.pendingRegistrations || 0}
+              </span>
+              <PendingActions sx={{ color: stats?.pendingRegistrations > 0 ? '#fa5252' : '#adb5bd', fontSize: 40 }} />
             </div>
           </div>
-          
-          <div className="widget-small">
-            <h3>Quick Actions</h3>
-            <div className="quick-actions">
-              <button className="action-btn primary">Create User</button>
-              <button className="action-btn secondary">Generate Report</button>
-              <button className="action-btn tertiary">System Backup</button>
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.cardContent}>
+            <h3>Ongoing Projects</h3>
+            <div className={styles.cardStats}>
+              <span className={styles.statNumber}>{stats?.ongoingProjects || 0}</span>
+              <Engineering sx={{ color: '#0056b3', fontSize: 40 }} />
             </div>
+          </div>
+        </div>
+
+        <div className={styles.card}>
+          <div className={styles.cardContent}>
+            <h3>System Health</h3>
+            <div className={styles.cardStats}>
+              <span className={`${styles.statusPill} ${stats?.aiHealth === 'Excellent' ? styles.healthy : styles.alert}`}>
+                {stats?.aiHealth || 'Offline'}
+              </span>
+              <CheckCircle sx={{ color: stats?.aiHealth === 'Excellent' ? '#099268' : '#fa5252', fontSize: 40 }} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Grid */}
+      <div className={styles.chartGrid}>
+        <div className={styles.chartCard} style={{ minHeight: '400px' }}>
+          <h3>Registration Trends (Last 30 Days)</h3>
+          <div style={{ height: '300px' }}>
+            <Line data={lineData} options={lineOptions} />
+          </div>
+        </div>
+        <div className={styles.chartCard}>
+          <h3>Project Distribution</h3>
+          <div style={{ height: '250px', position: 'relative' }}>
+            <Doughnut data={doughnutData} />
+            <div style={{ position: 'absolute', top: '55%', left: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center' }}>
+                <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#333' }}>
+                    {stats?.ongoingProjects || 0}
+                </span>
+                <br />
+                <span style={{ fontSize: '0.7rem', color: '#666', textTransform: 'uppercase' }}>Active</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Activity and Alerts */}
+      <div className={styles.bottomGrid}>
+        <div className={styles.activityCard}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h3>Recent System Activity</h3>
+            <button className={styles.viewAllBtn} onClick={() => navigate('/admin/audit-trail')}>
+              View Full Trail <ArrowForward fontSize="small" />
+            </button>
+          </div>
+          <table className={styles.activityTable}>
+            <thead>
+              <tr>
+                <th>Actor</th>
+                <th>Module</th>
+                <th>Action</th>
+                <th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody>
+              {activity.map((log) => (
+                <tr key={log.auditID}>
+                  <td style={{ fontWeight: 600 }}>{log.username}</td>
+                  <td><span className={styles.moduleTag}>{log.moduleName}</span></td>
+                  <td>{log.actions}</td>
+                  <td style={{ color: '#adb5bd' }}>{log.created_at}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className={styles.alertsCard}>
+          <h3>System Alerts</h3>
+          <div className={styles.alertList}>
+            {(!stats?.lastBackupAt || stats.lastBackupAt === 'Never' || (new Date().getTime() - new Date(stats.lastBackupAt).getTime() > 24 * 60 * 60 * 1000)) && (
+                <div className={`${styles.alertItem} ${styles.urgent}`}>
+                    <Notifications className={styles.alertIcon} />
+                    <div>
+                        <strong>Manual Backup Recommended</strong>
+                        <p>
+                            {stats?.lastBackupAt === 'Never' 
+                                ? 'No backup history found.' 
+                                : `Last backup: ${new Date(stats?.lastBackupAt).toLocaleString()}`}
+                        </p>
+                    </div>
+                </div>
+            )}
+            {stats?.pendingRegistrations > 0 && (
+                <div className={`${styles.alertItem} ${styles.warning}`}>
+                    <Notifications className={styles.alertIcon} />
+                    <div>
+                        <strong>{stats.pendingRegistrations} Users Awaiting Review</strong>
+                        <p>Immediate action required for compliance.</p>
+                    </div>
+                </div>
+            )}
+            {stats?.aiHealth === 'Offline' && (
+                <div className={`${styles.alertItem} ${styles.urgent}`}>
+                    <Notifications className={styles.alertIcon} />
+                    <div>
+                        <strong>AI Microservice Offline</strong>
+                        <p>Predictive analytics and exports disabled.</p>
+                    </div>
+                </div>
+            )}
           </div>
         </div>
       </div>

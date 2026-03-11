@@ -4,6 +4,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { FaBars } from 'react-icons/fa';
 import './Sidebar.css';
 import logo from '../../../assets/logo_SB.png';
+import { formatRoleName } from '../../../utils/roleUtils';
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -65,7 +66,7 @@ const ClientSidebar: React.FC<SidebarProps> = ({
         <>
           <div className="client-user-info">
             <div className="client-user-name">{user?.fullName || user?.username || 'User'}</div>
-            <div className="client-user-role">{user?.position || 'User'}</div>
+            <div className="client-user-role">{formatRoleName(user?.position)}</div>
           </div>
           
           <nav className="client-sidebar-nav">

@@ -17,7 +17,7 @@ const { spawn } = require('child_process');
 // 1. Initialize New Project Batch (SKC Only)
 router.post('/initialize', authMiddleware, async (req, res) => {
     try {
-        const { projType, targetYear, budget, governance_pct, active_citizenship_pct, economic_empowerment_pct, global_mobility_pct, agriculture_pct, environment_pct, PBS_pct, SIE_pct, education_pct, health_pct } = req.body;
+        const { projType, targetYear, budget, governance_pct, active_citizenship_pct, economic_empowerment_pct, global_mobility_pct, agriculture_pct, environment_pct, PBS_pct, SIE_pct, education_pct, health_pct, GAP_pct, MOOE_pct } = req.body;
         const { barangay: barangayID, userID, position } = req.user;
 
         if (position !== 'SKC' && position !== 'SK Chairperson') {
@@ -40,7 +40,9 @@ router.post('/initialize', authMiddleware, async (req, res) => {
             PBS_pct,
             SIE_pct,
             education_pct,
-            health_pct
+            health_pct,
+            GAP_pct,
+            MOOE_pct
         });
 
         res.json({
