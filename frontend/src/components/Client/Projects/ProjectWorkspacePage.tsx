@@ -62,7 +62,12 @@ const ProjectWorkspacePage: React.FC = () => {
     const fiscalYear = parseFiscalYear(projName);
     const projType: 'ABYIP' | 'CBYDP' = selectedProject?.projType === 'CBYDP' ? 'CBYDP' : 'ABYIP';
 
-    // ── Load rows on project/tab change ──────────────────────────────────────
+    const [auditRefreshTrigger, setAuditRefreshTrigger] = useState(0);
+    const handleAuditUpdate = useCallback(() => {
+        setAuditRefreshTrigger(prev => prev + 1);
+    }, []);
+
+    // ── Load rows on project/tab change or audit update ──────────────────────
     useEffect(() => {
         if (!selectedProject?.batchID) {
             setRows([]);
@@ -86,7 +91,7 @@ const ProjectWorkspacePage: React.FC = () => {
         };
 
         fetchRows();
-    }, [selectedProject?.batchID, activeTab]);
+    }, [selectedProject?.batchID, activeTab, auditRefreshTrigger]);
 
     // ── Collaboration ─────────────────────────────────────────────────────────
     const [remoteNotes, setRemoteNotes] = useState<any[]>([]);
@@ -103,11 +108,6 @@ const ProjectWorkspacePage: React.FC = () => {
                 )
             );
         });
-    }, []);
-
-    const [auditRefreshTrigger, setAuditRefreshTrigger] = useState(0);
-    const handleAuditUpdate = useCallback(() => {
-        setAuditRefreshTrigger(prev => prev + 1);
     }, []);
 
     const { collaborators, sendCursorMove, sendCellChange, sendNote } = useCollaborationSocket({
