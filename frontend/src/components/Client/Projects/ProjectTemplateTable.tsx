@@ -1,6 +1,7 @@
-import React, { useCallback } from 'react';
-import './ProjectTemplate.css';
+import React, { useCallback, useMemo } from 'react';
+import styles from './ProjectTemplate.module.css';
 import { AbyipRow, CbydpRow, parseYearRange } from './ProjectTemplateTypes';
+import ProjectTableRow from './ProjectTableRow';
 interface ProjectTemplateTableProps {
     projType: 'ABYIP' | 'CBYDP';
     projName: string;
@@ -38,12 +39,18 @@ const CBYDP_BASE_COLS = [
     { key: 'objective', label: 'Objective', width: '13%' },
     { key: 'performanceIndicator', label: 'Performance Indicator', width: '13%' },
 ];
-const CBYDP_TARGET_KEYS = ['target1', 'target2', 'target3'];
+const CBYDP_TARGET_COLS = [
+    { key: 'target1', label: 'Target 1' },
+    { key: 'target2', label: 'Target 2' },
+    { key: 'target3', label: 'Target 3' },
+];
 const CBYDP_TAIL_COLS = [
     { key: 'PPAs', label: 'PPAs', width: '12%' },
     { key: 'budget', label: 'Budget', width: '8%' },
     { key: 'personResponsible', label: 'Person Responsible', width: '10%' },
 ];
+
+const CBYDP_ALL_COLS = [...CBYDP_BASE_COLS, ...CBYDP_TARGET_COLS, ...CBYDP_TAIL_COLS];
 
 const CBYDP_SECTIONS: Array<CbydpRow['sectionType']> = ['FROM', 'TO', 'ADDITIONAL PROJECT'];
 
@@ -65,102 +72,36 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
 }) => {
     const yearLabels = parseYearRange(projName);
 
-    // Get collaborator info for a cell if someone is focused on it
-    const getCellHighlight = useCallback((cellId: string): any | null => {
-        let activeCollab: any | null = null;
+    // Optimized collaborator lookup: O(C) instead of O(N*M*C)
+    const collabLookup = useMemo(() => {
+        const lookup: Record<string, any> = {};
         collaborators.forEach((collab) => {
-            // Check if cell is in { cellId: '...' } format
-            const activeCellId = (collab.cell && 'cellId' in collab.cell) ? collab.cell.cellId : null;
-            if (collab.userID !== currentUserId && activeCellId === cellId) {
-                activeCollab = collab;
+            if (collab.userID !== currentUserId && collab.cell && 'cellId' in collab.cell) {
+                lookup[collab.cell.cellId] = collab;
             }
         });
-        return activeCollab;
+        return lookup;
     }, [collaborators, currentUserId]);
 
-    const handleFocus = (cellId: string) => sendCursorMove?.({ cellId });
-    const handleBlur = () => sendCursorMove?.(null);
-
-    const autoResize = (el: HTMLTextAreaElement) => {
-        el.style.height = 'auto';
-        el.style.height = el.scrollHeight + 'px';
-    };
-
-    const renderCell = (rowID: number, field: string, value: string | undefined) => {
-        const cellId = `cell-${rowID}-${field}`;
-        const activeCollab = getCellHighlight(cellId);
-
-        if (field === 'sheetRowIndex') {
-            return (
-                <td key={field} className="pt-cell pt-cell-secondary">
-                    <div className="pt-index-label">{value ?? ''}</div>
-                </td>
-            );
-        }
-
-        return (
-            <td
-                key={field}
-                className="pt-cell"
-                style={activeCollab ? { outline: `2px solid ${activeCollab.color}`, outlineOffset: '-2px' } : {}}
-            >
-                {activeCollab && (
-                    <div className="pt-collab-nametag" style={{ backgroundColor: activeCollab.color }}>
-                        {activeCollab.fullName}
-                    </div>
-                )}
-                <textarea
-                    id={cellId}
-                    className="pt-cell-input"
-                    value={value ?? ''}
-                    disabled={readOnly || !!activeCollab}
-                    ref={(el) => { if (el) autoResize(el); }}
-                    onFocus={() => {
-                        handleFocus(cellId);
-                        // Ensure textarea height is correct on focus
-                        const el = document.getElementById(cellId) as HTMLTextAreaElement;
-                        if (el) autoResize(el);
-                    }}
-                    onBlur={(e) => {
-                        handleBlur();
-                        onCellBlur?.(rowID, field, e.target.value);
-                    }}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                            if (e.shiftKey) {
-                                // Shift+Enter: let it add new line (default)
-                            } else {
-                                // Enter only: blur and finalize
-                                e.preventDefault();
-                                (e.target as HTMLTextAreaElement).blur();
-                            }
-                        }
-                    }}
-                    onChange={(e) => {
-                        autoResize(e.target);
-                        onCellChange?.(rowID, field, e.target.value);
-                    }}
-                />
-            </td>
-        );
-    };
+    const handleFocus = useCallback((cellId: string) => sendCursorMove?.({ cellId }), [sendCursorMove]);
+    const handleBlur = useCallback(() => sendCursorMove?.(null), [sendCursorMove]);
 
     // ── ABYIP Layout ──────────────────────────────────────────────────────────
 
     if (projType === 'ABYIP') {
         const abyipRows = rows as AbyipRow[];
         return (
-            <div className="pt-table-wrapper">
-                <table className="pt-table">
+            <div className={styles['pt-table-wrapper']}>
+                <table className={styles['pt-table']}>
                     <thead>
                         {/* Title rows */}
-                        <tr><th colSpan={12} className="pt-title-row">ANNUAL BARANGAY YOUTH INVESTMENT PROGRAM (ABYIP)</th></tr>
-                        <tr><th colSpan={12} className="pt-title-row">FY {fiscalYear}</th></tr>
-                        <tr><th colSpan={12} className="pt-title-row">YOUTH DEVELOPMENT AND EMPOWERMENT PROGRAMS</th></tr>
-                        <tr><th colSpan={12} className="pt-title-row">CENTER FOR PARTICIPATION: {centerOfParticipation.toUpperCase()}</th></tr>
+                        <tr><th colSpan={12} className={styles['pt-title-row']}>ANNUAL BARANGAY YOUTH INVESTMENT PROGRAM (ABYIP)</th></tr>
+                        <tr><th colSpan={12} className={styles['pt-title-row']}>FY {fiscalYear}</th></tr>
+                        <tr><th colSpan={12} className={styles['pt-title-row']}>YOUTH DEVELOPMENT AND EMPOWERMENT PROGRAMS</th></tr>
+                        <tr><th colSpan={12} className={styles['pt-title-row']}>CENTER FOR PARTICIPATION: {centerOfParticipation.toUpperCase()}</th></tr>
 
                         {/* Column headers — row 1 */}
-                        <tr className="pt-col-header">
+                        <tr className={styles['pt-col-header']}>
                             <th rowSpan={2} style={{ width: '4%' }}>Rows</th>
                             <th rowSpan={2} style={{ width: '9%' }}>Reference Code</th>
                             <th rowSpan={2} style={{ width: '10%' }}>PPAs</th>
@@ -172,7 +113,7 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
                             <th rowSpan={2} style={{ width: '8%' }}>Person Responsible</th>
                         </tr>
                         {/* Column headers — row 2 (budget sub-cols) */}
-                        <tr className="pt-col-header">
+                        <tr className={styles['pt-col-header']}>
                             <th style={{ width: '6%' }}>PS</th>
                             <th style={{ width: '6%' }}>MOOE</th>
                             <th style={{ width: '6%' }}>CO</th>
@@ -181,17 +122,24 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
                     </thead>
                     <tbody>
                         {abyipRows.map((row) => (
-                            <tr key={row.rowID}>
-                                {ABYIP_COLS.map((col) =>
-                                    renderCell(row.rowID, col.key, (row as any)[col.key])
-                                )}
-                            </tr>
+                            <ProjectTableRow
+                                key={row.rowID}
+                                row={row}
+                                columns={ABYIP_COLS}
+                                readOnly={readOnly}
+                                collabLookup={collabLookup}
+                                projType="ABYIP"
+                                onCellChange={onCellChange!}
+                                onCellBlur={onCellBlur!}
+                                handleFocus={handleFocus}
+                                handleBlur={handleBlur}
+                            />
                         ))}
                     </tbody>
                 </table>
 
                 {!readOnly && (
-                    <button className="pt-add-row-btn" onClick={() => onAddRow?.()}>
+                    <button className={styles['pt-add-row-btn']} onClick={() => onAddRow?.()}>
                         + Add Row
                     </button>
                 )}
@@ -203,52 +151,25 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
 
     const cbydpRows = rows as CbydpRow[];
 
-    const renderCbydpSection = (section: CbydpRow['sectionType']) => {
-        const sectionRows = cbydpRows.filter((r) => r.sectionType === section);
-        return (
-            <React.Fragment key={section}>
-                <tr>
-                    <td colSpan={10} className="pt-section-divider">{section}</td>
-                </tr>
-                {sectionRows.map((row) => (
-                    <tr key={row.rowID}>
-                        {CBYDP_BASE_COLS.map((col) => renderCell(row.rowID, col.key, (row as any)[col.key]))}
-                        {CBYDP_TARGET_KEYS.map((k) => renderCell(row.rowID, k, (row as any)[k]))}
-                        {CBYDP_TAIL_COLS.map((col) => renderCell(row.rowID, col.key, (row as any)[col.key]))}
-                    </tr>
-                ))}
-                {!readOnly && (
-                    <tr>
-                        <td colSpan={10} className="pt-add-row-cell">
-                            <button className="pt-add-row-btn-inline" onClick={() => onAddRow?.(section)}>
-                                + Add Row
-                            </button>
-                        </td>
-                    </tr>
-                )}
-            </React.Fragment>
-        );
-    };
-
-    const colCount = CBYDP_BASE_COLS.length + 3 + CBYDP_TAIL_COLS.length; // 10
+    const colCount = CBYDP_ALL_COLS.length; // 10
 
     return (
-        <div className="pt-table-wrapper">
-            <table className="pt-table">
+        <div className={styles['pt-table-wrapper']}>
+            <table className={styles['pt-table']}>
                 <thead>
                     <tr>
-                        <th colSpan={colCount} className="pt-title-row">
+                        <th colSpan={colCount} className={styles['pt-title-row']}>
                             COMPREHENSIVE BARANGAY YOUTH DEVELOPMENT PLAN (CBYDP) CY {fiscalYear}
                         </th>
                     </tr>
                     <tr>
-                        <th colSpan={colCount} className="pt-title-row">
+                        <th colSpan={colCount} className={styles['pt-title-row']}>
                             PARTICIPATION: {centerOfParticipation.toUpperCase()}
                         </th>
                     </tr>
 
                     {/* Column headers — row 1 */}
-                    <tr className="pt-col-header">
+                    <tr className={styles['pt-col-header']}>
                         <th rowSpan={2} style={{ width: '4%' }}>Rows</th>
                         <th rowSpan={2}>Youth Development Concern</th>
                         <th rowSpan={2}>Objective</th>
@@ -259,12 +180,45 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
                         <th rowSpan={2}>Person Responsible</th>
                     </tr>
                     {/* Column headers — row 2 (target years) */}
-                    <tr className="pt-col-header">
+                    <tr className={styles['pt-col-header']}>
                         {yearLabels.map((yr) => <th key={yr}>{yr}</th>)}
                     </tr>
                 </thead>
                 <tbody>
-                    {CBYDP_SECTIONS.map((section) => renderCbydpSection(section))}
+                    {CBYDP_SECTIONS.map((section) => {
+                        const sectionRows = cbydpRows.filter((r) => r.sectionType === section);
+                        return (
+                            <React.Fragment key={section}>
+                                <tr>
+                                    <td colSpan={colCount} className={styles['pt-section-divider']}>{section}</td>
+                                </tr>
+                                {sectionRows.map((row) => (
+                                    <ProjectTableRow
+                                        key={row.rowID}
+                                        row={row}
+                                        columns={CBYDP_ALL_COLS}
+                                        readOnly={readOnly}
+                                        collabLookup={collabLookup}
+                                        projType="CBYDP"
+                                        yearLabels={yearLabels}
+                                        onCellChange={onCellChange!}
+                                        onCellBlur={onCellBlur!}
+                                        handleFocus={handleFocus}
+                                        handleBlur={handleBlur}
+                                    />
+                                ))}
+                                {!readOnly && (
+                                    <tr>
+                                        <td colSpan={colCount} className={styles['pt-add-row-cell']}>
+                                            <button className={styles['pt-add-row-btn-inline']} onClick={() => onAddRow?.(section)}>
+                                                + Add Row
+                                            </button>
+                                        </td>
+                                    </tr>
+                                )}
+                            </React.Fragment>
+                        );
+                    })}
                 </tbody>
             </table>
         </div>

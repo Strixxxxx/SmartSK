@@ -9,6 +9,44 @@ const { decrypt } = require('../utils/crypto');
  * Fetch all audit trail entries for a given project batch,
  * joined with user info (full name).
  */
+/**
+ * Helper: Insert a new audit entry into projectAuditTrail.
+ * This can be used by other routes to log actions.
+ */
+async function createAuditEntry({
+    pool,
+    batchID,
+    userID,
+    action,
+    oldValue = null,
+    newValue = null,
+    center = null,
+    abyipID = null,
+    cbydpID = null
+}) {
+    try {
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('userID', sql.Int, userID)
+            .input('action', sql.NVarChar, action)
+            .input('oldValue', sql.NVarChar, oldValue)
+            .input('newValue', sql.NVarChar, newValue)
+            .input('center', sql.NVarChar, center)
+            .input('abyipID', sql.Int, abyipID)
+            .input('cbydpID', sql.Int, cbydpID)
+            .query(`
+                INSERT INTO projectAuditTrail 
+                (batchID, userID, action, oldValue, newValue, centerOfParticipation, abyipID, cbydpID)
+                VALUES 
+                (@batchID, @userID, @action, @oldValue, @newValue, @center, @abyipID, @cbydpID)
+            `);
+        return true;
+    } catch (error) {
+        console.error('Error creating audit entry:', error);
+        return false;
+    }
+}
+
 router.get('/:batchID/audit', authMiddleware, async (req, res) => {
     try {
         const { batchID } = req.params;
@@ -52,4 +90,7 @@ router.get('/:batchID/audit', authMiddleware, async (req, res) => {
     }
 });
 
-module.exports = router;
+module.exports = {
+    router,
+    createAuditEntry
+};

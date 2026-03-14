@@ -1,5 +1,5 @@
 import React from 'react';
-import './ProjectTemplate.css';
+import styles from './ProjectTemplate.module.css';
 
 const CATEGORIES = [
     'Governance',
@@ -23,11 +23,11 @@ interface ProjectSheetTabsProps {
 
 const ProjectSheetTabs: React.FC<ProjectSheetTabsProps> = ({ activeTab, onTabChange }) => {
     return (
-        <div className="pt-sheet-tabs">
+        <div className={styles['pt-sheet-tabs']}>
             {CATEGORIES.map((cat) => (
                 <button
                     key={cat}
-                    className={`pt-sheet-tab ${activeTab === cat ? 'active' : ''}`}
+                    className={`${styles['pt-sheet-tab']} ${activeTab === cat ? styles.active : ''}`}
                     onClick={() => onTabChange(cat)}
                     title={cat}
                 >

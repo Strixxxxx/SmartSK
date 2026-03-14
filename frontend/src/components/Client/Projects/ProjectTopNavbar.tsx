@@ -1,8 +1,10 @@
-import React from 'react';
-import { Box, Typography, Button, Tooltip, Divider } from '@mui/material';
-import { FileDownload, PictureAsPdf, AddCircleOutline } from '@mui/icons-material';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Box, Typography, Button, Tooltip, Divider, CircularProgress, IconButton } from '@mui/material';
+import { FileDownload, PictureAsPdf, AddCircleOutline, Close } from '@mui/icons-material';
 import CollaboratorAvatars from './CollaboratorAvatars';
 import { CollaboratorInfo } from '../../../hooks/useCollaborationSocket';
+import instance from '../../../backend connection/axiosConfig';
 
 interface ProjectTopNavbarProps {
     project: any | null;
@@ -14,15 +16,46 @@ interface ProjectTopNavbarProps {
 }
 
 const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({ project, canCreate, collaborators, currentUser, onCreateNew }) => {
+    const navigate = useNavigate();
+    const [isExportingExcel, setIsExportingExcel] = useState(false);
+    const [isExportingPDF, setIsExportingPDF] = useState(false);
 
-    const handleExportExcel = () => {
-        // TODO: Hook up to backend export endpoint when implemented
-        alert('Export to Excel – coming soon!');
-    };
+    const handleExport = async (format: 'excel' | 'pdf') => {
+        if (!project || !project.batchID) return;
+        
+        try {
+            if (format === 'excel') setIsExportingExcel(true);
+            else setIsExportingPDF(true);
 
-    const handleExportPDF = () => {
-        // TODO: Hook up to backend export endpoint when implemented
-        alert('Export to PDF – coming soon!');
+            const response = await instance.get(`/api/project-batch/export/${format}/${project.batchID}`, {
+                responseType: 'blob', // Important for file downloads
+            });
+            
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            
+            let fileName = `Export_${project.batchID}.${format === 'excel' ? 'xlsx' : 'pdf'}`;
+            const contentDisposition = response.headers['content-disposition'];
+            if (contentDisposition) {
+                const fileNameMatch = contentDisposition.match(/filename="?([^"]+)"?/);
+                if (fileNameMatch && fileNameMatch.length === 2) {
+                    fileName = fileNameMatch[1];
+                }
+            }
+            
+            link.setAttribute('download', fileName);
+            document.body.appendChild(link);
+            link.click();
+            link.parentNode?.removeChild(link);
+            
+        } catch (error) {
+            console.error(`Error exporting ${format}:`, error);
+            alert(`Failed to export ${format.toUpperCase()}. Please ensure the file is synced and try again.`);
+        } finally {
+            if (format === 'excel') setIsExportingExcel(false);
+            else setIsExportingPDF(false);
+        }
     };
 
     return (
@@ -40,7 +73,7 @@ const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({ project, canCreate,
                 zIndex: 10,
             }}
         >
-            {/* Left: Breadcrumb */}
+            {/* Left: Breadcrumb — show only filename */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Typography variant="body2" color="text.secondary">
                     Projects
@@ -48,11 +81,7 @@ const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({ project, canCreate,
                 {project && (
                     <>
                         <Typography variant="body2" color="text.disabled">/</Typography>
-                        <Typography variant="body2" fontWeight="600" color="primary">
-                            {project.projType} {project.targetYear}
-                        </Typography>
-                        <Typography variant="body2" color="text.disabled">/</Typography>
-                        <Typography variant="body2" color="text.secondary" noWrap sx={{ maxWidth: 240 }}>
+                        <Typography variant="body2" color="text.secondary" noWrap sx={{ maxWidth: 300 }}>
                             {project.projName}
                         </Typography>
                     </>
@@ -70,11 +99,12 @@ const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({ project, canCreate,
                             <Button
                                 size="small"
                                 variant="outlined"
-                                startIcon={<FileDownload />}
-                                onClick={handleExportExcel}
+                                startIcon={isExportingExcel ? <CircularProgress size={20} color="inherit" /> : <FileDownload />}
+                                onClick={() => handleExport('excel')}
+                                disabled={isExportingExcel || isExportingPDF}
                                 sx={{ textTransform: 'none', borderRadius: 2 }}
                             >
-                                Excel
+                                {isExportingExcel ? 'Exporting...' : 'Excel'}
                             </Button>
                         </Tooltip>
                         <Tooltip title="Export to PDF">
@@ -82,11 +112,12 @@ const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({ project, canCreate,
                                 size="small"
                                 variant="outlined"
                                 color="error"
-                                startIcon={<PictureAsPdf />}
-                                onClick={handleExportPDF}
+                                startIcon={isExportingPDF ? <CircularProgress size={20} color="inherit" /> : <PictureAsPdf />}
+                                onClick={() => handleExport('pdf')}
+                                disabled={isExportingExcel || isExportingPDF}
                                 sx={{ textTransform: 'none', borderRadius: 2 }}
                             >
-                                PDF
+                                {isExportingPDF ? 'Exporting...' : 'PDF'}
                             </Button>
                         </Tooltip>
                         <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
@@ -103,6 +134,18 @@ const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({ project, canCreate,
                         Create New Project Plan
                     </Button>
                 )}
+                <Tooltip title="Back to Dashboard">
+                    <IconButton
+                        size="small"
+                        onClick={() => navigate('/dashboard')}
+                        sx={{
+                            color: 'text.secondary',
+                            '&:hover': { color: 'error.main', bgcolor: 'rgba(211,47,47,0.08)' },
+                        }}
+                    >
+                        <Close fontSize="small" />
+                    </IconButton>
+                </Tooltip>
             </Box>
         </Box>
     );

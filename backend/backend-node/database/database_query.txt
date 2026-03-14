@@ -196,6 +196,25 @@ CREATE TABLE projectABYIP (
     CONSTRAINT FK_ABYIP_Batch FOREIGN KEY (projbatchID) REFERENCES projectBatch(batchID) ON DELETE CASCADE
 );
 
+-- CBYDP Agenda Statement Table
+CREATE TABLE projectAgenda (
+    agendaID INT PRIMARY KEY IDENTITY(1,1),
+    batchID INT NOT NULL,
+    governance NVARCHAR(MAX),
+    active_citizenship NVARCHAR(MAX),
+    economic_empowerment NVARCHAR(MAX),
+    global_mobility NVARCHAR(MAX),
+    agriculture NVARCHAR(MAX),
+    environment NVARCHAR(MAX),
+    PBS NVARCHAR(MAX),
+    SIE NVARCHAR(MAX),
+    education NVARCHAR(MAX),
+    health NVARCHAR(MAX),
+    GAP NVARCHAR(MAX),
+    MOOE NVARCHAR(MAX),
+    CONSTRAINT FK_projAgenda FOREIGN KEY (batchID) REFERENCES projectBatch(batchID),
+);
+
 -- Granular rows for CBYDP format
 CREATE TABLE projectCBYDP (
     cbydpID INT PRIMARY KEY IDENTITY(1,1),
@@ -209,7 +228,7 @@ CREATE TABLE projectCBYDP (
     target2 NVARCHAR(MAX),
     target3 NVARCHAR(MAX),
     PPAs NVARCHAR(MAX),
-    budget MONEY DEFAULT 0,
+    budget NVARCHAR(255),
     personResponsible NVARCHAR(255),
     sheetRowIndex INT,
     CONSTRAINT FK_CBYDP_Batch FOREIGN KEY (projbatchID) REFERENCES projectBatch(batchID) ON DELETE CASCADE

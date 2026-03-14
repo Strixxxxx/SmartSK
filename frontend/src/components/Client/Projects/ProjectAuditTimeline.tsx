@@ -26,7 +26,9 @@ interface ProjectAuditTimelineProps {
 
 /** Format a timestamp to relative time (e.g. "2 min ago") */
 function formatRelativeTime(ts: string): string {
-    const diff = Date.now() - new Date(ts).getTime();
+    // Strip 'Z' suffix if present to avoid UTC conversion, since DB values are already in PHT
+    const cleanTs = ts.endsWith('Z') ? ts.slice(0, -1) : ts;
+    const diff = Date.now() - new Date(cleanTs).getTime();
     const minutes = Math.floor(diff / 60000);
     if (minutes < 1) return 'just now';
     if (minutes < 60) return `${minutes} min ago`;
@@ -41,7 +43,9 @@ function actionLabel(action: string): string {
     switch (action) {
         case 'ADD_ROW': return 'Added Row';
         case 'ADD_TEXT': return 'Added Text';
-        case 'EDIT': return 'Edited';
+        case 'ADD_AGENDA': return 'Added Agenda';
+        case 'EDIT': return 'Edited Text';
+        case 'EDIT_AGENDA': return 'Edited Agenda';
         default: return action;
     }
 }
@@ -51,7 +55,9 @@ function actionColor(action: string): string {
     switch (action) {
         case 'ADD_ROW': return '#646cff';
         case 'ADD_TEXT': return '#2e7d32';
+        case 'ADD_AGENDA': return '#1b5e20'; // Dark Green
         case 'EDIT': return '#ed6c02';
+        case 'EDIT_AGENDA': return '#f9a825'; // Dark Yellow
         default: return '#78909c';
     }
 }
@@ -87,7 +93,13 @@ const ProjectAuditTimeline: React.FC<ProjectAuditTimelineProps> = ({
     }, [batchID, center, fetchLogs, auditRefreshTrigger]);
 
     return (
-        <Box sx={{ borderTop: '1px solid rgba(255,255,255,0.1)', flexShrink: 0, display: 'flex', flexDirection: 'column' }}>
+        <Box sx={{
+            borderTop: '1px solid rgba(255,255,255,0.1)',
+            flexShrink: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '350px', // Independent scroll limit
+        }}>
             {/* Header */}
             <Box sx={{ px: 2, py: 1, bgcolor: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
                 <History sx={{ fontSize: 14, color: '#646cff' }} />
@@ -115,7 +127,7 @@ const ProjectAuditTimeline: React.FC<ProjectAuditTimelineProps> = ({
                     </Typography>
                 ) : (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        {logs.slice(0, 3).map((log) => (
+                        {logs.map((log) => (
                             <Box key={log.auditID} sx={{ position: 'relative', pl: 2, borderLeft: '1px solid rgba(100, 108, 255, 0.3)' }}>
                                 {/* Relative Dot */}
                                 <Box sx={{
@@ -138,9 +150,23 @@ const ProjectAuditTimeline: React.FC<ProjectAuditTimelineProps> = ({
                                     </Typography>
                                 </Box>
 
-                                <Tooltip title={`Value: ${log.newValue}`}>
-                                    <Typography variant="body2" noWrap sx={{ color: '#ccc', fontSize: '0.7rem', mt: 0.2, cursor: 'default' }}>
-                                        {log.fullName} modified row #{log.rowID}
+                                <Tooltip title={`${log.newValue}`}>
+                                    <Typography variant="body2" sx={{
+                                        color: '#ccc',
+                                        fontSize: '0.7rem',
+                                        mt: 0.2,
+                                        cursor: 'default',
+                                        lineHeight: 1.2,
+                                        display: '-webkit-box',
+                                        WebkitLineClamp: 2,
+                                        WebkitBoxOrient: 'vertical',
+                                        overflow: 'hidden'
+                                    }}>
+                                        {
+                                            (log.action === 'ADD_AGENDA' || log.action === 'EDIT_AGENDA')
+                                                ? log.newValue
+                                                : `${log.fullName} modified row #${log.rowID || '?'}`
+                                        }
                                     </Typography>
                                 </Tooltip>
                             </Box>

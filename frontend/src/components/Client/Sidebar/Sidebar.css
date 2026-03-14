@@ -18,6 +18,7 @@
 .client-sidebar.collapsed {
   width: 70px;
   overflow: hidden;
+  background: linear-gradient(135deg, #eee9e9, #747bff);
 }
 
 .client-sidebar-header {
@@ -49,7 +50,7 @@
 }
 
 .client-sidebar.collapsed .client-sidebar-header {
-  background: linear-gradient(135deg, #eee9e9, #747bff);
+  background: transparent;
   justify-content: center;
   padding: 20px 0;
 }

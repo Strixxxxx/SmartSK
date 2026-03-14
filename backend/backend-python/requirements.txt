@@ -29,6 +29,7 @@ scikit-learn
 python-dateutil
 Pillow
 openpyxl
+reportlab
 
 # Crypto
 pycryptodome

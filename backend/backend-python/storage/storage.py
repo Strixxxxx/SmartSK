@@ -88,3 +88,10 @@ def blob_exists(container_name, blob_name):
     except Exception as e:
         logger.error(f"Error checking existence of blob '{blob_name}': {e}")
         return False
+
+def get_blob_client(container_name, blob_name):
+    """Returns a BlobClient for a specific blob."""
+    client = get_blob_service_client()
+    if not client:
+        return None
+    return client.get_blob_client(container=container_name, blob=blob_name)

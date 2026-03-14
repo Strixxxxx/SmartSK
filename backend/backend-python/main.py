@@ -8,6 +8,7 @@ sys.path.append(os.path.join(current_dir, "AI"))
 sys.path.append(os.path.join(current_dir, "database"))
 sys.path.append(os.path.join(current_dir, "util"))
 sys.path.append(os.path.join(current_dir, "projects"))
+sys.path.append(os.path.join(current_dir, "automation"))
 
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -85,6 +86,9 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(title="smartSK AI Service", description="FastAPI Microservice for smartSK AI Tasks", lifespan=lifespan)
+
+from export_service import router as export_router
+app.include_router(export_router, prefix="/automation/export")
 
 # --- CORS Configuration ---
 cors_origin = os.getenv("CORS_ORIGIN", "")

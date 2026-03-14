@@ -332,10 +332,10 @@ if (reportsRouter && typeof reportsRouter === 'function') {
 }
 
 // Project Audit router
-if (projectAuditRouter && typeof projectAuditRouter === 'function') {
-  app.use('/api/project-batch', projectAuditRouter);
+if (projectAuditRouter && projectAuditRouter.router) {
+  app.use('/api/project-batch', projectAuditRouter.router);
 } else {
-  console.error('projectAuditRouter is not a valid middleware function');
+  console.error('projectAuditRouter.router is not a valid middleware function');
 }
 
 // Project Notes router
@@ -344,10 +344,6 @@ if (projectNotesRouter && typeof projectNotesRouter === 'function') {
 } else {
   console.error('projectNotesRouter is not a valid middleware function');
 }
-
-// Removed legacy project/posting routes
-
-// Check PyBridge modules - removed duplicate validation since it's handled in import section above
 
 // Add or update the user-info endpoint
 app.get('/api/user-data', async (req, res) => {

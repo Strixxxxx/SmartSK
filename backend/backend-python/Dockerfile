@@ -34,12 +34,15 @@ FROM python:3.12-slim-bullseye
 
 WORKDIR /app
 
-# Install runtime dependencies including ODBC
+# Install runtime dependencies including ODBC and LibreOffice for PDF generation
 RUN apt-get -o Acquire::Retries=3 update && apt-get -o Acquire::Retries=3 install -y --no-install-recommends \
     ca-certificates \
     curl \
     gnupg2 \
     unixodbc \
+    libreoffice-calc \
+    libreoffice-common \
+    fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Microsoft ODBC Driver 17 for SQL Server (runtime)

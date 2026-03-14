@@ -4,6 +4,8 @@ const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const templateService = require('../utils/templateService');
 const { authMiddleware } = require('../session/session');
+const { createAuditEntry } = require('./projectAudit');
+const axios = require('axios');
 const { getBlobProperties, listBlobs, downloadBlobToBuffer, projectBatchContainerName } = require('../Storage/storage');
 const fs = require('fs');
 const path = require('path');
@@ -549,6 +551,156 @@ router.patch('/notifications/:notificationID/read', authMiddleware, async (req, 
     } catch (error) {
         console.error('Error marking notification as read:', error);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+// 13. Get Agenda Statement for a project batch
+router.get('/:batchID/agenda', authMiddleware, async (req, res) => {
+    try {
+        const { batchID } = req.params;
+        const pool = await getConnection();
+
+        const result = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query('SELECT * FROM projectAgenda WHERE batchID = @batchID');
+
+        res.json({ success: true, data: result.recordset.length ? result.recordset[0] : null });
+    } catch (error) {
+        console.error('Error fetching agenda:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+// 14. Update/Create Agenda Statement for a specific category
+router.patch('/:batchID/agenda', authMiddleware, async (req, res) => {
+    try {
+        const { batchID } = req.params;
+        const { categoryMap, value } = req.body; 
+        const userID = req.user.userID;
+        
+        const pool = await getConnection();
+        
+        const allowedColumns = [
+            'governance', 'active_citizenship', 'economic_empowerment', 'global_mobility',
+            'agriculture', 'environment', 'PBS', 'SIE', 'education', 'health', 'GAP', 'MOOE'
+        ];
+        
+        if (!allowedColumns.includes(categoryMap)) {
+            return res.status(400).json({ success: false, message: 'Invalid category mapping' });
+        }
+
+        // 1. Fetch current value for auditing
+        const currentRes = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query(`SELECT [${categoryMap}] FROM projectAgenda WHERE batchID = @batchID`);
+        
+        const oldValue = currentRes.recordset.length ? currentRes.recordset[0][categoryMap] : null;
+        const action = !oldValue ? 'ADD_AGENDA' : 'EDIT_AGENDA';
+
+        // 2. Perform UPSERT
+        const query = `
+            IF EXISTS (SELECT 1 FROM projectAgenda WHERE batchID = @batchID)
+            BEGIN
+                UPDATE projectAgenda SET [${categoryMap}] = @value WHERE batchID = @batchID
+            END
+            ELSE
+            BEGIN
+                INSERT INTO projectAgenda (batchID, [${categoryMap}]) VALUES (@batchID, @value)
+            END
+        `;
+
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('value', sql.NVarChar, value || '')
+            .query(query);
+
+        // 3. Log to Audit Trail using the centralized helper
+        const auditMessage = action === 'ADD_AGENDA'
+            ? `User added a new agenda: "${value || ''}"`
+            : `User changed the agenda from "${oldValue || ''}" to "${value || ''}"`;
+
+        await createAuditEntry({
+            pool,
+            batchID,
+            userID,
+            action,
+            oldValue: oldValue || 'N/A',
+            newValue: auditMessage,
+            center: categoryMap 
+        });
+
+        broadcastToRoom(batchID, { type: 'audit_update', batchID });
+
+        res.json({ success: true, message: 'Agenda statement updated' });
+    } catch (error) {
+        console.error('Error updating agenda:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+// 15. Export Project as Excel Workbook
+router.get('/export/excel/:batchID', authMiddleware, async (req, res) => {
+    try {
+        const { batchID } = req.params;
+        const axios = require('axios');
+        
+        // 1. Ensure Excel is up-to-date in Azure
+        const upToDate = await templateService.ensureExcelUpToDate(batchID);
+        if (!upToDate) {
+            return res.status(500).json({ success: false, message: 'Failed to synchronize Excel data before export.' });
+        }
+
+        // 2. Fetch the Excel file from Python microservice
+        const pythonUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/automation/export/excel/${batchID}`;
+        
+        const response = await axios({
+            url: pythonUrl,
+            method: 'GET',
+            responseType: 'stream',
+        });
+
+        // 3. Forward the headers and stream
+        res.setHeader('Content-Type', response.headers['content-type']);
+        res.setHeader('Content-Disposition', response.headers['content-disposition']);
+        res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+        response.data.pipe(res);
+
+    } catch (error) {
+        console.error('Error exporting Excel:', error.message);
+        res.status(500).json({ success: false, message: 'Internal Server Error during Excel Export' });
+    }
+});
+
+// 14. Export Project as PDF
+router.get('/export/pdf/:batchID', authMiddleware, async (req, res) => {
+    try {
+        const { batchID } = req.params;
+        const axios = require('axios');
+        
+        // 1. Ensure Excel is up-to-date in Azure
+        const upToDate = await templateService.ensureExcelUpToDate(batchID);
+        if (!upToDate) {
+            return res.status(500).json({ success: false, message: 'Failed to synchronize Excel data before export.' });
+        }
+
+        // 2. Fetch the PDF file from Python microservice
+        const pythonUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/automation/export/pdf/${batchID}`;
+        
+        const response = await axios({
+            url: pythonUrl,
+            method: 'GET',
+            responseType: 'stream',
+        });
+
+        // 3. Forward the headers and stream
+        res.setHeader('Content-Type', response.headers['content-type']);
+        res.setHeader('Content-Disposition', response.headers['content-disposition']);
+        res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
+        response.data.pipe(res);
+
+    } catch (error) {
+        console.error('Error exporting PDF:', error.message);
+        res.status(500).json({ success: false, message: 'Internal Server Error during PDF Export' });
     }
 });
 
