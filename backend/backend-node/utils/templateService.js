@@ -77,13 +77,7 @@ class TemplateService {
      * Trigger the Python Microservice to sync the Excel file
      */
     async triggerPythonSync(batchID) {
-        const os = require('os');
-        const fs = require('fs');
-        const path = require('path');
         const axios = require('axios');
-        const { downloadBlobToBuffer, uploadBlob, projectBatchContainerName } = require('../Storage/storage');
-        let tempFilePath = null;
-
         try {
             const pool = await getConnection();
             const batchResult = await pool.request()
@@ -96,35 +90,20 @@ class TemplateService {
             const abbr = this.getBarangayAbbr(barangayID);
             const fileName = `${projType}_${abbr}_${targetYear}.xlsx`;
 
-            // 1. Download existing blob to temp file
-            const fileBuffer = await downloadBlobToBuffer(projectBatchContainerName, fileName);
-            tempFilePath = path.join(os.tmpdir(), `sync_${Date.now()}_${fileName}`);
-            fs.writeFileSync(tempFilePath, fileBuffer);
-
-            // 2. Trigger Python
+            // Trigger Python - Pass fileName so Python can handle Azure Blob Storage directly
             const aiServiceUrl = process.env.AI_SERVICE_URL || 'http://localhost:8000';
             const response = await axios.post(`${aiServiceUrl}/sync-project`, {
                 batch_id: batchID,
-                file_path: tempFilePath
+                file_name: fileName
             });
 
             if (response.data.status !== 'ok') {
                 throw new Error('Python sync failed');
             }
 
-            // 3. Upload modified file back to Azure
-            const modifiedBuffer = fs.readFileSync(tempFilePath);
-            await uploadBlob(projectBatchContainerName, fileName, modifiedBuffer, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-
-            // 4. Cleanup
-            fs.unlinkSync(tempFilePath);
-
             return true;
         } catch (error) {
             console.error('Failed to trigger Python sync:', error.message);
-            if (tempFilePath && fs.existsSync(tempFilePath)) {
-                try { fs.unlinkSync(tempFilePath); } catch (e) { }
-            }
             return false;
         }
     }

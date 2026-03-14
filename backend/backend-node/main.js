@@ -28,7 +28,10 @@ if (fs.existsSync(dotenvPath)) {
   dotenv.config({ path: dotenvPath });
   console.log(`Loaded .env from: ${dotenvPath}`);
 } else {
-  console.warn(`Warning: .env file not found at ${dotenvPath}`);
+  // Only warn if critical variables are missing
+  if (!process.env.DB_SERVER) {
+    console.warn(`Warning: .env file not found at ${dotenvPath} and environment variables are not set.`);
+  }
 }
 
 // Check for required environment variables

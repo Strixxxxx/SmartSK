@@ -47,7 +47,9 @@ if os.path.exists(dotenv_path):
     load_dotenv(dotenv_path=dotenv_path)
     print(f"Loaded .env from: {os.path.abspath(dotenv_path)}")
 else:
-    print(f"Warning: .env file not found at {os.path.abspath(dotenv_path)}")
+    # Only warn if critical variables are missing
+    if not os.getenv("DB_SERVER"):
+        print(f"Warning: .env file not found at {os.path.abspath(dotenv_path)} and environment variables are not set.")
 
 from contextlib import asynccontextmanager
 
@@ -104,18 +106,57 @@ app.add_middleware(
 
 class SyncBatchRequest(BaseModel):
     batch_id: int
-    file_path: str
+    file_path: Optional[str] = None
+    file_name: Optional[str] = None
 
 @app.post("/sync-project")
 def trigger_sync_project(req: SyncBatchRequest):
+    temp_local_path = None
     try:
-        success = sync_excel_from_db(req.batch_id, req.file_path)
+        target_path = req.file_path
+        
+        # If no local path exists or it's provided but missing (common in Azure sidecars)
+        # fallback to downloading from Azure
+        if not target_path or not os.path.exists(target_path):
+            if not req.file_name:
+                 raise HTTPException(status_code=400, detail="Missing both file_path and file_name.")
+                 
+            print(f"File not found locally at '{target_path}', downloading '{req.file_name}' from Azure...")
+            PROJECT_BATCH_CONTAINER = os.getenv("PROJECT_BATCH_CONTAINER", "project-batch")
+            file_data = download_blob_to_memory(PROJECT_BATCH_CONTAINER, req.file_name)
+            
+            if not file_data:
+                raise HTTPException(status_code=404, detail=f"File '{req.file_name}' not found in Azure container '{PROJECT_BATCH_CONTAINER}'.")
+                
+            # Create a temporary local file for openpyxl to process
+            import tempfile
+            fd, temp_local_path = tempfile.mkstemp(suffix=".xlsx", prefix="sync_")
+            os.close(fd)
+            with open(temp_local_path, "wb") as f:
+                f.write(file_data)
+            
+            target_path = temp_local_path
+
+        success = sync_excel_from_db(req.batch_id, target_path)
+        
         if success:
+            # If we used a temp local file, we need to upload the results back to Azure
+            if temp_local_path:
+                PROJECT_BATCH_CONTAINER = os.getenv("PROJECT_BATCH_CONTAINER", "project-batch")
+                with open(temp_local_path, "rb") as f:
+                    modified_data = f.read()
+                upload_blob_from_memory(PROJECT_BATCH_CONTAINER, req.file_name, modified_data)
+                
             return {"status": "ok", "message": f"Excel file for batch {req.batch_id} synchronized."}
         else:
             raise HTTPException(status_code=500, detail="Synchronization failed.")
     except Exception as e:
+        print(f"Sync error: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if temp_local_path and os.path.exists(temp_local_path):
+            try: os.remove(temp_local_path)
+            except: pass
 
 @app.get("/health")
 def health_check():
