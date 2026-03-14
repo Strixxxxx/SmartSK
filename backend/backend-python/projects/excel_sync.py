@@ -278,8 +278,8 @@ def update_abyip_sheet(ws, db_rows):
         
         ws.row_dimensions[curr_row].height = max_h
 
-    # ABYIP headers start at row 6
-    apply_all_borders(ws, 6, start_row + rows_needed - 1, 2, 12)
+    # ABYIP headers start at row 8 (ANNUAL BARANGAY YOUTH INVESTMENT PROGRAM)
+    apply_all_borders(ws, 8, start_row + rows_needed - 1, 2, 12)
 
 def sync_excel_from_db(batch_id, file_path):
     conn = get_db_connection()
