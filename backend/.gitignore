@@ -16,7 +16,7 @@ backend-python/AI/__pycache__/
 backend-python/automation/__pycache__/
 backend-python/database/__pycache__/
 backend-python/projects/__pycache__/
-backend-python/storages/__pycache__/
+backend-python/storage/__pycache__/
 backend-python/util/__pycache__/
 # Editor directories and files
 .vscode/*
