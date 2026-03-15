@@ -112,7 +112,7 @@ class TemplateService {
      * Primary logic for creating a new project batch and template
      */
     async initializeNewProject(data) {
-        const { barangayID, projType, targetYear, budget, userID, governance_pct, active_citizenship_pct, economic_empowerment_pct, global_mobility_pct, agriculture_pct, environment_pct, PBS_pct, SIE_pct, education_pct, health_pct, GAP_pct, MOOE_pct } = data;
+        const { barangayID, projType, targetYear, budget, userID, termID, governance_pct, active_citizenship_pct, economic_empowerment_pct, global_mobility_pct, agriculture_pct, environment_pct, PBS_pct, SIE_pct, education_pct, health_pct, GAP_pct, MOOE_pct } = data;
 
         try {
             const pool = await getConnection();
@@ -141,6 +141,7 @@ class TemplateService {
                 .input('health_pct', sql.Decimal(5, 2), health_pct || 0)
                 .input('GAP_pct', sql.Decimal(5, 2), GAP_pct || 0)
                 .input('MOOE_pct', sql.Decimal(5, 2), MOOE_pct || 0)
+                .input('termID', sql.Int, termID)
                 .execute('sp_InitializeProjectBatch');
 
             const batchID = result.recordset[0].batchID;

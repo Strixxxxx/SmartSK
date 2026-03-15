@@ -97,6 +97,8 @@ const reportsRouter = require('./AIDataRetrieval/reports');
 const projectBatchRouter = require('./Projects/projectBatch');
 const projectNotesRouter = require('./Projects/projectNotes');
 const projectAuditRouter = require('./Projects/projectAudit');
+const projectDocumentsRouter = require('./Projects/projectDocuments');
+const disclosureRouter = require('./bulletinboard/disclosure');
 const { initializeWebSocketServer, broadcast } = require('./websockets/websocket');
 const { sendProjectDeadlineEmail } = require('./Email/email');
 
@@ -170,6 +172,13 @@ if (registerRouter && typeof registerRouter === 'function') {
   console.error('registerRouter is not a valid middleware function');
 }
 
+//Bulletin Board Router
+if (disclosureRouter && typeof disclosureRouter === 'function') {
+  app.use('/api/disclosures', disclosureRouter);
+} else {
+  console.error('disclosureRouter is not a valid middleware function');
+}
+
 // Health Check Endpoint for both frontend and AI service
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
@@ -182,7 +191,6 @@ app.get('/api/maintenance-status', (req, res) => {
   });
 });
 
-// Removed legacy routes
 // --- POST /api/maintenance-end : End maintenance mode ---
 app.post('/api/maintenance-end', (req, res) => {
   const maintenanceFlagPath = path.join(__dirname, 'maintenance.flag');
@@ -214,9 +222,6 @@ app.post('/api/maintenance-end', (req, res) => {
     });
   }
 });
-
-// app.use('/api/posts', postPublicRouter); // Removed legacy
-// app.use('/api', commentRouter); // Removed legacy
 
 // --- AUTHENTICATION MIDDLEWARE ---
 // All routes defined after this point will be protected by the authMiddleware.
@@ -346,6 +351,13 @@ if (projectNotesRouter && typeof projectNotesRouter === 'function') {
   app.use('/api/project-notes', projectNotesRouter);
 } else {
   console.error('projectNotesRouter is not a valid middleware function');
+}
+
+// Project Documents router
+if (projectDocumentsRouter && typeof projectDocumentsRouter === 'function') {
+  app.use('/api/project-documents', projectDocumentsRouter);
+} else {
+  console.error('projectDocumentsRouter is not a valid middleware function');
 }
 
 // Add or update the user-info endpoint

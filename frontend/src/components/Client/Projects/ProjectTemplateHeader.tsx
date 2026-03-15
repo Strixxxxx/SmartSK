@@ -54,8 +54,7 @@ const ProjectTemplateHeader: React.FC<ProjectTemplateHeaderProps> = ({
                         <img 
                             src={leftLogo} 
                             alt={`${barangay} logo`} 
-                            // @ts-ignore - fetchpriority is a valid experimental attribute for LCP optimization
-                            fetchpriority="high" 
+                            fetchPriority="high" 
                             loading="eager"
                         />
                     </div>
@@ -73,8 +72,7 @@ const ProjectTemplateHeader: React.FC<ProjectTemplateHeaderProps> = ({
                         <img 
                             src={SK_logo} 
                             alt="SK logo" 
-                            // @ts-ignore
-                            fetchpriority="high" 
+                            fetchPriority="high" 
                             loading="eager"
                         />
                     </div>
@@ -104,8 +102,18 @@ const ProjectTemplateHeader: React.FC<ProjectTemplateHeaderProps> = ({
                             sx={{
                                 '& .MuiOutlinedInput-root': {
                                     backgroundColor: '#fff',
-                                    fontSize: '0.875rem',
-                                    fontFamily: 'Calibri, sans-serif'
+                                    fontSize: '0.9rem',
+                                    fontFamily: 'Calibri, sans-serif',
+                                    '&.Mui-disabled': {
+                                        color: '#000',
+                                        WebkitTextFillColor: '#000',
+                                        border: '1px solid #ddd'
+                                    }
+                                },
+                                '& .MuiInputBase-input.Mui-disabled': {
+                                    opacity: 1,
+                                    color: '#000',
+                                    WebkitTextFillColor: '#000'
                                 }
                             }}
                         />

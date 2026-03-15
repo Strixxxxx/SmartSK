@@ -1,0 +1,263 @@
+.bulletinPage {
+    background-color: #f8fafc;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Navigation - Exact same as landing page */
+.nav {
+    position: fixed;
+    top: 1.5rem;
+    right: 2rem;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.navList {
+    display: flex;
+    list-style: none;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+}
+
+.navItem button,
+.navItem a {
+    background: none;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    color: #475569;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 25px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navItem button:hover,
+.navItem a:hover,
+.activeLink {
+    background: #0056b3;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 86, 179, 0.2);
+}
+
+.loginBtn {
+    background: #0056b3 !important;
+    color: #ffffff !important;
+}
+
+/* Hero Header */
+.heroHeader {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: white;
+    padding: 4rem 5%;
+    text-align: center;
+}
+
+.heroContent h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+}
+
+.heroContent p {
+    font-size: 1.2rem;
+    opacity: 0.8;
+}
+
+/* Disclosure Layout */
+.disclosureWrapper {
+    display: flex;
+    padding: 3rem 5%;
+    gap: 3rem;
+    flex: 1;
+}
+
+.filterSidebar {
+    width: 250px;
+    flex-shrink: 0;
+}
+
+.filterGroup {
+    margin-bottom: 2rem;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.filterGroup h4 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    color: #1e293b;
+    border-bottom: 2px solid #f1f5f9;
+    padding-bottom: 0.5rem;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.95rem;
+    color: #475569;
+    cursor: pointer;
+}
+
+.checkboxLabel input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Bulletin Grid & Sections */
+.mainBulletins {
+    flex: 1;
+}
+
+.termSection {
+    margin-bottom: 4rem;
+}
+
+.termHeader {
+    font-size: 1.75rem;
+    color: #1e293b;
+    margin-bottom: 1.5rem;
+    padding-left: 1rem;
+    border-left: 5px solid #747bff;
+}
+
+.bulletinGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+/* Card Improvements */
+.card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.badge {
+    padding: 0.35rem 0.85rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.badgeabyip {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.badgecbydp {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.statusBadge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #dcfce7;
+    color: #166534;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+}
+
+.cardTitle {
+    font-size: 1.25rem;
+    margin: 0.5rem 0 1rem;
+    color: #0f172a;
+    line-height: 1.4;
+}
+
+.cardMeta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+}
+
+.metaItem {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.budgetAmount {
+    margin-top: auto;
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #000;
+}
+
+/* Others */
+.footer {
+    padding: 3rem;
+    text-align: center;
+    background: #f1f5f9;
+    color: #64748b;
+    border-top: 1px solid #e2e8f0;
+}
+
+.emptyState {
+    text-align: center;
+    padding: 4rem;
+    background: white;
+    border-radius: 16px;
+    border: 2px dashed #e2e8f0;
+    color: #64748b;
+}
+
+@media (max-width: 1024px) {
+    .disclosureWrapper {
+        flex-direction: column;
+    }
+
+    .filterSidebar {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .filterGroup {
+        flex: 1;
+        min-width: 200px;
+        margin-bottom: 0;
+    }
+}

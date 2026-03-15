@@ -55,7 +55,7 @@ const Portfolio: React.FC = () => {
             <button onClick={() => handleNavClick('#home')} type="button">Home</button>
           </li>
           <li className={styles.navItem}>
-            <a href="/project-list">Projects</a>
+            <a href="/project-list">Full-Disclosure Board</a>
           </li>
           <li className={styles.navItem}>
             <button className={styles.loginBtn} onClick={() => setIsLoginModalOpen(true)}>Login</button>

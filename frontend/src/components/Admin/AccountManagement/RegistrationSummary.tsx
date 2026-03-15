@@ -8,7 +8,7 @@ import { Visibility, ArrowBackIosNew, ArrowForwardIos, Edit } from '@mui/icons-m
 import { toast } from 'react-toastify';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import AuditSummaryModal from './AuditSummaryModal'; // Import the new modal
-import { Save, Edit as EditIcon, Cancel } from '@mui/icons-material';
+import { Save, Edit as EditIcon, Cancel, CheckCircle, Warning, Autorenew } from '@mui/icons-material';
 
 const POSITION_MAPPING: Record<string, string> = {
     'SKC': 'SK Chairperson',
@@ -66,12 +66,22 @@ const RegistrationSummary: React.FC = () => {
     const [isAuditModalOpen, setIsAuditModalOpen] = useState(false);
     const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
 
+    // State for Term Lifecycle
+    const [approvedCount, setApprovedCount] = useState<number>(0);
+    const [isFinalized, setIsFinalized] = useState<boolean>(false);
+    const [isTermLoading, setIsTermLoading] = useState(false);
+    
+    // Safety Dialogs
+    const [isFinalizeDialogOpen, setIsFinalizeDialogOpen] = useState(false);
+    const [isNewTermDialogOpen, setIsNewTermDialogOpen] = useState(false);
+
     const fetchInitialData = useCallback(async () => {
         setPageLoading(true);
         try {
-            const [officialsRes, auditRes] = await Promise.all([
+            const [officialsRes, auditRes, termRes] = await Promise.all([
                 axiosInstance.get('/api/admin/audit/officials'),
-                axiosInstance.get('/api/admin/audit/registrations')
+                axiosInstance.get('/api/admin/audit/registrations'),
+                axiosInstance.get('/api/admin/audit/term-status')
             ]);
 
             if (officialsRes.data.success) {
@@ -85,6 +95,10 @@ const RegistrationSummary: React.FC = () => {
             }
             if (auditRes.data.success) {
                 setLogs(auditRes.data.data);
+            }
+            if (termRes.data.success) {
+                setApprovedCount(termRes.data.approvedCount);
+                setIsFinalized(termRes.data.isFinalized);
             }
         } catch (error) {
             toast.error('Failed to fetch initial data.');
@@ -131,6 +145,46 @@ const RegistrationSummary: React.FC = () => {
             handleSaveList();
         } else {
             setIsEditMode(true);
+        }
+    };
+
+    const handleFinalizeList = async () => {
+        setIsTermLoading(true);
+        try {
+            const response = await axiosInstance.post('/api/admin/audit/finalize-term', { officialsList });
+            if (response.data.success) {
+                toast.success('SK Officials list finalized successfully!');
+                setIsFinalizeDialogOpen(false);
+                setIsListModalOpen(false);
+                fetchInitialData();
+            } else {
+                throw new Error(response.data.message || 'Failed to finalize list.');
+            }
+        } catch (error) {
+            toast.error('Failed to finalize list.');
+            console.error('Finalize error:', error);
+        } finally {
+            setIsTermLoading(false);
+        }
+    };
+
+    const handleCreateNewTerm = async () => {
+        setIsTermLoading(true);
+        try {
+            const response = await axiosInstance.post('/api/admin/audit/start-new-term');
+            if (response.data.success) {
+                toast.success('New administration term started successfully!');
+                setIsNewTermDialogOpen(false);
+                setIsListModalOpen(false);
+                fetchInitialData();
+            } else {
+                throw new Error(response.data.message || 'Failed to start new term.');
+            }
+        } catch (error) {
+            toast.error('Failed to start new administration term.');
+            console.error('New Term error:', error);
+        } finally {
+            setIsTermLoading(false);
         }
     };
 
@@ -279,13 +333,27 @@ const RegistrationSummary: React.FC = () => {
                 fullWidth
                 maxWidth="lg"
             >
-                <DialogTitle sx={{ borderBottom: '1px solid #eee', pb: 2, bgcolor: '#f9f9f9' }}>
+                <DialogTitle sx={{ borderBottom: '1px solid #eee', pb: 2, bgcolor: '#f9f9f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     Manage SK Official List
+                    <IconButton onClick={handleCloseListModal} size="small">
+                        <Cancel />
+                    </IconButton>
                 </DialogTitle>
                 <DialogContent sx={{ overflowX: 'hidden' }}>
-                    <Typography variant="body2" sx={{ my: 2, color: 'text.secondary', fontWeight: 500 }}>
-                        Enter the full names of all official SK members. This list will be used by the AI for verification.
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', my: 2 }}>
+                        <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                            Enter the full names of all official SK members. This list will be used by the AI for verification.
+                        </Typography>
+                        <Button 
+                            variant="outlined" 
+                            color="warning" 
+                            startIcon={<Autorenew />}
+                            onClick={() => setIsNewTermDialogOpen(true)}
+                            disabled={approvedCount < 11}
+                        >
+                            Create New SK Official List
+                        </Button>
+                    </Box>
 
                     <TableContainer component={Paper} variant="outlined" sx={{ maxHeight: 500, overflowX: 'hidden' }}>
                         <Table stickyHeader size="medium">
@@ -327,14 +395,24 @@ const RegistrationSummary: React.FC = () => {
                         </Table>
                     </TableContainer>
                 </DialogContent>
-                <DialogActions sx={{ p: 3, borderTop: '1px solid #eee', bgcolor: '#f9f9f9' }}>
-                    <Button onClick={handleCloseListModal} disabled={saving} startIcon={<Cancel />} size="large">
-                        Close
-                    </Button>
+                <DialogActions sx={{ p: 3, borderTop: '1px solid #eee', bgcolor: '#f9f9f9', justifyContent: 'flex-end' }}>
+                    {!isEditMode && (
+                        <Button 
+                            variant="contained" 
+                            color="success" 
+                            startIcon={<CheckCircle />}
+                            onClick={() => setIsFinalizeDialogOpen(true)}
+                            disabled={isFinalized || officialsList.some(o => !o.fullName.trim())}
+                            size="large"
+                            sx={{ px: 4, mr: 2 }}
+                        >
+                            {isFinalized ? 'Already Finalized' : 'Finalize List'}
+                        </Button>
+                    )}
                     <Button
                         onClick={handleToggleEdit}
                         variant="contained"
-                        disabled={saving}
+                        disabled={saving || isFinalized}
                         startIcon={isEditMode ? (saving ? <CircularProgress size={20} /> : <Save />) : <EditIcon />}
                         color={isEditMode ? "success" : "primary"}
                         size="large"
@@ -407,6 +485,43 @@ const RegistrationSummary: React.FC = () => {
                     onSuccess={handleAuditSuccess}
                 />
             )}
+
+            {/* Finalize Safety Dialog */}
+            <Dialog open={isFinalizeDialogOpen} onClose={() => !isTermLoading && setIsFinalizeDialogOpen(false)}>
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', color: 'warning.main', gap: 1 }}>
+                    <Warning /> Finalize SK Official List
+                </DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        Are you sure? Once finalized, this SK Official List will be locked and cannot be changed until the next administration term begins.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsFinalizeDialogOpen(false)} disabled={isTermLoading}>Cancel</Button>
+                    <Button onClick={handleFinalizeList} color="warning" variant="contained" disabled={isTermLoading}>
+                        {isTermLoading ? <CircularProgress size={24} color="inherit" /> : 'Yes, Finalize'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Create New Term Safety Dialog */}
+            <Dialog open={isNewTermDialogOpen} onClose={() => !isTermLoading && setIsNewTermDialogOpen(false)}>
+                <DialogTitle sx={{ display: 'flex', alignItems: 'center', color: 'error.main', gap: 1 }}>
+                    <Warning /> Start New Administration Term
+                </DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        Are you sure? This will finalize the current term and <strong>automatically archive all 11 active accounts</strong> to prepare for the next administration.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setIsNewTermDialogOpen(false)} disabled={isTermLoading}>Cancel</Button>
+                    <Button onClick={handleCreateNewTerm} color="error" variant="contained" disabled={isTermLoading}>
+                        {isTermLoading ? <CircularProgress size={24} color="inherit" /> : 'Yes, Start New Term'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
         </Paper>
     );
 };

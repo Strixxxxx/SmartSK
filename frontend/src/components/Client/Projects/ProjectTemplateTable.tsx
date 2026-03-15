@@ -9,6 +9,7 @@ interface ProjectTemplateTableProps {
     centerOfParticipation: string;
     rows: (AbyipRow | CbydpRow)[];
     readOnly: boolean;
+    hideRowIndex?: boolean;
     onAddRow?: (sectionType?: string) => void;
     onCellChange?: (rowID: number, field: string, value: string) => void;
     onCellBlur?: (rowID: number, field: string, value: string) => void;
@@ -63,6 +64,7 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
     centerOfParticipation,
     rows,
     readOnly,
+    hideRowIndex = false,
     onAddRow,
     onCellChange,
     onCellBlur,
@@ -102,9 +104,9 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
 
                         {/* Column headers — row 1 */}
                         <tr className={styles['pt-col-header']}>
-                            <th rowSpan={2} style={{ width: '4%' }}>Rows</th>
-                            <th rowSpan={2} style={{ width: '9%' }}>Reference Code</th>
-                            <th rowSpan={2} style={{ width: '10%' }}>PPAs</th>
+                            {!hideRowIndex && <th rowSpan={2} style={{ width: '4%' }}>Rows</th>}
+                            <th rowSpan={2} style={{ width: '10%' }}>Reference Code</th>
+                            <th rowSpan={2} style={{ width: '11%' }}>PPAs</th>
                             <th rowSpan={2} style={{ width: '12%' }}>Description</th>
                             <th rowSpan={2} style={{ width: '12%' }}>Expected Result</th>
                             <th rowSpan={2} style={{ width: '12%' }}>Performance Indicator</th>
@@ -125,7 +127,7 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
                             <ProjectTableRow
                                 key={row.rowID}
                                 row={row}
-                                columns={ABYIP_COLS}
+                                columns={hideRowIndex ? ABYIP_COLS.slice(1) : ABYIP_COLS}
                                 readOnly={readOnly}
                                 collabLookup={collabLookup}
                                 projType="ABYIP"
@@ -158,19 +160,19 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
             <table className={styles['pt-table']}>
                 <thead>
                     <tr>
-                        <th colSpan={colCount} className={styles['pt-title-row']}>
+                        <th colSpan={hideRowIndex ? colCount - 1 : colCount} className={styles['pt-title-row']}>
                             COMPREHENSIVE BARANGAY YOUTH DEVELOPMENT PLAN (CBYDP) CY {fiscalYear}
                         </th>
                     </tr>
                     <tr>
-                        <th colSpan={colCount} className={styles['pt-title-row']}>
+                        <th colSpan={hideRowIndex ? colCount - 1 : colCount} className={styles['pt-title-row']}>
                             PARTICIPATION: {centerOfParticipation.toUpperCase()}
                         </th>
                     </tr>
 
                     {/* Column headers — row 1 */}
                     <tr className={styles['pt-col-header']}>
-                        <th rowSpan={2} style={{ width: '4%' }}>Rows</th>
+                        {!hideRowIndex && <th rowSpan={2} style={{ width: '4%' }}>Rows</th>}
                         <th rowSpan={2}>Youth Development Concern</th>
                         <th rowSpan={2}>Objective</th>
                         <th rowSpan={2}>Performance Indicator</th>
@@ -188,15 +190,15 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
                     {CBYDP_SECTIONS.map((section) => {
                         const sectionRows = cbydpRows.filter((r) => r.sectionType === section);
                         return (
-                            <React.Fragment key={section}>
-                                <tr>
-                                    <td colSpan={colCount} className={styles['pt-section-divider']}>{section}</td>
+                            <React.Fragment key={`${section}-${centerOfParticipation}`}>
+                                <tr key={`divider-${section}`}>
+                                    <td colSpan={hideRowIndex ? colCount - 1 : colCount} className={styles['pt-section-divider']}>{section}</td>
                                 </tr>
-                                {sectionRows.map((row) => (
+                                {sectionRows.map((row, idx) => (
                                     <ProjectTableRow
-                                        key={row.rowID}
+                                        key={`${row.rowID || idx}-${section}`}
                                         row={row}
-                                        columns={CBYDP_ALL_COLS}
+                                        columns={hideRowIndex ? CBYDP_ALL_COLS.slice(1) : CBYDP_ALL_COLS}
                                         readOnly={readOnly}
                                         collabLookup={collabLookup}
                                         projType="CBYDP"

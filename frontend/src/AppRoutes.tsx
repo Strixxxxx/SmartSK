@@ -16,7 +16,8 @@ import ForgotPassword from './components/ForgotPassword/ForgotPassword';
 import Unauthorized from './components/Unauthorized/Unauthorized';
 import NewAccount from './components/Login/NewAccount';
 import Portfolio from './components/Portfolio/Portfolio';
-import ProjectList from './components/Portfolio/ProjectList';
+import DigitalBulletin from './DigitalBulletin/DigitalBulletin';
+import DisclosureDetailView from './DigitalBulletin/DisclosureDetailView';
 import ComingSoon from './components/ComingSoon/ComingSoon';
 import RegistrationPage from './components/Registration/RegistrationPage';
 
@@ -66,7 +67,8 @@ const AppRoutes: React.FC = () => {
 
         {/* Only these two public routes are accessible on mobile */}
         <Route path="/home" element={<Portfolio />} />
-        <Route path="/project-list" element={<ProjectList />} />
+        <Route path="/project-list" element={<DigitalBulletin />} />
+        <Route path="/project-list/:batchID" element={<DisclosureDetailView />} />
 
         {/* All other routes (including login) show ComingSoon on mobile */}
         <Route path="*" element={<ComingSoon />} />
@@ -78,7 +80,8 @@ const AppRoutes: React.FC = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/home" element={<Portfolio />} />
-      <Route path="/project-list" element={<ProjectList />} />
+      <Route path="/project-list" element={<DigitalBulletin />} />
+      <Route path="/project-list/:batchID" element={<DisclosureDetailView />} />
       <Route path="/register" element={<RegistrationPage />} />
 
       <Route path="/forgot-password" element={<ForgotPassword />} />

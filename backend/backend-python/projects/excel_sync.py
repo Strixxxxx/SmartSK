@@ -242,11 +242,17 @@ def update_abyip_sheet(ws, db_rows):
         ws.delete_rows(start_row, amount=abs(diff))
 
     # Set ABYIP Column Widths
-    # B-G (2-7) and K-L (11-12) -> 14
-    # H-J (8-10) -> 7
-    for c_idx in range(2, 8): ws.column_dimensions[get_column_letter(c_idx)].width = 14
-    for c_idx in range(8, 11): ws.column_dimensions[get_column_letter(c_idx)].width = 7
-    for c_idx in range(11, 13): ws.column_dimensions[get_column_letter(c_idx)].width = 14
+    # A (1) -> 8
+    # B-G (2-7) and L (12) -> 14
+    # H-K (8-11) -> 10
+    # M (13) -> 8
+    ws.column_dimensions[get_column_letter(1)].width = 8   # A
+    for c_idx in range(2, 8): 
+        ws.column_dimensions[get_column_letter(c_idx)].width = 14  # B-G
+    for c_idx in range(8, 12): 
+        ws.column_dimensions[get_column_letter(c_idx)].width = 10  # H-K
+    ws.column_dimensions[get_column_letter(12)].width = 14  # L
+    ws.column_dimensions[get_column_letter(13)].width = 8 # M
 
     for r_idx in range(rows_needed):
         curr_row = start_row + r_idx
@@ -264,7 +270,7 @@ def update_abyip_sheet(ws, db_rows):
                 display_val = "N/A" if val is None or str(val).strip() == "" else val
                 
                 # Determine width for height calculation
-                w_est = 14 if col_idx not in [8, 9, 10] else 7
+                w_est = 14 if col_idx not in [8, 9, 10, 11] else 10
                 max_h = max(max_h, calculate_row_height(display_val, 8, w_est))
                 
                 safe_write(ws, curr_row, col_idx, display_val,

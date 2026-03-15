@@ -20,7 +20,7 @@ const { spawn } = require('child_process');
 router.post('/initialize', authMiddleware, async (req, res) => {
     try {
         const { projType, targetYear, budget, governance_pct, active_citizenship_pct, economic_empowerment_pct, global_mobility_pct, agriculture_pct, environment_pct, PBS_pct, SIE_pct, education_pct, health_pct, GAP_pct, MOOE_pct } = req.body;
-        const { barangay: barangayID, userID, position } = req.user;
+        const { barangay: barangayID, userID, position, termID } = req.user;
 
         if (position !== 'SKC' && position !== 'SK Chairperson') {
             return res.status(403).json({ success: false, message: 'Unauthorized: Only SK Chairperson can create projects.' });
@@ -33,6 +33,7 @@ router.post('/initialize', authMiddleware, async (req, res) => {
             targetYear,
             budget,
             userID,
+            termID,
             governance_pct,
             active_citizenship_pct,
             economic_empowerment_pct,

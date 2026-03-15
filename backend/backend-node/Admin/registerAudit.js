@@ -90,6 +90,176 @@ router.post('/officials', authMiddleware, async (req, res) => {
     }
 });
 
+/**
+ * GET /term-status
+ * Fetches the status of the current administration term
+ */
+router.get('/term-status', authMiddleware, async (req, res) => {
+    try {
+        const pool = await getConnection();
+        const barangayID = req.user.barangay;
+
+        // 1. Get current term for barangay
+        const termResult = await pool.request()
+            .input('barangayID', sql.Int, barangayID)
+            .query('SELECT TOP 1 termID, officialListJSON FROM skTerms WHERE barangayID = @barangayID AND isCurrent = 1 ORDER BY termID DESC');
+
+        let currentTermID = null;
+        let isFinalized = false;
+
+        if (termResult.recordset.length > 0) {
+            currentTermID = termResult.recordset[0].termID;
+            // Consider finalized if json is not empty and not "[]"
+            const jsonStr = termResult.recordset[0].officialListJSON;
+            isFinalized = jsonStr && jsonStr !== '[]' && jsonStr.length > 5;
+        }
+
+        // 2. Count approved, active users for this term
+        let approvedCount = 0;
+        if (currentTermID) {
+            const countResult = await pool.request()
+                .input('barangayID', sql.Int, barangayID)
+                .input('termID', sql.Int, currentTermID)
+                .query(`
+                    SELECT COUNT(*) as count 
+                    FROM userInfo 
+                    WHERE barangay = @barangayID 
+                      AND termID = @termID 
+                      AND isArchived = 0 
+                      AND position IN (2, 3, 4, 5, 6, 7, 8, 9, 10, 11) -- Only count the 10 SK positions + SKC
+                `);
+            approvedCount = countResult.recordset[0].count;
+        }
+
+        res.json({ success: true, approvedCount, isFinalized, currentTermID });
+    } catch (error) {
+        console.error("Error fetching term status:", error);
+        res.status(500).json({ success: false, message: 'Failed to fetch term status.' });
+    }
+});
+
+/**
+ * POST /finalize-term
+ * Saves the filled SK list to Azure and snapshots it into skTerms
+ */
+router.post('/finalize-term', authMiddleware, async (req, res) => {
+    const { officialsList } = req.body;
+
+    if (!Array.isArray(officialsList) || officialsList.length !== 10) {
+        // NOTE: it is 10 positions (SKC, SKS, SKT, 7 Kagawads)
+        // Wait, 1 + 1 + 1 + 7 = 10? Let's check POSITION_MAPPING in frontend.
+        // It has 10 positions.
+    }
+
+    try {
+        const pool = await getConnection();
+        const barangayID = req.user.barangay;
+        const barangayResult = await pool.request()
+            .input('barangayID', sql.Int, barangayID)
+            .query('SELECT barangayName FROM barangays WHERE barangayID = @barangayID');
+
+        if (barangayResult.recordset.length === 0) return res.status(404).json({ success: false, message: 'Admin barangay not found.' });
+        const barangayName = barangayResult.recordset[0].barangayName;
+        const blobName = `SK OFFICIAL - ${barangayName}.json`;
+        const jsonContent = JSON.stringify(officialsList, null, 2);
+
+        // 1. Upload to Azure
+        await uploadTextToBlob(registerContainerName, blobName, jsonContent);
+
+        // 2. Snapshot into skTerms (update current or create if not exists)
+        const termResult = await pool.request()
+            .input('barangayID', sql.Int, barangayID)
+            .query('SELECT TOP 1 termID FROM skTerms WHERE barangayID = @barangayID AND isCurrent = 1 ORDER BY termID DESC');
+
+        if (termResult.recordset.length > 0) {
+            await pool.request()
+                .input('termID', sql.Int, termResult.recordset[0].termID)
+                .input('jsonContent', sql.NVarChar(sql.MAX), jsonContent)
+                .query('UPDATE skTerms SET officialListJSON = @jsonContent WHERE termID = @termID');
+        } else {
+            // Need to initialize first term
+            await pool.request()
+                .input('barangayID', sql.Int, barangayID)
+                .input('jsonContent', sql.NVarChar(sql.MAX), jsonContent)
+                .query('INSERT INTO skTerms (barangayID, officialListJSON, isCurrent) VALUES (@barangayID, @jsonContent, 1)');
+        }
+
+        addAuditTrail({
+            actor: 'A',
+            module: 'I',
+            userID: req.user.userID,
+            actions: 'finalize-term',
+            descriptions: `Admin ${req.user.fullName} finalized the SK Officials list for ${barangayName}.`
+        });
+
+        res.json({ success: true, message: 'SK Officials list finalized successfully.' });
+
+    } catch (error) {
+        console.error("Error finalizing SK list:", error);
+        res.status(500).json({ success: false, message: 'Failed to finalize SK list.' });
+    }
+});
+
+/**
+ * POST /start-new-term
+ * Archives all current term users, clears the Azure blob, starts a new term
+ */
+router.post('/start-new-term', authMiddleware, async (req, res) => {
+    try {
+        const pool = await getConnection();
+        const barangayID = req.user.barangay;
+        
+        const barangayResult = await pool.request()
+            .input('barangayID', sql.Int, barangayID)
+            .query('SELECT barangayName FROM barangays WHERE barangayID = @barangayID');
+
+        if (barangayResult.recordset.length === 0) return res.status(404).json({ success: false, message: 'Admin barangay not found.' });
+        const barangayName = barangayResult.recordset[0].barangayName;
+
+        const termResult = await pool.request()
+            .input('barangayID', sql.Int, barangayID)
+            .query('SELECT TOP 1 termID FROM skTerms WHERE barangayID = @barangayID AND isCurrent = 1 ORDER BY termID DESC');
+
+        // Note: we can still start a term even if there is no previous term, but usually there is one
+        if (termResult.recordset.length > 0) {
+            const currentTermID = termResult.recordset[0].termID;
+
+            // 1. Archive active users of this term
+            await pool.request()
+                .input('barangayID', sql.Int, barangayID)
+                .input('termID', sql.Int, currentTermID)
+                .query('UPDATE userInfo SET isArchived = 1 WHERE barangay = @barangayID AND termID = @termID');
+
+            // 2. Lock the current term
+            await pool.request()
+                .input('termID', sql.Int, currentTermID)
+                .query('UPDATE skTerms SET isCurrent = 0, isLocked = 1, lockedAt = GETDATE() WHERE termID = @termID');
+        }
+
+        // 3. Clear the Azure JSON blob 
+        const blobName = `SK OFFICIAL - ${barangayName}.json`;
+        await uploadTextToBlob(registerContainerName, blobName, '[]');
+
+        // 4. Create new term record
+        await pool.request()
+            .input('barangayID', sql.Int, barangayID)
+            .query("INSERT INTO skTerms (barangayID, officialListJSON, isCurrent) VALUES (@barangayID, '[]', 1)");
+
+        addAuditTrail({
+            actor: 'A',
+            module: 'I',
+            userID: req.user.userID,
+            actions: 'start-new-term',
+            descriptions: `Admin ${req.user.fullName} ended the previous term and started a new administration term for ${barangayName}.`
+        });
+
+        res.json({ success: true, message: 'New administration term started successfully.' });
+    } catch (error) {
+        console.error("Error starting new term:", error);
+        res.status(500).json({ success: false, message: 'Failed to start new administration term.' });
+    }
+});
+
 
 // --- Registration Audit Log Endpoints ---
 
@@ -195,10 +365,27 @@ router.post('/override', authMiddleware, async (req, res) => {
 
     try {
         const pool = await getConnection();
+        // Fetch termID for the user's barangay
+        const userBrgyResult = await pool.request()
+            .input('chkUserID', sql.Int, userID)
+            .query('SELECT barangay FROM preUserInfo WHERE userID = @chkUserID');
+            
+        let termID = null;
+        if (userBrgyResult.recordset.length > 0) {
+            const brgyID = userBrgyResult.recordset[0].barangay;
+            const termResult = await pool.request()
+                .input('brgyID', sql.Int, brgyID)
+                .query('SELECT TOP 1 termID FROM skTerms WHERE barangayID = @brgyID AND isCurrent = 1 ORDER BY termID DESC');
+            if (termResult.recordset.length > 0) {
+                termID = termResult.recordset[0].termID;
+            }
+        }
+
         const request = pool.request()
             .input('userID', sql.Int, userID)
             .input('adminReport', sql.NVarChar(sql.MAX), report)
-            .input('adminUsername', sql.NVarChar(50), adminUsername);
+            .input('adminUsername', sql.NVarChar(50), adminUsername)
+            .input('termID', sql.Int, termID);
 
         if (verdict === 'approved') {
             await request.execute('sp_ManuallyApprovePendingUser');

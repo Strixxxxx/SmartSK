@@ -47,8 +47,10 @@ CREATE TABLE userInfo (
     emailHash VARCHAR(64) NULL,
     usernameHash VARCHAR(64) NULL,
     phoneHash VARCHAR(64) NULL,
+    termID INT NULL,  -- Links user to their administration term
     CONSTRAINT FK_User_Role FOREIGN KEY (position) REFERENCES roles(roleID),
-    CONSTRAINT FK_User_Barangay FOREIGN KEY (barangay) REFERENCES barangays(barangayID)
+    CONSTRAINT FK_User_Barangay FOREIGN KEY (barangay) REFERENCES barangays(barangayID),
+    CONSTRAINT FK_User_Term FOREIGN KEY (termID) REFERENCES skTerms(termID)
 );
 
 CREATE INDEX IX_userInfo_isArchived ON userInfo(isArchived);
@@ -103,6 +105,19 @@ CREATE TABLE [registrationAuditManual] (
     processedAt DATETIME NOT NULL DEFAULT GETDATE(),
     isApprove BIT NULL,
     CONSTRAINT FK_registrationAuditManual_preUserInfo FOREIGN KEY (userID) REFERENCES preUserInfo(userID) ON DELETE CASCADE
+);
+
+--SK Term Batch Table
+
+CREATE TABLE skTerms (
+    termID INT PRIMARY KEY IDENTITY(1,1),
+    barangayID INT NOT NULL,
+    officialListJSON NVARCHAR(MAX) NOT NULL, -- Snapshot of the finalized JSON list
+    isLocked BIT DEFAULT 0,
+    isCurrent BIT DEFAULT 1, -- Only one current term per barangay
+    createdAt DATETIME DEFAULT GETDATE(),
+    lockedAt DATETIME NULL,
+    CONSTRAINT FK_skTerms_Barangay FOREIGN KEY (barangayID) REFERENCES barangays(barangayID)
 );
 
 --Session Logs Table
@@ -172,8 +187,10 @@ CREATE TABLE projectBatch (
     MOOE_pct DECIMAL(5,2) DEFAULT 0,
     total_pct DECIMAL(5,2) DEFAULT 0,
     isArchived BIT DEFAULT 0,
-    createdAt DATETIME DEFAULT GETDATE()
+    createdAt DATETIME DEFAULT GETDATE(),
+    termID INT NULL, -- Links project to the administration term
     CONSTRAINT FK_Barangay FOREIGN KEY (barangayID) REFERENCES barangays(barangayID),
+    CONSTRAINT FK_Batch_Term FOREIGN KEY (termID) REFERENCES skTerms(termID)
 );
 
 -- Granular rows for ABYIP format
@@ -630,7 +647,8 @@ CREATE PROCEDURE sp_InitializeProjectBatch
     @education_pct DECIMAL(5,2) = 0,
     @health_pct DECIMAL(5,2) = 0,
     @GAP_pct DECIMAL(5,2) = 0,
-    @MOOE_pct DECIMAL(5,2) = 0
+    @MOOE_pct DECIMAL(5,2) = 0,
+    @termID INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -642,20 +660,20 @@ BEGIN
             @PBS_pct + @SIE_pct + @education_pct + @health_pct +
             @GAP_pct + @MOOE_pct;
 
-        -- Insert into header with centralized barangayID, projName, and percentages
+        -- Insert into header with centralized barangayID, projName, percentages, and termID
         INSERT INTO projectBatch (
             barangayID, projType, projName, targetYear, budget,
             governance_pct, active_citizenship_pct, economic_empowerment_pct,
             global_mobility_pct, agriculture_pct, environment_pct,
             PBS_pct, SIE_pct, education_pct, health_pct, 
-            GAP_pct, MOOE_pct, total_pct
+            GAP_pct, MOOE_pct, total_pct, termID
         )
         VALUES (
             @barangayID, @projType, @projName, @targetYear, @budget,
             @governance_pct, @active_citizenship_pct, @economic_empowerment_pct,
             @global_mobility_pct, @agriculture_pct, @environment_pct,
             @PBS_pct, @SIE_pct, @education_pct, @health_pct,
-            @GAP_pct, @MOOE_pct, @total_pct
+            @GAP_pct, @MOOE_pct, @total_pct, @termID
         );
         
         DECLARE @newBatchID INT = SCOPE_IDENTITY();
@@ -688,8 +706,11 @@ BEGIN
     SELECT 
         pb.*,
         sl.StatusName,
-        sl.StatusID as currentStatusID
+        sl.StatusID as currentStatusID,
+        st.isLocked as projectTermIsLocked,
+        st.isCurrent as projectTermIsCurrent
     FROM projectBatch pb
+    LEFT JOIN skTerms st ON pb.termID = st.termID
     CROSS APPLY (
         SELECT TOP 1 pt.statusID 
         FROM projectTracker pt 
@@ -705,7 +726,8 @@ GO
 --Transfer of the Account from the preUserInfo to UserInfo Table
 
 CREATE PROCEDURE [sp_ApprovePendingUser]
-    @userID INT
+    @userID INT,
+    @termID INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -722,12 +744,12 @@ BEGIN
             INSERT INTO userInfo (
                 userID, username, passKey, fullName, position, barangay, 
                 emailAddress, phoneNumber, isDefaultPassword, isArchived, 
-                emailHash, usernameHash, phoneHash, encryptionKeyVersion
+                emailHash, usernameHash, phoneHash, encryptionKeyVersion, termID
             )
             SELECT
                 p.userID, p.username, p.passKey, p.fullName, p.position, p.barangay,
                 p.emailAddress, p.phoneNumber, 0, p.isArchived, -- Set isDefaultPassword to 0 as per requirements
-                p.emailHash, p.usernameHash, p.phoneHash, encryptionKeyVersion
+                p.emailHash, p.usernameHash, p.phoneHash, encryptionKeyVersion, @termID
             FROM preUserInfo p
             WHERE p.userID = @userID;
 
@@ -740,10 +762,15 @@ BEGIN
         END
         ELSE
         BEGIN
-            -- If user already exists, just ensure their status is marked as approved
+            -- If user already exists, just ensure their status is marked as approved and update termID if provided
             UPDATE preUserInfoEx
             SET status = 'approved', rejectionReason = 'User already existed in main table but was re-approved.'
             WHERE userID = @userID;
+            
+            IF @termID IS NOT NULL
+            BEGIN
+                UPDATE userInfo SET termID = @termID WHERE userID = @userID;
+            END
         END
 
         COMMIT TRANSACTION;
@@ -812,12 +839,16 @@ GO
 
 --IMPORTANT NOTE: MUST RUN THE STORED PROCEDURE BELOW HERE AFTER RUNNING THE MIGRATION SCRIPT FOR AES-256-GCM ENCRYPTION
 
---Manually Approved Account Application 
+--Updated Manual Approval Account Application 
+
+DROP PROCEDURE IF EXISTS sp_ManuallyApprovePendingUser;
+GO
 
 CREATE PROCEDURE [sp_ManuallyApprovePendingUser]
     @userID INT,
     @adminReport NVARCHAR(MAX),
-    @adminUsername NVARCHAR(50)
+    @adminUsername NVARCHAR(50),
+    @termID INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -839,15 +870,22 @@ BEGIN
             INSERT INTO userInfo (
                 userID, username, passKey, fullName, position, barangay, 
                 emailAddress, phoneNumber, isDefaultPassword, isArchived, 
-                emailHash, usernameHash, phoneHash, encryptionKeyVersion
+                emailHash, usernameHash, phoneHash, encryptionKeyVersion, termID
             )
             SELECT
                 p.userID, p.username, p.passKey, p.fullName, p.position, p.barangay,
                 p.emailAddress, p.phoneNumber, 0, p.isArchived,
-                p.emailHash, p.usernameHash, p.phoneHash, p.encryptionKeyVersion
+                p.emailHash, p.usernameHash, p.phoneHash, p.encryptionKeyVersion, @termID
             FROM preUserInfo p
             WHERE p.userID = @userID;
             SET IDENTITY_INSERT userInfo OFF;
+        END
+        ELSE
+        BEGIN
+            IF @termID IS NOT NULL
+            BEGIN
+                UPDATE userInfo SET termID = @termID WHERE userID = @userID;
+            END
         END
 
         UPDATE preUserInfoEx

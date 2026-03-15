@@ -16,6 +16,7 @@ interface UserInfo {
   position: string;
   emailAddress?: string;
   phoneNumber?: string;
+  termID?: number;
   barangay?: string;
   role?: string;
   isDefaultPassword?: boolean;

@@ -81,8 +81,9 @@ function getAgendaColumnMap(tabName: string): string {
         user?.position?.toLowerCase().includes('chairperson') ||
         user?.position?.toUpperCase() === 'SKC';
 
-    const isReadOnly = selectedProject?.projType === 'ABYIP' &&
-        (selectedProject?.currentStatusID || 0) >= 6;
+    const isReadOnly = (selectedProject?.projType === 'ABYIP' && (selectedProject?.currentStatusID || 0) >= 6) ||
+        Boolean(selectedProject?.projectTermIsLocked) ||
+        (selectedProject?.termID && user?.termID && selectedProject.termID !== user.termID);
 
     const projName: string = selectedProject?.projName ?? '';
     const barangay = parseBarangay(projName);

@@ -68,6 +68,7 @@ def get_user_data(cursor, user_id):
             pe.attachmentPathBack,
             pe.dateOfBirth,
             b.barangayName,
+            p.barangay AS barangayID,
             r.roleName
         FROM preUserInfo p
         JOIN preUserInfoEx pe ON p.userID = pe.userID
@@ -95,6 +96,7 @@ def get_user_data(cursor, user_id):
         "attachmentPathBack": user_data.attachmentPathBack,
         "dateOfBirth": user_data.dateOfBirth,
         "barangayName": user_data.barangayName,
+        "barangayID": user_data.barangayID,
         "roleName": user_data.roleName
     }
 
@@ -351,7 +353,12 @@ def main(user_id):
 
         if decision == 'approved':
             logging.info(f"Executing sp_ApprovePendingUser for userID: {user_id}")
-            cursor.execute("{CALL sp_ApprovePendingUser (?)}", user_id)
+            # Fetch active termID
+            cursor.execute("SELECT TOP 1 termID FROM skTerms WHERE barangayID = ? AND isCurrent = 1 ORDER BY termID DESC", user_data["barangayID"])
+            term_row = cursor.fetchone()
+            current_term_id = term_row.termID if term_row else None
+            
+            cursor.execute("{CALL sp_ApprovePendingUser (?, ?)}", user_id, current_term_id)
         else:
             logging.info(f"Updating status to 'rejected' for userID: {user_id}")
             cursor.execute("UPDATE preUserInfoEx SET status = ?, rejectionReason = ? WHERE userID = ?", 'rejected', final_rejection_reason, user_id)

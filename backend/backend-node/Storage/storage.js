@@ -181,6 +181,25 @@ async function listBlobs(containerName) {
 }
 
 /**
+ * Lists all blobs in a container with their properties, optionally filtered by options.
+ * @param {string} containerName - The name of the container.
+ * @param {Object} options - Options for listing (e.g., prefix).
+ * @returns {Promise<Array<Object>>} A list of blob objects with properties.
+ */
+async function listBlobsWithProperties(containerName, options = {}) {
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    await containerClient.createIfNotExists();
+    const blobs = [];
+    for await (const blob of containerClient.listBlobsFlat(options)) {
+        blobs.push({
+            name: blob.name,
+            properties: blob.properties
+        });
+    }
+    return blobs;
+}
+
+/**
  * Uploads a buffer to a specific blob in a specific container.
  * @param {string} containerName - The name of the container.
  * @param {string} blobName - The name for the blob.
@@ -384,6 +403,7 @@ module.exports = {
     deleteFile,
     getBlobContent, // Export the new function
     listBlobs,      // Export the new function
+    listBlobsWithProperties,
     uploadBlob,     // Export the new function
     uploadTextToBlob,
     downloadBlobAsText,

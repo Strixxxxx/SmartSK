@@ -18,7 +18,9 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturing';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import EastIcon from '@mui/icons-material/East';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 
+import SupportingDocumentsModal from './SupportingDocumentsModal';
 import './ProjectTrackerList.css';
 
 interface ProjectBatch {
@@ -59,6 +61,8 @@ const formatDate = (dateStr?: string) => {
 const ProjectTrackerList: React.FC = () => {
     const [batches, setBatches] = useState<ProjectBatch[]>([]);
     const [loading, setLoading] = useState(true);
+    const [docModalOpen, setDocModalOpen] = useState(false);
+    const [selectedBatchForDocs, setSelectedBatchForDocs] = useState<ProjectBatch | null>(null);
     const navigate = useNavigate();
     const { user } = useAuth();
 
@@ -107,6 +111,12 @@ const ProjectTrackerList: React.FC = () => {
         } catch (err: any) {
             alert(err.response?.data?.message || 'Failed to advance milestone.');
         }
+    };
+
+    const handleOpenDocs = (e: React.MouseEvent, batch: ProjectBatch) => {
+        e.stopPropagation();
+        setSelectedBatchForDocs(batch);
+        setDocModalOpen(true);
     };
 
     const activeBatches = batches.filter(b => b.currentStatusID < 9);
@@ -223,19 +233,41 @@ const ProjectTrackerList: React.FC = () => {
                                 </p>
                             )}
 
-                            {/* ── SKC Advance Button ────────────────────────── */}
-                            {canAdvance && (
-                                <button
-                                    className="ptl-advance-btn"
-                                    onClick={(e) => handleAdvance(e, batch)}
-                                >
-                                    Advance to Step {batch.currentStatusID + 1}: {STATUS_STEPS[batch.currentStatusID]?.label}
-                                </button>
-                            )}
+                            <div className="ptl-actions-row">
+                                {/* ── SKC Advance Button ────────────────────────── */}
+                                {canAdvance && (
+                                    <button
+                                        className="ptl-advance-btn"
+                                        onClick={(e) => handleAdvance(e, batch)}
+                                    >
+                                        Advance to Step {batch.currentStatusID + 1}: {STATUS_STEPS[batch.currentStatusID]?.label}
+                                    </button>
+                                )}
+
+                                {/* ── Supporting Document Button ────────────────── */}
+                                {batch.currentStatusID >= 3 && (
+                                    <button
+                                        className="ptl-docs-btn"
+                                        onClick={(e) => handleOpenDocs(e, batch)}
+                                    >
+                                        <InsertDriveFileIcon sx={{ fontSize: 16 }} />
+                                        Supporting Documents
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     );
                 })}
             </div>
+
+            {selectedBatchForDocs && (
+                <SupportingDocumentsModal
+                    open={docModalOpen}
+                    onClose={() => setDocModalOpen(false)}
+                    batchID={selectedBatchForDocs.batchID}
+                    projName={selectedBatchForDocs.projName}
+                />
+            )}
         </div>
     );
 };

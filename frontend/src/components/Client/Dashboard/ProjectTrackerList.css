@@ -288,7 +288,6 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    margin-top: 14px;
     padding: 8px 18px;
     font-size: 12px;
     font-weight: 700;
@@ -307,6 +306,40 @@
 }
 
 .ptl-advance-btn:active {
+    transform: translateY(0);
+}
+
+/* ── Actions Row (Side-by-side) ─────────────────────────── */
+.ptl-actions-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+    align-items: center;
+}
+
+.ptl-docs-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 18px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #1a73e8 !important;
+    background-color: #ffffff !important;
+    border: 1px solid #1a73e8;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.15s;
+    gap: 8px;
+    letter-spacing: 0.02em;
+}
+
+.ptl-docs-btn:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+}
+
+.ptl-docs-btn:active {
     transform: translateY(0);
 }
 
