@@ -7,74 +7,22 @@ import pandas as pd
 from dotenv import load_dotenv
 import io
 
-# --- Import Refactored Logic Modules ---
-from .pa_logic import generate_project_analysis
-from .trends_logic import generate_trends_report
 from .forecast import generate_forecast_report
-from storage.storage import download_blob_to_memory, upload_blob_from_memory, list_blobs
-
-# ==============================================================================
-# Configuration
-# ==============================================================================
+from storage.storage import download_blob_to_memory, upload_blob_from_memory, list_blobs, JSON_CONTAINER
+from database.db_utils import get_db_connection
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Load environment variables explicitly from the backend directory root
-dotenv_path = os.path.join(os.path.dirname(__file__), '..', '..', '.env')
-load_dotenv(dotenv_path=dotenv_path)
-logger.info(f"Attempting to load .env file from: {os.path.abspath(dotenv_path)}")
-
-# --- Local Storage and Database Credentials ---
-HA_CONTAINER_NAME = os.getenv("HA_CONTAINER")
-JSON_CONTAINER_NAME = os.getenv("JSON_CONTAINER")
-
-DB_SERVER = os.getenv('DB_SERVER')
-DB_DATABASE = os.getenv('DB_DATABASE')
-DB_USER = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_DRIVER = os.getenv('DB_DRIVER', '{ODBC Driver 17 for SQL Server}')
-DB_CONN_STR = f'DRIVER={DB_DRIVER};SERVER={DB_SERVER};DATABASE={DB_DATABASE};UID={DB_USER};PWD={DB_PASSWORD}'
-
 # ==============================================================================
 # Data Sourcing
 # ==============================================================================
 
-def get_data_from_azure():
-    """Fetches all CSVs from the Azure historical archive and merges them into a single DataFrame."""
-    logger.info("Attempting to fetch data from Azure Blob Storage...")
-    if not HA_CONTAINER_NAME:
-        logger.error("Azure storage configuration for data sourcing is missing (HA_CONTAINER).")
-        return pd.DataFrame()
-
-    try:
-        blob_names = list_blobs(HA_CONTAINER_NAME)
-        all_dfs = []
-        for blob_name in blob_names:
-            if blob_name.lower().endswith('.csv'):
-                logger.info(f"Downloading and parsing {blob_name}...")
-                file_data = download_blob_to_memory(HA_CONTAINER_NAME, blob_name)
-                if file_data:
-                    df = pd.read_csv(io.BytesIO(file_data))
-                    all_dfs.append(df)
-        
-        if not all_dfs:
-            logger.warning("No CSV files found in Azure historical data container.")
-            return pd.DataFrame()
-
-        master_df = pd.concat(all_dfs, ignore_index=True)
-        logger.info(f"Successfully merged {len(all_dfs)} files from Azure storage into a DataFrame with {len(master_df)} rows.")
-        return master_df
-
-    except Exception as e:
-        logger.error(f"Error fetching data from Azure storage: {e}", exc_info=True)
-        return pd.DataFrame()
-
+def get_data_from_sql():
     logger.info("Retrieving finalized ABYIP data from SQL database...")
     try:
-        import pyodbc
-        with pyodbc.connect(DB_CONN_STR) as conn:
+        with get_db_connection() as conn:
             # Query targets ABYIP projects that have reached 'City Approval' (Status 6) or beyond.
             # Groups content by batch/year for accurate forecasting.
             query = """
@@ -112,15 +60,15 @@ def get_data_from_azure():
 def upload_master_report(report_name, report_data):
     """Uploads a master report dictionary as a single JSON file to Azure Blob Storage."""
     logger.info(f"Uploading master report '{report_name}' to Azure Storage...")
-    if not JSON_CONTAINER_NAME:
+    if not JSON_CONTAINER:
         raise ConnectionError("Azure storage configuration for report upload is missing (JSON_CONTAINER).")
 
     try:
         report_json = json.dumps(report_data, indent=2)
-        success = upload_blob_from_memory(JSON_CONTAINER_NAME, report_name, report_json.encode('utf-8'))
+        success = upload_blob_from_memory(JSON_CONTAINER, report_name, report_json.encode('utf-8'))
         
         if success:
-            logger.info(f"Successfully uploaded {report_name} to Azure container '{JSON_CONTAINER_NAME}'.")
+            logger.info(f"Successfully uploaded {report_name} to Azure container '{JSON_CONTAINER}'.")
         else:
             raise Exception(f"Failed to upload {report_name} to Azure.")
 
@@ -236,15 +184,12 @@ def main():
     """Main function to run the entire AI job orchestration."""
     logger.info("--- Starting AI Job Orchestration ---")
     
-    # 1. Source Data
-    master_df = get_data_from_azure()
-    if master_df.empty:
-        logger.warning("Azure data source was empty or failed. Falling back to SQL.")
-        master_df = get_data_from_sql()
+    # 1. Source Data from SQL (Single Source of Truth)
+    master_df = get_data_from_sql()
     
     if master_df.empty:
-        logger.critical("FATAL: No data could be sourced from Local Storage or SQL. Aborting job.")
-        raise RuntimeError("No data could be sourced from Local Storage or SQL.")
+        logger.critical("FATAL: No finalized ABYIP data found in SQL Database. Aborting job.")
+        raise RuntimeError("No finalized ABYIP data found in SQL Database.")
 
     # 2. Normalize Column Names
     if 'Category' in master_df.columns and 'category' not in master_df.columns:

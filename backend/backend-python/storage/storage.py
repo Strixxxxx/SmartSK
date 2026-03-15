@@ -10,6 +10,8 @@ logger = logging.getLogger(__name__)
 dotenv_path = os.path.join(os.path.dirname(__file__), '..', '..', '.env')
 load_dotenv(dotenv_path=dotenv_path)
 
+JSON_CONTAINER = os.getenv("JSON_CONTAINER")
+
 _blob_service_client = None
 
 def get_blob_service_client():
