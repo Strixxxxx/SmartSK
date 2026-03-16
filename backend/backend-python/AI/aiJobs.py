@@ -24,7 +24,7 @@ def get_data_from_sql():
     try:
         with get_db_connection() as conn:
             # Query targets ABYIP projects that have reached 'City Approval' (Status 6) or beyond.
-            # Groups content by batch/year for accurate forecasting.
+            # Using a subquery for status to be more robust than CROSS APPLY in some environments.
             query = """
             SELECT 
                 pb.batchID,
@@ -36,15 +36,14 @@ def get_data_from_sql():
                 pa.total,
                 pa.sheetRowIndex
             FROM projectBatch pb
-            JOIN projectABYIP pa ON pb.batchID = pa.projbatchID
-            CROSS APPLY (
-                SELECT TOP 1 pt.statusID 
-                FROM projectTracker pt 
-                WHERE pt.batchID = pb.batchID 
-                ORDER BY pt.updatedAt DESC
-            ) latestStatus
+            INNER JOIN projectABYIP pa ON pb.batchID = pa.projbatchID
+            INNER JOIN (
+                SELECT batchID, MAX(statusID) as maxStatus
+                FROM projectTracker
+                GROUP BY batchID
+            ) tracker ON pb.batchID = tracker.batchID
             WHERE pb.projType = 'ABYIP' 
-              AND latestStatus.statusID >= 6
+              AND tracker.maxStatus >= 6
             ORDER BY pb.targetYear DESC, pa.sheetRowIndex ASC;
             """
             df = pd.read_sql_query(query, conn)
@@ -192,56 +191,35 @@ def main():
         logger.critical("FATAL: No finalized ABYIP data found in SQL Database. Aborting job.")
         raise RuntimeError("No finalized ABYIP data found in SQL Database.")
 
-    # 2. Normalize Column Names
-    if 'Category' in master_df.columns and 'category' not in master_df.columns:
-        logger.info("Normalizing column 'Category' to 'category'.")
-        master_df.rename(columns={'Category': 'category'}, inplace=True)
-
-    if 'Committee' in master_df.columns and 'committee' not in master_df.columns:
-        logger.info("Normalizing column 'Committee' to 'committee'.")
-        master_df.rename(columns={'Committee': 'committee'}, inplace=True)
-
-    # 3. Standardize Data (NEW STEP)
+    # 3. Standardize Data
     master_df = standardize_data(master_df)
 
-    # 4. Reshape Data from Wide to Long Format
-    logger.info("Reshaping data from wide to long format...")
+    # 4. Handle SQL Format (Long Format)
+    logger.info("Processing SQL data for analysis...")
     try:
-        id_vars = ['PPA', 'category', 'committee']
-        id_vars = [col for col in id_vars if col in master_df.columns]
-        
-        melted_df = master_df.melt(
-            id_vars=id_vars,
-            var_name='metric_year',
-            value_name='value'
-        )
+        # Extract year from targetYear (e.g. '2024')
+        master_df['year'] = master_df['targetYear'].str.extract(r'(\d{4})')
+        master_df.dropna(subset=['year'], inplace=True)
+        master_df['year'] = master_df['year'].astype(int)
 
-        melted_df.dropna(subset=['value'], inplace=True)
-        melted_df = melted_df[melted_df['value'] != '']
-
-        melted_df['year'] = melted_df['metric_year'].str.extract(r'(\d{4})')
-        melted_df['metric_type'] = melted_df['metric_year'].str.extract(r'([A-Za-z]+)')[0].str.lower()
+        # Ensure numeric values
+        master_df['total'] = pd.to_numeric(master_df['total'], errors='coerce').fillna(0)
         
-        melted_df.dropna(subset=['year'], inplace=True)
-        melted_df['year'] = melted_df['year'].astype(int)
-
-        melted_df['value'] = pd.to_numeric(melted_df['value'].astype(str).str.replace(',', ''), errors='coerce')
+        # In the SQL schema, 'total' is the direct metric. 
+        # The AI logic expects 'total', 'ps', 'mooe', 'co' columns.
+        # Since the query currently only fetches total, we'll map it.
+        if 'total' in master_df.columns:
+            # Downstream logic expects these columns to exist
+            if 'ps' not in master_df.columns: master_df['ps'] = 0
+            if 'mooe' not in master_df.columns: master_df['mooe'] = 0
+            if 'co' not in master_df.columns: master_df['co'] = 0
+            
+        master_df['start_date'] = pd.to_datetime(master_df['year'].astype(str) + '-01-01')
         
-        long_df = melted_df.pivot_table(
-            index=id_vars + ['year'],
-            columns='metric_type',
-            values='value',
-            aggfunc='first'
-        ).reset_index()
-
-        long_df['start_date'] = pd.to_datetime(long_df['year'].astype(str) + '-01-01')
-        
-        master_df = long_df
-        logger.info(f"Data successfully reshaped. Resulting DataFrame has {len(master_df)} rows.")
+        logger.info(f"Data successfully processed. DataFrame has {len(master_df)} rows.")
     except Exception as e:
-        logger.error(f"Failed to reshape data: {e}", exc_info=True)
-        # Raise exception if reshaping fails, as downstream modules will not work
-        raise RuntimeError(f"Failed to reshape data: {e}")
+        logger.error(f"Failed to process SQL data: {e}", exc_info=True)
+        raise RuntimeError(f"Failed to process SQL data: {e}")
 
     # Convert date columns for filtering
     if 'start_date' in master_df.columns:
