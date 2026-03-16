@@ -9,10 +9,11 @@ from google.genai import types
 logger = logging.getLogger(__name__)
 
 # --- Centralized Model Names ---
-PRIMARY_MODEL = "gemini-2.5-flash"
-FALLBACK_MODEL = "gemini-2.5-flash-lite"
+PRIMARY_MODEL = "gemini-3-flash-preview"
+FALLBACK_MODEL = "gemini-3.1-flash-lite-preview"
 
 _client = None
+_active_model = PRIMARY_MODEL
 
 def get_gemini_client():
     """Returns a singleton genai.Client instance."""
@@ -25,23 +26,22 @@ def get_gemini_client():
         _client = genai.Client(api_key=api_key)
     return _client
 
-def call_gemini_with_retry(prompt, validation_func, max_retries=5, model_name=PRIMARY_MODEL):
+def call_gemini_with_retry(prompt, validation_func, max_retries=5):
     """
-    Calls the Gemini API with fallback logic using the new google-genai Client.
-    If PRIMARY_MODEL hits quota, it switches to FALLBACK_MODEL.
+    Calls the Gemini API with persistent fallback logic.
+    If PRIMARY_MODEL hits quota, it switches to FALLBACK_MODEL for the duration of the session.
     """
+    global _active_model
     client = get_gemini_client()
     if not client:
         return None
 
-    current_model_name = model_name
-
     for attempt in range(max_retries):
-        logger.info(f"Calling Gemini API ({current_model_name})... Attempt {attempt + 1}/{max_retries}")
+        logger.info(f"Calling Gemini API ({_active_model})... Attempt {attempt + 1}/{max_retries}")
         try:
             # Generate content using the new client API
             response = client.models.generate_content(
-                model=current_model_name,
+                model=_active_model,
                 contents=prompt
             )
             
@@ -69,10 +69,10 @@ def call_gemini_with_retry(prompt, validation_func, max_retries=5, model_name=PR
         except Exception as e:
             error_msg = str(e).lower()
             if "429" in error_msg or "quota" in error_msg or "resource_exhausted" in error_msg:
-                logger.error(f"Quota Exceeded (429) for model '{current_model_name}'.")
-                if current_model_name == PRIMARY_MODEL:
-                    logger.warning(f"Switching to fallback model: {FALLBACK_MODEL}")
-                    current_model_name = FALLBACK_MODEL
+                logger.error(f"Quota Exceeded (429) for model '{_active_model}'.")
+                if _active_model == PRIMARY_MODEL:
+                    logger.warning(f"Switching session model to fallback: {FALLBACK_MODEL}")
+                    _active_model = FALLBACK_MODEL
                     # Don't increment attempt, just retry with new model
                     continue
                 else:

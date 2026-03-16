@@ -75,9 +75,11 @@ def _generate_chart_data(df: pd.DataFrame, group_by_column: str) -> dict:
     # 2. Run forecast for each group
     forecast_year = agg_df.index.max() + 1 if not agg_df.empty else datetime.now().year + 1
     forecast_values = {}
+    logger.info(f"Running LSTM forecasts for {len(agg_df.columns)} groups for year {forecast_year}...")
     for col in agg_df.columns:
         historical_series = agg_df[col]
         forecast_values[col] = _run_lstm_forecast(historical_series)
+        logger.info(f"  > Forecasted {col}: ₱{forecast_values[col]:,.2f}")
     
     # 3. Append forecast to the aggregated data
     agg_df.loc[forecast_year] = forecast_values

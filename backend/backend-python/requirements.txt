@@ -4,6 +4,7 @@ numpy
 
 # Database
 pyodbc
+sqlalchemy
 
 # Google & AI
 google-genai

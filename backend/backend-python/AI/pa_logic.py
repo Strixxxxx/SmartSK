@@ -33,18 +33,20 @@ def process_input_data(df):
         return pd.DataFrame()
 
     # Identify budget columns
-    budget_cols = [col for col in df.columns if 'budget' in col.lower()]
+    budget_cols = [col for col in df.columns if 'budget' in col.lower() or col.lower() == 'total']
     
     if not budget_cols:
-        logger.warning("No budget-related columns found in the DataFrame.")
+        logger.warning(f"No budget-related columns found in columns: {df.columns.tolist()}")
         return df
 
     # Convert budget columns to numeric, coercing errors to NaN
+    logger.info(f"Normalizing budget data in columns: {budget_cols}")
     for col in budget_cols:
         df[col] = pd.to_numeric(df[col], errors='coerce')
-    
-    # Drop rows where ALL budget columns are NaN
-    df.dropna(subset=budget_cols, how='all', inplace=True)
+        if col.lower() == 'total' and 'budget' not in df.columns:
+            # Also provide it as 'budget' for standard algorithms
+            df['budget'] = df[col]
+            budget_cols.append('budget')
     
     # Fill any remaining NaN values in the DataFrame with 0
     df.fillna(0, inplace=True)
@@ -259,8 +261,10 @@ def generate_project_analysis(df, api_key, filters=None):
             }
 
         # Process the filtered data
+        logger.info(f"Found {len(filtered_df)} rows for filters {filters}. Processing...")
         processed_df = process_input_data(filtered_df)
         if processed_df.empty:
+             logger.warning("Data is empty after processing. Returning insufficient data report.")
              return {
                 "summary_report": "Insufficient data for this specific filter combination.",
                 "recommendations": ["Try broadening the filter criteria."],
@@ -269,9 +273,11 @@ def generate_project_analysis(df, api_key, filters=None):
             }
 
         # Generate qualitative analysis from Gemini
+        logger.info("Requesting analysis from Gemini AI...")
         qualitative_analysis = generate_gemini_analysis(processed_df, filters, api_key)
         
-        # Generate quantitative analysis from LSTM (placeholder)
+        # Generate quantitative analysis from LSTM
+        logger.info("Running LSTM quantitative variance forecast...")
         quantitative_analysis = generate_lstm_analysis(processed_df)
         
         # Combine all parts into the final report

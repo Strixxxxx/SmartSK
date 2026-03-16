@@ -112,6 +112,7 @@ def generate_trends_report(df, api_key, category='General'):
             }
 
         # Generate trends from Gemini
+        logger.info(f"Requesting 10 project trends for '{category}' from Gemini AI...")
         trends_data = generate_gemini_trends(filtered_df, category, api_key)
         
         # Add metadata
@@ -124,7 +125,7 @@ def generate_trends_report(df, api_key, category='General'):
             'gemini_used': not trends_data.get('error', False)
         }
         
-        logger.info(f"--- Finished Trends Report for category: '{category}' ---")
+        logger.info(f"Successfully generated trends for category: '{category}'.")
         return trends_data
 
     except Exception as e:

@@ -11,23 +11,31 @@ DB_USER = os.getenv("DB_USER")
 DB_PASSWORD = os.getenv("DB_PASSWORD")
 DB_DRIVER = os.getenv('DB_DRIVER')
 
+import urllib
+from sqlalchemy import create_engine, text
+
+# --- Centralized DB Engine ---
+# For Mssql + pyodbc, SQLAlchemy requires a specific connection string format
+# format: mssql+pyodbc:///?odbc_connect={params}
+params = urllib.parse.quote_plus(f'DRIVER={DB_DRIVER};SERVER={DB_SERVER};DATABASE={DB_DATABASE};UID={DB_USER};PWD={DB_PASSWORD}')
+engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
+
 def get_raw_data_from_db(category=None):
     """
-    Fetches raw project data from the database and returns it as a list of dictionaries.
+    Fetches raw project data from the database using SQLAlchemy engine.
     """
     if not all([DB_SERVER, DB_DATABASE, DB_USER, DB_PASSWORD]):
         raise Exception("Database credentials are not fully configured in environment variables.")
     
-    conn_str = f'DRIVER={DB_DRIVER};SERVER={DB_SERVER};DATABASE={DB_DATABASE};UID={DB_USER};PWD={DB_PASSWORD}'
-    
     try:
-        with pyodbc.connect(conn_str) as conn:
-            logger.info("Connecting to the database to fetch raw data.")
+        logger.info("Connecting to the database via SQLAlchemy to fetch raw data.")
+        
+        query = "EXEC [Raw Data] @categoryFilter=:category"
+        
+        # Using engine.connect() with pandas to satisfy the connectable requirement
+        with engine.connect() as conn:
+            df = pd.read_sql(text(query), conn, params={"category": category} if category else {"category": None})
             
-            query = "EXEC [Raw Data] @categoryFilter=?"
-            params = (category,) if category else (None,)
-            
-            df = pd.read_sql(query, conn, params=params)
             logger.info(f"Successfully fetched {len(df)} rows from the database.")
 
             if df.empty:
@@ -43,9 +51,11 @@ def get_raw_data_from_db(category=None):
         return []
 
 def get_db_connection():
-    """Returns a pyodbc connection object using standardized env vars."""
-    conn_str = f'DRIVER={DB_DRIVER};SERVER={DB_SERVER};DATABASE={DB_DATABASE};UID={DB_USER};PWD={DB_PASSWORD}'
-    return pyodbc.connect(conn_str)
+    """
+    Returns a raw pyodbc connection object for manual cursor operations.
+    Maintained for backward compatibility but prefers SQLAlchemy for Pandas.
+    """
+    return engine.raw_connection()
 
 def get_barangay_abbr(barangay_id):
     """Maps barangay ID to abbreviation for filename conventions."""
