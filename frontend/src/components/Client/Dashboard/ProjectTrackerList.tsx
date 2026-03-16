@@ -71,6 +71,9 @@ const ProjectTrackerList: React.FC = () => {
         user?.position?.toLowerCase().includes('chairperson') ||
         user?.position?.toUpperCase() === 'SKC';
 
+    const hasTrackerControl = isSkc || user?.permissions?.trackerControl === true;
+    const hasDocsControl = isSkc || user?.permissions?.docsControl === true;
+
     const fetchBatches = useCallback(async () => {
         try {
             const res = await axios.get('/api/project-batch/all-files');
@@ -140,7 +143,6 @@ const ProjectTrackerList: React.FC = () => {
                 {activeBatches.map(batch => {
                     const { days, level } = getStatusAge(batch.updatedAt);
                     const isAIStep = batch.currentStatusID === 6 && batch.projType === 'ABYIP';
-                    const canAdvance = isSkc && batch.currentStatusID < 9;
 
                     return (
                         <div
@@ -235,7 +237,7 @@ const ProjectTrackerList: React.FC = () => {
 
                             <div className="ptl-actions-row">
                                 {/* ── SKC Advance Button ────────────────────────── */}
-                                {canAdvance && (
+                                {hasTrackerControl && batch.currentStatusID < 9 && (
                                     <button
                                         className="ptl-advance-btn"
                                         onClick={(e) => handleAdvance(e, batch)}
@@ -245,7 +247,7 @@ const ProjectTrackerList: React.FC = () => {
                                 )}
 
                                 {/* ── Supporting Document Button ────────────────── */}
-                                {batch.currentStatusID >= 3 && (
+                                {hasDocsControl && batch.currentStatusID >= 3 && (
                                     <button
                                         className="ptl-docs-btn"
                                         onClick={(e) => handleOpenDocs(e, batch)}

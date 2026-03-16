@@ -52,6 +52,27 @@ const isAdmin = (req, res, next) => {
     });
   }
 
+  const userPosition = req.user.position?.toLowerCase() || '';
+
+  if (userPosition === 'admin' || userPosition === 'skc' || userPosition.includes('chairperson')) {
+    next(); // User is an admin or SKC, proceed
+  } else {
+    return res.status(403).json({
+      success: false,
+      message: 'Access denied. Admin privileges required.'
+    });
+  }
+};
+
+// Middleware to check if user is a Master Admin
+const isMasterAdmin = (req, res, next) => {
+  if (!req.user || !req.user.position) {
+    return res.status(401).json({
+      success: false,
+      message: 'Authentication failed: User position not found.'
+    });
+  }
+
   const userPosition = req.user.position;
 
   if (userPosition === 'Admin') {
@@ -59,7 +80,7 @@ const isAdmin = (req, res, next) => {
   } else {
     return res.status(403).json({
       success: false,
-      message: 'Access denied. Admin privileges required.'
+      message: 'Access denied. Master Admin privileges required.'
     });
   }
 };
@@ -87,11 +108,13 @@ const checkAdminStatus = async (req, res) => {
     }
 
     const userPosition = result.recordset[0].position;
-    const isAdminUser = userPosition.toLowerCase().includes('admin');
+    const isAdminUser = userPosition.toLowerCase().includes('admin') || userPosition === 'SKC';
+    const isMasterAdminUser = userPosition === 'Admin';
 
     return res.json({
       success: true,
-      isAdmin: isAdminUser
+      isAdmin: isAdminUser,
+      isMasterAdmin: isMasterAdminUser
     });
   } catch (error) {
     console.error('Error checking admin status');
@@ -103,8 +126,40 @@ const checkAdminStatus = async (req, res) => {
   }
 };
 
+// Middleware to check granular project permissions for standard users
+const hasAccessControl = (requiredControl) => {
+  return async (req, res, next) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ success: false, message: 'Authentication failed' });
+      }
+
+      // Admins and SKC bypass this check
+      if (req.user.position === 'Admin' || req.user.position === 'SKC') {
+        return next();
+      }
+
+      const pool = await getConnection();
+      const result = await pool.request()
+        .input('userId', sql.Int, req.user.userID)
+        .query(`SELECT ${requiredControl} FROM accessControl WHERE userID = @userId`);
+
+      if (result.recordset.length > 0 && result.recordset[0][requiredControl] === true) {
+        return next();
+      }
+
+      return res.status(403).json({ success: false, message: 'Access denied by Access Control settings.' });
+    } catch (error) {
+      console.error('Error checking access control settings:', error);
+      return res.status(500).json({ success: false, message: 'Server error checking permissions.' });
+    }
+  };
+};
+
 module.exports = {
   verifyToken,
   isAdmin,
-  checkAdminStatus
+  isMasterAdmin,
+  checkAdminStatus,
+  hasAccessControl
 };

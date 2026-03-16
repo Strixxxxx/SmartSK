@@ -13,6 +13,11 @@ interface LoginResponse {
     barangay?: string;
     role?: string;
     isDefaultPassword?: boolean;
+    permissions?: {
+      templateControl: boolean;
+      trackerControl: boolean;
+      docsControl: boolean;
+    };
   };
 }
 
@@ -25,6 +30,11 @@ interface UserInfo {
   phoneNumber?: string;
   barangay?: string;
   role?: string;
+  permissions?: {
+    templateControl: boolean;
+    trackerControl: boolean;
+    docsControl: boolean;
+  };
 }
 
 // Add authentication state tracking
@@ -99,9 +109,9 @@ export const fetchUserData = async (skipCache = false): Promise<UserInfo | null>
       let role = '';
       if (position.includes('admin')) {
         role = 'MA, SA';
-      } else if (position.includes('chairperson')) {
+      } else if (position.includes('chairperson') || position === 'skc') {
         role = 'SKC';
-      } else if (position.includes('official')) {
+      } else if (position.includes('official') || position.startsWith('skk')) {
         role = 'SKO';
       }
       
@@ -113,7 +123,8 @@ export const fetchUserData = async (skipCache = false): Promise<UserInfo | null>
         emailAddress: userInfo.emailAddress,
         phoneNumber: userInfo.phoneNumber,
         barangay: userInfo.barangay,
-        role 
+        role,
+        permissions: userInfo.permissions
       };
       userDataCache = userData;
       lastFetchTime = Date.now();
@@ -154,9 +165,9 @@ const getRoleFromPosition = (position: string): string => {
   const pos = position?.toLowerCase() || '';
   if (pos.includes('admin')) {
     return 'MA';
-  } else if (pos.includes('chairperson')) {
+  } else if (pos.includes('chairperson') || pos === 'skc') {
     return 'SKC';
-  } else if (pos.includes('official')) {
+  } else if (pos.includes('official') || pos.startsWith('skk')) {
     return 'SKO';
   }
   return '';
@@ -317,9 +328,9 @@ export const checkPotentialSession = async (): Promise<boolean> => {
       let role = '';
       if (position.includes('admin')) {
         role = 'MA, SA';
-      } else if (position.includes('chairperson')) {
+      } else if (position.includes('chairperson') || position === 'skc') {
         role = 'SKC';
-      } else if (position.includes('official')) {
+      } else if (position.includes('official') || position.startsWith('skk')) {
         role = 'SKO';
       }
       
@@ -331,7 +342,8 @@ export const checkPotentialSession = async (): Promise<boolean> => {
         emailAddress: userInfo.emailAddress,
         phoneNumber: userInfo.phoneNumber,
         barangay: userInfo.barangay,
-        role 
+        role,
+        permissions: userInfo.permissions
       };
       userDataCache = userData;
       lastFetchTime = Date.now();

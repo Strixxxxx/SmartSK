@@ -26,7 +26,7 @@ import Dashboard from './components/Client/Dashboard/Dashboard';
 import ProjectWorkspacePage from './components/Client/Projects/ProjectWorkspacePage';
 import Forecast from './components/Client/Forecast/Forecast';
 import Predictive from './components/Client/PredictiveAnalysis/pa';
-import RawDataList from './components/Client/RawData/RawDataList';
+import AccessControl from './components/Client/AccessControl/AccessControl';
 
 // Admin Pages
 import DashboardAdmin from './components/Admin/Dashboard/DashboardAdmin';
@@ -105,7 +105,9 @@ const AppRoutes: React.FC = () => {
           <>
             <Route index element={<Navigate to="dashboard" />} />
             <Route path="dashboard" element={<Dashboard />} />
-            <Route path="raw-data-list" element={<RawDataList />} />
+            {user?.role === 'SKC' && (
+              <Route path="access-control" element={<AccessControl />} />
+            )}
             <Route path="forecast" element={<Forecast />} />
             <Route path="predictive-analytics" element={<Predictive />} />
           </>

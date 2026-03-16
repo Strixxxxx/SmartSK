@@ -120,6 +120,17 @@ CREATE TABLE skTerms (
     CONSTRAINT FK_skTerms_Barangay FOREIGN KEY (barangayID) REFERENCES barangays(barangayID)
 );
 
+--Access Control Table for SK Chairperson
+
+CREATE TABLE accessControl (
+    acID INT PRIMARY KEY IDENTITY(1,1),
+    userID INT NOT NULL,
+    templateControl BIT DEFAULT 0, -- Create new project plan
+    trackerControl BIT DEFAULT 0,  -- Update project tracking
+    docsControl BIT DEFAULT 0,     -- Upload supporting documents
+    CONSTRAINT FK_AccessControl_User FOREIGN KEY (userID) REFERENCES userInfo(userID) ON DELETE CASCADE
+);
+
 --Session Logs Table
 
 create table sessions(

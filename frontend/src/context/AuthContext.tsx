@@ -20,6 +20,11 @@ interface UserInfo {
   barangay?: string;
   role?: string;
   isDefaultPassword?: boolean;
+  permissions?: {
+    templateControl: boolean;
+    trackerControl: boolean;
+    docsControl: boolean;
+  };
 }
 
 interface AuthContextType {

@@ -1,0 +1,127 @@
+.container {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 20px; /* Aligned with dashboard padding */
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.content {
+  max-width: 1200px;
+  margin: 0 auto;
+  animation: fadeIn 0.4s ease-out;
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.title {
+  color: #1e293b !important;
+  font-weight: 700 !important;
+  margin-bottom: 0.5rem !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 2rem !important;
+  letter-spacing: -0.025em;
+}
+
+.subtitle {
+  color: #64748b !important;
+  font-size: 1.1rem !important;
+  opacity: 0.9;
+}
+
+.alert {
+  margin-bottom: 2rem;
+  border-radius: 8px !important;
+}
+
+.tableCard {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.tableContainer {
+  max-height: calc(100vh - 250px);
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+
+.tableHeadCell {
+  background-color: #f8fafc !important;
+  color: #334155 !important;
+  font-weight: 600 !important;
+  white-space: nowrap;
+  border-bottom: 2px solid #e2e8f0 !important;
+  padding: 1rem 1.5rem !important;
+}
+
+.tableHeadCell small {
+  color: #64748b;
+  font-weight: 400;
+  font-size: 0.8rem;
+  display: block;
+  margin-top: 4px;
+}
+
+.tableRow {
+  transition: background-color 0.2s ease;
+}
+
+.tableRow:hover {
+  background-color: #f1f5f9 !important;
+}
+
+.tableRow td {
+  padding: 1rem 1.5rem !important;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+}
+
+.roleBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: #e0e7ff;
+  color: #4338ca;
+  border: 1px solid #c7d2fe;
+}
+
+.positionSubtitle {
+  display: block;
+  color: #64748b;
+  font-size: 0.8rem !important;
+  margin-top: -2px;
+  font-weight: 500;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1024px) {
+  .sidebarExpanded,
+  .sidebarCollapsed {
+    margin-left: 0;
+    width: 100%;
+    padding: 1rem;
+  }
+  
+  .tableContainer {
+    max-height: none;
+  }
+}

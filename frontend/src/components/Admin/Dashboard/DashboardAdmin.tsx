@@ -16,8 +16,6 @@ import {
   People, 
   PendingActions, 
   Engineering, 
-  CheckCircle, 
-  Notifications, 
   ArrowForward 
 } from '@mui/icons-material';
 import { fetchDashboardStats, fetchDashboardCharts, fetchDashboardActivity } from '../../../backend connection/adminApi';
@@ -143,17 +141,6 @@ const DashboardAdmin: React.FC = () => {
           </div>
         </div>
 
-        <div className={styles.card}>
-          <div className={styles.cardContent}>
-            <h3>System Health</h3>
-            <div className={styles.cardStats}>
-              <span className={`${styles.statusPill} ${stats?.aiHealth === 'Excellent' ? styles.healthy : styles.alert}`}>
-                {stats?.aiHealth || 'Offline'}
-              </span>
-              <CheckCircle sx={{ color: stats?.aiHealth === 'Excellent' ? '#099268' : '#fa5252', fontSize: 40 }} />
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Charts Grid */}
@@ -179,8 +166,8 @@ const DashboardAdmin: React.FC = () => {
         </div>
       </div>
 
-      {/* Activity and Alerts */}
-      <div className={styles.bottomGrid}>
+      {/* Recent System Activity */}
+      <div className={styles.recentActivityContainer}>
         <div className={styles.activityCard}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <h3>Recent System Activity</h3>
@@ -208,43 +195,6 @@ const DashboardAdmin: React.FC = () => {
               ))}
             </tbody>
           </table>
-        </div>
-
-        <div className={styles.alertsCard}>
-          <h3>System Alerts</h3>
-          <div className={styles.alertList}>
-            {(!stats?.lastBackupAt || stats.lastBackupAt === 'Never' || (new Date().getTime() - new Date(stats.lastBackupAt).getTime() > 24 * 60 * 60 * 1000)) && (
-                <div className={`${styles.alertItem} ${styles.urgent}`}>
-                    <Notifications className={styles.alertIcon} />
-                    <div>
-                        <strong>Manual Backup Recommended</strong>
-                        <p>
-                            {stats?.lastBackupAt === 'Never' 
-                                ? 'No backup history found.' 
-                                : `Last backup: ${new Date(stats?.lastBackupAt).toLocaleString()}`}
-                        </p>
-                    </div>
-                </div>
-            )}
-            {stats?.pendingRegistrations > 0 && (
-                <div className={`${styles.alertItem} ${styles.warning}`}>
-                    <Notifications className={styles.alertIcon} />
-                    <div>
-                        <strong>{stats.pendingRegistrations} Users Awaiting Review</strong>
-                        <p>Immediate action required for compliance.</p>
-                    </div>
-                </div>
-            )}
-            {stats?.aiHealth === 'Offline' && (
-                <div className={`${styles.alertItem} ${styles.urgent}`}>
-                    <Notifications className={styles.alertIcon} />
-                    <div>
-                        <strong>AI Microservice Offline</strong>
-                        <p>Predictive analytics and exports disabled.</p>
-                    </div>
-                </div>
-            )}
-          </div>
         </div>
       </div>
     </div>

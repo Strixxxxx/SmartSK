@@ -98,6 +98,7 @@ const projectNotesRouter = require('./Projects/projectNotes');
 const projectAuditRouter = require('./Projects/projectAudit');
 const projectDocumentsRouter = require('./Projects/projectDocuments');
 const disclosureRouter = require('./bulletinboard/disclosure');
+const accessControlRouter = require('./Admin/accessControl');
 const { initializeWebSocketServer, broadcast } = require('./websockets/websocket');
 const { sendProjectDeadlineEmail } = require('./Email/email');
 
@@ -265,7 +266,7 @@ if (auditRouter && typeof auditRouter === 'function') {
 }
 
 if (backupRouter && typeof backupRouter === 'function') {
-  adminRouter.use('/backup', backupRouter);
+  adminRouter.use('/backup', routeGuard.isMasterAdmin, backupRouter);
 } else {
   console.error('backupRouter is not a valid middleware function');
 }
@@ -322,6 +323,13 @@ if (rolesRouter && typeof rolesRouter === 'function') {
   app.use('/api/roles', rolesRouter);
 } else {
   console.error('rolesRouter is not a valid middleware function');
+}
+
+// Access Control router
+if (accessControlRouter && typeof accessControlRouter === 'function') {
+  adminRouter.use('/access-control', accessControlRouter);
+} else {
+  console.error('accessControlRouter is not a valid middleware function');
 }
 
 // Phase 3: Project Batch router

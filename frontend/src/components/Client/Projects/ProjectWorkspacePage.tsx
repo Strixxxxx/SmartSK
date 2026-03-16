@@ -79,7 +79,8 @@ function getAgendaColumnMap(tabName: string): string {
 
     const canCreate = user?.role === 'SKC' ||
         user?.position?.toLowerCase().includes('chairperson') ||
-        user?.position?.toUpperCase() === 'SKC';
+        user?.position?.toUpperCase() === 'SKC' ||
+        user?.permissions?.templateControl === true;
 
     const isReadOnly = (selectedProject?.projType === 'ABYIP' && (selectedProject?.currentStatusID || 0) >= 6) ||
         Boolean(selectedProject?.projectTermIsLocked) ||

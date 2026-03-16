@@ -130,11 +130,13 @@ const authMiddleware = async (req, res, next) => {
     const result = await pool.request()
       .input('sessionID', sql.VarChar, decoded.sessionID)
       .query(`
-        SELECT u.userID, u.username, u.fullName, r.roleName as position, u.isDefaultPassword, u.barangay, b.barangayName, u.emailAddress, u.phoneNumber, u.termID
+        SELECT u.userID, u.username, u.fullName, r.roleName as position, u.isDefaultPassword, u.barangay, b.barangayName, u.emailAddress, u.phoneNumber, u.termID,
+               ac.templateControl, ac.trackerControl, ac.docsControl
         FROM sessions s
         JOIN userInfo u ON s.userID = u.userID
         LEFT JOIN roles r ON u.position = r.roleID
         LEFT JOIN barangays b ON u.barangay = b.barangayID
+        LEFT JOIN accessControl ac ON u.userID = ac.userID
         WHERE s.sessionID = @sessionID AND s.expires_at IS NULL
       `);
 
@@ -162,7 +164,12 @@ const authMiddleware = async (req, res, next) => {
         barangayName: user.barangayName,
         emailAddress: decrypt(user.emailAddress),
         phoneNumber: decrypt(user.phoneNumber),
-        termID: user.termID
+        termID: user.termID,
+        permissions: {
+          templateControl: Boolean(user.templateControl),
+          trackerControl: Boolean(user.trackerControl),
+          docsControl: Boolean(user.docsControl)
+        }
       };
 
       next();

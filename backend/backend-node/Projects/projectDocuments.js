@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const { authMiddleware } = require('../session/session');
+const { hasAccessControl } = require('../routeGuard/routeGuard');
 const { getConnection, sql } = require('../database/database');
 const {
     docContainerName,
@@ -101,7 +102,7 @@ router.get('/:batchID', authMiddleware, async (req, res) => {
  * POST /api/project-documents/:batchID/upload
  * Upload a document to a specific category.
  */
-router.post('/:batchID/upload', authMiddleware, upload.single('document'), async (req, res) => {
+router.post('/:batchID/upload', authMiddleware, hasAccessControl('docsControl'), upload.single('document'), async (req, res) => {
     try {
         const { batchID } = req.params;
         const { category } = req.body;
@@ -155,7 +156,7 @@ router.post('/:batchID/upload', authMiddleware, upload.single('document'), async
  * DELETE /api/project-documents/:batchID/delete
  * Delete a document by its full path.
  */
-router.delete('/:batchID/delete', authMiddleware, async (req, res) => {
+router.delete('/:batchID/delete', authMiddleware, hasAccessControl('docsControl'), async (req, res) => {
     try {
         const { batchID } = req.params;
         const { documentPath } = req.body;

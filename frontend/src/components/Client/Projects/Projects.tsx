@@ -34,10 +34,12 @@ const Projects: React.FC = () => {
         }
     }, [user]);
 
-    // Check if user is SK Chairperson
-    const canCreateProject = user?.role === 'SKC' ||
+    // Check if user is SK Chairperson or has template control permission
+    const canCreateProject = 
+        user?.role === 'SKC' ||
         user?.position?.toLowerCase().includes('chairperson') ||
-        user?.position?.toUpperCase() === 'SKC';
+        user?.position?.toUpperCase() === 'SKC' ||
+        user?.permissions?.templateControl === true;
 
     const handleOpenProject = (project: any) => {
         navigate(`/projects/${project.batchID}`, { state: { project } });

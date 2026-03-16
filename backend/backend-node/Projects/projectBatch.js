@@ -4,6 +4,7 @@ const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const templateService = require('../utils/templateService');
 const { authMiddleware } = require('../session/session');
+const { hasAccessControl } = require('../routeGuard/routeGuard');
 const { createAuditEntry } = require('./projectAudit');
 const axios = require('axios');
 const { getBlobProperties, listBlobs, downloadBlobToBuffer, projectBatchContainerName } = require('../Storage/storage');
@@ -15,15 +16,11 @@ const os = require('os');
  * Phase 3: Project Batch Management Router
  */
 
-// 1. Initialize New Project Batch (SKC Only)
-router.post('/initialize', authMiddleware, async (req, res) => {
+// 1. Initialize New Project Batch (Access Control: templateControl)
+router.post('/initialize', authMiddleware, hasAccessControl('templateControl'), async (req, res) => {
     try {
         const { projType, targetYear, budget, governance_pct, active_citizenship_pct, economic_empowerment_pct, global_mobility_pct, agriculture_pct, environment_pct, PBS_pct, SIE_pct, education_pct, health_pct, GAP_pct, MOOE_pct } = req.body;
         const { barangay: barangayID, userID, position, termID } = req.user;
-
-        if (position !== 'SKC' && position !== 'SK Chairperson') {
-            return res.status(403).json({ success: false, message: 'Unauthorized: Only SK Chairperson can create projects.' });
-        }
 
         // Initialize DB and Template
         const result = await templateService.initializeNewProject({
@@ -80,19 +77,11 @@ router.get('/dashboard', authMiddleware, async (req, res) => {
     }
 });
 
-// 3. Update Project Status (Checkpoints)
-router.post('/update-status', authMiddleware, async (req, res) => {
+// 3. Update Project Status (Checkpoints) (Access Control: trackerControl)
+router.post('/update-status', authMiddleware, hasAccessControl('trackerControl'), async (req, res) => {
     try {
         const { batchID, statusID } = req.body;
         const { userID, position } = req.user;
-
-        // RBAC: Only SK Chairperson (SKC) can update project milestones
-        if (position !== 'SKC') {
-            return res.status(403).json({
-                success: false,
-                message: 'Unauthorized: Only the SK Chairperson can update project milestones.'
-            });
-        }
 
         const pool = await getConnection();
 
