@@ -10,7 +10,6 @@ const { getBlobProperties, listBlobs, downloadBlobToBuffer, projectBatchContaine
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { spawn } = require('child_process');
 
 /**
  * Phase 3: Project Batch Management Router
@@ -117,14 +116,14 @@ router.post('/update-status', authMiddleware, async (req, res) => {
 
         // City Approval (statusID = 6) on ABYIP only -> trigger AI job
         if (statusID === 6 && projType === 'ABYIP') {
-            console.log(`[AI Trigger] ABYIP batch ${batchID} reached City Approval. Launching aiJobs.py...`);
-            const aiJobsPath = path.join(__dirname, '..', '..', '..', 'backend-python', 'AI', 'aiJobs.py');
-            const pyProcess = spawn('python', ['-m', 'backend-python.AI.aiJobs'], {
-                cwd: path.join(__dirname, '..', '..', '..'),
-                detached: true,
-                stdio: 'ignore'
+            console.log(`[AI Trigger] ABYIP batch ${batchID} reached City Approval. Triggering AI Job via HTTP...`);
+            
+            // Fire-and-forget HTTP call to Python microservice
+            const pythonUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/run-ai-batch-job`;
+            
+            axios.post(pythonUrl).catch(err => {
+                console.error('[AI Trigger] Failed to trigger AI job via HTTP:', err.message);
             });
-            pyProcess.unref(); // Fire-and-forget
 
             // Insert AI_TRIGGERED notification
             await pool.request()

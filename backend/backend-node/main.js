@@ -18,7 +18,6 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const pdfParse = require('pdf-parse');
-const { spawn } = require('child_process');
 const os = require('os');
 const dotenv = require('dotenv');
 const cron = require('node-cron');
