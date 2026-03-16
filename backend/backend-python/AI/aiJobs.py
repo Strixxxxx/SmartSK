@@ -31,7 +31,8 @@ def get_data_from_sql():
                 pb.projName,
                 pb.targetYear,
                 pa.PPA,
-                pa.category,
+                pa.centerOfParticipation AS category,
+                pa.personResponsible AS committee,
                 pa.total,
                 pa.sheetRowIndex
             FROM projectBatch pb
