@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import {
-    Box, Typography, CircularProgress, Tooltip,
+    Box, Typography, CircularProgress, Tooltip, IconButton,
 } from '@mui/material';
-import { History } from '@mui/icons-material';
+import { History, Add, Remove } from '@mui/icons-material';
 import axiosInstance from '../../../backend connection/axiosConfig';
 
 interface AuditLog {
     auditID: number;
     batchID: number;
-    rowID: number;
+    rowID: number | null;
     action: string;
     oldValue: string | null;
     newValue: string;
@@ -46,6 +46,7 @@ function actionLabel(action: string): string {
         case 'ADD_AGENDA': return 'Added Agenda';
         case 'EDIT': return 'Edited Text';
         case 'EDIT_AGENDA': return 'Edited Agenda';
+        case 'DELETE_ROW': return 'Deleted Row';
         default: return action;
     }
 }
@@ -58,6 +59,7 @@ function actionColor(action: string): string {
         case 'ADD_AGENDA': return '#1b5e20'; // Dark Green
         case 'EDIT': return '#ed6c02';
         case 'EDIT_AGENDA': return '#f9a825'; // Dark Yellow
+        case 'DELETE_ROW': return '#d32f2f'; // Red
         default: return '#78909c';
     }
 }
@@ -70,6 +72,8 @@ const ProjectAuditTimeline: React.FC<ProjectAuditTimelineProps> = ({
 }) => {
     const [logs, setLogs] = useState<AuditLog[]>([]);
     const [loading, setLoading] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [timelineHeight, setTimelineHeight] = useState(300);
 
     const fetchLogs = useCallback(async () => {
         if (!batchID) return;
@@ -92,88 +96,153 @@ const ProjectAuditTimeline: React.FC<ProjectAuditTimelineProps> = ({
         fetchLogs();
     }, [batchID, center, fetchLogs, auditRefreshTrigger]);
 
+    // Resizing logic
+    const handleMouseDown = (e: React.MouseEvent) => {
+        e.preventDefault();
+        const startY = e.clientY;
+        const startHeight = timelineHeight;
+
+        const handleMouseMove = (moveEvent: MouseEvent) => {
+            const deltaY = startY - moveEvent.clientY;
+            const newHeight = Math.max(100, Math.min(600, startHeight + deltaY));
+            setTimelineHeight(newHeight);
+        };
+
+        const handleMouseUp = () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    };
+
     return (
         <Box sx={{
-            borderTop: '1px solid rgba(255,255,255,0.1)',
+            borderTop: '1px solid rgba(0,0,0,0.1)',
             flexShrink: 0,
             display: 'flex',
             flexDirection: 'column',
-            maxHeight: '350px', // Independent scroll limit
+            height: isExpanded ? `${timelineHeight}px` : 'auto',
+            maxHeight: '80vh',
+            transition: 'height 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            position: 'relative',
+            bgcolor: '#fff',
         }}>
+            {/* Resize Handle (only when expanded) */}
+            {isExpanded && (
+                <Box
+                    onMouseDown={handleMouseDown}
+                    sx={{
+                        position: 'absolute',
+                        top: -3,
+                        left: 0,
+                        right: 0,
+                        height: '6px',
+                        cursor: 'ns-resize',
+                        zIndex: 10,
+                        '&:hover': { bgcolor: 'rgba(100, 108, 255, 0.2)' }
+                    }}
+                />
+            )}
+
             {/* Header */}
-            <Box sx={{ px: 2, py: 1, bgcolor: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0 }}>
-                <History sx={{ fontSize: 14, color: '#646cff' }} />
-                <Typography variant="overline" sx={{ fontWeight: 'bold', color: '#646cff', fontSize: '0.65rem', letterSpacing: '0.1em' }}>
-                    AUDIT TIMELINE
-                </Typography>
-            </Box>
-
-            {/* Subtitle */}
-            <Box sx={{ px: 2, pb: 0.5, flexShrink: 0 }}>
-                <Typography variant="caption" sx={{ color: '#aaa', fontSize: '0.6rem' }}>
-                    RECENT CHANGES IN {projType?.toUpperCase()} ({center ?? 'GENERAL'})
-                </Typography>
-            </Box>
-
-            {/* Logs Area */}
-            <Box sx={{ flexGrow: 1, overflowY: 'auto', px: 2, py: 1, minHeight: 0 }}>
-                {loading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-                        <CircularProgress size={20} sx={{ color: '#646cff' }} />
-                    </Box>
-                ) : logs.length === 0 ? (
-                    <Typography variant="body2" sx={{ color: '#666', textAlign: 'center', py: 2, fontSize: '0.75rem' }}>
-                        No history found for {center ?? 'this sheet'}.
+            <Box 
+                onClick={() => setIsExpanded(!isExpanded)}
+                sx={{ 
+                    px: 2, 
+                    py: 1.2, 
+                    bgcolor: 'rgba(0,0,0,0.03)', 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    flexShrink: 0,
+                    cursor: 'pointer',
+                    '&:hover': { bgcolor: 'rgba(0,0,0,0.05)' }
+                }}
+            >
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <History sx={{ fontSize: 16, color: '#646cff' }} />
+                    <Typography variant="overline" sx={{ fontWeight: 'bold', color: '#646cff', fontSize: '0.65rem', letterSpacing: '0.1em' }}>
+                        AUDIT TIMELINE
                     </Typography>
-                ) : (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        {logs.map((log) => (
-                            <Box key={log.auditID} sx={{ position: 'relative', pl: 2, borderLeft: '1px solid rgba(100, 108, 255, 0.3)' }}>
-                                {/* Relative Dot */}
-                                <Box sx={{
-                                    position: 'absolute',
-                                    left: -4,
-                                    top: 4,
-                                    width: 7,
-                                    height: 7,
-                                    borderRadius: '50%',
-                                    bgcolor: actionColor(log.action),
-                                    boxShadow: `0 0 8px ${actionColor(log.action)}`
-                                }} />
-
-                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                    <Typography variant="caption" sx={{ fontWeight: 'bold', color: actionColor(log.action), fontSize: '0.65rem' }}>
-                                        {actionLabel(log.action)}
-                                    </Typography>
-                                    <Typography variant="caption" sx={{ color: '#666', fontSize: '0.6rem' }}>
-                                        {formatRelativeTime(log.timestamp)}
-                                    </Typography>
-                                </Box>
-
-                                <Tooltip title={`${log.newValue}`}>
-                                    <Typography variant="body2" sx={{
-                                        color: '#ccc',
-                                        fontSize: '0.7rem',
-                                        mt: 0.2,
-                                        cursor: 'default',
-                                        lineHeight: 1.2,
-                                        display: '-webkit-box',
-                                        WebkitLineClamp: 2,
-                                        WebkitBoxOrient: 'vertical',
-                                        overflow: 'hidden'
-                                    }}>
-                                        {
-                                            (log.action === 'ADD_AGENDA' || log.action === 'EDIT_AGENDA')
-                                                ? log.newValue
-                                                : `${log.fullName} modified row #${log.rowID || '?'}`
-                                        }
-                                    </Typography>
-                                </Tooltip>
-                            </Box>
-                        ))}
-                    </Box>
-                )}
+                </Box>
+                <IconButton size="small" sx={{ p: 0.5 }}>
+                    {isExpanded ? <Remove sx={{ fontSize: 16 }} /> : <Add sx={{ fontSize: 16 }} />}
+                </IconButton>
             </Box>
+
+            {isExpanded && (
+                <>
+                    {/* Subtitle */}
+                    <Box sx={{ px: 2, py: 0.5, flexShrink: 0, borderBottom: '1px solid rgba(0,0,0,0.05)' }}>
+                        <Typography variant="caption" sx={{ color: '#888', fontSize: '0.6rem', fontWeight: 600 }}>
+                            RECENT CHANGES IN {projType?.toUpperCase()} ({center ?? 'GENERAL'})
+                        </Typography>
+                    </Box>
+
+                    {/* Logs Area */}
+                    <Box sx={{ flexGrow: 1, overflowY: 'auto', px: 2, py: 1.5 }}>
+                        {loading ? (
+                            <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                                <CircularProgress size={20} sx={{ color: '#646cff' }} />
+                            </Box>
+                        ) : logs.length === 0 ? (
+                            <Typography variant="body2" sx={{ color: '#999', textAlign: 'center', py: 4, fontSize: '0.75rem', fontStyle: 'italic' }}>
+                                No history found for {center ?? 'this sheet'}.
+                            </Typography>
+                        ) : (
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                {logs.map((log) => (
+                                    <Box key={log.auditID} sx={{ position: 'relative', pl: 2, borderLeft: '1px solid rgba(100, 108, 255, 0.2)' }}>
+                                        {/* Relative Dot */}
+                                        <Box sx={{
+                                            position: 'absolute',
+                                            left: -4.5,
+                                            top: 4,
+                                            width: 8,
+                                            height: 8,
+                                            borderRadius: '50%',
+                                            bgcolor: actionColor(log.action),
+                                            boxShadow: `0 0 6px ${actionColor(log.action)}44`,
+                                            border: '1.5px solid #fff'
+                                        }} />
+
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                                            <Typography variant="caption" sx={{ fontWeight: 'bold', color: actionColor(log.action), fontSize: '0.65rem', textTransform: 'uppercase' }}>
+                                                {actionLabel(log.action)}
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ color: '#999', fontSize: '0.6rem' }}>
+                                                {formatRelativeTime(log.timestamp)}
+                                            </Typography>
+                                        </Box>
+
+                                        <Tooltip title={`${log.newValue}`} arrow placement="left">
+                                            <Typography variant="body2" sx={{
+                                                color: '#444',
+                                                fontSize: '0.72rem',
+                                                mt: 0.3,
+                                                cursor: 'default',
+                                                lineHeight: 1.4,
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: 'vertical',
+                                                overflow: 'hidden'
+                                            }}>
+                                                {log.newValue}
+                                            </Typography>
+                                        </Tooltip>
+                                        
+                                        <Typography variant="caption" sx={{ color: '#aaa', fontSize: '0.6rem', display: 'block', mt: 0.2 }}>
+                                            by {log.fullName}
+                                        </Typography>
+                                    </Box>
+                                ))}
+                            </Box>
+                        )}
+                    </Box>
+                </>
+            )}
         </Box>
     );
 };

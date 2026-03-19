@@ -29,7 +29,7 @@ backend-python/util/__pycache__/
 *.sln
 *.sw?
 .env
-database/database_query.txt
+backend-node/database/database_query.txt
 
 # Sensitive credentials
 AI/credentials.json

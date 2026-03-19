@@ -239,6 +239,49 @@
     background: #bbdefb;
 }
 
+/* ── Action Buttons ──────────────────────────────────────── */
+.pt-action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.pt-delete-row-btn {
+    padding: 6px 18px;
+    font-size: 12px;
+    background: #fff;
+    color: #d32f2f;
+    border: 1.5px solid #d32f2f;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pt-delete-row-btn:hover {
+    background: #ffebee;
+}
+
+.pt-action-buttons-inline {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.pt-delete-row-btn-inline {
+    padding: 4px 12px;
+    font-size: 11px;
+    background: #fff;
+    color: #d32f2f;
+    border: 1px solid #ffcdd2;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.pt-delete-row-btn-inline:hover {
+    background: #ffebee;
+}
+
 /* ── Sheet Tab Bar ───────────────────────────────────────── */
 .pt-sheet-tabs {
     display: flex;

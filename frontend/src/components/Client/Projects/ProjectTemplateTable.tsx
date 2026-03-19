@@ -11,6 +11,7 @@ interface ProjectTemplateTableProps {
     readOnly: boolean;
     hideRowIndex?: boolean;
     onAddRow?: (sectionType?: string) => void;
+    onDeleteRecentRow?: (sectionType?: string) => void;
     onCellChange?: (rowID: number, field: string, value: string) => void;
     onCellBlur?: (rowID: number, field: string, value: string) => void;
     /** collaborators Map<userID, CollaboratorInfo> */
@@ -66,6 +67,7 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
     readOnly,
     hideRowIndex = false,
     onAddRow,
+    onDeleteRecentRow,
     onCellChange,
     onCellBlur,
     collaborators = new Map(),
@@ -141,9 +143,14 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
                 </table>
 
                 {!readOnly && (
-                    <button className={styles['pt-add-row-btn']} onClick={() => onAddRow?.()}>
-                        + Add Row
-                    </button>
+                    <div className={styles['pt-action-buttons']}>
+                        <button className={styles['pt-add-row-btn']} onClick={() => onAddRow?.()}>
+                            + Add Row
+                        </button>
+                        <button className={styles['pt-delete-row-btn']} onClick={() => onDeleteRecentRow?.()}>
+                            - Delete Recent Row
+                        </button>
+                    </div>
                 )}
             </div>
         );
@@ -212,9 +219,14 @@ const ProjectTemplateTable: React.FC<ProjectTemplateTableProps> = ({
                                 {!readOnly && (
                                     <tr>
                                         <td colSpan={colCount} className={styles['pt-add-row-cell']}>
-                                            <button className={styles['pt-add-row-btn-inline']} onClick={() => onAddRow?.(section)}>
-                                                + Add Row
-                                            </button>
+                                            <div className={styles['pt-action-buttons-inline']}>
+                                                <button className={styles['pt-add-row-btn-inline']} onClick={() => onAddRow?.(section)}>
+                                                    + Add Row
+                                                </button>
+                                                <button className={styles['pt-delete-row-btn-inline']} onClick={() => onDeleteRecentRow?.(section)}>
+                                                    - Delete Recent Row
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 )}

@@ -693,4 +693,113 @@ router.get('/export/pdf/:batchID', authMiddleware, async (req, res) => {
     }
 });
 
+// 16. Delete a specific row from a project batch
+router.delete('/:batchID/rows/:rowID', authMiddleware, async (req, res) => {
+    try {
+        const { batchID, rowID } = req.params;
+        const { projType } = req.query; // Need projType to know which table to delete from
+        const userID = req.user.userID;
+
+        const pool = await getConnection();
+
+        // 1. Fetch row data before deletion for auditing
+        let rowData;
+        if (projType === 'ABYIP') {
+            const result = await pool.request()
+                .input('rowID', sql.Int, rowID)
+                .query('SELECT * FROM projectABYIP WHERE abyipID = @rowID');
+            rowData = result.recordset[0];
+        } else {
+            const result = await pool.request()
+                .input('rowID', sql.Int, rowID)
+                .query('SELECT * FROM projectCBYDP WHERE cbydpID = @rowID');
+            rowData = result.recordset[0];
+        }
+
+        if (!rowData) {
+            return res.status(404).json({ success: false, message: 'Row not found.' });
+        }
+
+        const center = rowData.centerOfParticipation;
+        const sheetRowIndex = rowData.sheetRowIndex;
+
+        // 2. Check if the row is empty
+        const isRowEmpty = (data, type) => {
+            if (type === 'ABYIP') {
+                const fields = ['referenceCode', 'PPA', 'Description', 'expectedResult', 'performanceIndicator', 'period', 'PS', 'MOOE', 'CO', 'total', 'personResponsible'];
+                return fields.every(f => !data[f] || String(data[f]).trim() === '');
+            } else {
+                const fields = ['YDC', 'objective', 'performanceIndicator', 'target1', 'target2', 'target3', 'PPAs', 'budget', 'personResponsible'];
+                return fields.every(f => !data[f] || String(data[f]).trim() === '');
+            }
+        };
+
+        const isEmpty = isRowEmpty(rowData, projType);
+        let auditMessage = '';
+
+        if (isEmpty) {
+            auditMessage = 'User deleted an empty row.';
+        } else {
+            // Priority: PPA/PPAs > First non-empty data > Row Index
+            const ppaValue = projType === 'ABYIP' ? rowData.PPA : rowData.PPAs;
+            if (ppaValue && String(ppaValue).trim()) {
+                auditMessage = `User deleted row: ${ppaValue}`;
+            } else {
+                // Find first non-empty field
+                let firstData = '';
+                const fields = projType === 'ABYIP' 
+                    ? ['referenceCode', 'Description', 'expectedResult', 'performanceIndicator']
+                    : ['YDC', 'objective', 'performanceIndicator'];
+                
+                for (const f of fields) {
+                    if (rowData[f] && String(rowData[f]).trim()) {
+                        firstData = rowData[f];
+                        break;
+                    }
+                }
+
+                if (firstData) {
+                    auditMessage = `User deleted row: ${firstData} (Row #${sheetRowIndex})`;
+                } else {
+                    auditMessage = `User deleted row #${sheetRowIndex}`;
+                }
+            }
+        }
+
+        // 3. Delete the row
+        if (projType === 'ABYIP') {
+            await pool.request()
+                .input('rowID', sql.Int, rowID)
+                .input('batchID', sql.Int, batchID)
+                .query('DELETE FROM projectABYIP WHERE abyipID = @rowID AND projbatchID = @batchID');
+        } else {
+            await pool.request()
+                .input('rowID', sql.Int, rowID)
+                .input('batchID', sql.Int, batchID)
+                .query('DELETE FROM projectCBYDP WHERE cbydpID = @rowID AND projbatchID = @batchID');
+        }
+
+        // 4. Log to Audit Trail
+        await createAuditEntry({
+            pool,
+            batchID,
+            userID: req.user.userID,
+            action: 'DELETE_ROW',
+            oldValue: JSON.stringify(rowData),
+            newValue: auditMessage,
+            center: center
+        });
+
+        // 5. Broadcast real-time update
+        broadcastToRoom(batchID, { type: 'audit_update', batchID });
+
+        res.json({ success: true, message: 'Row deleted successfully.' });
+
+    } catch (error) {
+        console.error('Error deleting row:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
 module.exports = router;
+

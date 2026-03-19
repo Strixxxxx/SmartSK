@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Box } from '@mui/material';
+import { Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 import ProjectWorkspaceSidebar from './ProjectWorkspaceSidebar';
 import ProjectWorkNotes from './ProjectWorkNotes';
 import ProjectTopNavbar from './ProjectTopNavbar';
@@ -52,6 +52,7 @@ const ProjectWorkspacePage: React.FC = () => {
     const [projectListRefreshTrigger, setProjectListRefreshTrigger] = useState(0);
     const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
     const [isRightSidebarCollapsed, setIsRightSidebarCollapsed] = useState(true);
+    const [deleteConfirmation, setDeleteConfirmation] = useState<{ open: boolean; sectionType?: string; onConfirm?: () => void }>({ open: false });
     const { user } = useAuth();
     
     // ── Tab Caching ──────────────────────────────────────────────────────────
@@ -268,6 +269,67 @@ function getAgendaColumnMap(tabName: string): string {
         }
     }, [selectedProject?.batchID, activeTab, projType, rows]);
 
+    // ── Delete row handler ────────────────────────────────────────────────────
+    const handleDeleteRecentRow = useCallback(async (sectionType?: string) => {
+        if (!selectedProject?.batchID) return;
+
+        // 1. Identify the latest row
+        let targetRow: AbyipRow | CbydpRow | undefined;
+        if (projType === 'ABYIP') {
+            const abyipRows = rows as AbyipRow[];
+            if (abyipRows.length === 0) return;
+            const maxIndex = Math.max(0, ...abyipRows.map(r => r.sheetRowIndex || 0));
+            targetRow = abyipRows.find(r => r.sheetRowIndex === maxIndex);
+        } else {
+            const cbydpRows = rows as CbydpRow[];
+            const sectionRows = cbydpRows.filter(r => r.sectionType === (sectionType || 'FROM'));
+            if (sectionRows.length === 0) return;
+            const maxIndex = Math.max(0, ...sectionRows.map(r => r.sheetRowIndex || 0));
+            targetRow = sectionRows.find(r => r.sheetRowIndex === maxIndex);
+        }
+
+        if (!targetRow) return;
+
+        // 2. Check if empty
+        const isRowEmpty = (row: any) => {
+            if (projType === 'ABYIP') {
+                const fields = ['referenceCode', 'PPA', 'Description', 'expectedResult', 'performanceIndicator', 'period', 'PS', 'MOOE', 'CO', 'total', 'personResponsible'];
+                return fields.every(f => !row[f] || String(row[f]).trim() === '');
+            } else {
+                const fields = ['YDC', 'objective', 'performanceIndicator', 'target1', 'target2', 'target3', 'PPAs', 'budget', 'personResponsible'];
+                return fields.every(f => !row[f] || String(row[f]).trim() === '');
+            }
+        };
+
+        const performDelete = async () => {
+            try {
+                await axiosInstance.delete(`/api/project-batch/${selectedProject.batchID}/rows/${targetRow!.rowID}`, {
+                    params: { projType }
+                });
+                
+                // Update UI state
+                const updated = rows.filter(r => (r as any).rowID !== targetRow!.rowID);
+                setRows(updated);
+                dataCache.current[activeTab] = updated;
+                setAuditRefreshTrigger(prev => prev + 1);
+            } catch (err) {
+                console.error('Failed to delete row:', err);
+            } finally {
+                setDeleteConfirmation({ open: false });
+            }
+        };
+
+        if (isRowEmpty(targetRow)) {
+            await performDelete();
+        } else {
+            setDeleteConfirmation({
+                open: true,
+                sectionType,
+                onConfirm: performDelete
+            });
+        }
+    }, [selectedProject?.batchID, projType, rows, activeTab]);
+
     // ── Update Status handler ───────────────────────────────────────────────
     const handleUpdateStatus = async (statusID: number) => {
         if (!selectedProject?.batchID) return;
@@ -376,6 +438,7 @@ function getAgendaColumnMap(tabName: string): string {
                                             rows={rows}
                                             readOnly={isReadOnly}
                                             onAddRow={handleAddRow}
+                                            onDeleteRecentRow={handleDeleteRecentRow}
                                             onCellChange={handleCellChange}
                                             onCellBlur={handleCellBlur}
                                             collaborators={collabMap}
@@ -426,6 +489,37 @@ function getAgendaColumnMap(tabName: string): string {
                     setProjectListRefreshTrigger(prev => prev + 1);
                 }}
             />
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog
+                open={deleteConfirmation.open}
+                onClose={() => setDeleteConfirmation({ open: false })}
+                aria-labelledby="delete-row-dialog-title"
+                aria-describedby="delete-row-dialog-description"
+            >
+                <DialogTitle id="delete-row-dialog-title" sx={{ color: '#d32f2f', fontWeight: 'bold' }}>
+                    Confirm Row Deletion
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="delete-row-dialog-description">
+                        Are you sure to delete this row? It consist of data and it couldnt revert back once it was deleted.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ p: 2, pt: 0 }}>
+                    <Button onClick={() => setDeleteConfirmation({ open: false })} sx={{ color: '#666' }}>
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={deleteConfirmation.onConfirm} 
+                        variant="contained" 
+                        color="error" 
+                        autoFocus
+                        sx={{ bgcolor: '#d32f2f', '&:hover': { bgcolor: '#b71c1c' } }}
+                    >
+                        Delete Permanently
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };
