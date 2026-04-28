@@ -32,6 +32,7 @@ import AccessControl from './components/Client/AccessControl/AccessControl';
 import DashboardAdmin from './components/Admin/Dashboard/DashboardAdmin';
 import AccountManagement from './components/Admin/AccountManagement/AccountManagement';
 import AdminProjects from './components/Admin/Projects/AdminProjects';
+import AdminProjectDetailView from './components/Admin/Projects/AdminProjectDetailView';
 import RawData from './components/Admin/Raw Data/rawdata';
 import AuditTrail from './components/Admin/Audit Trail/audit';
 import SessionLog from './components/Admin/Session Log/sessions';
@@ -135,6 +136,9 @@ const AppRoutes: React.FC = () => {
           <Route path="archive" element={<Archive />} />
           <Route path="backup" element={<Backup />} />
         </Route>
+
+        {/* Full-screen Admin Details Page (Outside Layout to avoid double sidebar) */}
+        <Route path="/admin/projects/:batchID" element={<AdminProjectDetailView />} />
       </Route>
 
       {/* Fallback for any other path */}

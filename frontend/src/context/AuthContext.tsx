@@ -18,6 +18,7 @@ interface UserInfo {
   phoneNumber?: string;
   termID?: number;
   barangay?: string;
+  barangayName?: string;
   role?: string;
   isDefaultPassword?: boolean;
   permissions?: {

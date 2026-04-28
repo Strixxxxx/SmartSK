@@ -241,16 +241,18 @@ router.post('/start-new-term', authMiddleware, async (req, res) => {
         await uploadTextToBlob(registerContainerName, blobName, '[]');
 
         // 4. Create new term record
+        const { termName } = req.body;
         await pool.request()
             .input('barangayID', sql.Int, barangayID)
-            .query("INSERT INTO skTerms (barangayID, officialListJSON, isCurrent) VALUES (@barangayID, '[]', 1)");
+            .input('termName', sql.NVarChar(50), termName || null)
+            .query("INSERT INTO skTerms (barangayID, officialListJSON, isCurrent, termName) VALUES (@barangayID, '[]', 1, @termName)");
 
         addAuditTrail({
             actor: 'A',
             module: 'I',
             userID: req.user.userID,
             actions: 'start-new-term',
-            descriptions: `Admin ${req.user.fullName} ended the previous term and started a new administration term for ${barangayName}.`
+            descriptions: `Admin ${req.user.fullName} ended the previous term and started a new administration term (${termName || 'Unnamed'}) for ${barangayName}.`
         });
 
         res.json({ success: true, message: 'New administration term started successfully.' });
@@ -259,6 +261,27 @@ router.post('/start-new-term', authMiddleware, async (req, res) => {
         res.status(500).json({ success: false, message: 'Failed to start new administration term.' });
     }
 });
+
+/**
+ * GET /term-history
+ * Fetches all previous terms for the admin's barangay.
+ */
+router.get('/term-history', authMiddleware, async (req, res) => {
+    try {
+        const pool = await getConnection();
+        const barangayID = req.user.barangay;
+
+        const result = await pool.request()
+            .input('barangayID', sql.Int, barangayID)
+            .query('SELECT termID, termName, officialListJSON, isLocked, isCurrent, createdAt, lockedAt FROM skTerms WHERE barangayID = @barangayID ORDER BY termID DESC');
+
+        res.json({ success: true, data: result.recordset });
+    } catch (error) {
+        console.error("Error fetching term history:", error);
+        res.status(500).json({ success: false, message: 'Failed to fetch term history.' });
+    }
+});
+
 
 
 // --- Registration Audit Log Endpoints ---

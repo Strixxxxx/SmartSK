@@ -26,6 +26,7 @@ interface DisclosureExplorerProps {
     onSelectView: (view: 'PLAN' | 'DOCUMENT', data?: any) => void;
     activeView: 'PLAN' | 'DOCUMENT';
     activeDocumentId?: string;
+    docEndpoint?: string; // New prop
 }
 
 const DisclosureExplorer: React.FC<DisclosureExplorerProps> = ({
@@ -34,7 +35,8 @@ const DisclosureExplorer: React.FC<DisclosureExplorerProps> = ({
     onToggleCollapse,
     onSelectView,
     activeView,
-    activeDocumentId
+    activeDocumentId,
+    docEndpoint = '/api/disclosures' // Default to public
 }) => {
     const [docsExpanded, setDocsExpanded] = useState(true);
     const [docCategories, setDocCategories] = useState<any>({});
@@ -45,7 +47,7 @@ const DisclosureExplorer: React.FC<DisclosureExplorerProps> = ({
             if (!batchInfo?.batchID) return;
             setLoadingDocs(true);
             try {
-                const response = await axiosInstance.get(`/api/disclosures/${batchInfo.batchID}/documents`);
+                const response = await axiosInstance.get(`${docEndpoint}/${batchInfo.batchID}/documents`);
                 if (response.data.success) {
                     setDocCategories(response.data.data.categories || {});
                 }
@@ -56,7 +58,7 @@ const DisclosureExplorer: React.FC<DisclosureExplorerProps> = ({
             }
         };
         fetchDocs();
-    }, [batchInfo?.batchID]);
+    }, [batchInfo?.batchID, docEndpoint]);
 
     // List of category names from the object keys
     const categoryNames = Object.keys(docCategories);

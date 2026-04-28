@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 
 interface DisclosureTopNavbarProps {
     batchInfo: any;
+    backPath?: string;
 }
 
-const DisclosureTopNavbar: React.FC<DisclosureTopNavbarProps> = ({ batchInfo }) => {
+const DisclosureTopNavbar: React.FC<DisclosureTopNavbarProps> = ({ batchInfo, backPath = '/project-list' }) => {
     const navigate = useNavigate();
 
     return (
@@ -33,7 +34,7 @@ const DisclosureTopNavbar: React.FC<DisclosureTopNavbarProps> = ({ batchInfo }) 
             <Box sx={{ display: 'flex', gap: 1 }}>
                 <IconButton 
                     size="small" 
-                    onClick={() => navigate('/project-list')}
+                    onClick={() => navigate(backPath)}
                     sx={{ bgcolor: '#f1f3f4', '&:hover': { bgcolor: '#e8eaed' } }}
                 >
                     <Close fontSize="small" />

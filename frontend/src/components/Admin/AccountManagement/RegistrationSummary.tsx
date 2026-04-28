@@ -4,7 +4,7 @@ import {
     TextField, CircularProgress, Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, IconButton, Tooltip, Chip
 } from '@mui/material';
-import { Visibility, ArrowBackIosNew, ArrowForwardIos, Edit } from '@mui/icons-material';
+import { Visibility, ArrowBackIosNew, ArrowForwardIos, Edit, History, ExpandMore, ExpandLess } from '@mui/icons-material';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import AuditSummaryModal from './AuditSummaryModal'; // Import the new modal
@@ -74,6 +74,10 @@ const RegistrationSummary: React.FC = () => {
     // Safety Dialogs
     const [isFinalizeDialogOpen, setIsFinalizeDialogOpen] = useState(false);
     const [isNewTermDialogOpen, setIsNewTermDialogOpen] = useState(false);
+    const [isTermHistoryModalOpen, setIsTermHistoryModalOpen] = useState(false);
+    const [termHistory, setTermHistory] = useState<any[]>([]);
+    const [newTermName, setNewTermName] = useState('');
+    const [fetchingHistory, setFetchingHistory] = useState(false);
 
     const fetchInitialData = useCallback(async () => {
         setPageLoading(true);
@@ -169,12 +173,17 @@ const RegistrationSummary: React.FC = () => {
     };
 
     const handleCreateNewTerm = async () => {
+        if (!newTermName.trim()) {
+            toast.error('Please enter the Term of Office.');
+            return;
+        }
         setIsTermLoading(true);
         try {
-            const response = await axiosInstance.post('/api/admin/audit/start-new-term');
+            const response = await axiosInstance.post('/api/admin/audit/start-new-term', { termName: newTermName });
             if (response.data.success) {
                 toast.success('New administration term started successfully!');
                 setIsNewTermDialogOpen(false);
+                setNewTermName('');
                 setIsListModalOpen(false);
                 fetchInitialData();
             } else {
@@ -186,6 +195,26 @@ const RegistrationSummary: React.FC = () => {
         } finally {
             setIsTermLoading(false);
         }
+    };
+
+    const fetchTermHistory = async () => {
+        setFetchingHistory(true);
+        try {
+            const response = await axiosInstance.get('/api/admin/audit/term-history');
+            if (response.data.success) {
+                setTermHistory(response.data.data);
+            }
+        } catch (error) {
+            toast.error('Failed to fetch term history.');
+            console.error('Term history error:', error);
+        } finally {
+            setFetchingHistory(false);
+        }
+    };
+
+    const handleOpenTermHistory = () => {
+        fetchTermHistory();
+        setIsTermHistoryModalOpen(true);
     };
 
     const handleNameChange = (position: string, newName: string) => {
@@ -256,9 +285,18 @@ const RegistrationSummary: React.FC = () => {
                 <Typography variant="h5" component="h3">
                     Registration Audit Report
                 </Typography>
-                <Button variant="contained" onClick={handleOpenListModal}>
-                    Manage SK Official List
-                </Button>
+                <Box sx={{ display: 'flex', gap: 2 }}>
+                    <Button 
+                        variant="outlined" 
+                        startIcon={<History />} 
+                        onClick={handleOpenTermHistory}
+                    >
+                        Term History
+                    </Button>
+                    <Button variant="contained" onClick={handleOpenListModal}>
+                        Manage SK Official List
+                    </Button>
+                </Box>
             </Box>
 
             <TableContainer component={Paper} variant="outlined">
@@ -505,24 +543,169 @@ const RegistrationSummary: React.FC = () => {
             </Dialog>
 
             {/* Create New Term Safety Dialog */}
-            <Dialog open={isNewTermDialogOpen} onClose={() => !isTermLoading && setIsNewTermDialogOpen(false)}>
+            <Dialog open={isNewTermDialogOpen} onClose={() => !isTermLoading && setIsNewTermDialogOpen(false)} fullWidth maxWidth="sm">
                 <DialogTitle sx={{ display: 'flex', alignItems: 'center', color: 'error.main', gap: 1 }}>
                     <Warning /> Start New Administration Term
                 </DialogTitle>
                 <DialogContent>
-                    <Typography>
+                    <Typography sx={{ mb: 2 }}>
                         Are you sure? This will finalize the current term and <strong>automatically archive all 11 active accounts</strong> to prepare for the next administration.
                     </Typography>
+                    <TextField
+                        fullWidth
+                        label="Term of Office (e.g., 2023-2026)"
+                        variant="outlined"
+                        value={newTermName}
+                        onChange={(e) => setNewTermName(e.target.value)}
+                        placeholder="Enter year term"
+                        disabled={isTermLoading}
+                        autoFocus
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setIsNewTermDialogOpen(false)} disabled={isTermLoading}>Cancel</Button>
-                    <Button onClick={handleCreateNewTerm} color="error" variant="contained" disabled={isTermLoading}>
+                    <Button 
+                        onClick={handleCreateNewTerm} 
+                        color="error" 
+                        variant="contained" 
+                        disabled={isTermLoading || !newTermName.trim()}
+                    >
                         {isTermLoading ? <CircularProgress size={24} color="inherit" /> : 'Yes, Start New Term'}
                     </Button>
                 </DialogActions>
             </Dialog>
 
+            {/* Term History Modal */}
+            <TermHistoryDialog 
+                open={isTermHistoryModalOpen} 
+                onClose={() => setIsTermHistoryModalOpen(false)} 
+                history={termHistory}
+                loading={fetchingHistory}
+            />
+
         </Paper>
+    );
+};
+
+/**
+ * Helper component for each row in the Term History table
+ */
+const TermHistoryRow: React.FC<{ term: any }> = ({ term }) => {
+    const [open, setOpen] = useState(false);
+    let officials: OfficialMember[] = [];
+    try {
+        officials = JSON.parse(term.officialListJSON || '[]');
+    } catch (e) {
+        console.error("Error parsing term officials:", e);
+    }
+
+    return (
+        <>
+            <TableRow hover>
+                <TableCell>
+                    <IconButton size="small" onClick={() => setOpen(!open)}>
+                        {open ? <ExpandLess /> : <ExpandMore />}
+                    </IconButton>
+                </TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>{term.termName || 'Unnamed Term'}</TableCell>
+                <TableCell>
+                    <Chip 
+                        label={term.isCurrent ? 'Current' : 'Previous'} 
+                        color={term.isCurrent ? 'primary' : 'default'} 
+                        size="small" 
+                    />
+                </TableCell>
+                <TableCell>{new Date(term.createdAt).toLocaleDateString()}</TableCell>
+                <TableCell>{term.lockedAt ? new Date(term.lockedAt).toLocaleDateString() : 'Active'}</TableCell>
+            </TableRow>
+            <TableRow>
+                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+                    <Box sx={{ margin: 1, display: open ? 'block' : 'none' }}>
+                        <Typography variant="subtitle2" gutterBottom component="div" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+                            SK Officials List
+                        </Typography>
+                        <Table size="small">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>Position</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>Full Name</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {officials.length > 0 ? officials.map((off) => (
+                                    <TableRow key={off.position}>
+                                        <TableCell sx={{ color: 'text.secondary', width: '40%' }}>
+                                            {POSITION_MAPPING[off.position] || off.position}
+                                        </TableCell>
+                                        <TableCell sx={{ fontWeight: 500 }}>
+                                            {off.fullName || <span style={{ fontStyle: 'italic', color: '#ccc' }}>Not set</span>}
+                                        </TableCell>
+                                    </TableRow>
+                                )) : (
+                                    <TableRow>
+                                        <TableCell colSpan={2} align="center" sx={{ fontStyle: 'italic', color: 'text.disabled' }}>
+                                            No officials recorded for this term.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </Box>
+                </TableCell>
+            </TableRow>
+        </>
+    );
+};
+
+/**
+ * Dialog component for viewing Term History
+ */
+const TermHistoryDialog: React.FC<{ open: boolean; onClose: () => void; history: any[]; loading: boolean }> = ({ open, onClose, history, loading }) => {
+    return (
+        <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+            <DialogTitle sx={{ borderBottom: '1px solid #eee', bgcolor: '#f9f9f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <History color="primary" />
+                    Term History
+                </Box>
+                <IconButton onClick={onClose} size="small">
+                    <Cancel />
+                </IconButton>
+            </DialogTitle>
+            <DialogContent sx={{ p: 0 }}>
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                        <CircularProgress />
+                    </Box>
+                ) : history.length === 0 ? (
+                    <Box sx={{ p: 4, textAlign: 'center' }}>
+                        <Typography color="text.secondary">No previous administration terms found.</Typography>
+                    </Box>
+                ) : (
+                    <TableContainer sx={{ maxHeight: 600 }}>
+                        <Table stickyHeader>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell sx={{ width: 50 }} />
+                                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Term Name</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Status</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Created At</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Finalized At</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {history.map((term) => (
+                                    <TermHistoryRow key={term.termID} term={term} />
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                )}
+            </DialogContent>
+            <DialogActions sx={{ p: 2, borderTop: '1px solid #eee' }}>
+                <Button onClick={onClose} variant="outlined">Close</Button>
+            </DialogActions>
+        </Dialog>
     );
 };
 

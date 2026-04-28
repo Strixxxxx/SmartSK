@@ -140,4 +140,38 @@ router.get('/file-url/:projectID', authMiddleware, async (req, res) => {
     }
 });
 
+// POST to archive a project batch
+router.post('/batch/:batchID', authMiddleware, async (req, res) => {
+    const { batchID } = req.params;
+    try {
+        const pool = await getConnection();
+        const request = pool.request();
+        request.input('batchID', sql.Int, batchID);
+
+        const batchToArchive = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query('SELECT projName FROM projectBatch WHERE batchID = @batchID');
+
+        if (batchToArchive.recordset.length === 0) {
+            return res.status(404).json({ success: false, message: 'Project batch not found.' });
+        }
+        const { projName } = batchToArchive.recordset[0];
+
+        await request.query('UPDATE projectBatch SET isArchived = 1 WHERE batchID = @batchID');
+
+        addAuditTrail({
+            actor: 'A',
+            module: 'D',
+            userID: req.user.userId,
+            actions: 'archive-batch',
+            descriptions: `Admin ${req.user.fullName} archived project batch: ${projName}`
+        });
+
+        res.json({ success: true, message: 'Project batch archived successfully.' });
+    } catch (error) {
+        console.error(`Error archiving project batch ${batchID}:`, error);
+        res.status(500).json({ success: false, message: 'Failed to archive project batch.' });
+    }
+});
+
 module.exports = router;
