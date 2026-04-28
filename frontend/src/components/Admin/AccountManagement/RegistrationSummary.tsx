@@ -70,7 +70,7 @@ const RegistrationSummary: React.FC = () => {
     const [approvedCount, setApprovedCount] = useState<number>(0);
     const [isFinalized, setIsFinalized] = useState<boolean>(false);
     const [isTermLoading, setIsTermLoading] = useState(false);
-    
+
     // Safety Dialogs
     const [isFinalizeDialogOpen, setIsFinalizeDialogOpen] = useState(false);
     const [isNewTermDialogOpen, setIsNewTermDialogOpen] = useState(false);
@@ -286,9 +286,9 @@ const RegistrationSummary: React.FC = () => {
                     Registration Audit Report
                 </Typography>
                 <Box sx={{ display: 'flex', gap: 2 }}>
-                    <Button 
-                        variant="outlined" 
-                        startIcon={<History />} 
+                    <Button
+                        variant="outlined"
+                        startIcon={<History />}
                         onClick={handleOpenTermHistory}
                     >
                         Term History
@@ -382,9 +382,9 @@ const RegistrationSummary: React.FC = () => {
                         <Typography variant="body2" sx={{ color: 'text.secondary', fontWeight: 500 }}>
                             Enter the full names of all official SK members. This list will be used by the AI for verification.
                         </Typography>
-                        <Button 
-                            variant="outlined" 
-                            color="warning" 
+                        <Button
+                            variant="outlined"
+                            color="warning"
                             startIcon={<Autorenew />}
                             onClick={() => setIsNewTermDialogOpen(true)}
                             disabled={approvedCount < 11}
@@ -435,9 +435,9 @@ const RegistrationSummary: React.FC = () => {
                 </DialogContent>
                 <DialogActions sx={{ p: 3, borderTop: '1px solid #eee', bgcolor: '#f9f9f9', justifyContent: 'flex-end' }}>
                     {!isEditMode && (
-                        <Button 
-                            variant="contained" 
-                            color="success" 
+                        <Button
+                            variant="contained"
+                            color="success"
                             startIcon={<CheckCircle />}
                             onClick={() => setIsFinalizeDialogOpen(true)}
                             disabled={isFinalized || officialsList.some(o => !o.fullName.trim())}
@@ -564,10 +564,10 @@ const RegistrationSummary: React.FC = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setIsNewTermDialogOpen(false)} disabled={isTermLoading}>Cancel</Button>
-                    <Button 
-                        onClick={handleCreateNewTerm} 
-                        color="error" 
-                        variant="contained" 
+                    <Button
+                        onClick={handleCreateNewTerm}
+                        color="error"
+                        variant="contained"
                         disabled={isTermLoading || !newTermName.trim()}
                     >
                         {isTermLoading ? <CircularProgress size={24} color="inherit" /> : 'Yes, Start New Term'}
@@ -576,9 +576,9 @@ const RegistrationSummary: React.FC = () => {
             </Dialog>
 
             {/* Term History Modal */}
-            <TermHistoryDialog 
-                open={isTermHistoryModalOpen} 
-                onClose={() => setIsTermHistoryModalOpen(false)} 
+            <TermHistoryDialog
+                open={isTermHistoryModalOpen}
+                onClose={() => setIsTermHistoryModalOpen(false)}
                 history={termHistory}
                 loading={fetchingHistory}
             />
@@ -609,10 +609,10 @@ const TermHistoryRow: React.FC<{ term: any }> = ({ term }) => {
                 </TableCell>
                 <TableCell sx={{ fontWeight: 'bold' }}>{term.termName || 'Unnamed Term'}</TableCell>
                 <TableCell>
-                    <Chip 
-                        label={term.isCurrent ? 'Current' : 'Previous'} 
-                        color={term.isCurrent ? 'primary' : 'default'} 
-                        size="small" 
+                    <Chip
+                        label={term.isCurrent ? 'Current' : 'Previous'}
+                        color={term.isCurrent ? 'primary' : 'default'}
+                        size="small"
                     />
                 </TableCell>
                 <TableCell>{new Date(term.createdAt).toLocaleDateString()}</TableCell>
@@ -686,11 +686,11 @@ const TermHistoryDialog: React.FC<{ open: boolean; onClose: () => void; history:
                         <Table stickyHeader>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell sx={{ width: 50 }} />
-                                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Term Name</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Status</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Created At</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5' }}>Finalized At</TableCell>
+                                    <TableCell sx={{ width: 50, bgcolor: '#f5f5f5', borderBottom: '1px solid #e0e0e0' }} />
+                                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderBottom: '1px solid #e0e0e0' }}>Term of Office</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderBottom: '1px solid #e0e0e0' }}>Status</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderBottom: '1px solid #e0e0e0' }}>Created At</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold', bgcolor: '#f5f5f5', borderBottom: '1px solid #e0e0e0' }}>Finalized At</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
