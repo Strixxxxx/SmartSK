@@ -17,17 +17,18 @@ router.get('/:batchID', async (req, res) => {
             .input('batchID', sql.Int, batchID)
             .query(`
                 SELECT n.noteID, n.batchID, n.userID, n.content, n.createdAt,
-                       u.fullName, r.roleName AS position
+                       COALESCE(u.fullName, '') as fullName, 
+                       COALESCE(r.roleName, 'Automated System') AS position
                 FROM projectNotes n
-                JOIN userInfo u ON n.userID = u.userID
-                JOIN roles r ON u.position = r.roleID
+                LEFT JOIN userInfo u ON n.userID = u.userID
+                LEFT JOIN roles r ON u.position = r.roleID
                 WHERE n.batchID = @batchID
                 ORDER BY n.createdAt ASC
             `);
 
         const decryptedData = result.recordset.map(row => ({
             ...row,
-            fullName: decrypt(row.fullName) || 'Unknown'
+            fullName: row.userID ? (decrypt(row.fullName) || 'Unknown') : 'SmartSK System'
         }));
 
         res.json({ success: true, data: decryptedData });

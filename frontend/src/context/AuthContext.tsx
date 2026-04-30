@@ -25,6 +25,7 @@ interface UserInfo {
     templateControl: boolean;
     trackerControl: boolean;
     docsControl: boolean;
+    budgetControl: boolean;
   };
 }
 

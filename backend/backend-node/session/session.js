@@ -131,7 +131,7 @@ const authMiddleware = async (req, res, next) => {
       .input('sessionID', sql.VarChar, decoded.sessionID)
       .query(`
         SELECT u.userID, u.username, u.fullName, r.roleName as position, u.isDefaultPassword, u.barangay, b.barangayName, u.emailAddress, u.phoneNumber, u.termID,
-               ac.templateControl, ac.trackerControl, ac.docsControl
+               ac.templateControl, ac.trackerControl, ac.docsControl, ac.budgetControl
         FROM sessions s
         JOIN userInfo u ON s.userID = u.userID
         LEFT JOIN roles r ON u.position = r.roleID
@@ -168,7 +168,8 @@ const authMiddleware = async (req, res, next) => {
         permissions: {
           templateControl: Boolean(user.templateControl),
           trackerControl: Boolean(user.trackerControl),
-          docsControl: Boolean(user.docsControl)
+          docsControl: Boolean(user.docsControl),
+          budgetControl: Boolean(user.budgetControl)
         }
       };
 

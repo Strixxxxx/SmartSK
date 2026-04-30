@@ -59,7 +59,7 @@ router.post('/', async (req, res) => {
 
     const result = await request.query(`
         SELECT u.userID, u.username, u.passKey, u.fullName, r.roleName as position, u.barangay as barangayID, b.barangayName as barangayName, u.isDefaultPassword, u.isArchived,
-               ac.templateControl, ac.trackerControl, ac.docsControl
+               ac.templateControl, ac.trackerControl, ac.docsControl, ac.budgetControl
         FROM userInfo u
         LEFT JOIN roles r ON u.position = r.roleID
         LEFT JOIN barangays b ON u.barangay = b.barangayID
@@ -115,7 +115,8 @@ router.post('/', async (req, res) => {
         permissions: {
           templateControl: Boolean(user.templateControl),
           trackerControl: Boolean(user.trackerControl),
-          docsControl: Boolean(user.docsControl)
+          docsControl: Boolean(user.docsControl),
+          budgetControl: Boolean(user.budgetControl)
         }
       }
     });

@@ -27,7 +27,8 @@ router.get('/', async (req, res) => {
           r.roleName as position,
           ISNULL(ac.templateControl, 0) as templateControl,
           ISNULL(ac.trackerControl, 0) as trackerControl,
-          ISNULL(ac.docsControl, 0) as docsControl
+          ISNULL(ac.docsControl, 0) as docsControl,
+          ISNULL(ac.budgetControl, 0) as budgetControl
         FROM userInfo u
         LEFT JOIN roles r ON u.position = r.roleID
         LEFT JOIN accessControl ac ON u.userID = ac.userID
@@ -51,7 +52,8 @@ router.get('/', async (req, res) => {
         fullName: decodedFullName,
         templateControl: Boolean(user.templateControl),
         trackerControl: Boolean(user.trackerControl),
-        docsControl: Boolean(user.docsControl)
+        docsControl: Boolean(user.docsControl),
+        budgetControl: Boolean(user.budgetControl)
       };
     });
 
@@ -69,7 +71,7 @@ router.get('/', async (req, res) => {
 // Update access control settings for a user
 router.post('/update', async (req, res) => {
   try {
-    const { targetUserID, templateControl, trackerControl, docsControl } = req.body;
+    const { targetUserID, templateControl, trackerControl, docsControl, budgetControl } = req.body;
     const userBarangay = req.user.barangay;
     const termID = req.user.termID;
 
@@ -111,9 +113,10 @@ router.post('/update', async (req, res) => {
         .input('templateControl', sql.Bit, templateControl ? 1 : 0)
         .input('trackerControl', sql.Bit, trackerControl ? 1 : 0)
         .input('docsControl', sql.Bit, docsControl ? 1 : 0)
+        .input('budgetControl', sql.Bit, budgetControl ? 1 : 0)
         .query(`
           UPDATE accessControl 
-          SET templateControl = @templateControl, trackerControl = @trackerControl, docsControl = @docsControl
+          SET templateControl = @templateControl, trackerControl = @trackerControl, docsControl = @docsControl, budgetControl = @budgetControl
           WHERE userID = @userID
         `);
     } else {
@@ -123,9 +126,10 @@ router.post('/update', async (req, res) => {
         .input('templateControl', sql.Bit, templateControl ? 1 : 0)
         .input('trackerControl', sql.Bit, trackerControl ? 1 : 0)
         .input('docsControl', sql.Bit, docsControl ? 1 : 0)
+        .input('budgetControl', sql.Bit, budgetControl ? 1 : 0)
         .query(`
-          INSERT INTO accessControl (userID, templateControl, trackerControl, docsControl)
-          VALUES (@userID, @templateControl, @trackerControl, @docsControl)
+          INSERT INTO accessControl (userID, templateControl, trackerControl, docsControl, budgetControl)
+          VALUES (@userID, @templateControl, @trackerControl, @docsControl, @budgetControl)
         `);
     }
 
@@ -135,7 +139,7 @@ router.post('/update', async (req, res) => {
       module: 'A', // Access Control
       userID: req.user.userID,
       actions: 'update-access',
-      descriptions: `SKC ${req.user.fullName} updated access controls for ${decodedFullName}. Template: ${templateControl}, Tracker: ${trackerControl}, Docs: ${docsControl}`
+      descriptions: `SKC ${req.user.fullName} updated access controls for ${decodedFullName}. Template: ${templateControl}, Tracker: ${trackerControl}, Docs: ${docsControl}, Budget: ${budgetControl}`
     });
 
     return res.json({ success: true, message: 'Access control updated successfully.' });

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, TextField, Button, Paper, Divider, IconButton, Tooltip } from '@mui/material';
 import { PushPin, NoteAlt, Menu as MenuIcon } from '@mui/icons-material';
 import axiosInstance from '../../../backend connection/axiosConfig';
+import { formatRoleName } from '../../../utils/roleUtils';
 
 interface NoteItem {
     noteID: number;
@@ -18,11 +19,12 @@ interface ProjectWorkNotesProps {
     onPostNote?: (note: NoteItem) => void;
     remoteNotes?: NoteItem[];
     center?: string | null;
+    refreshTrigger?: number;
     isCollapsed?: boolean;
     onToggleCollapse?: () => void;
 }
 
-const ProjectWorkNotes: React.FC<ProjectWorkNotesProps> = ({ project, onPostNote, remoteNotes, center, isCollapsed = false, onToggleCollapse }) => {
+const ProjectWorkNotes: React.FC<ProjectWorkNotesProps> = ({ project, onPostNote, remoteNotes, center, refreshTrigger = 0, isCollapsed = false, onToggleCollapse }) => {
     const [notes, setNotes] = useState<NoteItem[]>([]);
     const [input, setInput] = useState('');
     const [isPosting, setIsPosting] = useState(false);
@@ -45,7 +47,7 @@ const ProjectWorkNotes: React.FC<ProjectWorkNotesProps> = ({ project, onPostNote
             }
         };
         fetchNotes();
-    }, [project?.batchID, center]);
+    }, [project?.batchID, center, refreshTrigger]);
 
     // Append remote notes received via WebSocket
     useEffect(() => {
@@ -210,7 +212,7 @@ const ProjectWorkNotes: React.FC<ProjectWorkNotesProps> = ({ project, onPostNote
                                     <Typography variant="caption" fontWeight={700} sx={{ color: '#5a4e2f' }}>
                                         {note.fullName}
                                         <Typography component="span" variant="caption" sx={{ color: '#8c7b44', ml: 0.5 }}>
-                                            ({note.position})
+                                            ({formatRoleName(note.position)})
                                         </Typography>
                                     </Typography>
                                 </Box>

@@ -112,7 +112,11 @@ class TemplateService {
      * Primary logic for creating a new project batch and template
      */
     async initializeNewProject(data) {
-        const { barangayID, projType, targetYear, budget, userID, termID, governance_pct, active_citizenship_pct, economic_empowerment_pct, global_mobility_pct, agriculture_pct, environment_pct, PBS_pct, SIE_pct, education_pct, health_pct, GAP_pct, MOOE_pct } = data;
+        const { 
+            barangayID, projType, targetYear, budget, userID, termID, 
+            governance_pct, active_citizenship_pct, economic_empowerment_pct, global_mobility_pct, agriculture_pct, environment_pct, PBS_pct, SIE_pct, education_pct, health_pct, GAP_pct, MOOE_pct,
+            governance_amount, active_citizenship_amount, economic_empowerment_amount, global_mobility_amount, agriculture_amount, environment_amount, PBS_amount, SIE_amount, education_amount, health_amount, GAP_amount, MOOE_amount
+        } = data;
 
         try {
             const pool = await getConnection();
@@ -142,6 +146,18 @@ class TemplateService {
                 .input('GAP_pct', sql.Decimal(5, 2), GAP_pct || 0)
                 .input('MOOE_pct', sql.Decimal(5, 2), MOOE_pct || 0)
                 .input('termID', sql.Int, termID)
+                .input('governance_amount', sql.Decimal(18, 2), governance_amount || 0)
+                .input('active_citizenship_amount', sql.Decimal(18, 2), active_citizenship_amount || 0)
+                .input('economic_empowerment_amount', sql.Decimal(18, 2), economic_empowerment_amount || 0)
+                .input('global_mobility_amount', sql.Decimal(18, 2), global_mobility_amount || 0)
+                .input('agriculture_amount', sql.Decimal(18, 2), agriculture_amount || 0)
+                .input('environment_amount', sql.Decimal(18, 2), environment_amount || 0)
+                .input('PBS_amount', sql.Decimal(18, 2), PBS_amount || 0)
+                .input('SIE_amount', sql.Decimal(18, 2), SIE_amount || 0)
+                .input('education_amount', sql.Decimal(18, 2), education_amount || 0)
+                .input('health_amount', sql.Decimal(18, 2), health_amount || 0)
+                .input('GAP_amount', sql.Decimal(18, 2), GAP_amount || 0)
+                .input('MOOE_amount', sql.Decimal(18, 2), MOOE_amount || 0)
                 .execute('sp_InitializeProjectBatch');
 
             const batchID = result.recordset[0].batchID;

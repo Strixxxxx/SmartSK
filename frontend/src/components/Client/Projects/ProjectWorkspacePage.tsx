@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
+import { Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Alert, Typography } from '@mui/material';
 import ProjectWorkspaceSidebar from './ProjectWorkspaceSidebar';
 import ProjectWorkNotes from './ProjectWorkNotes';
 import ProjectTopNavbar from './ProjectTopNavbar';
 import CreateProjectModal from './CreateProjectModal';
+import BudgetAdjustmentModal from './BudgetAdjustmentModal';
 import ProjectTemplateHeader from './ProjectTemplateHeader';
 import ProjectTemplateTable from './ProjectTemplateTable';
 import { AbyipRow, CbydpRow } from './ProjectTemplateTypes';
@@ -97,10 +98,35 @@ function getAgendaColumnMap(tabName: string): string {
         setAuditRefreshTrigger(prev => prev + 1);
     }, []);
 
+    // ── Budget Monitoring ──────────────────────────────────────────────────
+    const [budgetSummary, setBudgetSummary] = useState<any>(null);
+    const [isBudgetModalOpen, setIsBudgetModalOpen] = useState(false);
+
+    const canAdjustBudget = user?.role === 'SKC' || 
+                            user?.position?.toLowerCase().includes('chairperson') ||
+                            user?.permissions?.budgetControl;
+
+    const fetchBudgetSummary = useCallback(async () => {
+        if (!selectedProject?.batchID || projType !== 'ABYIP') return;
+        try {
+            const res = await axiosInstance.get(`/api/project-batch/${selectedProject.batchID}/budget-summary?center=${encodeURIComponent(activeTab)}`);
+            if (res.data.success) {
+                setBudgetSummary(res.data.data);
+            }
+        } catch (err) {
+            console.error('Failed to fetch budget summary:', err);
+        }
+    }, [selectedProject?.batchID, projType, activeTab]);
+
+    useEffect(() => {
+        fetchBudgetSummary();
+    }, [fetchBudgetSummary, auditRefreshTrigger]);
+
     // Clear cache when project matches change
     useEffect(() => {
         dataCache.current = {};
         setAgendaData({});
+        setBudgetSummary(null);
     }, [selectedProject?.batchID]);
 
     // ── Load rows on project/tab change (TAB CACHE + SKELETON) ───────────────
@@ -217,7 +243,22 @@ function getAgendaColumnMap(tabName: string): string {
     const handleCellChange = useCallback((rowID: number, field: string, value: string) => {
         // 1. Optimistic update (Immediate UI feedback)
         setRows((prev) => {
-            const updated = prev.map((r) => (r as any).rowID === rowID ? { ...r, [field]: value } : r);
+            const updated = prev.map((r) => {
+                if ((r as any).rowID === rowID) {
+                    const updatedRow = { ...r, [field]: value };
+                    
+                    // ABYIP: Auto-calculate total for instant feedback
+                    if (projType === 'ABYIP' && ['PS', 'MOOE', 'CO'].includes(field)) {
+                        const ps = parseFloat(String(field === 'PS' ? value : (r as any).PS || 0)) || 0;
+                        const mooe = parseFloat(String(field === 'MOOE' ? value : (r as any).MOOE || 0)) || 0;
+                        const co = parseFloat(String(field === 'CO' ? value : (r as any).CO || 0)) || 0;
+                        (updatedRow as any).total = (ps + mooe + co).toFixed(2);
+                    }
+                    
+                    return updatedRow;
+                }
+                return r;
+            });
             dataCache.current[activeTab] = updated; // Update cache
             return updated;
         });
@@ -393,6 +434,7 @@ function getAgendaColumnMap(tabName: string): string {
                 onSelectProject={(proj) => {
                     setSelectedProject(proj);
                     setRows([]);
+                    setRemoteNotes([]);
                     setActiveTab(CATEGORIES[0]);
                     dataCache.current = {};
                 }}
@@ -415,7 +457,53 @@ function getAgendaColumnMap(tabName: string): string {
                     currentUser={user}
                     onCreateNew={() => setIsModalOpen(true)}
                     onUpdateStatus={handleUpdateStatus}
+                    onAdjustBudget={() => setIsBudgetModalOpen(true)}
+                    canAdjustBudget={canAdjustBudget}
                 />
+
+                {/* Real-time Budget Alert */}
+                {projType === 'ABYIP' && budgetSummary && (
+                    <Alert 
+                        severity={budgetSummary.percentUsed >= 100 ? 'error' : (budgetSummary.percentUsed >= 80 ? 'warning' : 'info')}
+                        variant="filled"
+                        sx={{ 
+                            borderRadius: 0, 
+                            fontWeight: 'bold', 
+                            px: 3,
+                            bgcolor: budgetSummary.percentUsed < 80 ? '#2c3e50' : undefined 
+                        }}
+                        action={
+                            canAdjustBudget && (
+                                <Button color="inherit" size="small" variant="outlined" onClick={() => setIsBudgetModalOpen(true)}>
+                                    ADJUST ALLOCATION
+                                </Button>
+                            )
+                        }
+                    >
+                        <Box sx={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+                            <Box>
+                                <Typography variant="caption" sx={{ opacity: 0.8, display: 'block', lineHeight: 1, mb: 0.5 }}>BATCH UTILIZATION</Typography>
+                                <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                    {budgetSummary.percentUsed >= 100 
+                                        ? `CRITICAL: ₱${Math.abs(budgetSummary.remainingBudget).toLocaleString('en-PH', { minimumFractionDigits: 2 })} OVER BUDGET`
+                                        : `${budgetSummary.percentUsed.toFixed(1)}% Used (₱${budgetSummary.remainingBudget.toLocaleString('en-PH', { minimumFractionDigits: 2 })} left)`
+                                    }
+                                </Typography>
+                            </Box>
+                            
+                            {budgetSummary.categorySummary && (
+                                <Box sx={{ borderLeft: '1px solid rgba(255,255,255,0.3)', pl: 4 }}>
+                                    <Typography variant="caption" sx={{ opacity: 0.8, display: 'block', lineHeight: 1, mb: 0.5 }}>
+                                        {budgetSummary.categorySummary.center.toUpperCase()} ALLOCATION
+                                    </Typography>
+                                    <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
+                                        ₱{budgetSummary.categorySummary.used.toLocaleString('en-PH', { minimumFractionDigits: 2 })} of ₱{budgetSummary.categorySummary.allocated.toLocaleString('en-PH', { minimumFractionDigits: 2 })} ({budgetSummary.categorySummary.percentUsed.toFixed(1)}%)
+                                    </Typography>
+                                </Box>
+                            )}
+                        </Box>
+                    </Alert>
+                )}
 
                 {/* Main Row */}
                 <Box sx={{ display: 'flex', flexGrow: 1, overflow: 'hidden' }}>
@@ -483,6 +571,7 @@ function getAgendaColumnMap(tabName: string): string {
                             remoteNotes={remoteNotes}
                             onPostNote={(note) => sendNote(note)}
                             center={activeTab}
+                            refreshTrigger={auditRefreshTrigger}
                             isCollapsed={isRightSidebarCollapsed}
                             onToggleCollapse={() => setIsRightSidebarCollapsed(prev => !prev)}
                         />
@@ -530,6 +619,18 @@ function getAgendaColumnMap(tabName: string): string {
                     </Button>
                 </DialogActions>
             </Dialog>
+
+            {/* Budget Adjustment Modal */}
+            {selectedProject && (
+                <BudgetAdjustmentModal
+                    open={isBudgetModalOpen}
+                    onClose={() => setIsBudgetModalOpen(false)}
+                    batchID={selectedProject.batchID}
+                    onAdjusted={() => {
+                        setAuditRefreshTrigger(prev => prev + 1);
+                    }}
+                />
+            )}
         </Box>
     );
 };

@@ -31,7 +31,7 @@ const ABYIP_COLS = [
     { key: 'PS', label: 'PS', width: '6%', budget: true },
     { key: 'MOOE', label: 'MOOE', width: '6%', budget: true },
     { key: 'CO', label: 'CO', width: '6%', budget: true },
-    { key: 'total', label: 'Total', width: '6%', budget: true },
+    { key: 'total', label: 'Total', width: '6%', budget: true, readOnly: true },
     { key: 'personResponsible', label: 'Person Responsible', width: '8%' },
 ];
 

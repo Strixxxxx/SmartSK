@@ -32,18 +32,18 @@ const ABYIP_STEPS = ['Select Template', 'Configuration', 'Percentage Allocation'
 const CBYDP_STEPS = ['Select Template', 'Configuration'];
 
 const THEMATIC_AREAS = [
-    { key: 'governance_pct', label: 'Governance' },
-    { key: 'active_citizenship_pct', label: 'Active Citizenship' },
-    { key: 'economic_empowerment_pct', label: 'Economic Empowerment' },
-    { key: 'global_mobility_pct', label: 'Global Mobility' },
-    { key: 'agriculture_pct', label: 'Agriculture' },
-    { key: 'environment_pct', label: 'Environment' },
-    { key: 'PBS_pct', label: 'Peace Building & Security' },
-    { key: 'SIE_pct', label: 'Social Inclusion & Equity' },
-    { key: 'education_pct', label: 'Education' },
-    { key: 'health_pct', label: 'Health' },
-    { key: 'GAP_pct', label: 'General Administration Program' },
-    { key: 'MOOE_pct', label: 'Maintenance and Other Operating Expenses' },
+    { key: 'governance', label: 'Governance' },
+    { key: 'active_citizenship', label: 'Active Citizenship' },
+    { key: 'economic_empowerment', label: 'Economic Empowerment' },
+    { key: 'global_mobility', label: 'Global Mobility' },
+    { key: 'agriculture', label: 'Agriculture' },
+    { key: 'environment', label: 'Environment' },
+    { key: 'PBS', label: 'Peace Building & Security' },
+    { key: 'SIE', label: 'Social Inclusion & Equity' },
+    { key: 'education', label: 'Education' },
+    { key: 'health', label: 'Health' },
+    { key: 'GAP', label: 'General Administration Program' },
+    { key: 'MOOE', label: 'Maintenance and Other Operating Expenses' },
 ];
 
 const formatCurrency = (value: number): string => {
@@ -64,15 +64,20 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
         yearStart: '',
         yearEnd: '',
         budget: 0,
-        ...THEMATIC_AREAS.reduce((acc, area) => ({ ...acc, [area.key]: 0 }), {}),
+        // Store both pct and amount
+        ...THEMATIC_AREAS.reduce((acc, area) => ({ 
+            ...acc, 
+            [`${area.key}_pct`]: 0,
+            [`${area.key}_amount`]: 0 
+        }), {}),
     });
 
     const handleNext = () => setActiveStep((prev) => prev + 1);
     const handleBack = () => setActiveStep((prev) => prev - 1);
 
-    const calculateTotalPct = (): number => {
+    const calculateTotalAmount = (): number => {
         return parseFloat(
-            THEMATIC_AREAS.reduce((acc, area) => acc + (formData as any)[area.key], 0).toFixed(2)
+            THEMATIC_AREAS.reduce((acc, area) => acc + (formData as any)[`${area.key}_amount`], 0).toFixed(2)
         );
     };
 
@@ -101,8 +106,14 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
 
     const handleSliderChange = (key: string, pct: number) => {
         const intPct = Math.round(pct);
-        setFormData((prev) => ({ ...prev, [key]: intPct }));
-        const amount = formData.budget > 0 ? (intPct / 100) * formData.budget : 0;
+        const amount = formData.budget > 0 ? parseFloat(((intPct / 100) * formData.budget).toFixed(2)) : 0;
+        
+        setFormData((prev) => ({ 
+            ...prev, 
+            [`${key}_pct`]: intPct,
+            [`${key}_amount`]: amount
+        }));
+        
         setAmountDisplays((prev) => ({ ...prev, [key]: amount > 0 ? formatCurrency(amount) : '' }));
     };
 
@@ -115,11 +126,16 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
 
         const amount = parseFloat(stripped) || 0;
         const pct = formData.budget > 0 ? parseFloat(((amount / formData.budget) * 100).toFixed(2)) : 0;
-        setFormData((prev) => ({ ...prev, [key]: Math.min(pct, 100) }));
+        
+        setFormData((prev) => ({ 
+            ...prev, 
+            [`${key}_pct`]: Math.min(pct, 100),
+            [`${key}_amount`]: amount
+        }));
     };
 
-    const handleAmountBlur = (key: string, pct: number) => {
-        const amount = formData.budget > 0 ? (pct / 100) * formData.budget : 0;
+    const handleAmountBlur = (key: string) => {
+        const amount = (formData as any)[`${key}_amount`];
         setAmountDisplays((prev) => ({ ...prev, [key]: amount > 0 ? formatCurrency(amount) : '' }));
     };
 
@@ -129,7 +145,14 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                 projType: formData.projType,
                 targetYear: formData.projType === 'ABYIP' ? formData.targetYear : `${formData.yearStart}-${formData.yearEnd}`,
                 budget: formData.projType === 'ABYIP' ? formData.budget : 0,
-                ...THEMATIC_AREAS.reduce((acc, area) => ({ ...acc, [area.key]: formData.projType === 'ABYIP' ? (formData as any)[area.key] : 0 }), {}),
+                ...THEMATIC_AREAS.reduce((acc, area) => {
+                    const isABYIP = formData.projType === 'ABYIP';
+                    return { 
+                        ...acc, 
+                        [`${area.key}_pct`]: isABYIP ? (formData as any)[`${area.key}_pct`] : 0,
+                        [`${area.key}_amount`]: isABYIP ? (formData as any)[`${area.key}_amount`] : 0
+                    };
+                }, {}),
             };
 
             const response = await axios.post('/api/project-batch/initialize', payload);
@@ -245,23 +268,29 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                     </Box>
                 );
             case 2: {
-                const total = calculateTotalPct();
+                const totalAmount = calculateTotalAmount();
+                const totalBudget = formData.budget;
                 return (
                     <Box sx={{ mt: 3 }}>
                         <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <Typography variant="h6">Thematic Split</Typography>
-                            <Typography
-                                variant="h6"
-                                color={total > 100 ? 'error' : 'primary'}
-                                sx={{ fontWeight: 'bold' }}
-                            >
-                                Total: {Number.isInteger(total) ? `${total}%` : `${total.toFixed(2)}%`}
-                            </Typography>
+                            <Box sx={{ textAlign: 'right' }}>
+                                <Typography
+                                    variant="h6"
+                                    color={totalAmount > totalBudget + 0.01 ? 'error' : 'primary'}
+                                    sx={{ fontWeight: 'bold' }}
+                                >
+                                    Allocated: ₱{totalAmount.toLocaleString('en-PH', { minimumFractionDigits: 2 })}
+                                </Typography>
+                                <Typography variant="caption" color={totalAmount > totalBudget + 0.01 ? 'error' : 'text.secondary'}>
+                                    Total Budget: ₱{totalBudget.toLocaleString('en-PH', { minimumFractionDigits: 2 })}
+                                </Typography>
+                            </Box>
                         </Box>
                         <Divider sx={{ mb: 2 }} />
                         <Box sx={{ maxHeight: 320, overflowY: 'auto', pr: 1 }}>
                             {THEMATIC_AREAS.map((area) => {
-                                const pct: number = (formData as any)[area.key];
+                                const pct: number = (formData as any)[`${area.key}_pct`];
                                 return (
                                     <Box key={area.key} sx={{ mb: 3 }}>
                                         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
@@ -288,7 +317,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                                                 sx={{ width: 140, flexShrink: 0 }}
                                                 value={amountDisplays[area.key]}
                                                 onChange={(e) => handleAmountChange(area.key, e.target.value)}
-                                                onBlur={() => handleAmountBlur(area.key, pct)}
+                                                onBlur={() => handleAmountBlur(area.key)}
                                                 placeholder="0.00"
                                                 inputProps={{ inputMode: 'decimal' }}
                                                 InputProps={{
@@ -304,6 +333,11 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                         {formData.budget <= 0 && (
                             <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
                                 Set a budget in Step 2 to enable amount-based input.
+                            </Typography>
+                        )}
+                        {totalAmount > totalBudget + 0.01 && (
+                            <Typography variant="caption" color="error" sx={{ mt: 1, display: 'block', fontWeight: 'bold' }}>
+                                Warning: Total allocated exceeds available budget.
                             </Typography>
                         )}
                     </Box>
@@ -339,7 +373,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                     <Button
                         onClick={handleCreate}
                         variant="contained"
-                        disabled={formData.projType === 'ABYIP' ? (calculateTotalPct() > 100 || formData.budget <= 0) : (!formData.yearStart || !formData.yearEnd)}
+                        disabled={formData.projType === 'ABYIP' ? (calculateTotalAmount() > formData.budget + 0.01 || formData.budget <= 0) : (!formData.yearStart || !formData.yearEnd)}
                     >
                         Create Plan
                     </Button>

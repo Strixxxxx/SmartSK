@@ -25,6 +25,7 @@ interface AccessControlData {
   templateControl: boolean;
   trackerControl: boolean;
   docsControl: boolean;
+  budgetControl: boolean;
 }
 
 
@@ -71,7 +72,8 @@ const AccessControl: React.FC = () => {
       targetUserID: userID,
       templateControl: field === 'templateControl' ? !userToUpdate.templateControl : userToUpdate.templateControl,
       trackerControl: field === 'trackerControl' ? !userToUpdate.trackerControl : userToUpdate.trackerControl,
-      docsControl: field === 'docsControl' ? !userToUpdate.docsControl : userToUpdate.docsControl
+      docsControl: field === 'docsControl' ? !userToUpdate.docsControl : userToUpdate.docsControl,
+      budgetControl: field === 'budgetControl' ? !userToUpdate.budgetControl : userToUpdate.budgetControl
     };
 
     try {
@@ -129,6 +131,7 @@ const AccessControl: React.FC = () => {
                   <TableCell className={styles.tableHeadCell} align="center" sx={{ fontWeight: 'bold' }}>Template Creation Control<br /><small>(Create Project Plans)</small></TableCell>
                   <TableCell className={styles.tableHeadCell} align="center" sx={{ fontWeight: 'bold' }}>Project Tracker Control<br /><small>(Update Project Trackers)</small></TableCell>
                   <TableCell className={styles.tableHeadCell} align="center" sx={{ fontWeight: 'bold' }}>Documents Control<br /><small>(Upload Supporting Documents)</small></TableCell>
+                  <TableCell className={styles.tableHeadCell} align="center" sx={{ fontWeight: 'bold' }}>Budget Reallocation Control<br /><small>(Adjust Budget Allocations)</small></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -171,6 +174,13 @@ const AccessControl: React.FC = () => {
                         <Switch
                           checked={row.docsControl}
                           onChange={() => handleToggle(row.userID, 'docsControl')}
+                          color="primary"
+                        />
+                      </TableCell>
+                      <TableCell align="center">
+                        <Switch
+                          checked={row.budgetControl}
+                          onChange={() => handleToggle(row.userID, 'budgetControl')}
                           color="primary"
                         />
                       </TableCell>

@@ -19,7 +19,11 @@ const os = require('os');
 // 1. Initialize New Project Batch (Access Control: templateControl)
 router.post('/initialize', authMiddleware, hasAccessControl('templateControl'), async (req, res) => {
     try {
-        const { projType, targetYear, budget, governance_pct, active_citizenship_pct, economic_empowerment_pct, global_mobility_pct, agriculture_pct, environment_pct, PBS_pct, SIE_pct, education_pct, health_pct, GAP_pct, MOOE_pct } = req.body;
+        const {
+            projType, targetYear, budget,
+            governance_pct, active_citizenship_pct, economic_empowerment_pct, global_mobility_pct, agriculture_pct, environment_pct, PBS_pct, SIE_pct, education_pct, health_pct, GAP_pct, MOOE_pct,
+            governance_amount, active_citizenship_amount, economic_empowerment_amount, global_mobility_amount, agriculture_amount, environment_amount, PBS_amount, SIE_amount, education_amount, health_amount, GAP_amount, MOOE_amount
+        } = req.body;
         const { barangay: barangayID, userID, position, termID } = req.user;
 
         // Initialize DB and Template
@@ -41,7 +45,19 @@ router.post('/initialize', authMiddleware, hasAccessControl('templateControl'), 
             education_pct,
             health_pct,
             GAP_pct,
-            MOOE_pct
+            MOOE_pct,
+            governance_amount,
+            active_citizenship_amount,
+            economic_empowerment_amount,
+            global_mobility_amount,
+            agriculture_amount,
+            environment_amount,
+            PBS_amount,
+            SIE_amount,
+            education_amount,
+            health_amount,
+            GAP_amount,
+            MOOE_amount
         });
 
         res.json({
@@ -106,10 +122,10 @@ router.post('/update-status', authMiddleware, hasAccessControl('trackerControl')
         // City Approval (statusID = 6) on ABYIP only -> trigger AI job
         if (statusID === 6 && projType === 'ABYIP') {
             console.log(`[AI Trigger] ABYIP batch ${batchID} reached City Approval. Triggering AI Job via HTTP...`);
-            
+
             // Fire-and-forget HTTP call to Python microservice
             const pythonUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/run-ai-batch-job`;
-            
+
             axios.post(pythonUrl).catch(err => {
                 console.error('[AI Trigger] Failed to trigger AI job via HTTP:', err.message);
             });
@@ -438,6 +454,13 @@ router.patch('/:batchID/rows/:rowID', authMiddleware, async (req, res) => {
                 .input('value', sql.NVarChar, value)
                 .input('batchID', sql.Int, batchID)
                 .query(`UPDATE projectABYIP SET [${field}] = @value WHERE abyipID = @rowID AND projbatchID = @batchID`);
+
+            // Auto-calculate total if PS, MOOE, or CO are updated
+            if (['PS', 'MOOE', 'CO'].includes(field)) {
+                await pool.request()
+                    .input('rowID', sql.Int, rowID)
+                    .query(`UPDATE projectABYIP SET total = ISNULL(PS, 0) + ISNULL(MOOE, 0) + ISNULL(CO, 0) WHERE abyipID = @rowID`);
+            }
         } else {
             await pool.request()
                 .input('rowID', sql.Int, rowID)
@@ -565,16 +588,16 @@ router.get('/:batchID/agenda', authMiddleware, async (req, res) => {
 router.patch('/:batchID/agenda', authMiddleware, async (req, res) => {
     try {
         const { batchID } = req.params;
-        const { categoryMap, center, value } = req.body; 
+        const { categoryMap, center, value } = req.body;
         const userID = req.user.userID;
-        
+
         const pool = await getConnection();
-        
+
         const allowedColumns = [
             'governance', 'active_citizenship', 'economic_empowerment', 'global_mobility',
             'agriculture', 'environment', 'PBS', 'SIE', 'education', 'health', 'GAP', 'MOOE'
         ];
-        
+
         if (!allowedColumns.includes(categoryMap)) {
             return res.status(400).json({ success: false, message: 'Invalid category mapping' });
         }
@@ -583,7 +606,7 @@ router.patch('/:batchID/agenda', authMiddleware, async (req, res) => {
         const currentRes = await pool.request()
             .input('batchID', sql.Int, batchID)
             .query(`SELECT [${categoryMap}] FROM projectAgenda WHERE batchID = @batchID`);
-        
+
         const oldValue = currentRes.recordset.length ? currentRes.recordset[0][categoryMap] : null;
         const action = !oldValue ? 'ADD_AGENDA' : 'EDIT_AGENDA';
 
@@ -634,7 +657,7 @@ router.get('/export/excel/:batchID', authMiddleware, async (req, res) => {
     try {
         const { batchID } = req.params;
         const axios = require('axios');
-        
+
         // 1. Ensure Excel is up-to-date in Azure
         const upToDate = await templateService.ensureExcelUpToDate(batchID);
         if (!upToDate) {
@@ -643,7 +666,7 @@ router.get('/export/excel/:batchID', authMiddleware, async (req, res) => {
 
         // 2. Fetch the Excel file from Python microservice
         const pythonUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/automation/export/excel/${batchID}`;
-        
+
         const response = await axios({
             url: pythonUrl,
             method: 'GET',
@@ -667,7 +690,7 @@ router.get('/export/pdf/:batchID', authMiddleware, async (req, res) => {
     try {
         const { batchID } = req.params;
         const axios = require('axios');
-        
+
         // 1. Ensure Excel is up-to-date in Azure
         const upToDate = await templateService.ensureExcelUpToDate(batchID);
         if (!upToDate) {
@@ -676,7 +699,7 @@ router.get('/export/pdf/:batchID', authMiddleware, async (req, res) => {
 
         // 2. Fetch the PDF file from Python microservice
         const pythonUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/automation/export/pdf/${batchID}`;
-        
+
         const response = await axios({
             url: pythonUrl,
             method: 'GET',
@@ -749,10 +772,10 @@ router.delete('/:batchID/rows/:rowID', authMiddleware, async (req, res) => {
             } else {
                 // Find first non-empty field
                 let firstData = '';
-                const fields = projType === 'ABYIP' 
+                const fields = projType === 'ABYIP'
                     ? ['referenceCode', 'Description', 'expectedResult', 'performanceIndicator']
                     : ['YDC', 'objective', 'performanceIndicator'];
-                
+
                 for (const f of fields) {
                     if (rowData[f] && String(rowData[f]).trim()) {
                         firstData = rowData[f];
@@ -799,6 +822,263 @@ router.delete('/:batchID/rows/:rowID', authMiddleware, async (req, res) => {
 
     } catch (error) {
         console.error('Error deleting row:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+// 17. Get budget summary for a specific batch
+router.get('/:batchID/budget-summary', authMiddleware, async (req, res) => {
+    try {
+        const { batchID } = req.params;
+        const { center } = req.query;
+        const pool = await getConnection();
+
+        // 1. Get allocated budget and category amounts
+        const batchRes = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query(`
+                SELECT 
+                    projType, budget,
+                    governance_amount, active_citizenship_amount, economic_empowerment_amount,
+                    global_mobility_amount, agriculture_amount, environment_amount,
+                    PBS_amount, SIE_amount, education_amount, health_amount,
+                    GAP_amount, MOOE_amount,
+                    governance_pct, active_citizenship_pct, economic_empowerment_pct,
+                    global_mobility_pct, agriculture_pct, environment_pct,
+                    PBS_pct, SIE_pct, education_pct, health_pct,
+                    GAP_pct, MOOE_pct
+                FROM projectBatch 
+                WHERE batchID = @batchID
+            `);
+
+        if (!batchRes.recordset.length) {
+            return res.status(404).json({ success: false, message: 'Batch not found.' });
+        }
+
+        const batch = batchRes.recordset[0];
+        const { projType, budget } = batch;
+
+        // 2. Get used budget (Overall)
+        let usedBatch = 0;
+        if (projType === 'ABYIP') {
+            const usedRes = await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .query('SELECT SUM(total) as used FROM projectABYIP WHERE projbatchID = @batchID');
+            usedBatch = usedRes.recordset[0].used || 0;
+        } else {
+            // For CBYDP, the budget column is NVARCHAR, we should try to parse it if it contains numbers
+            const usedRes = await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .query("SELECT SUM(TRY_CAST(budget AS MONEY)) as used FROM projectCBYDP WHERE projbatchID = @batchID");
+            usedBatch = usedRes.recordset[0].used || 0;
+        }
+
+        // 3. Category specific summary (if requested)
+        let categorySummary = null;
+        if (center && projType === 'ABYIP') {
+            const catUsedRes = await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('center', sql.NVarChar, center)
+                .query('SELECT SUM(total) as used FROM projectABYIP WHERE projbatchID = @batchID AND centerOfParticipation = @center');
+
+            const usedInCat = catUsedRes.recordset[0].used || 0;
+
+            const thematicMap = {
+                'Governance': 'governance',
+                'Active Citizenship': 'active_citizenship',
+                'Economic Empowerment': 'economic_empowerment',
+                'Global Mobility': 'global_mobility',
+                'Agriculture': 'agriculture',
+                'Environment': 'environment',
+                'Peace Building and Security': 'PBS',
+                'Social Inclusion and Equity': 'SIE',
+                'Education': 'education',
+                'Health': 'health',
+                'General Administration Program': 'GAP',
+                'Maintenance and Other Operating Expenses': 'MOOE'
+            };
+            const colPrefix = thematicMap[center];
+            let allocatedInCat = colPrefix ? (batch[`${colPrefix}_amount`] || 0) : 0;
+            
+            // Smart Fallback: If amount is 0 and percentage is set, calculate it
+            if (allocatedInCat === 0 && colPrefix && batch[`${colPrefix}_pct`] > 0) {
+                allocatedInCat = (budget * batch[`${colPrefix}_pct`]) / 100;
+            }
+
+            categorySummary = {
+                center,
+                allocated: allocatedInCat,
+                used: usedInCat,
+                remaining: allocatedInCat - usedInCat,
+                percentUsed: allocatedInCat > 0 ? (usedInCat / allocatedInCat) * 100 : 0
+            };
+        }
+
+        res.json({
+            success: true,
+            data: {
+                totalBudget: budget,
+                usedBudget: usedBatch,
+                remainingBudget: budget - usedBatch,
+                percentUsed: budget > 0 ? (usedBatch / budget) * 100 : 0,
+                categorySummary,
+                allocations: {
+                    governance: (batch.governance_amount || 0) === 0 && batch.governance_pct > 0 ? (budget * batch.governance_pct / 100) : batch.governance_amount,
+                    active_citizenship: (batch.active_citizenship_amount || 0) === 0 && batch.active_citizenship_pct > 0 ? (budget * batch.active_citizenship_pct / 100) : batch.active_citizenship_amount,
+                    economic_empowerment: (batch.economic_empowerment_amount || 0) === 0 && batch.economic_empowerment_pct > 0 ? (budget * batch.economic_empowerment_pct / 100) : batch.economic_empowerment_amount,
+                    global_mobility: (batch.global_mobility_amount || 0) === 0 && batch.global_mobility_pct > 0 ? (budget * batch.global_mobility_pct / 100) : batch.global_mobility_amount,
+                    agriculture: (batch.agriculture_amount || 0) === 0 && batch.agriculture_pct > 0 ? (budget * batch.agriculture_pct / 100) : batch.agriculture_amount,
+                    environment: (batch.environment_amount || 0) === 0 && batch.environment_pct > 0 ? (budget * batch.environment_pct / 100) : batch.environment_amount,
+                    PBS: (batch.PBS_amount || 0) === 0 && batch.PBS_pct > 0 ? (budget * batch.PBS_pct / 100) : batch.PBS_amount,
+                    SIE: (batch.SIE_amount || 0) === 0 && batch.SIE_pct > 0 ? (budget * batch.SIE_pct / 100) : batch.SIE_amount,
+                    education: (batch.education_amount || 0) === 0 && batch.education_pct > 0 ? (budget * batch.education_pct / 100) : batch.education_amount,
+                    health: (batch.health_amount || 0) === 0 && batch.health_pct > 0 ? (budget * batch.health_pct / 100) : batch.health_amount,
+                    GAP: (batch.GAP_amount || 0) === 0 && batch.GAP_pct > 0 ? (budget * batch.GAP_pct / 100) : batch.GAP_amount,
+                    MOOE: (batch.MOOE_amount || 0) === 0 && batch.MOOE_pct > 0 ? (budget * batch.MOOE_pct / 100) : batch.MOOE_amount
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching budget summary:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+// 18. Reallocate budget between categories
+router.post('/:batchID/reallocate-budget', authMiddleware, async (req, res) => {
+    try {
+        const { batchID } = req.params;
+        const { newAllocations, reason } = req.body;
+        const { userID, position } = req.user;
+        const ROLE_MAP = {
+            "SKC": "SK Chairperson", "SKS": "SK Secretary", "SKT": "SK Treasurer",
+            "SKK1": "SK Kagawad I", "SKK2": "SK Kagawad II", "SKK3": "SK Kagawad III",
+            "SKK4": "SK Kagawad IV", "SKK5": "SK Kagawad V", "SKK6": "SK Kagawad VI",
+            "SKK7": "SK Kagawad VII", "Admin": "Administrator"
+        };
+        const displayRole = ROLE_MAP[position] || position;
+
+        // 1. Authorization check: Only SK Chairperson OR those with budgetControl permission
+        const isAuthorized = position === 'SKC' || position === 'SK Chairperson' || req.user.permissions?.budgetControl;
+        if (!isAuthorized) {
+            return res.status(403).json({ success: false, message: 'Unauthorized: Only SK Chairperson or authorized users can adjust budget.' });
+        }
+
+        const pool = await getConnection();
+
+        // 2. Get current budget to validate
+        const batchRes = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query('SELECT projType, budget, governance_amount, active_citizenship_amount, economic_empowerment_amount, global_mobility_amount, agriculture_amount, environment_amount, PBS_amount, SIE_amount, education_amount, health_amount, GAP_amount, MOOE_amount FROM projectBatch WHERE batchID = @batchID');
+
+        if (!batchRes.recordset.length) return res.status(404).json({ success: false, message: 'Batch not found.' });
+        const currentBatch = batchRes.recordset[0];
+
+        if (currentBatch.projType !== 'ABYIP') {
+            return res.status(400).json({ success: false, message: 'Budget reallocation is only allowed for ABYIP projects.' });
+        }
+
+        const totalBudget = currentBatch.budget;
+
+        // 3. Validate sum of new allocations
+        const sum = Object.values(newAllocations).reduce((a, b) => (Number(a) || 0) + (Number(b) || 0), 0);
+        if (sum > totalBudget + 0.01) {
+            return res.status(400).json({ success: false, message: `Total allocation (₱${sum.toLocaleString()}) exceeds total budget (₱${totalBudget.toLocaleString()}).` });
+        }
+
+        // 4. Create snapshot for log
+        const oldAllocation = {
+            governance: currentBatch.governance_amount,
+            activeCitizenship: currentBatch.active_citizenship_amount,
+            economicEmpowerment: currentBatch.economic_empowerment_amount,
+            globalMobility: currentBatch.global_mobility_amount,
+            agriculture: currentBatch.agriculture_amount,
+            environment: currentBatch.environment_amount,
+            peaceBuilding: currentBatch.PBS_amount,
+            socialInclusion: currentBatch.SIE_amount,
+            education: currentBatch.education_amount,
+            health: currentBatch.health_amount,
+            GAP: currentBatch.GAP_amount,
+            MOOE: currentBatch.MOOE_amount
+        };
+
+        // 5. Update DB
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('gov', sql.Money, newAllocations.governance || 0)
+            .input('ac', sql.Money, newAllocations.activeCitizenship || 0)
+            .input('ee', sql.Money, newAllocations.economicEmpowerment || 0)
+            .input('gm', sql.Money, newAllocations.globalMobility || 0)
+            .input('ag', sql.Money, newAllocations.agriculture || 0)
+            .input('en', sql.Money, newAllocations.environment || 0)
+            .input('pb', sql.Money, newAllocations.peaceBuilding || 0)
+            .input('si', sql.Money, newAllocations.socialInclusion || 0)
+            .input('ed', sql.Money, newAllocations.education || 0)
+            .input('he', sql.Money, newAllocations.health || 0)
+            .input('gap', sql.Money, newAllocations.GAP || 0)
+            .input('mooe', sql.Money, newAllocations.MOOE || 0)
+            .input('gov_pct', sql.Decimal(5, 2), totalBudget > 0 ? (newAllocations.governance / totalBudget) * 100 : 0)
+            .input('ac_pct', sql.Decimal(5, 2), totalBudget > 0 ? (newAllocations.activeCitizenship / totalBudget) * 100 : 0)
+            .input('ee_pct', sql.Decimal(5, 2), totalBudget > 0 ? (newAllocations.economicEmpowerment / totalBudget) * 100 : 0)
+            .input('gm_pct', sql.Decimal(5, 2), totalBudget > 0 ? (newAllocations.globalMobility / totalBudget) * 100 : 0)
+            .input('ag_pct', sql.Decimal(5, 2), totalBudget > 0 ? (newAllocations.agriculture / totalBudget) * 100 : 0)
+            .input('en_pct', sql.Decimal(5, 2), totalBudget > 0 ? (newAllocations.environment / totalBudget) * 100 : 0)
+            .input('pb_pct', sql.Decimal(5, 2), totalBudget > 0 ? (newAllocations.peaceBuilding / totalBudget) * 100 : 0)
+            .input('si_pct', sql.Decimal(5, 2), totalBudget > 0 ? (newAllocations.socialInclusion / totalBudget) * 100 : 0)
+            .input('ed_pct', sql.Decimal(5, 2), totalBudget > 0 ? (newAllocations.education / totalBudget) * 100 : 0)
+            .input('he_pct', sql.Decimal(5, 2), totalBudget > 0 ? (newAllocations.health / totalBudget) * 100 : 0)
+            .input('gap_pct', sql.Decimal(5, 2), totalBudget > 0 ? (newAllocations.GAP / totalBudget) * 100 : 0)
+            .input('mooe_pct', sql.Decimal(5, 2), totalBudget > 0 ? (newAllocations.MOOE / totalBudget) * 100 : 0)
+            .query(`
+                UPDATE projectBatch SET 
+                    governance_amount = @gov, active_citizenship_amount = @ac, economic_empowerment_amount = @ee,
+                    global_mobility_amount = @gm, agriculture_amount = @ag, environment_amount = @en,
+                    PBS_amount = @pb, SIE_amount = @si, education_amount = @ed, health_amount = @he,
+                    GAP_amount = @gap, MOOE_amount = @mooe,
+                    governance_pct = @gov_pct, active_citizenship_pct = @ac_pct, economic_empowerment_pct = @ee_pct,
+                    global_mobility_pct = @gm_pct, agriculture_pct = @ag_pct, environment_pct = @en_pct,
+                    PBS_pct = @pb_pct, SIE_pct = @si_pct, education_pct = @ed_pct, health_pct = @he_pct,
+                    GAP_pct = @gap_pct, MOOE_pct = @mooe_pct
+                WHERE batchID = @batchID
+            `);
+
+        // 6. Log change to accountability table
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('userID', sql.Int, userID)
+            .input('old', sql.NVarChar, JSON.stringify(oldAllocation))
+            .input('new', sql.NVarChar, JSON.stringify(newAllocations))
+            .input('reason', sql.NVarChar, reason)
+            .query(`
+                INSERT INTO budgetAdjustmentLog (batchID, userID, oldAllocationJSON, newAllocationJSON, reasonForChange)
+                VALUES (@batchID, @userID, @old, @new, @reason)
+            `);
+
+        // 7. Auto-post to Project Notes (Work Notes & Agenda)
+        const noteContent = `${displayRole} ${req.user.fullName} changed the budget allocations within the project. The reason for change is as follows: ${reason}`;
+        const noteRes = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('content', sql.NVarChar, noteContent)
+            .query(`
+                INSERT INTO projectNotes (batchID, userID, content) 
+                OUTPUT INSERTED.noteID, INSERTED.batchID, INSERTED.userID, INSERTED.content, INSERTED.createdAt
+                VALUES (@batchID, NULL, @content)
+            `);
+        
+        const newNote = noteRes.recordset[0];
+        const enrichedNote = {
+            ...newNote,
+            fullName: 'SmartSK System',
+            position: 'Automated System'
+        };
+
+        broadcastToRoom(batchID, { type: 'budget_reallocated', batchID });
+        broadcastToRoom(batchID, { type: 'project_note', note: enrichedNote });
+        broadcastToRoom(batchID, { type: 'audit_update', batchID });
+
+        res.json({ success: true, message: 'Budget reallocated successfully.' });
+    } catch (error) {
+        console.error('Error reallocating budget:', error);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 });
