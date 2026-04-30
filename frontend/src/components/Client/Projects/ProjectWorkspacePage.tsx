@@ -165,8 +165,16 @@ function getAgendaColumnMap(tabName: string): string {
                 const newData = res.data.data ?? [];
                 dataCache.current[activeTab] = newData; // Update cache silently
                 setRows(newData);
+
+                // Also refresh agenda data silently
+                if (projType === 'CBYDP') {
+                    const agendaRes = await axiosInstance.get(`/api/project-batch/${selectedProject.batchID}/agenda`);
+                    if (agendaRes.data.success && agendaRes.data.data) {
+                        setAgendaData(agendaRes.data.data);
+                    }
+                }
             } catch (err) {
-                console.error('Failed to silently refresh rows:', err);
+                console.error('Failed to silently refresh rows or agenda:', err);
             }
         };
 
@@ -360,6 +368,7 @@ function getAgendaColumnMap(tabName: string): string {
         try {
             await axiosInstance.patch(`/api/project-batch/${selectedProject.batchID}/agenda`, {
                 categoryMap: colMap,
+                center: activeTab,
                 value: newValue
             });
             // trigger audit refresh if you added audit logs in backend, or just UI refresh
@@ -389,6 +398,7 @@ function getAgendaColumnMap(tabName: string): string {
                 }}
                 auditRefreshTrigger={auditRefreshTrigger}
                 projectListRefreshTrigger={projectListRefreshTrigger}
+                onAuditUpdate={handleAuditUpdate}
                 center={activeTab}
                 isCollapsed={isLeftSidebarCollapsed}
                 onToggleCollapse={() => setIsLeftSidebarCollapsed(prev => !prev)}

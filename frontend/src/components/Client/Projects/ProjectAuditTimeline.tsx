@@ -2,8 +2,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import {
     Box, Typography, CircularProgress, Tooltip, IconButton,
 } from '@mui/material';
-import { History, Add, Remove } from '@mui/icons-material';
+import { History, Add, Remove, SettingsBackupRestore } from '@mui/icons-material';
 import axiosInstance from '../../../backend connection/axiosConfig';
+import ReversionModal from './ReversionModal';
 
 interface AuditLog {
     auditID: number;
@@ -22,6 +23,7 @@ interface ProjectAuditTimelineProps {
     targetYear?: string;
     center?: string | null;
     auditRefreshTrigger?: number;
+    onAuditUpdate?: () => void;
 }
 
 /** Format a timestamp to relative time (e.g. "2 min ago") */
@@ -47,6 +49,7 @@ function actionLabel(action: string): string {
         case 'EDIT': return 'Edited Text';
         case 'EDIT_AGENDA': return 'Edited Agenda';
         case 'DELETE_ROW': return 'Deleted Row';
+        case 'REVERT': return 'Restored Value';
         default: return action;
     }
 }
@@ -60,6 +63,7 @@ function actionColor(action: string): string {
         case 'EDIT': return '#ed6c02';
         case 'EDIT_AGENDA': return '#f9a825'; // Dark Yellow
         case 'DELETE_ROW': return '#d32f2f'; // Red
+        case 'REVERT': return '#0288d1'; // Blue
         default: return '#78909c';
     }
 }
@@ -69,11 +73,13 @@ const ProjectAuditTimeline: React.FC<ProjectAuditTimelineProps> = ({
     projType,
     center,
     auditRefreshTrigger,
+    onAuditUpdate,
 }) => {
     const [logs, setLogs] = useState<AuditLog[]>([]);
     const [loading, setLoading] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [timelineHeight, setTimelineHeight] = useState(300);
+    const [reversionModalOpen, setReversionModalOpen] = useState(false);
 
     const fetchLogs = useCallback(async () => {
         if (!batchID) return;
@@ -167,10 +173,35 @@ const ProjectAuditTimeline: React.FC<ProjectAuditTimelineProps> = ({
                         AUDIT TIMELINE
                     </Typography>
                 </Box>
-                <IconButton size="small" sx={{ p: 0.5 }}>
-                    {isExpanded ? <Remove sx={{ fontSize: 16 }} /> : <Add sx={{ fontSize: 16 }} />}
-                </IconButton>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <Tooltip title="Reversion History (Restore your edits)">
+                        <IconButton 
+                            size="small" 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setReversionModalOpen(true);
+                            }}
+                            sx={{ color: '#646cff' }}
+                        >
+                            <SettingsBackupRestore sx={{ fontSize: 18 }} />
+                        </IconButton>
+                    </Tooltip>
+                    <IconButton size="small" sx={{ p: 0.5 }}>
+                        {isExpanded ? <Remove sx={{ fontSize: 16 }} /> : <Add sx={{ fontSize: 16 }} />}
+                    </IconButton>
+                </Box>
             </Box>
+
+            <ReversionModal 
+                open={reversionModalOpen}
+                onClose={() => setReversionModalOpen(false)}
+                batchID={batchID}
+                center={center}
+                onSuccess={() => {
+                    fetchLogs();
+                    if (onAuditUpdate) onAuditUpdate();
+                }}
+            />
 
             {isExpanded && (
                 <>

@@ -466,21 +466,22 @@ router.patch('/:batchID/rows/:rowID', authMiddleware, async (req, res) => {
                 .input('action', sql.NVarChar, safeOldValue ? 'EDIT' : 'ADD_TEXT')
                 .input('oldValue', sql.NVarChar, safeOldValue || null)
                 .input('newValue', sql.NVarChar, auditSummary)
-                .input('center', sql.NVarChar, finalCenter);
+                .input('center', sql.NVarChar, finalCenter)
+                .input('field', sql.NVarChar, field);
 
             if (projType === 'ABYIP') {
                 await auditRequest
                     .input('abyipID', sql.Int, rowID)
                     .query(`
-                        INSERT INTO projectAuditTrail (batchID, abyipID, userID, action, oldValue, newValue, centerOfParticipation)
-                        VALUES (@batchID, @abyipID, @userID, @action, @oldValue, @newValue, @center)
+                        INSERT INTO projectAuditTrail (batchID, abyipID, userID, action, oldValue, newValue, centerOfParticipation, targetColumn)
+                        VALUES (@batchID, @abyipID, @userID, @action, @oldValue, @newValue, @center, @field)
                     `);
             } else {
                 await auditRequest
                     .input('cbydpID', sql.Int, rowID)
                     .query(`
-                        INSERT INTO projectAuditTrail (batchID, cbydpID, userID, action, oldValue, newValue, centerOfParticipation)
-                        VALUES (@batchID, @cbydpID, @userID, @action, @oldValue, @newValue, @center)
+                        INSERT INTO projectAuditTrail (batchID, cbydpID, userID, action, oldValue, newValue, centerOfParticipation, targetColumn)
+                        VALUES (@batchID, @cbydpID, @userID, @action, @oldValue, @newValue, @center, @field)
                     `);
             }
 
@@ -564,7 +565,7 @@ router.get('/:batchID/agenda', authMiddleware, async (req, res) => {
 router.patch('/:batchID/agenda', authMiddleware, async (req, res) => {
     try {
         const { batchID } = req.params;
-        const { categoryMap, value } = req.body; 
+        const { categoryMap, center, value } = req.body; 
         const userID = req.user.userID;
         
         const pool = await getConnection();
@@ -615,7 +616,8 @@ router.patch('/:batchID/agenda', authMiddleware, async (req, res) => {
             action,
             oldValue: oldValue || 'N/A',
             newValue: auditMessage,
-            center: categoryMap 
+            center: center || categoryMap,
+            targetColumn: categoryMap
         });
 
         broadcastToRoom(batchID, { type: 'audit_update', batchID });

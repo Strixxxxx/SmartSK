@@ -19,6 +19,7 @@ interface ProjectWorkspaceSidebarProps {
     center?: string;
     isCollapsed?: boolean;
     onToggleCollapse?: () => void;
+    onAuditUpdate?: () => void;
 }
 
 const ProjectWorkspaceSidebar: React.FC<ProjectWorkspaceSidebarProps> = ({
@@ -29,6 +30,7 @@ const ProjectWorkspaceSidebar: React.FC<ProjectWorkspaceSidebarProps> = ({
     center,
     isCollapsed = false,
     onToggleCollapse,
+    onAuditUpdate,
 }) => {
     const { user, logout } = useAuth();
     const [batches, setBatches] = useState<any[]>([]);
@@ -213,6 +215,7 @@ const ProjectWorkspaceSidebar: React.FC<ProjectWorkspaceSidebarProps> = ({
                     projType={selectedProject?.projType}
                     center={center}
                     auditRefreshTrigger={auditRefreshTrigger}
+                    onAuditUpdate={onAuditUpdate}
                 />
 
                 {/* Footer: Logout */}
