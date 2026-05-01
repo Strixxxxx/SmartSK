@@ -24,6 +24,7 @@ interface ProjectAuditTimelineProps {
     center?: string | null;
     auditRefreshTrigger?: number;
     onAuditUpdate?: () => void;
+    isReadOnly?: boolean;
 }
 
 /** Format a timestamp to relative time (e.g. "2 min ago") */
@@ -74,6 +75,7 @@ const ProjectAuditTimeline: React.FC<ProjectAuditTimelineProps> = ({
     center,
     auditRefreshTrigger,
     onAuditUpdate,
+    isReadOnly = false,
 }) => {
     const [logs, setLogs] = useState<AuditLog[]>([]);
     const [loading, setLoading] = useState(false);
@@ -174,18 +176,20 @@ const ProjectAuditTimeline: React.FC<ProjectAuditTimelineProps> = ({
                     </Typography>
                 </Box>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <Tooltip title="Reversion History (Restore your edits)">
-                        <IconButton 
-                            size="small" 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setReversionModalOpen(true);
-                            }}
-                            sx={{ color: '#646cff' }}
-                        >
-                            <SettingsBackupRestore sx={{ fontSize: 18 }} />
-                        </IconButton>
-                    </Tooltip>
+                    {!isReadOnly && (
+                        <Tooltip title="Reversion History (Restore your edits)">
+                            <IconButton 
+                                size="small" 
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setReversionModalOpen(true);
+                                }}
+                                sx={{ color: '#646cff' }}
+                            >
+                                <SettingsBackupRestore sx={{ fontSize: 18 }} />
+                            </IconButton>
+                        </Tooltip>
+                    )}
                     <IconButton size="small" sx={{ p: 0.5 }}>
                         {isExpanded ? <Remove sx={{ fontSize: 16 }} /> : <Add sx={{ fontSize: 16 }} />}
                     </IconButton>

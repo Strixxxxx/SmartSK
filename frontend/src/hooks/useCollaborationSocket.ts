@@ -24,6 +24,7 @@ interface UseCollaborationSocketOptions {
     onCellChange?: (changes: any[]) => void;
     onNote?: (note: any) => void;
     onAuditUpdate?: (batchID: number) => void;
+    onAiReportStatus?: (msg: any) => void;
 }
 
 const WS_URL = (() => {
@@ -32,7 +33,7 @@ const WS_URL = (() => {
     return backendHttpUrl.replace(/^http/, 'ws');
 })();
 
-export function useCollaborationSocket({ batchID, onCellChange, onNote, onAuditUpdate }: UseCollaborationSocketOptions) {
+export function useCollaborationSocket({ batchID, onCellChange, onNote, onAuditUpdate, onAiReportStatus }: UseCollaborationSocketOptions) {
     const wsRef = useRef<WebSocket | null>(null);
     const [collaborators, setCollaborators] = useState<Map<number, CollaboratorInfo>>(new Map());
     const [isConnected, setIsConnected] = useState(false);
@@ -133,6 +134,12 @@ export function useCollaborationSocket({ batchID, onCellChange, onNote, onAuditU
                 else if (msg.type === 'audit_update') {
                     if (onAuditUpdate) {
                         onAuditUpdate(Number(msg.batchID));
+                    }
+                }
+                
+                else if (msg.type === 'ai_report_status') {
+                    if (onAiReportStatus) {
+                        onAiReportStatus(msg);
                     }
                 }
 

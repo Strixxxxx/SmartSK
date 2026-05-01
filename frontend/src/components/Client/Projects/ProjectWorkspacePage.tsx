@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Alert, Typography } from '@mui/material';
+import { Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Alert, Typography, Snackbar } from '@mui/material';
 import ProjectWorkspaceSidebar from './ProjectWorkspaceSidebar';
 import ProjectWorkNotes from './ProjectWorkNotes';
 import ProjectTopNavbar from './ProjectTopNavbar';
@@ -54,6 +54,7 @@ const ProjectWorkspacePage: React.FC = () => {
     const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(false);
     const [isRightSidebarCollapsed, setIsRightSidebarCollapsed] = useState(true);
     const [deleteConfirmation, setDeleteConfirmation] = useState<{ open: boolean; sectionType?: string; onConfirm?: () => void }>({ open: false });
+    const [aiSnackbar, setAiSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({ open: false, message: '', severity: 'info' });
     const { user } = useAuth();
     
     // ── Tab Caching ──────────────────────────────────────────────────────────
@@ -232,6 +233,13 @@ function getAgendaColumnMap(tabName: string): string {
         onCellChange: handleRemoteCellChange,
         onNote: handleRemoteNote,
         onAuditUpdate: handleAuditUpdate,
+        onAiReportStatus: (msg: any) => {
+            setAiSnackbar({
+                open: true,
+                message: msg.message,
+                severity: msg.status === 'success' ? 'success' : 'error'
+            });
+        }
     });
 
     // Build a Map for the collaborators (keyed by userID)
@@ -392,12 +400,21 @@ function getAgendaColumnMap(tabName: string): string {
                     ...prev,
                     currentStatusID: statusID
                 }));
+                if (res.data.aiTriggered) {
+                    setAiSnackbar({
+                        open: true,
+                        message: 'City Approval reached! AI Report generation has been queued and will update shortly.',
+                        severity: 'info'
+                    });
+                }
             }
         } catch (err: any) {
             console.error('Failed to update status:', err);
-            alert(err.response?.data?.message || 'Failed to update milestone.');
+            const errMsg = err.response?.data?.message || 'Failed to update milestone.';
+            setAiSnackbar({ open: true, message: errMsg, severity: 'error' });
         }
     };
+
 
     // ── Update Agenda Statement handler ─────────────────────────────────────
     const handleAgendaSave = async (newValue: string) => {
@@ -444,6 +461,7 @@ function getAgendaColumnMap(tabName: string): string {
                 center={activeTab}
                 isCollapsed={isLeftSidebarCollapsed}
                 onToggleCollapse={() => setIsLeftSidebarCollapsed(prev => !prev)}
+                isReadOnly={isReadOnly}
             />
 
             {/* Content Area */}
@@ -631,6 +649,18 @@ function getAgendaColumnMap(tabName: string): string {
                     }}
                 />
             )}
+
+            {/* AI Report Status Snackbar */}
+            <Snackbar
+                open={aiSnackbar.open}
+                autoHideDuration={6000}
+                onClose={() => setAiSnackbar(prev => ({ ...prev, open: false }))}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert onClose={() => setAiSnackbar(prev => ({ ...prev, open: false }))} severity={aiSnackbar.severity} sx={{ width: '100%', border: '1px solid rgba(255,255,255,0.2)' }} variant="filled">
+                    {aiSnackbar.message}
+                </Alert>
+            </Snackbar>
         </Box>
     );
 };
