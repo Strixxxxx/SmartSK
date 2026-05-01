@@ -51,7 +51,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
           clearInterval(reconnectInterval);
         }
         // Authenticate the WebSocket connection
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (token) {
           ws.send(JSON.stringify({ type: 'auth', token }));
         }
@@ -73,6 +73,25 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
           } else if (message.type === 'POSTS_UPDATED') { // Handle the new message type
             if (import.meta.env.DEV) console.log('[WebSocket] Posts updated, triggering refresh.');
             setPostUpdateTimestamp(Date.now()); // Update timestamp to trigger re-renders
+          } else if (message.type === 'user_update') {
+            if (import.meta.env.DEV) console.log('[WebSocket] User profile update received.');
+            
+            if (message.messages && Array.isArray(message.messages)) {
+              message.messages.forEach((msg: string) => {
+                toast.info(msg, {
+                  position: "top-right",
+                  autoClose: 6000,
+                });
+              });
+            } else {
+              toast.info(message.message || 'Your account settings have been updated.', {
+                position: "top-right",
+                autoClose: 5000,
+              });
+            }
+            
+            // Dispatch custom event for AuthContext to refresh profile
+            window.dispatchEvent(new CustomEvent('user-profile-refresh'));
           }
 
         } catch (error) {

@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import {
   checkPotentialSession,
-  isUserAuthenticated,
   getCachedUserData,
   clearUserDataCache,
   login as authLogin,
@@ -102,10 +101,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     window.addEventListener('auth-error', handleAuthError);
+    window.addEventListener('user-profile-refresh', refreshUser);
 
     // Cleanup event listener
     return () => {
       window.removeEventListener('auth-error', handleAuthError);
+      window.removeEventListener('user-profile-refresh', refreshUser);
     };
   }, []);
 
@@ -152,8 +153,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshUser = async () => {
     try {
-      if (isUserAuthenticated()) {
-        const userData = getCachedUserData();
+      if (sessionStorage.getItem('token')) {
+        const { fetchUserData } = await import('../backend connection/auth');
+        const userData = await fetchUserData(true); // Skip cache
         if (userData) {
           setUser(userData);
         }

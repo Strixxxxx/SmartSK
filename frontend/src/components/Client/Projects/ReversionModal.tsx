@@ -38,6 +38,10 @@ const ReversionModal: React.FC<ReversionModalProps> = ({ open, onClose, batchID,
         currentValue: null,
         lastEditor: null
     });
+    const [confirmDialog, setConfirmDialog] = useState<{ open: boolean; log: ReversibleLog | null }>({
+        open: false,
+        log: null
+    });
 
     useEffect(() => {
         if (open && batchID) {
@@ -120,7 +124,7 @@ const ReversionModal: React.FC<ReversionModalProps> = ({ open, onClose, batchID,
                                         <Tooltip title="Restore this value">
                                             <IconButton 
                                                 edge="end" 
-                                                onClick={() => handleRevert(log.auditID)}
+                                                onClick={() => setConfirmDialog({ open: true, log })}
                                                 disabled={revertingID === log.auditID}
                                                 sx={{ color: '#646cff' }}
                                             >
@@ -187,6 +191,34 @@ const ReversionModal: React.FC<ReversionModalProps> = ({ open, onClose, batchID,
                         color="warning"
                     >
                         Confirm Overwrite
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            {/* Confirmation Dialog */}
+            <Dialog open={confirmDialog.open} onClose={() => setConfirmDialog({ open: false, log: null })}>
+                <DialogTitle sx={{ fontWeight: 600 }}>Confirm Restoration</DialogTitle>
+                <DialogContent>
+                    <Typography variant="body2" gutterBottom>
+                        Are you sure you want to restore <strong>{confirmDialog.log?.targetColumn}</strong> to its previous state?
+                    </Typography>
+                    <Box sx={{ mt: 2, p: 2, bgcolor: '#f0f4ff', borderRadius: 1, borderLeft: '4px solid #646cff' }}>
+                        <Typography variant="caption" sx={{ fontWeight: 'bold', display: 'block', mb: 0.5 }}>Restoring to:</Typography>
+                        <Typography variant="body2" sx={{ fontStyle: 'italic' }}>"{confirmDialog.log?.oldValue}"</Typography>
+                    </Box>
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={() => setConfirmDialog({ open: false, log: null })} color="inherit">Cancel</Button>
+                    <Button 
+                        onClick={() => {
+                            if (confirmDialog.log) {
+                                handleRevert(confirmDialog.log.auditID);
+                                setConfirmDialog({ open: false, log: null });
+                            }
+                        }} 
+                        variant="contained" 
+                        sx={{ bgcolor: '#646cff', '&:hover': { bgcolor: '#535bf2' } }}
+                    >
+                        Confirm Restoration
                     </Button>
                 </DialogActions>
             </Dialog>
