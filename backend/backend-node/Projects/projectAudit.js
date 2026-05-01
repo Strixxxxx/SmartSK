@@ -205,13 +205,37 @@ router.post('/revert/:auditID', authMiddleware, async (req, res) => {
             targetColumn
         });
 
-        // 7. Broadcast update
+        // 7. Recalculate total if budget field changed (ABYIP)
+        let newTotal = null;
+        if (abyipID && ['PS', 'MOOE', 'CO'].includes(targetColumn)) {
+            const totalRes = await pool.request()
+                .input('abyipID', sql.Int, abyipID)
+                .query(`
+                    UPDATE projectABYIP 
+                    SET total = ISNULL(CAST(NULLIF(PS, '') AS DECIMAL(18,2)), 0) + 
+                                ISNULL(CAST(NULLIF(MOOE, '') AS DECIMAL(18,2)), 0) + 
+                                ISNULL(CAST(NULLIF(CO, '') AS DECIMAL(18,2)), 0)
+                    OUTPUT INSERTED.total
+                    WHERE abyipID = @abyipID
+                `);
+            if (totalRes.recordset.length) {
+                newTotal = totalRes.recordset[0].total;
+            }
+        }
+
+        // 8. Broadcast update
         const { broadcastToRoom } = require('../websockets/websocket');
         broadcastToRoom(batchID, { type: 'audit_update', batchID });
+        
+        const broadcastChanges = [{ rowID: abyipID || cbydpID, field: targetColumn, value: oldValue }];
+        if (newTotal !== null) {
+            broadcastChanges.push({ rowID: abyipID, field: 'total', value: String(newTotal) });
+        }
+
         broadcastToRoom(batchID, { 
             type: 'cell_change', 
             batchID, 
-            changes: [{ rowID: abyipID || cbydpID, field: targetColumn, value: oldValue }] 
+            changes: broadcastChanges
         });
 
         res.json({ success: true, message: 'Value successfully restored.' });

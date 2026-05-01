@@ -7,7 +7,7 @@ const { addAuditTrail } = require('../audit/auditService');
 // Get access control list for the current SKC's barangay and term
 router.get('/', async (req, res) => {
   try {
-    const userBarangay = req.user.barangay; 
+    const userBarangay = req.user.barangay;
     const termID = req.user.termID;
 
     if (!userBarangay || !termID) {
@@ -99,15 +99,36 @@ router.post('/update', async (req, res) => {
     let decodedFullName = targetUser.fullName;
     try {
       decodedFullName = decrypt(targetUser.fullName);
-    } catch (e) {}
+    } catch (e) { }
 
-    // Check if record exists in accessControl
-    const existingCheck = await pool.request()
+    // 1. Fetch current permissions for comparison
+    const currentPermsRes = await pool.request()
       .input('userID', sql.Int, targetUserID)
-      .query('SELECT acID FROM accessControl WHERE userID = @userID');
+      .query('SELECT templateControl, trackerControl, docsControl, budgetControl FROM accessControl WHERE userID = @userID');
 
-    if (existingCheck.recordset.length > 0) {
-      // Update
+    const current = currentPermsRes.recordset[0] || {
+      templateControl: false, trackerControl: false, docsControl: false, budgetControl: false
+    };
+
+    // 2. Build specific messages
+    const messages = [];
+    const check = (key, label, newMode) => {
+      const oldMode = Boolean(current[key]);
+      if (oldMode !== newMode) {
+        messages.push(newMode
+          ? `You are now allowed to ${label}.`
+          : `You are no longer allowed to ${label}.`
+        );
+      }
+    };
+
+    check('templateControl', 'create new projects', Boolean(templateControl));
+    check('trackerControl', 'manage project tracker', Boolean(trackerControl));
+    check('docsControl', 'manage supporting documents', Boolean(docsControl));
+    check('budgetControl', 'manage budget allocations', Boolean(budgetControl));
+
+    // 3. Update/Insert in DB
+    if (currentPermsRes.recordset.length > 0) {
       await pool.request()
         .input('userID', sql.Int, targetUserID)
         .input('templateControl', sql.Bit, templateControl ? 1 : 0)
@@ -120,7 +141,6 @@ router.post('/update', async (req, res) => {
           WHERE userID = @userID
         `);
     } else {
-      // Insert
       await pool.request()
         .input('userID', sql.Int, targetUserID)
         .input('templateControl', sql.Bit, templateControl ? 1 : 0)
@@ -141,6 +161,18 @@ router.post('/update', async (req, res) => {
       actions: 'update-access',
       descriptions: `SKC ${req.user.fullName} updated access controls for ${decodedFullName}. Template: ${templateControl}, Tracker: ${trackerControl}, Docs: ${docsControl}, Budget: ${budgetControl}`
     });
+
+    // Notify the target user via WebSocket with specific messages
+    try {
+      const { sendToUser } = require('../websockets/websocket');
+      sendToUser(targetUserID, {
+        type: 'user_update',
+        userID: targetUserID,
+        messages: messages.length > 0 ? messages : ['Your account settings have been updated.']
+      });
+    } catch (wsError) {
+      console.error('Failed to send WebSocket notification:', wsError);
+    }
 
     return res.json({ success: true, message: 'Access control updated successfully.' });
 

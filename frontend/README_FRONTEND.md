@@ -11,7 +11,8 @@ The SmartSK frontend is a modern, responsive Single Page Application (SPA) built
 - **Theming**: Dark mode and light mode support with consistent brand colors.
 
 ### Styling: [CSS Modules](https://github.com/css-modules/css-modules)
-- **Scoped Styles**: Every component has its own `.module.css` file to prevent style leakage.
+- **Scoped Styles**: New components utilize `.module.css` to prevent style leakage.
+- **Legacy Compatibility**: Existing `.css` files are maintained as-is (without renaming to `.module.css`) to ensure stability and prevent import errors across existing `.tsx` files.
 - **BEM-like approach**: Ensures maintainability and clarity in layout structures.
 
 ### State Management
@@ -57,3 +58,12 @@ npm run build
 - `src/components/Client`: Functional modules for SK official submissions and analytics.
 - `src/backend connection`: Centralized API logic and Axios interceptors.
 - `src/context`: React Context providers for global application state.
+
+---
+
+## 📜 Frontend Version History
+
+*   **V1**: Admin and client interfaces were combined into a single page and hidden based on user roles. No dedicated homepage was present.
+*   **V2**: Introduced a dedicated public homepage. Re-architected data fetching and state management to support hourly predictive trend updates from the backend.
+*   **V3 (Current)**: Removed legacy Posting and Project modules. Introduced the unified **Project Workspace**, **Project Tracker**, and **Full Disclosure Board/Bulletin Board**. Implemented frontend interfaces for **AI Registration Verification** (with manual overrides) and **Budget Allocations**.
+

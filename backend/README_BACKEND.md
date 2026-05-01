@@ -16,8 +16,16 @@ Built with **Express.js**, this service acts as the primary API for the frontend
 ### 2. [Python Backend](./backend-python/) (AI/ML Service)
 A **FastAPI** service dedicated to heavy data lifting and generative AI.
 - **Generative AI**: Integration with Google Gemini for report synthesis and predictive analysis.
-- **Forecasting**: Data processing and forecasting using optimized mathematical models.
+- **Forecasting**: Data processing and forecasting using optimized mathematical models (LSTM).
 - **Compliance**: AI audits for user registration and project submissions.
+
+---
+
+## 📜 Backend Version History
+
+*   **V1**: Backend only. Admin and client interfaces were served directly. Forecasting relied on Meta's Prophet for Project Implementation.
+*   **V2**: Node.js served a new homepage. Forecasting migrated to Gemini API and LSTM with hourly updates. Node.js communicated with Python scripts via Child Process Spawn.
+*   **V3 (Current)**: The Python environment was decoupled into a dedicated FastAPI microservice for improved scalability and stability. Added support for AI Registration Verification (with manual overrides) and Budget Allocations. Legacy modules (Posting, old Project module) were removed in favor of Project Workspace and Full Disclosure Board.
 
 ---
 

@@ -12,8 +12,8 @@ SmartSK is a sophisticated full-stack web application designed specifically for 
 
 The repository is organized into two primary components:
 
-*   [**Backend**](./backend/README.md): Contains the Node.js API Gateway and the Python-based micro-0service.
-*   [**Frontend**](./frontend/README.md): A modern React application built with TypeScript and Material-UI.
+*   [**Backend**](./backend/README_BACKEND.md): Contains the Node.js API Gateway and the Python-based microservice.
+*   [**Frontend**](./frontend/README_FRONTEND.md): A modern React application built with TypeScript and Material-UI.
 
 ---
 
@@ -44,6 +44,16 @@ The repository is organized into two primary components:
 
 ---
 
+## 📜 Version History
+
+For a detailed breakdown of the UI/UX evolution, backend logic shifts, and package changes across versions, please see the [**Detailed Version History**](./VERSION_HISTORY.md).
+
+*   **V1 (Initial Phase)**: Included backend only with no homepage. Admin and client interfaces were combined into a single page and conditionally hidden based on roles. Forecasting focused on Project Implementation using Meta's Prophet.
+*   **V2 (AI Integration)**: Introduced the homepage. Forecasting was upgraded to use the Gemini API and LSTM, adding predictive trends that updated hourly. The Node.js server communicated with Python scripts via Child Process Spawn.
+*   **V3 (Current Architecture)**: Removed legacy Posting and Project modules, replacing them with a comprehensive Project Workspace, Project Tracker, and a Full Disclosure Board/Bulletin Board. Introduced AI Registration Verification with manual overriding and Budget Allocations. The Python backend was migrated to a robust FastAPI microservice architecture.
+
+---
+
 ## ⚙️ Getting Started
 
 ### Prerequisites
@@ -59,9 +69,9 @@ The repository is organized into two primary components:
    ```
 
 2. **Backend Setup**:
-   Follow the instructions in the [Backend README](./backend/README.md).
+   Follow the instructions in the [Backend README](./backend/README_BACKEND.md).
 
 3. **Frontend Setup**:
-   Follow the instructions in the [Frontend README](./frontend/README.md).
+   Follow the instructions in the [Frontend README](./frontend/README_FRONTEND.md).
 
 ---
