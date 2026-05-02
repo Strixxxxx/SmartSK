@@ -230,6 +230,17 @@
   box-shadow: 0 8px 25px rgba(100, 108, 255, 0.4);
 }
 
+.action-btn.archive-btn {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.action-btn.archive-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+}
+
 .create-account-btn {
   background: linear-gradient(135deg, #646cff, #747bff);
   color: white;

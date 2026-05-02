@@ -42,6 +42,10 @@ const UserAccounts: React.FC = () => {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
   const [emailError, setEmailError] = useState<string>('');
   const [isEmailValid, setIsEmailValid] = useState<boolean>(false);
+  // Archive state
+  const [userToArchive, setUserToArchive] = useState<User | null>(null);
+  const [isArchiveConfirmOpen, setIsArchiveConfirmOpen] = useState<boolean>(false);
+  const [archiveLoading, setArchiveLoading] = useState<boolean>(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -191,6 +195,48 @@ const UserAccounts: React.FC = () => {
     }
   };
 
+  // --- Archive Handlers ---
+  const handleArchiveClick = (targetUser: User) => {
+    setUserToArchive(targetUser);
+    setIsArchiveConfirmOpen(true);
+  };
+
+  const handleCancelArchive = () => {
+    setUserToArchive(null);
+    setIsArchiveConfirmOpen(false);
+  };
+
+  const handleConfirmArchive = async () => {
+    if (!userToArchive) return;
+    setArchiveLoading(true);
+    try {
+      const response = await axiosInstance.post('/api/admin/acc-archive/by-username', {
+        userName: userToArchive.userName
+      });
+      if (response.data.success) {
+        toast.success(`Account for ${userToArchive.fullName} archived successfully.`);
+        fetchUsers();
+        handleCancelArchive();
+      } else {
+        throw new Error(response.data.message || 'Failed to archive account');
+      }
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message: string }>;
+      if (axiosError.response?.status === 401) {
+        navigate('/home', { replace: true });
+        return;
+      }
+      if (axiosError.response?.status === 403) {
+        toast.error('You cannot archive your own account.');
+        handleCancelArchive();
+        return;
+      }
+      toast.error(axiosError.response?.data?.message || axiosError.message || 'Failed to archive account');
+    } finally {
+      setArchiveLoading(false);
+    }
+  };
+
   if (loading && !users.length) {
     return <Loading />;
   }
@@ -217,19 +263,31 @@ const UserAccounts: React.FC = () => {
                   <th>Email Address</th>
                   <th>Phone Number</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
-                  <tr key={user.userName}>
-                    <td>{user.userName}</td>
-                    <td>{user.fullName}</td>
-                    <td>{user.emailAddress}</td>
-                    <td>{user.phoneNumber}</td>
+                {users.map((tableUser) => (
+                  <tr key={tableUser.userName}>
+                    <td>{tableUser.userName}</td>
+                    <td>{tableUser.fullName}</td>
+                    <td>{tableUser.emailAddress}</td>
+                    <td>{tableUser.phoneNumber}</td>
                     <td>
-                      <span className={`status ${user.isArchived ? 'inactive' : 'active'}`}>
-                        {user.isArchived ? 'Inactive' : 'Active'}
+                      <span className={`status ${tableUser.isArchived ? 'inactive' : 'active'}`}>
+                        {tableUser.isArchived ? 'Inactive' : 'Active'}
                       </span>
+                    </td>
+                    <td>
+                      {/* Hide archive button for the currently logged-in admin */}
+                      {tableUser.userName !== user?.username && (
+                        <button
+                          onClick={() => handleArchiveClick(tableUser)}
+                          className="action-btn archive-btn"
+                        >
+                          Archive
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -342,6 +400,31 @@ const UserAccounts: React.FC = () => {
           </Button>
           <Button onClick={handleConfirmSubmit} color="primary" autoFocus disabled={formLoading}>
             {formLoading ? <CircularProgress size={24} /> : 'Confirm'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Archive Confirmation Dialog */}
+      <Dialog
+        open={isArchiveConfirmOpen}
+        onClose={handleCancelArchive}
+        aria-labelledby="archive-dialog-title"
+        aria-describedby="archive-dialog-description"
+      >
+        <DialogTitle id="archive-dialog-title">
+          {"Confirm Archive Account"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="archive-dialog-description">
+            Are you sure you want to archive the account for <strong>{userToArchive?.fullName}</strong>? This will also archive all their associated posts.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelArchive} color="primary" disabled={archiveLoading}>
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmArchive} color="error" variant="contained" autoFocus disabled={archiveLoading}>
+            {archiveLoading ? <CircularProgress size={24} /> : 'Archive'}
           </Button>
         </DialogActions>
       </Dialog>

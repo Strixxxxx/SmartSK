@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { Box, Tab, Tabs, Paper, Typography } from '@mui/material';
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import UserAccounts from './UserAccounts';
-import RoleManagement from './RoleManagement';
 import RegistrationSummary from './RegistrationSummary';
 import './AccountManagement.css';
 
@@ -68,17 +66,13 @@ const AccountManagement: React.FC = () => {
               variant="fullWidth"
             >
               <Tab icon={<PeopleAltIcon />} iconPosition="start" label="User Accounts" id="account-management-tab-0" />
-              <Tab icon={<ManageAccountsIcon />} iconPosition="start" label="Role Management" id="account-management-tab-1" />
-              <Tab icon={<HourglassEmptyIcon />} iconPosition="start" label="Registration Summary" id="account-management-tab-2" />
+              <Tab icon={<HourglassEmptyIcon />} iconPosition="start" label="Registration Summary" id="account-management-tab-1" />
             </Tabs>
           </Box>
           <TabPanel value={value} index={0}>
             <UserAccounts />
           </TabPanel>
           <TabPanel value={value} index={1}>
-            <RoleManagement />
-          </TabPanel>
-          <TabPanel value={value} index={2}>
             <RegistrationSummary />
           </TabPanel>
         </Paper>

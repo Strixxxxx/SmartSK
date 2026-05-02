@@ -48,30 +48,34 @@ if (!process.env.AI_SERVICE_URL) {
 }
 
 const axios = require('axios');
-// Ping AI service 3 times on startup
-const pingAIService = async (attempts = 3) => {
-  const url = `${process.env.AI_SERVICE_URL}/health`;
-  console.log(`Starting connectivity check to AI Service: ${url}`);
 
-  for (let i = 1; i <= attempts; i++) {
+// --- AI Service Exponential Backoff Startup Check ---
+// Attempts to reach the FastAPI sidecar with escalating wait times.
+// Formula: min(1000 * 2^(n-1), 15000ms) — Max 15 attempts.
+const pingAIServiceWithBackoff = async (maxAttempts = 15) => {
+  const url = `${process.env.AI_SERVICE_URL}/health`;
+  console.log(`[AI Startup] Starting exponential backoff connectivity check to: ${url}`);
+
+  for (let i = 1; i <= maxAttempts; i++) {
     try {
-      const response = await axios.get(url, { timeout: 2000 });
+      const response = await axios.get(url, { timeout: 3000 });
       if (response.status === 200) {
-        console.log(`[Attempt ${i}] AI Service is REACHABLE.`);
-        return;
+        console.log(`[AI Startup] AI Service is REACHABLE on attempt ${i}.`);
+        return true;
       }
     } catch (error) {
-      console.log(`[Attempt ${i}] AI Service is NOT reachable. (Error: ${error.message})`);
+      const delay = Math.min(1000 * Math.pow(2, i - 1), 15000);
+      console.log(`[AI Startup] Attempt ${i}/${maxAttempts} failed. Retrying in ${delay}ms... (${error.message})`);
+      if (i < maxAttempts) await new Promise(resolve => setTimeout(resolve, delay));
     }
-    if (i < attempts) await new Promise(resolve => setTimeout(resolve, 2000));
   }
-  console.warn("AI Service connectivity check failed after 3 attempts. Continuing startup...");
+  console.warn('[AI Startup] AI Service unreachable after all attempts. Continuing without it.');
+  return false;
 };
 
-// Ping AI service 3 times after a 60-second delay to allow for manual service startup
-setTimeout(() => {
-  pingAIService();
-}, 60 * 1000);
+// Begin the exponential backoff check immediately on startup (no blind wait)
+pingAIServiceWithBackoff();
+
 
 // Import the other js files
 const routeGuard = require('./routeGuard/routeGuard');
@@ -179,9 +183,20 @@ if (disclosureRouter && typeof disclosureRouter === 'function') {
   console.error('disclosureRouter is not a valid middleware function');
 }
 
-// Health Check Endpoint for both frontend and AI service
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'healthy', timestamp: new Date().toISOString() });
+// Health Check Endpoint — Bidirectional (checks Node AND FastAPI)
+app.get('/health', async (req, res) => {
+  const aiStatus = { reachable: false };
+  try {
+    const aiRes = await axios.get(`${process.env.AI_SERVICE_URL}/health`, { timeout: 3000 });
+    if (aiRes.status === 200) aiStatus.reachable = true;
+  } catch (_) {
+    // AI service unreachable; report it but don't crash
+  }
+  res.status(200).json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    aiService: aiStatus.reachable ? 'reachable' : 'unreachable'
+  });
 });
 
 app.get('/api/maintenance-status', (req, res) => {

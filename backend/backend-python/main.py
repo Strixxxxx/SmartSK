@@ -77,6 +77,39 @@ import datetime
 
 
 
+# --- AI Job Queue Worker ---
+ai_job_queue = asyncio.Queue()
+
+async def ai_job_worker():
+    while True:
+        req_data = await ai_job_queue.get()
+        try:
+            print("Processing AI Job from queue...")
+            # Run the synchronous AI job in a thread pool to avoid blocking the event loop
+            await asyncio.to_thread(run_ai_batch_job)
+            
+            # Fire success callback
+            batch_id = req_data.get('batch_id')
+            port = os.getenv("NODE_PORT", "8000")
+            url = f"http://127.0.0.1:{port}/api/project-batch/webhook/ai-status"
+            try:
+                requests.post(url, json={"status": "success", "batchID": batch_id}, timeout=5)
+                print(f"Successfully sent callback to Node.js for batch {batch_id}")
+            except Exception as e:
+                print(f"Failed to send success callback to Node.js: {e}")
+                
+        except Exception as e:
+            print(f"AI Job failed: {e}")
+            batch_id = req_data.get('batch_id')
+            port = os.getenv("NODE_PORT", "8000")
+            url = f"http://127.0.0.1:{port}/api/project-batch/webhook/ai-status"
+            try:
+                requests.post(url, json={"status": "failed", "batchID": batch_id, "error": str(e)}, timeout=5)
+            except Exception as cb_err:
+                print(f"Failed to send failure callback to Node.js: {cb_err}")
+        finally:
+            ai_job_queue.task_done()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Run Node.js connectivity check
@@ -85,7 +118,13 @@ async def lifespan(app: FastAPI):
         ping_node_backend()
     
     asyncio.create_task(delayed_ping())
+    
+    # Start the AI job worker
+    worker_task = asyncio.create_task(ai_job_worker())
+    
     yield
+    
+    worker_task.cancel()
 
 app = FastAPI(title="smartSK AI Service", description="FastAPI Microservice for smartSK AI Tasks", lifespan=lifespan)
 
@@ -162,11 +201,14 @@ def trigger_sync_project(req: SyncBatchRequest):
 def health_check():
     return {"status": "healthy"}
 
+class AIBatchJobRequest(BaseModel):
+    batch_id: Optional[int] = None
+
 @app.post("/run-ai-batch-job")
-def trigger_batch_job(background_tasks: BackgroundTasks):
+async def trigger_batch_job(req: AIBatchJobRequest):
     try:
-        background_tasks.add_task(run_ai_batch_job)
-        return {"status": "ok", "message": "Batch AI Job triggered successfully."}
+        await ai_job_queue.put({'batch_id': req.batch_id})
+        return {"status": "ok", "message": "Batch AI Job queued successfully."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

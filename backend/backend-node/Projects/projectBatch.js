@@ -104,13 +104,29 @@ router.post('/update-status', authMiddleware, hasAccessControl('trackerControl')
         // Fetch projType to check for ABYIP AI trigger
         const batchResult = await pool.request()
             .input('batchID', sql.Int, batchID)
-            .query('SELECT projType FROM projectBatch WHERE batchID = @batchID');
+            .query('SELECT projType, barangayID FROM projectBatch WHERE batchID = @batchID');
 
         if (!batchResult.recordset.length) {
             return res.status(404).json({ success: false, message: 'Batch not found.' });
         }
 
-        const { projType } = batchResult.recordset[0];
+        const { projType, barangayID } = batchResult.recordset[0];
+
+        // --- CIRCUIT BREAKER: Pre-flight health check before City Approval AI trigger ---
+        if (statusID === 6 && projType === 'ABYIP') {
+            console.log(`[Circuit Breaker] Checkpoint 6 reached for batch ${batchID}. Checking AI service health...`);
+            try {
+                const aiHealthUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/health`;
+                await axios.get(aiHealthUrl, { timeout: 3000 });
+                console.log('[Circuit Breaker] AI Service is reachable. Allowing status transition.');
+            } catch (healthErr) {
+                console.error('[Circuit Breaker] TRIPPED — AI Service is unreachable. Blocking status transition.', healthErr.message);
+                return res.status(503).json({
+                    success: false,
+                    message: 'AI Service is temporarily down. Cannot transition to City Approval. Please try again later.'
+                });
+            }
+        }
 
         // Insert new status record into projectTracker
         await pool.request()
@@ -126,14 +142,14 @@ router.post('/update-status', authMiddleware, hasAccessControl('trackerControl')
             // Fire-and-forget HTTP call to Python microservice
             const pythonUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/run-ai-batch-job`;
 
-            axios.post(pythonUrl).catch(err => {
+            axios.post(pythonUrl, { batch_id: batchID }).catch(err => {
                 console.error('[AI Trigger] Failed to trigger AI job via HTTP:', err.message);
             });
 
             // Insert AI_TRIGGERED notification
             await pool.request()
                 .input('batchID', sql.Int, batchID)
-                .input('barangayID', sql.Int, req.user.barangay)
+                .input('barangayID', sql.Int, barangayID)
                 .input('notifType', sql.NVarChar, 'AI_TRIGGERED')
                 .input('message', sql.NVarChar,
                     `AI historical data sync triggered for ABYIP project (Batch #${batchID}) upon City Approval. Reports will be updated shortly.`)
@@ -154,6 +170,61 @@ router.post('/update-status', authMiddleware, hasAccessControl('trackerControl')
 
     } catch (error) {
         console.error('Error updating status:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+
+// Webhook for Python AI Job Callback
+router.post('/webhook/ai-status', async (req, res) => {
+    try {
+        const { status, batchID, error } = req.body;
+        if (!batchID) return res.status(400).json({ success: false, message: 'Missing batchID' });
+
+        const pool = await getConnection();
+        
+        // Find the barangayID for this batch
+        const batchResult = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query('SELECT barangayID FROM projectBatch WHERE batchID = @batchID');
+            
+        if (!batchResult.recordset.length) {
+            return res.status(404).json({ success: false, message: 'Batch not found' });
+        }
+        
+        const barangayID = batchResult.recordset[0].barangayID;
+        
+        let message = '';
+        let notifType = '';
+        if (status === 'success') {
+            notifType = 'AI_SUCCESS';
+            message = `AI-Generated Reports for Batch #${batchID} are currently Updated. Try looking up the updated forecasts and analysis!`;
+        } else {
+            notifType = 'AI_FAILED';
+            message = `AI-Generated Reports for Batch #${batchID} failed to update. Please contact the administrator or try again later.`;
+        }
+
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('barangayID', sql.Int, barangayID)
+            .input('notifType', sql.NVarChar, notifType)
+            .input('message', sql.NVarChar, message)
+            .query(`
+                INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
+                VALUES (@batchID, @barangayID, @notifType, @message)
+            `);
+            
+        // Broadcast via websocket
+        broadcastToRoom(batchID, { 
+            type: 'ai_report_status', 
+            batchID, 
+            status, 
+            message 
+        });
+
+        res.json({ success: true, message: 'Callback received' });
+    } catch (err) {
+        console.error('Webhook error:', err);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 });

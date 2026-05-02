@@ -7,9 +7,9 @@ const { decrypt } = require('../utils/crypto');
 
 // GET all archived accounts
 router.get('/', authMiddleware, async (req, res) => {
-  try {
-    const pool = await getConnection();
-    const result = await pool.request().query(`
+    try {
+        const pool = await getConnection();
+        const result = await pool.request().query(`
       SELECT 
         u.userID, 
         u.username, 
@@ -26,19 +26,19 @@ router.get('/', authMiddleware, async (req, res) => {
       ORDER BY u.fullName
     `);
 
-    const decryptedData = result.recordset.map(user => ({
-        ...user,
-        username: decrypt(user.username),
-        fullName: decrypt(user.fullName),
-        emailAddress: decrypt(user.emailAddress),
-        phoneNumber: decrypt(user.phoneNumber),
-    }));
+        const decryptedData = result.recordset.map(user => ({
+            ...user,
+            username: decrypt(user.username),
+            fullName: decrypt(user.fullName),
+            emailAddress: decrypt(user.emailAddress),
+            phoneNumber: decrypt(user.phoneNumber),
+        }));
 
-    res.json({ success: true, data: decryptedData });
-  } catch (error) {
-    console.error('Error fetching archived accounts:', error);
-    res.status(500).json({ success: false, message: 'Failed to fetch archived accounts.' });
-  }
+        res.json({ success: true, data: decryptedData });
+    } catch (error) {
+        console.error('Error fetching archived accounts:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch archived accounts.' });
+    }
 });
 
 // POST to archive an account
@@ -99,7 +99,7 @@ router.post('/restore/:userId', authMiddleware, async (req, res) => {
     const { userId } = req.params;
     try {
         const pool = await getConnection();
-        
+
         // Check if the user exists and is actually archived
         const userToRestore = await pool.request()
             .input('userID', sql.Int, userId)
