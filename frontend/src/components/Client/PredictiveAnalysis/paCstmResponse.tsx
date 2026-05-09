@@ -1,8 +1,39 @@
 import React from 'react';
-import { Container, Row, Col, Card, Alert, Table, ListGroup, Spinner } from 'react-bootstrap';
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  List,
+  ListItem,
+  CircularProgress,
+  Divider,
+  Stack,
+  Alert
+} from '@mui/material';
+import {
+  Summarize,
+  Insights,
+  TipsAndUpdates,
+  WarningAmber,
+  TrendingUp,
+  AttachMoney,
+  Timeline,
+  Timer,
+  ChatBubbleOutline,
+  InfoOutlined
+} from '@mui/icons-material';
 import CitationRenderer from './CitationRenderer';
+import styles from './pa.module.css';
 
-// --- UNIFIED TYPE DEFINITIONS (similar to paResponse.tsx) ---
+// --- Interfaces ---
 
 interface Citation {
   id: number;
@@ -54,7 +85,6 @@ interface Metadata {
   filters_applied: Record<string, any>;
 }
 
-// This interface now represents the flat structure from the new paCstm.py
 export interface PaCstmApiResponse {
   summary_report?: string;
   success_factors?: string[];
@@ -68,8 +98,8 @@ export interface PaCstmApiResponse {
   citations?: Citation[];
   quantitative_analysis?: QuantitativeAnalysis;
   metadata?: Metadata;
-  error?: string; // For top-level errors
-  message?: string; // Often comes with 'error'
+  error?: string;
+  message?: string;
 }
 
 interface PaCstmResponseProps {
@@ -77,49 +107,103 @@ interface PaCstmResponseProps {
   isLoading?: boolean;
 }
 
-// --- REUSABLE SECTION COMPONENT ---
+// --- COLOUR-CODED SECTION COMPONENT ---
 
-const SectionCard: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
-  <Card className="mb-4 shadow-sm">
-    <Card.Header className="p-3 bg-light bg-gradient border-bottom-0">
-      <h4 className="mb-0 fw-normal">{title}</h4>
-    </Card.Header>
-    <Card.Body className="p-4">
-      {children}
-    </Card.Body>
-  </Card>
+interface DashboardSectionProps {
+  title: string;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+  flex?: string | number;
+  accentClass?: string;
+}
+
+const DashboardSection: React.FC<DashboardSectionProps> = ({
+  title, icon, children, flex = 1, accentClass = ''
+}) => (
+  <Box sx={{ flex, minWidth: 0, display: 'flex' }}>
+    <Card className={styles.contentCard} sx={{ width: '100%' }}>
+      <Box className={`${styles.cardHeader} ${accentClass}`}>
+        <Box sx={{ display: 'flex' }}>{icon}</Box>
+        <Typography variant="h6" className={styles.cardHeaderTitle}>{title}</Typography>
+      </Box>
+      <CardContent className={styles.cardBody}>
+        {children}
+      </CardContent>
+    </Card>
+  </Box>
 );
+
+// --- SUCCESS PROBABILITY RING COMPONENT ---
+
+const ProbabilityRing: React.FC<{ value: number }> = ({ value }) => {
+  const pct = Math.min(Math.max(value * 100, 0), 100);
+  const color = pct >= 70 ? '#2e7d32' : pct >= 40 ? '#f57c00' : '#d32f2f';
+
+  return (
+    <Box sx={{ position: 'relative', display: 'inline-flex', mb: 1 }}>
+      {/* Background track */}
+      <CircularProgress
+        variant="determinate"
+        value={100}
+        size={110}
+        thickness={4}
+        sx={{ color: '#e2e8f0', position: 'absolute' }}
+      />
+      {/* Coloured fill */}
+      <CircularProgress
+        variant="determinate"
+        value={pct}
+        size={110}
+        thickness={4}
+        sx={{ color }}
+      />
+      <Box
+        sx={{
+          top: 0, left: 0, bottom: 0, right: 0,
+          position: 'absolute',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'column',
+        }}
+      >
+        <Typography variant="h5" fontWeight={800} sx={{ color, lineHeight: 1 }}>
+          {pct.toFixed(0)}%
+        </Typography>
+      </Box>
+    </Box>
+  );
+};
 
 // --- MAIN RESPONSE COMPONENT ---
 
 const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoading }) => {
   if (isLoading) {
     return (
-        <div className="text-center mt-4">
-            <Spinner animation="border" role="status">
-                <span className="visually-hidden">Loading...</span>
-            </Spinner>
-            <p>Loading customized analysis results...</p>
-        </div>
+      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" py={10}>
+        <CircularProgress size={60} />
+        <Typography variant="body1" sx={{ mt: 2, color: 'text.secondary' }}>
+          Assembling your customized report...
+        </Typography>
+      </Box>
     );
   }
 
   if (!analysisResult) {
-    return <Alert variant="secondary" className="mt-4">No customized analysis results to display.</Alert>;
+    return <Alert severity="info" sx={{ mt: 4, borderRadius: 2 }}>No customized analysis results to display.</Alert>;
   }
 
-  console.log("Analysis Result in paCstmResponse:", analysisResult);
-
-  // Handle errors returned from the backend
   if (analysisResult.error || analysisResult.message) {
     return (
-      <Container className="mt-4">
-        <Alert variant="danger">
-          <Alert.Heading>An Error Occurred During Analysis</Alert.Heading>
-          <p>{analysisResult.message || analysisResult.error}</p>
-          <p className="small mb-0">Please try adjusting your filters or contact support if the issue persists.</p>
+      <Box mt={4}>
+        <Alert severity="error" sx={{ borderRadius: 2 }}>
+          <Typography variant="h6" gutterBottom>An Error Occurred During Analysis</Typography>
+          <Typography variant="body2">{analysisResult.message || analysisResult.error}</Typography>
+          <Typography variant="caption" display="block" sx={{ mt: 1 }}>
+            Please try adjusting your filters or contact support if the issue persists.
+          </Typography>
         </Alert>
-      </Container>
+      </Box>
     );
   }
 
@@ -139,151 +223,298 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
   } = analysisResult;
 
   const formattedTimestamp = metadata?.timestamp
-    ? new Date(metadata.timestamp).toLocaleString('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    ? new Date(metadata.timestamp).toLocaleString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    })
     : 'N/A';
 
-  // Check if there are any results to display besides metadata
-  const hasContent = summary_report || success_factors || recommendations || risk_mitigation_strategies || predicted_trends || budget || implementation_date || estimated_duration || feedback || quantitative_analysis;
+  const hasContent = summary_report || success_factors || recommendations
+    || risk_mitigation_strategies || predicted_trends || budget
+    || implementation_date || estimated_duration || feedback || quantitative_analysis;
 
   if (!hasContent) {
-      return <Alert variant="warning" className="mt-4">The customized analysis returned no content based on the selected filters. Please try different options.</Alert>;
+    return <Alert severity="warning" sx={{ mt: 4, borderRadius: 2 }}>The analysis returned no content for the selected filters.</Alert>;
   }
 
+  const successProbability = quantitative_analysis?.predicted_success_probability ?? null;
+
   return (
-    <Container fluid className="predictive-analysis-response mt-4">
-      <Row className="justify-content-center">
-        <Col lg={11} xl={10}>
-          <Card className="mb-4 shadow-sm bg-white">
-            <Card.Body className="p-4">
-              <h2 className="mb-3 text-dark">Customized Analysis</h2>
+    <Box className={styles.responseContainer} sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+
+      {/* â”€â”€ Row 1: Executive Summary + Success Probability â”€â”€ */}
+      {/* ── Row 1: Executive Summary & Success Probability ── */}
+      <Box sx={{ width: '100%' }}>
+        <Card className={styles.sectionHeaderCard}>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4, alignItems: { xs: 'flex-start', md: 'center' } }}>
+            
+            {/* Left: Summary Text */}
+            <Box sx={{ flex: 1 }}>
+              <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+                <Summarize color="primary" fontSize="large" />
+                <Typography variant="h5" fontWeight={700} color="#1e293b">
+                  Executive Analysis Summary
+                </Typography>
+              </Stack>
               {summary_report ? (
-                <p className="lead text-body-secondary"><CitationRenderer text={summary_report} citations={citations} /></p>
+                <Typography variant="body1" className={styles.summaryText}>
+                  <CitationRenderer text={summary_report} citations={citations} />
+                </Typography>
               ) : (
-                <p className="lead text-muted">An executive summary was not generated for this customized report.</p>
+                <Typography variant="body1" color="text.secondary" fontStyle="italic">
+                  An executive summary was not generated for this customized report.
+                </Typography>
               )}
-            </Card.Body>
-          </Card>
+            </Box>
 
-          {quantitative_analysis && (
-            <SectionCard title="Quantitative Predictions">
-              <Row>
-                {quantitative_analysis.predicted_success_probability && (
-                  <Col md={6}>
-                    <h5 className="fw-normal">Predicted Success Probability</h5>
-                    <p className="fs-4 fw-bold text-primary">
-                      {(quantitative_analysis.predicted_success_probability * 100).toFixed(0)}%
-                    </p>
-                  </Col>
-                )}
-                {quantitative_analysis.forecasted_budget_variance && (
-                  <Col md={6}>
-                    <h5 className="fw-normal">Forecasted Budget Variance</h5>
-                    <p className="fs-4 fw-bold text-info">
-                      {quantitative_analysis.forecasted_budget_variance}
-                    </p>
-                  </Col>
-                )}
-              </Row>
-            </SectionCard>
-          )}
+            {/* Right: Probability Ring */}
+            {successProbability !== null && (
+              <Box sx={{ 
+                minWidth: '240px', 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                p: 3,
+                bgcolor: 'rgba(46, 125, 50, 0.03)',
+                borderRadius: '16px',
+                border: '1px solid rgba(46, 125, 50, 0.1)',
+                alignSelf: 'stretch'
+              }}>
+                <ProbabilityRing value={successProbability} />
+                <Typography className={styles.statLabel} sx={{ mt: 2 }}>Success Probability</Typography>
+                <Typography variant="h4" fontWeight={800} color={
+                  successProbability * 100 >= 70 ? 'success.main'
+                    : successProbability * 100 >= 40 ? 'warning.main'
+                      : 'error.main'
+                }>
+                  {(successProbability * 100).toFixed(0)}%
+                </Typography>
+                <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1, textAlign: 'center', maxWidth: '200px' }}>
+                  Based on AI analysis of historical data and current project metrics.
+                </Typography>
+              </Box>
+            )}
 
-          {success_factors && success_factors.length > 0 && (
-            <SectionCard title="Success Factors">
-              <ListGroup variant="flush">
-                {success_factors.map((item, index) => (
-                  <ListGroup.Item key={index} className="px-0 border-0"><CitationRenderer text={item} citations={citations} /></ListGroup.Item>
+          </Box>
+        </Card>
+      </Box>
+
+      {/* â”€â”€ Row 2: Success Factors + Recommendations â”€â”€ */}
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: '24px', alignItems: 'stretch' }}>
+        <DashboardSection
+          title="Success Factors"
+          icon={<Insights sx={{ color: '#2e7d32' }} />}
+          accentClass={styles.cardHeaderSuccess}
+        >
+          <List dense disablePadding>
+            {success_factors?.map((item, index) => (
+              <ListItem key={index} className={styles.listItem}>
+                <CitationRenderer text={item} citations={citations} />
+              </ListItem>
+            )) || <Typography variant="body2" color="text.secondary">No factors identified.</Typography>}
+          </List>
+        </DashboardSection>
+
+        <DashboardSection
+          title="Recommendations"
+          icon={<TipsAndUpdates sx={{ color: '#0288d1' }} />}
+          accentClass={styles.cardHeaderRecommend}
+        >
+          <List dense disablePadding>
+            {recommendations?.map((item, index) => (
+              <ListItem key={index} className={styles.listItem}>
+                <CitationRenderer text={item} citations={citations} />
+              </ListItem>
+            )) || <Typography variant="body2" color="text.secondary">No specific recommendations.</Typography>}
+          </List>
+        </DashboardSection>
+      </Box>
+
+      {/* â”€â”€ Row 3: Risk Management â”€â”€ */}
+      {risk_mitigation_strategies && risk_mitigation_strategies.length > 0 && (
+        <DashboardSection
+          title="Risks & Mitigation Strategies"
+          icon={<WarningAmber sx={{ color: '#d32f2f' }} />}
+          accentClass={styles.cardHeaderRisk}
+        >
+          <TableContainer component={Paper} className={styles.tableContainer} elevation={0}>
+            <Table size="medium">
+              <TableHead className={styles.tableHeader}>
+                <TableRow>
+                  <TableCell sx={{ width: '40%' }}>Risk</TableCell>
+                  <TableCell>Mitigation Strategy</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {risk_mitigation_strategies.map((item, index) => (
+                  <TableRow key={index} hover>
+                    <TableCell><CitationRenderer text={item.risk} citations={citations} /></TableCell>
+                    <TableCell><CitationRenderer text={item.mitigation} citations={citations} /></TableCell>
+                  </TableRow>
                 ))}
-              </ListGroup>
-            </SectionCard>
-          )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </DashboardSection>
+      )}
 
-          {recommendations && recommendations.length > 0 && (
-            <SectionCard title="Recommendations">
-              <ListGroup variant="flush">
-                {recommendations.map((item, index) => (
-                  <ListGroup.Item key={index} className="px-0 border-0"><CitationRenderer text={item} citations={citations} /></ListGroup.Item>
-                ))}
-              </ListGroup>
-            </SectionCard>
-          )}
-
-          {risk_mitigation_strategies && risk_mitigation_strategies.length > 0 && (
-            <SectionCard title="Risks & Mitigation Strategies">
-              <Table striped bordered hover responsive="sm" className="m-0">
-                <thead className="table-light">
-                  <tr>
-                    <th className="w-50">Risk</th>
-                    <th>Mitigation Strategy</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {risk_mitigation_strategies.map((item, index) => (
-                    <tr key={index}>
-                      <td><CitationRenderer text={item.risk} citations={citations} /></td>
-                      <td><CitationRenderer text={item.mitigation} citations={citations} /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </SectionCard>
+      {/* â”€â”€ Row 4: Budget + Predicted Trends â”€â”€ */}
+      {(budget || (predicted_trends && predicted_trends.length > 0)) && (
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: '24px', alignItems: 'stretch' }}>
+          {budget && (
+            <DashboardSection
+              title="Budgetary Analysis"
+              icon={<AttachMoney sx={{ color: '#f57c00' }} />}
+              accentClass={styles.cardHeaderBudget}
+            >
+              <Typography variant="body2" paragraph>
+                <CitationRenderer text={budget.analysis} citations={citations} />
+              </Typography>
+              <Divider sx={{ my: 2 }} />
+              {budget.historical_patterns && (
+                <Box mb={1}>
+                  <Typography variant="subtitle2" component="span" fontWeight="bold">Historical: </Typography>
+                  <Typography variant="body2" component="span">
+                    <CitationRenderer text={budget.historical_patterns} citations={citations} />
+                  </Typography>
+                </Box>
+              )}
+              {budget.recommendations && (
+                <Box>
+                  <Typography variant="subtitle2" component="span" fontWeight="bold">Strategic Tip: </Typography>
+                  <Typography variant="body2" component="span" color="primary.main">
+                    <CitationRenderer text={budget.recommendations} citations={citations} />
+                  </Typography>
+                </Box>
+              )}
+            </DashboardSection>
           )}
 
           {predicted_trends && predicted_trends.length > 0 && (
-            <SectionCard title="Predicted Trends">
-              <ListGroup variant="flush">
+            <DashboardSection
+              title="Predicted Trends"
+              icon={<TrendingUp sx={{ color: '#7b1fa2' }} />}
+              accentClass={styles.cardHeaderTrends}
+            >
+              <List dense disablePadding>
                 {predicted_trends.map((item, index) => (
-                  <ListGroup.Item key={index} className="px-0 border-0"><CitationRenderer text={item} citations={citations} /></ListGroup.Item>
+                  <ListItem key={index} className={styles.listItem}>
+                    <CitationRenderer text={item} citations={citations} />
+                  </ListItem>
                 ))}
-              </ListGroup>
-            </SectionCard>
+              </List>
+            </DashboardSection>
           )}
+        </Box>
+      )}
 
-          {budget && (
-            <SectionCard title="Budget Analysis">
-              <p><CitationRenderer text={budget.analysis} citations={citations} /></p>
-              {budget.historical_patterns && <><hr /><p><strong>Historical Patterns:</strong> <CitationRenderer text={budget.historical_patterns} citations={citations} /></p></>}
-              {budget.current_trends && <p><strong>Current Trends:</strong> <CitationRenderer text={budget.current_trends} citations={citations} /></p>}
-              {budget.recommendations && <p><strong>Recommendations:</strong> <CitationRenderer text={budget.recommendations} citations={citations} /></p>}
-            </SectionCard>
-          )}
-
+      {/* â”€â”€ Row 5: Timeline + Duration â”€â”€ */}
+      {(implementation_date || estimated_duration) && (
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: '24px', alignItems: 'stretch' }}>
           {implementation_date && (
-            <SectionCard title="Implementation Timeline">
-              <p><CitationRenderer text={implementation_date.analysis} citations={citations} /></p>
-              {implementation_date.historical_patterns && <><hr /><p><strong>Historical Patterns:</strong> <CitationRenderer text={implementation_date.historical_patterns} citations={citations} /></p></>}
-              {implementation_date.current_practices && <p><strong>Current Practices:</strong> <CitationRenderer text={implementation_date.current_practices} citations={citations} /></p>}
-              {implementation_date.seasonal_factors && <p><strong>Seasonal Factors:</strong> <CitationRenderer text={implementation_date.seasonal_factors} citations={citations} /></p>}
-              {implementation_date.resource_considerations && <p><strong>Resource Considerations:</strong> <CitationRenderer text={implementation_date.resource_considerations} citations={citations} /></p>}
-            </SectionCard>
+            <DashboardSection
+              title="Implementation Timeline"
+              icon={<Timeline sx={{ color: '#00796b' }} />}
+              accentClass={styles.cardHeaderTimeline}
+            >
+              <Typography variant="body2" paragraph>
+                <CitationRenderer text={implementation_date.analysis} citations={citations} />
+              </Typography>
+              <Divider sx={{ my: 2 }} />
+              <Stack spacing={1.5}>
+                {implementation_date.current_practices && (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">Standard Practice:</Typography>
+                    <Typography variant="body2">
+                      <CitationRenderer text={implementation_date.current_practices} citations={citations} />
+                    </Typography>
+                  </Box>
+                )}
+                {implementation_date.seasonal_factors && (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">Seasonal Considerations:</Typography>
+                    <Typography variant="body2">
+                      <CitationRenderer text={implementation_date.seasonal_factors} citations={citations} />
+                    </Typography>
+                  </Box>
+                )}
+              </Stack>
+            </DashboardSection>
           )}
 
           {estimated_duration && (
-            <SectionCard title="Project Duration Analysis">
-              <p><CitationRenderer text={estimated_duration.analysis} citations={citations} /></p>
-              {estimated_duration.historical_timeframes && <><hr /><p><strong>Historical Timeframes:</strong> <CitationRenderer text={estimated_duration.historical_timeframes} citations={citations} /></p></>}
-              {estimated_duration.complexity_factors && <p><strong>Complexity Factors:</strong> <CitationRenderer text={estimated_duration.complexity_factors} citations={citations} /></p>}
-              {estimated_duration.current_standards && <p><strong>Current Standards:</strong> <CitationRenderer text={estimated_duration.current_standards} citations={citations} /></p>}
-              {estimated_duration.dependencies && <p><strong>Dependencies:</strong> <CitationRenderer text={estimated_duration.dependencies} citations={citations} /></p>}
-            </SectionCard>
+            <DashboardSection
+              title="Project Duration Intelligence"
+              icon={<Timer sx={{ color: '#0288d1' }} />}
+              accentClass={styles.cardHeaderDuration}
+            >
+              <Typography variant="body2" paragraph>
+                <CitationRenderer text={estimated_duration.analysis} citations={citations} />
+              </Typography>
+              <Divider sx={{ my: 2 }} />
+              <Stack spacing={1.5}>
+                {estimated_duration.historical_timeframes && (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">Historical Reference:</Typography>
+                    <Typography variant="body2">
+                      <CitationRenderer text={estimated_duration.historical_timeframes} citations={citations} />
+                    </Typography>
+                  </Box>
+                )}
+                {estimated_duration.complexity_factors && (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">Complexity Drivers:</Typography>
+                    <Typography variant="body2">
+                      <CitationRenderer text={estimated_duration.complexity_factors} citations={citations} />
+                    </Typography>
+                  </Box>
+                )}
+              </Stack>
+            </DashboardSection>
           )}
+        </Box>
+      )}
 
-          {feedback && (
-            <SectionCard title="Expected Community Feedback">
-              {Array.isArray(feedback) ? <ListGroup variant='flush'>{feedback.map((item, index) => <ListGroup.Item key={index} className="px-0 border-0"><CitationRenderer text={item} citations={citations} /></ListGroup.Item>)}</ListGroup> : <p><CitationRenderer text={feedback} citations={citations} /></p>}
-            </SectionCard>
+      {/* â”€â”€ Row 6: Community Sentiment â”€â”€ */}
+      {feedback && (
+        <DashboardSection
+          title="Expected Community Feedback"
+          icon={<ChatBubbleOutline sx={{ color: '#c2185b' }} />}
+          accentClass={styles.cardHeaderFeedback}
+        >
+          {Array.isArray(feedback) ? (
+            <List dense disablePadding>
+              {feedback.map((item, index) => (
+                <ListItem key={index} className={styles.listItem}>
+                  <CitationRenderer text={item} citations={citations} />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Typography variant="body2">
+              <CitationRenderer text={feedback} citations={citations} />
+            </Typography>
           )}
+        </DashboardSection>
+      )}
 
+      {/* â”€â”€ Footer Metadata â”€â”€ */}
+      {metadata && (
+        <Box className={styles.footer}>
+          <Stack direction="row" spacing={1} justifyContent="center" alignItems="center" mb={0.5}>
+            <InfoOutlined fontSize="small" />
+            <Typography variant="body2">
+              Intelligence generated on {formattedTimestamp}
+            </Typography>
+          </Stack>
+          <Typography variant="caption">
+            Source: {metadata.data_source} &nbsp;|&nbsp; Projects Analyzed: {metadata.total_projects_analyzed} &nbsp;|&nbsp; Knowledge Sources: {metadata.internet_sources_consulted}
+          </Typography>
+        </Box>
+      )}
 
-
-          {metadata && (
-            <div className="text-center mt-4 text-muted small">
-              <p className="mb-1">Analysis generated on {formattedTimestamp} ({metadata.analysis_type})</p>
-              <p className="mb-0">Source: {metadata.data_source} | Projects Analyzed: {metadata.total_projects_analyzed} | Internet Sources: {metadata.internet_sources_consulted}</p>
-            </div>
-          )}
-        </Col>
-      </Row>
-    </Container>
+    </Box>
   );
 };
 

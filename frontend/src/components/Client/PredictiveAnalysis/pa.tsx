@@ -1,33 +1,38 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Form, Alert } from 'react-bootstrap';
+import { 
+  Box, 
+  Typography, 
+  Tabs, 
+  Tab, 
+  Card, 
+  CardContent, 
+  FormControl, 
+  InputLabel, 
+  Select, 
+  MenuItem, 
+  Alert,
+  CircularProgress
+} from '@mui/material';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import PaCstmResponse, { PaCstmApiResponse } from './paCstmResponse';
 import Trends from './paTrends';
-import Loading from '../../Loading/Loading';
-import './pa.css';
+import styles from './pa.module.css';
 
 // --- Interfaces ---
 
-// This is the structure of the entire pa_analysis.json file
-// It's a dictionary where each key (like 'general' or 'category_health')
-// maps to a full analysis report.
 type PaAnalysisReport = Record<string, PaCstmApiResponse>;
 
 const PredictiveAnalysis: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('analysis');
+  const [activeTab, setActiveTab] = useState(0); // MUI Tabs use numeric index
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   
-  // State to hold the entire fetched report
   const [analysisReport, setAnalysisReport] = useState<PaAnalysisReport | null>(null);
-  // State to hold the currently selected analysis to display
   const [selectedAnalysis, setSelectedAnalysis] = useState<PaCstmApiResponse | null>(null);
   
-  // State for the category dropdown
   const [selectedCategoryKey, setSelectedCategoryKey] = useState<string>('general');
   const [availableCategories, setAvailableCategories] = useState<Array<{ key: string; name: string }>>([]);
 
-  // Fetch the entire analysis report on component mount
   useEffect(() => {
     const fetchAnalysisReport = async () => {
       setLoading(true);
@@ -42,18 +47,15 @@ const PredictiveAnalysis: React.FC = () => {
 
         setAnalysisReport(reportData);
         
-        // Set the initial view to the 'general' report
         if (reportData.general) {
           setSelectedAnalysis(reportData.general);
           setSelectedCategoryKey('general');
         } else {
-          // Fallback to the first available report if 'general' doesn't exist
           const firstKey = Object.keys(reportData)[0];
           setSelectedAnalysis(reportData[firstKey]);
           setSelectedCategoryKey(firstKey);
         }
 
-        // Populate the dropdown options from the keys of the report
         const categories = Object.keys(reportData).map(key => {
           let name = 'General Analysis';
           if (key.startsWith('category_')) {
@@ -75,9 +77,12 @@ const PredictiveAnalysis: React.FC = () => {
     fetchAnalysisReport();
   }, []);
 
-  // Handle changes in the category dropdown
-  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newKey = event.target.value;
+  const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+  };
+
+  const handleCategoryChange = (event: any) => {
+    const newKey = event.target.value as string;
     setSelectedCategoryKey(newKey);
     if (analysisReport && analysisReport[newKey]) {
       setSelectedAnalysis(analysisReport[newKey]);
@@ -85,89 +90,79 @@ const PredictiveAnalysis: React.FC = () => {
   };
 
   const renderAnalysisSelector = () => (
-    <div className="mb-4">
-      <h3 className="forecast-title" style={{ margin: 0, marginBottom: '1rem' }}>Select Analysis View</h3>
-      <div className="forecast-filters">
-        <Card style={{ border: '1px solid #dee2e6', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
-          <Card.Body>
-            <div className="filter-row">
-              <div className="filter-group">
-                <label>Analysis Category</label>
-                <div className="select-wrapper">
-                  <Form.Select
-                    value={selectedCategoryKey}
-                    onChange={handleCategoryChange}
-                    aria-label="Select Analysis Category"
-                  >
-                    {availableCategories.map(cat => (
-                        <option key={cat.key} value={cat.key}>{cat.name}</option>
-                    ))}
-                  </Form.Select>
-                </div>
-              </div>
-            </div>
-          </Card.Body>
-        </Card>
-      </div>
-    </div>
+    <Card className={styles.selectorCard}>
+      <CardContent sx={{ p: 3 }}>
+        <Typography variant="h6" className={styles.selectorLabel}>
+          Select Analysis View
+        </Typography>
+        <FormControl fullWidth variant="outlined">
+          <InputLabel id="category-select-label">Analysis Category</InputLabel>
+          <Select
+            labelId="category-select-label"
+            value={selectedCategoryKey}
+            onChange={handleCategoryChange}
+            label="Analysis Category"
+          >
+            {availableCategories.map(cat => (
+              <MenuItem key={cat.key} value={cat.key}>{cat.name}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </CardContent>
+    </Card>
   );
 
   return (
-    <div className="predictive-analysis-container">
-      <h2 className="forecast-title">Predictive Analysis</h2>
-      <p className="lead">
+    <Box className={styles.predictiveContainer}>
+      <Typography variant="h4" className={styles.title}>
+        Predictive Analysis
+      </Typography>
+      <Typography variant="body1" className={styles.description}>
         Use AI-powered predictive analysis to gain insights into project success factors,
         outcomes, and recommendations based on pre-computed historical data.
-      </p>
+      </Typography>
 
-      <div className="forecast-tabs">
-        <button
-          className={activeTab === 'analysis' ? 'active' : ''}
-          onClick={() => setActiveTab('analysis')}
+      <Box className={styles.tabsContainer}>
+        <Tabs 
+          value={activeTab} 
+          onChange={handleTabChange} 
+          aria-label="predictive analysis tabs"
+          textColor="primary"
+          indicatorColor="primary"
         >
-          Project Analysis
-        </button>
-        <button
-          className={activeTab === 'trends' ? 'active' : ''}
-          onClick={() => setActiveTab('trends')}
-        >
-          Project Trends
-        </button>
-      </div>
+          <Tab label="Project Analysis" className={styles.tabButton} />
+          <Tab label="Project Trends" className={styles.tabButton} />
+        </Tabs>
+      </Box>
 
-      <div className="forecast-content">
-        {activeTab === 'analysis' && (
+      <Box className={styles.responseContainer}>
+        {activeTab === 0 && (
           <>
             {loading ? (
-              <div className="text-center mt-4">
-                <Loading />
-                <p>Loading Analysis Report...</p>
-              </div>
+              <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" py={10}>
+                <CircularProgress size={60} />
+                <Typography variant="body1" sx={{ mt: 2, color: 'text.secondary' }}>
+                  Processing Intelligence Report...
+                </Typography>
+              </Box>
             ) : error ? (
-              <Alert variant="danger">{error}</Alert>
+              <Alert severity="error" sx={{ borderRadius: 2 }}>{error}</Alert>
             ) : (
               <>
-                <Card className="mb-4">
-                  <Card.Body>
-                    {renderAnalysisSelector()}
-                  </Card.Body>
-                </Card>
-
-                <div className="analysis-results-section">
-                  <PaCstmResponse
-                    analysisResult={selectedAnalysis}
-                    isLoading={false} 
-                  />
-                </div>
+                {renderAnalysisSelector()}
+                <PaCstmResponse
+                  analysisResult={selectedAnalysis}
+                  isLoading={false} 
+                />
               </>
             )}
           </>
         )}
-        {activeTab === 'trends' && (
+        {activeTab === 1 && (
           <Trends />
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

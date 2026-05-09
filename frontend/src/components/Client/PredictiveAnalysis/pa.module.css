@@ -1,0 +1,298 @@
+/* ===================================================
+   Predictive Analysis CSS Module
+   Design: Clean White, Modern Government-Standard
+   =================================================== */
+
+/* ---------- Page Container ---------- */
+.predictiveContainer {
+  padding: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background-color: #f8fafc;
+  min-height: calc(100vh - 64px);
+}
+
+.title {
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 8px !important;
+}
+
+.description {
+  color: #64748b;
+  margin-bottom: 32px !important;
+  font-size: 1.05rem;
+}
+
+/* ---------- Tabs ---------- */
+.tabsContainer {
+  margin-bottom: 28px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.tabButton {
+  padding: 12px 24px;
+  font-weight: 600;
+  text-transform: none !important;
+  font-size: 0.95rem !important;
+}
+
+/* ---------- Selector Card ---------- */
+.selectorCard {
+  background: #ffffff;
+  border-radius: 16px !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+  margin-bottom: 28px !important;
+  overflow: visible !important;
+}
+
+.selectorLabel {
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 12px;
+  display: block;
+}
+
+/* ---------- Response Container ---------- */
+.responseContainer {
+  margin-top: 8px;
+}
+
+/* ---------- Executive Summary Card ---------- */
+.sectionHeaderCard {
+  background: #ffffff;
+  border-radius: 16px !important;
+  border: 1px solid #e2e8f0 !important;
+  /* Signature top accent stripe */
+  border-top: 4px solid #1976d2 !important;
+  padding: 32px !important;
+  box-shadow: 0 4px 16px rgba(25, 118, 210, 0.07) !important;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle radial shimmer in the top-right corner for depth */
+.sectionHeaderCard::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(25, 118, 210, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.summaryText {
+  font-size: 1.05rem;
+  line-height: 1.85;
+  color: #334155;
+}
+
+/* ---------- Success Probability Hero Card ---------- */
+.statCard {
+  height: 100%;
+  padding: 24px !important;
+  border-radius: 20px !important;
+  border: 1px solid #e2e8f0 !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%) !important;
+  border-top: 4px solid #2e7d32 !important;
+  transition: box-shadow 0.25s ease, transform 0.25s ease !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.statCard::before {
+  content: '';
+  position: absolute;
+  bottom: -40px;
+  right: -40px;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(46, 125, 50, 0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.statCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(46, 125, 50, 0.12) !important;
+}
+
+.statIcon {
+  font-size: 44px !important;
+  margin-bottom: 12px;
+}
+
+.statValue {
+  font-weight: 800 !important;
+  color: #1e293b;
+  line-height: 1.1 !important;
+}
+
+.statLabel {
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  margin-bottom: 4px;
+}
+
+/* ---------- Content Cards ---------- */
+.contentCard {
+  background: #ffffff !important;
+  border-radius: 16px !important;
+  border: 1px solid #e2e8f0 !important;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.contentCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07) !important;
+}
+
+.cardHeader {
+  padding: 18px 24px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* Left accent stripe per section type, applied via modifier below */
+  border-left: 3px solid transparent;
+}
+
+/* Colour-coded left borders for each section type */
+.cardHeaderSuccess {
+  border-left-color: #2e7d32 !important;
+}
+
+.cardHeaderRecommend {
+  border-left-color: #0288d1 !important;
+}
+
+.cardHeaderRisk {
+  border-left-color: #d32f2f !important;
+}
+
+.cardHeaderBudget {
+  border-left-color: #f57c00 !important;
+}
+
+.cardHeaderTrends {
+  border-left-color: #7b1fa2 !important;
+}
+
+.cardHeaderTimeline {
+  border-left-color: #00796b !important;
+}
+
+.cardHeaderDuration {
+  border-left-color: #0288d1 !important;
+}
+
+.cardHeaderFeedback {
+  border-left-color: #c2185b !important;
+}
+
+.cardHeaderTitle {
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  font-size: 1.0rem !important;
+}
+
+.cardBody {
+  padding: 24px !important;
+  flex-grow: 1;
+}
+
+/* ---------- List Items ---------- */
+.listItem {
+  padding: 10px 0 10px 12px !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  color: #475569;
+  line-height: 1.65;
+  position: relative;
+  transition: background-color 0.15s ease;
+}
+
+/* Left accent mark on hover */
+.listItem::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background-color: #1976d2;
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.listItem:hover::before {
+  opacity: 1;
+}
+
+.listItem:hover {
+  background-color: #f8fafc;
+  border-radius: 4px;
+}
+
+.listItem:last-child {
+  border-bottom: none !important;
+}
+
+/* ---------- Table Styling ---------- */
+.tableContainer {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+}
+
+.tableHeader {
+  background-color: #f8fafc !important;
+}
+
+.tableHeader th {
+  font-weight: 700 !important;
+  color: #475569 !important;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+}
+
+/* ---------- Metadata Footer ---------- */
+.footer {
+  margin-top: 40px;
+  padding: 20px 24px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  color: #94a3b8;
+  text-align: center;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+  .predictiveContainer {
+    padding: 16px;
+  }
+
+  .sectionHeaderCard {
+    padding: 20px !important;
+  }
+
+  .statCard {
+    padding: 24px 16px !important;
+  }
+}
