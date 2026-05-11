@@ -19,14 +19,12 @@ import {
   Grid,
   InputAdornment,
   Divider,
-  IconButton,
 } from '@mui/material';
 import {
   Person as PersonIcon,
   Email as EmailIcon,
   Phone as PhoneIcon,
   Badge as BadgeIcon,
-  Close as CloseIcon,
   AddCircleOutline as AddIcon,
 } from '@mui/icons-material';
 import Loading from '../../Loading/Loading';
@@ -145,8 +143,8 @@ const UserAccounts: React.FC = () => {
   const handleOpenConfirmModal = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isEmailValid) {
-        toast.error('Please enter a valid email address.');
-        return;
+      toast.error('Please enter a valid email address.');
+      return;
     }
     setIsConfirmModalOpen(true);
   };
@@ -310,8 +308,8 @@ const UserAccounts: React.FC = () => {
         </div>
       </div>
 
-      <Dialog 
-        open={isModalOpen} 
+      <Dialog
+        open={isModalOpen}
         onClose={handleCloseModal}
         maxWidth="sm"
         fullWidth
@@ -323,12 +321,12 @@ const UserAccounts: React.FC = () => {
           }
         }}
       >
-        <DialogTitle sx={{ 
-          pb: 1, 
-          pt: 3, 
+        <DialogTitle sx={{
+          pb: 1,
+          pt: 3,
           px: 4,
-          display: 'flex', 
-          alignItems: 'center', 
+          display: 'flex',
+          alignItems: 'center',
           justifyContent: 'space-between',
           background: 'linear-gradient(to right, #ffffff, #f8f9fa)'
         }}>
@@ -352,7 +350,7 @@ const UserAccounts: React.FC = () => {
             <DialogContentText sx={{ mb: 3, color: '#555', fontSize: '0.9rem' }}>
               Ensure all information is accurate. New officials will receive their credentials via the provided email address.
             </DialogContentText>
-            
+
             <Grid container spacing={2.5}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 600, color: '#333' }}>Username</Typography>
@@ -373,12 +371,12 @@ const UserAccounts: React.FC = () => {
                       </InputAdornment>
                     ),
                   }}
-                  sx={{ 
+                  sx={{
                     '& .MuiOutlinedInput-root': { borderRadius: '8px' }
                   }}
                 />
               </Grid>
-              
+
               <Grid size={{ xs: 12, sm: 6 }}>
                 <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 600, color: '#333' }}>Full Name</Typography>
                 <TextField
@@ -397,7 +395,7 @@ const UserAccounts: React.FC = () => {
                       </InputAdornment>
                     ),
                   }}
-                  sx={{ 
+                  sx={{
                     '& .MuiOutlinedInput-root': { borderRadius: '8px' }
                   }}
                 />
@@ -420,7 +418,7 @@ const UserAccounts: React.FC = () => {
                       </InputAdornment>
                     ),
                   }}
-                  sx={{ 
+                  sx={{
                     '& .MuiOutlinedInput-root': { borderRadius: '8px' }
                   }}
                 >
@@ -458,7 +456,7 @@ const UserAccounts: React.FC = () => {
                       </InputAdornment>
                     ),
                   }}
-                  sx={{ 
+                  sx={{
                     '& .MuiOutlinedInput-root': { borderRadius: '8px' }
                   }}
                 />
@@ -482,19 +480,19 @@ const UserAccounts: React.FC = () => {
                       </InputAdornment>
                     ),
                   }}
-                  sx={{ 
+                  sx={{
                     '& .MuiOutlinedInput-root': { borderRadius: '8px' }
                   }}
                 />
               </Grid>
             </Grid>
           </DialogContent>
-          
+
           <DialogActions sx={{ px: 4, py: 3, bgcolor: '#fcfcfc', borderTop: '1px solid #eee' }}>
-            <Button 
-              onClick={handleCloseModal} 
-              sx={{ 
-                color: '#666', 
+            <Button
+              onClick={handleCloseModal}
+              sx={{
+                color: '#666',
                 fontWeight: 600,
                 textTransform: 'none',
                 '&:hover': { bgcolor: '#f5f5f5' }
@@ -502,11 +500,11 @@ const UserAccounts: React.FC = () => {
             >
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              variant="contained" 
+            <Button
+              type="submit"
+              variant="contained"
               disabled={formLoading || !isEmailValid}
-              sx={{ 
+              sx={{
                 bgcolor: '#1a237e',
                 color: 'white',
                 fontWeight: 600,
