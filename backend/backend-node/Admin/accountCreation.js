@@ -76,14 +76,16 @@ router.post('/create-account', authMiddleware, async (req, res) => {
     const {
       username,
       fullName,
-      barangay,
+      position, // roleName like 'SKC'
       emailAddress,
       phoneNumber,
       password
     } = req.body;
 
+    const barangayID = req.user.barangay; // Inherit barangay from the admin
+
     // Validate required fields
-    if (!username || !fullName || !barangay || !emailAddress || !phoneNumber || !password) {
+    if (!username || !fullName || !position || !emailAddress || !phoneNumber || !password) {
       return res.status(400).json({
         success: false,
         message: 'All fields are required'
@@ -122,23 +124,13 @@ router.post('/create-account', authMiddleware, async (req, res) => {
       return res.status(409).json({ success: false, message: 'Username already exists' });
     }
 
-    // Get barangayID from barangay name
-    const barangayResult = await pool.request()
-      .input('barangayName', sql.NVarChar, barangay)
-      .query('SELECT barangayID FROM barangays WHERE barangayName = @barangayName');
-
-    if (barangayResult.recordset.length === 0) {
-      return res.status(400).json({ success: false, message: 'Invalid barangay provided' });
-    }
-    const barangayID = barangayResult.recordset[0].barangayID;
-
-    // Get roleID for 'SKO'
+    // Get roleID for the provided position
     const roleResult = await pool.request()
-      .input('roleName', sql.NVarChar, 'SKK1')
+      .input('roleName', sql.NVarChar, position)
       .query('SELECT roleID FROM roles WHERE roleName = @roleName');
 
     if (roleResult.recordset.length === 0) {
-      return res.status(500).json({ success: false, message: 'Default role "SKK1" not found in database.' });
+      return res.status(400).json({ success: false, message: `Invalid position provided: ${position}` });
     }
     const positionID = roleResult.recordset[0].roleID;
 

@@ -15,7 +15,20 @@ import {
   TextField,
   Box,
   MenuItem,
+  Typography,
+  Grid,
+  InputAdornment,
+  Divider,
+  IconButton,
 } from '@mui/material';
+import {
+  Person as PersonIcon,
+  Email as EmailIcon,
+  Phone as PhoneIcon,
+  Badge as BadgeIcon,
+  Close as CloseIcon,
+  AddCircleOutline as AddIcon,
+} from '@mui/icons-material';
 import Loading from '../../Loading/Loading';
 
 interface User {
@@ -31,7 +44,7 @@ const UserAccounts: React.FC = () => {
   const [formData, setFormData] = useState({
     username: '',
     fullName: '',
-    barangay: '',
+    position: '',
     emailAddress: '',
     phoneNumber: ''
   });
@@ -121,7 +134,7 @@ const UserAccounts: React.FC = () => {
     setFormData({
       username: '',
       fullName: '',
-      barangay: '',
+      position: '',
       emailAddress: '',
       phoneNumber: ''
     });
@@ -152,7 +165,7 @@ const UserAccounts: React.FC = () => {
       const response = await axiosInstance.post('/api/admin/user-list/create-account', {
         username: formData.username,
         fullName: formData.fullName,
-        barangay: formData.barangay,
+        position: formData.position,
         emailAddress: formData.emailAddress,
         phoneNumber: formData.phoneNumber,
         password: defaultPassword
@@ -297,84 +310,214 @@ const UserAccounts: React.FC = () => {
         </div>
       </div>
 
-      <Dialog open={isModalOpen} onClose={handleCloseModal}>
-        <DialogTitle>Create New Account</DialogTitle>
+      <Dialog 
+        open={isModalOpen} 
+        onClose={handleCloseModal}
+        maxWidth="sm"
+        fullWidth
+        PaperProps={{
+          sx: {
+            borderRadius: '12px',
+            boxShadow: '0 8px 32px rgba(0,0,0,0.1)',
+            overflow: 'hidden'
+          }
+        }}
+      >
+        <DialogTitle sx={{ 
+          pb: 1, 
+          pt: 3, 
+          px: 4,
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          background: 'linear-gradient(to right, #ffffff, #f8f9fa)'
+        }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <AddIcon sx={{ color: '#1a237e', fontSize: 28 }} />
+            <Box>
+              <Typography variant="h5" sx={{ fontWeight: 700, color: '#1a237e', lineHeight: 1.2 }}>
+                Register Official
+              </Typography>
+              <Typography variant="caption" sx={{ color: '#666', fontWeight: 500 }}>
+                Sangguniang Kabataan Management System
+              </Typography>
+            </Box>
+          </Box>
+        </DialogTitle>
+
+        <Divider sx={{ mx: 4, opacity: 0.6 }} />
+
         <Box component="form" onSubmit={handleOpenConfirmModal}>
-          <DialogContent>
-            <DialogContentText>
-              Please fill out the form to create a new user account.
+          <DialogContent sx={{ px: 4, py: 3 }}>
+            <DialogContentText sx={{ mb: 3, color: '#555', fontSize: '0.9rem' }}>
+              Ensure all information is accurate. New officials will receive their credentials via the provided email address.
             </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="username"
-              name="username"
-              label="Username"
-              type="text"
-              fullWidth
-              value={formData.username}
-              onChange={handleChange}
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              margin="dense"
-              id="fullName"
-              name="fullName"
-              label="Full Name"
-              type="text"
-              fullWidth
-              value={formData.fullName}
-              onChange={handleChange}
-              required
-              sx={{ mb: 2 }}
-            />
-            <TextField
-              margin="dense"
-              id="barangay"
-              name="barangay"
-              label="Barangay"
-              select
-              fullWidth
-              value={formData.barangay}
-              onChange={handleChange}
-              required
-              sx={{ mb: 2 }}
-            >
-              <MenuItem value="San Bartolome">San Bartolome</MenuItem>
-              <MenuItem value="Nagkaisang Nayon">Nagkaisang Nayon</MenuItem>
-            </TextField>
-            <TextField
-              margin="dense"
-              id="emailAddress"
-              name="emailAddress"
-              label="Email Address"
-              type="email"
-              fullWidth
-              value={formData.emailAddress}
-              onChange={handleChange}
-              required
-              sx={{ mb: 2 }}
-              error={!!emailError}
-              helperText={emailError}
-            />
-            <TextField
-              margin="dense"
-              id="phoneNumber"
-              name="phoneNumber"
-              label="Phone Number"
-              type="tel"
-              fullWidth
-              value={formData.phoneNumber}
-              onChange={handleChange}
-              required
-              sx={{ mb: 2 }}
-            />
+            
+            <Grid container spacing={2.5}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 600, color: '#333' }}>Username</Typography>
+                <TextField
+                  autoFocus
+                  id="username"
+                  name="username"
+                  placeholder="e.g. juan.delacruz"
+                  type="text"
+                  fullWidth
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonIcon sx={{ color: '#999', fontSize: 20 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': { borderRadius: '8px' }
+                  }}
+                />
+              </Grid>
+              
+              <Grid size={{ xs: 12, sm: 6 }}>
+                <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 600, color: '#333' }}>Full Name</Typography>
+                <TextField
+                  id="fullName"
+                  name="fullName"
+                  placeholder="First M. Last"
+                  type="text"
+                  fullWidth
+                  value={formData.fullName}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PersonIcon sx={{ color: '#999', fontSize: 20 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': { borderRadius: '8px' }
+                  }}
+                />
+              </Grid>
+
+              <Grid size={12}>
+                <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 600, color: '#333' }}>Official Position</Typography>
+                <TextField
+                  id="position"
+                  name="position"
+                  select
+                  fullWidth
+                  value={formData.position}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <BadgeIcon sx={{ color: '#999', fontSize: 20, mr: 1 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': { borderRadius: '8px' }
+                  }}
+                >
+                  <MenuItem value="SKC">SK Chairperson</MenuItem>
+                  <MenuItem value="SKS">SK Secretary</MenuItem>
+                  <MenuItem value="SKT">SK Treasurer</MenuItem>
+                  <Divider sx={{ my: 1 }} />
+                  <MenuItem value="SKK1">SK Kagawad 1</MenuItem>
+                  <MenuItem value="SKK2">SK Kagawad 2</MenuItem>
+                  <MenuItem value="SKK3">SK Kagawad 3</MenuItem>
+                  <MenuItem value="SKK4">SK Kagawad 4</MenuItem>
+                  <MenuItem value="SKK5">SK Kagawad 5</MenuItem>
+                  <MenuItem value="SKK6">SK Kagawad 6</MenuItem>
+                  <MenuItem value="SKK7">SK Kagawad 7</MenuItem>
+                </TextField>
+              </Grid>
+
+              <Grid size={12}>
+                <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 600, color: '#333' }}>Email Address</Typography>
+                <TextField
+                  id="emailAddress"
+                  name="emailAddress"
+                  placeholder="official@example.com"
+                  type="email"
+                  fullWidth
+                  value={formData.emailAddress}
+                  onChange={handleChange}
+                  required
+                  error={!!emailError}
+                  helperText={emailError}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <EmailIcon sx={{ color: '#999', fontSize: 20 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': { borderRadius: '8px' }
+                  }}
+                />
+              </Grid>
+
+              <Grid size={12}>
+                <Typography variant="subtitle2" sx={{ mb: 0.8, fontWeight: 600, color: '#333' }}>Phone Number</Typography>
+                <TextField
+                  id="phoneNumber"
+                  name="phoneNumber"
+                  placeholder="09123456789"
+                  type="tel"
+                  fullWidth
+                  value={formData.phoneNumber}
+                  onChange={handleChange}
+                  required
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <PhoneIcon sx={{ color: '#999', fontSize: 20 }} />
+                      </InputAdornment>
+                    ),
+                  }}
+                  sx={{ 
+                    '& .MuiOutlinedInput-root': { borderRadius: '8px' }
+                  }}
+                />
+              </Grid>
+            </Grid>
           </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseModal}>Cancel</Button>
-            <Button type="submit" variant="contained" className="create-account-btn" disabled={formLoading || !isEmailValid}>
-              {formLoading ? <CircularProgress size={24} /> : 'Create'}
+          
+          <DialogActions sx={{ px: 4, py: 3, bgcolor: '#fcfcfc', borderTop: '1px solid #eee' }}>
+            <Button 
+              onClick={handleCloseModal} 
+              sx={{ 
+                color: '#666', 
+                fontWeight: 600,
+                textTransform: 'none',
+                '&:hover': { bgcolor: '#f5f5f5' }
+              }}
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              variant="contained" 
+              disabled={formLoading || !isEmailValid}
+              sx={{ 
+                bgcolor: '#1a237e',
+                color: 'white',
+                fontWeight: 600,
+                px: 4,
+                borderRadius: '8px',
+                textTransform: 'none',
+                '&:hover': { bgcolor: '#0d47a1' },
+                '&.Mui-disabled': { bgcolor: '#e0e0e0' }
+              }}
+            >
+              {formLoading ? <CircularProgress size={24} sx={{ color: 'white' }} /> : 'Register Account'}
             </Button>
           </DialogActions>
         </Box>
