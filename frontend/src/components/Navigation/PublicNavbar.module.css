@@ -1,0 +1,117 @@
+.nav {
+    position: fixed;
+    top: 1.5rem;
+    right: 2rem;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.scrolled {
+    top: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+}
+
+.navList {
+    display: flex;
+    list-style: none;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    align-items: center;
+}
+
+.navItem button {
+    background: none;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    color: #475569;
+    font-weight: 500;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: none;
+    border-radius: 25px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navItem button:hover,
+.navItem button.activeLink {
+    background: #0056b3 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 86, 179, 0.2);
+}
+
+.loginBtn {
+    background: #0056b3 !important;
+    color: #ffffff !important;
+}
+
+.menuButton {
+    display: none !important;
+    color: #0056b3 !important;
+}
+
+/* Drawer Styles */
+.drawerPaper {
+    width: 280px;
+    background: rgba(255, 255, 255, 0.8) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.drawerContainer {
+    padding: 1.5rem;
+}
+
+.drawerHeader {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2rem;
+}
+
+.drawerItem {
+    border-radius: 12px !important;
+    margin-bottom: 0.5rem !important;
+    color: #1e293b !important;
+    font-weight: 500 !important;
+}
+
+.drawerItem:hover {
+    background-color: rgba(0, 86, 179, 0.1) !important;
+    color: #0056b3 !important;
+}
+
+.mobileLogin {
+    background-color: #0056b3 !important;
+    color: #ffffff !important;
+    margin-top: 2rem !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .nav {
+        top: 1rem;
+        right: 1rem;
+        padding: 0.5rem; /* Increased padding for centering */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .navList {
+        display: none;
+    }
+
+    .menuButton {
+        display: flex !important;
+        margin: 0 !important; /* Reset margin */
+    }
+}

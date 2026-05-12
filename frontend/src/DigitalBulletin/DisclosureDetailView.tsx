@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../backend connection/axiosConfig';
 import Loading from '../components/Loading/Loading';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, useMediaQuery, useTheme } from '@mui/material';
 import DisclosureExplorer from './DisclosureExplorer';
 import DisclosureTopNavbar from './DisclosureTopNavbar';
 import ProjectTemplateHeader from '../components/Client/Projects/ProjectTemplateHeader';
@@ -31,6 +31,8 @@ const CATEGORIES = [
 ];
 
 const DisclosureDetailView: React.FC = () => {
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const { batchID } = useParams<{ batchID: string }>();
     const [details, setDetails] = useState<BatchDetail | null>(null);
     const [loading, setLoading] = useState(true);
@@ -69,6 +71,15 @@ const DisclosureDetailView: React.FC = () => {
         fetchDetails();
     }, [batchID]);
 
+    // Automatically collapse sidebar on mobile
+    useEffect(() => {
+        if (isMobile) {
+            setIsSidebarCollapsed(true);
+        } else {
+            setIsSidebarCollapsed(false);
+        }
+    }, [isMobile]);
+
     // Filter rows when activeTab or details change
     useEffect(() => {
         if (!details) return;
@@ -86,6 +97,9 @@ const DisclosureDetailView: React.FC = () => {
     const handleSelectView = (view: 'PLAN' | 'DOCUMENT', data?: any) => {
         setViewMode(view);
         setActiveDoc(data || null);
+        if (isMobile) {
+            setIsSidebarCollapsed(true);
+        }
     };
 
     if (loading) return <Loading />;
@@ -95,7 +109,7 @@ const DisclosureDetailView: React.FC = () => {
     const projType = batchInfo.projType;
 
     return (
-        <div className={styles.container}>
+        <div className={`${styles.container} ${isSidebarCollapsed ? styles.sidebarCollapsed : ''}`}>
             <DisclosureExplorer 
                 batchInfo={batchInfo}
                 isCollapsed={isSidebarCollapsed}
@@ -106,7 +120,10 @@ const DisclosureDetailView: React.FC = () => {
             />
 
             <main className={styles.mainContent}>
-                <DisclosureTopNavbar batchInfo={batchInfo} />
+                <DisclosureTopNavbar 
+                    batchInfo={batchInfo} 
+                    onMenuClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                />
 
                 <Box className={styles.contentArea}>
                     {viewMode === 'PLAN' ? (

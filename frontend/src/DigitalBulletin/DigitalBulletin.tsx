@@ -5,6 +5,7 @@ import styles from './DigitalBulletin.module.css';
 import Loading from '../components/Loading/Loading';
 import Login from '../components/Login/Login';
 import { useNavigate } from 'react-router-dom';
+import PublicNavbar from '../components/Navigation/PublicNavbar';
 
 interface ProjectBatch {
     batchID: number;
@@ -98,13 +99,7 @@ const DigitalBulletin: React.FC = () => {
 
     return (
         <div className={styles.bulletinPage}>
-            <nav className={styles.nav}>
-                <ul className={styles.navList}>
-                    <li className={styles.navItem}><a href="/home">Home</a></li>
-                    <li className={styles.navItem}><a href="/project-list" className={styles.activeLink}>Full-Disclosure Board</a></li>
-                    <li className={styles.navItem}><button onClick={() => setIsLoginModalOpen(true)} className={styles.loginBtn}>Login</button></li>
-                </ul>
-            </nav>
+            <PublicNavbar onLoginClick={() => setIsLoginModalOpen(true)} />
 
             <header className={styles.heroHeader}>
                 <div className={styles.heroContent}>

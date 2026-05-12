@@ -29,17 +29,6 @@
     border-right: 1px solid #e0d9c4;
 }
 
-.explorer.collapsed {
-    width: 60px;
-}
-
-/* Reusing some existing spreadsheet styles if needed, 
-   but most will come from the shared components */
-.spreadsheetContainer {
-    height: 100%;
-    width: 100%;
-}
-
 .error {
     display: flex;
     align-items: center;
@@ -47,4 +36,17 @@
     height: 100vh;
     color: #d32f2f;
     font-weight: 500;
+}
+
+/* Mobile Overrides */
+@media (max-width: 900px) {
+    .contentArea {
+        padding: 8px;
+    }
+}
+
+@media (max-width: 600px) {
+    .contentArea {
+        padding: 4px;
+    }
 }
