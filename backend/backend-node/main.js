@@ -142,7 +142,7 @@ app.use('/storage', express.static(path.join(__dirname, 'File_Storage')));
 // Extended timeout middleware for upload endpoints
 app.use((req, res, next) => {
   // Set longer timeout for upload and processing endpoints
-  if (req.path.includes('/upload') || req.path.includes('/rawdata') || req.path.includes('/api/create-post')) {
+  if (req.path.includes('/upload') || req.path.includes('/api/create-post')) {
     req.setTimeout(600000); // 10 minutes
     res.setTimeout(600000); // 10 minutes
 

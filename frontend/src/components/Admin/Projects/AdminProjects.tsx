@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import Loading from '../../Loading/Loading';
 import AdminProjectCard from './AdminProjectCard';
 import styles from './AdminProjects.module.css';
-import { Switch, FormControlLabel, Paper, Box } from '@mui/material';
+import { Switch, FormControlLabel, Paper, Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 
 interface ProjectBatch {
     batchID: number;
@@ -165,23 +165,59 @@ const AdminProjects: React.FC = () => {
                 </main>
             </div>
 
-            {showArchiveConfirm && (
-                <div className="modal-overlay">
-                    <div className="file-viewer-modal" style={{ height: 'auto', maxWidth: '400px' }}>
-                        <div className="file-viewer-header">
-                            <h3 className="file-viewer-title">Confirm Archive</h3>
-                            <button className="file-viewer-close" onClick={() => setShowArchiveConfirm(false)}>×</button>
-                        </div>
-                        <div className="file-viewer-content" style={{ padding: '20px' }}>
-                            <p>Are you sure you want to archive this entire project batch? This action cannot be undone.</p>
-                        </div>
-                        <div style={{ padding: '0 20px 20px', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-                            <button onClick={() => setShowArchiveConfirm(false)} className="review-button" style={{ backgroundColor: '#6c757d' }}>Cancel</button>
-                            <button onClick={confirmArchive} className="review-button">Archive</button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <Dialog
+                open={showArchiveConfirm}
+                onClose={() => setShowArchiveConfirm(false)}
+                aria-labelledby="archive-dialog-title"
+                aria-describedby="archive-dialog-description"
+                PaperProps={{
+                    style: {
+                        borderRadius: '16px',
+                        padding: '10px'
+                    }
+                }}
+            >
+                <DialogTitle id="archive-dialog-title" sx={{ fontWeight: 700, color: '#202124' }}>
+                    Confirm Archive
+                </DialogTitle>
+                <DialogContent>
+                    <DialogContentText id="archive-dialog-description" sx={{ color: '#5f6368' }}>
+                        Are you sure you want to archive this entire project batch? This action cannot be undone and will move the project to the archive records.
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions sx={{ padding: '20px', gap: '10px' }}>
+                    <Button 
+                        onClick={() => setShowArchiveConfirm(false)} 
+                        variant="outlined"
+                        sx={{ 
+                            borderRadius: '8px', 
+                            textTransform: 'none', 
+                            fontWeight: 600,
+                            color: '#5f6368',
+                            borderColor: '#dadce0'
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={confirmArchive} 
+                        variant="contained" 
+                        color="error"
+                        sx={{ 
+                            borderRadius: '8px', 
+                            textTransform: 'none', 
+                            fontWeight: 600,
+                            boxShadow: 'none',
+                            '&:hover': {
+                                boxShadow: '0 4px 12px rgba(211, 47, 47, 0.3)',
+                                backgroundColor: '#d32f2f'
+                            }
+                        }}
+                    >
+                        Archive Project
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 };

@@ -95,19 +95,21 @@ const PredictiveAnalysis: React.FC = () => {
         <Typography variant="h6" className={styles.selectorLabel}>
           Select Analysis View
         </Typography>
-        <FormControl fullWidth variant="outlined">
-          <InputLabel id="category-select-label">Analysis Category</InputLabel>
-          <Select
-            labelId="category-select-label"
-            value={selectedCategoryKey}
-            onChange={handleCategoryChange}
-            label="Analysis Category"
-          >
-            {availableCategories.map(cat => (
-              <MenuItem key={cat.key} value={cat.key}>{cat.name}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+        <Box sx={{ mt: 1 }}>
+          <FormControl fullWidth variant="outlined">
+            <InputLabel id="category-select-label">Analysis Category</InputLabel>
+            <Select
+              labelId="category-select-label"
+              value={selectedCategoryKey}
+              onChange={handleCategoryChange}
+              label="Analysis Category"
+            >
+              {availableCategories.map(cat => (
+                <MenuItem key={cat.key} value={cat.key}>{cat.name}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
       </CardContent>
     </Card>
   );

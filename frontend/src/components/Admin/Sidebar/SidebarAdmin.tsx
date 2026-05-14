@@ -68,11 +68,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                   Projects
                 </Link>
               </li>
-              <li className={isActive('/admin/raw-data') ? 'active' : ''}>
-                <Link to="/admin/raw-data" title="Raw Data">
-                  Raw Data
-                </Link>
-              </li>
               <li className={isActive('/admin/audit-trail') ? 'active' : ''}>
                 <Link to="/admin/audit-trail" title="Audit Trail">
                   Audit Trail

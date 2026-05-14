@@ -475,8 +475,6 @@ function getAgendaColumnMap(tabName: string): string {
                     currentUser={user}
                     onCreateNew={() => setIsModalOpen(true)}
                     onUpdateStatus={handleUpdateStatus}
-                    onAdjustBudget={() => setIsBudgetModalOpen(true)}
-                    canAdjustBudget={canAdjustBudget}
                 />
 
                 {/* Real-time Budget Alert */}

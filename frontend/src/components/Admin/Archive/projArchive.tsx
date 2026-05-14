@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import { toast } from 'react-toastify';
 import { AxiosError } from 'axios';
-import { FaEye, FaDownload, FaSpinner, FaInfoCircle } from 'react-icons/fa';
+import { FaInfoCircle } from 'react-icons/fa';
 import {
   Dialog,
   DialogActions,
@@ -12,22 +12,19 @@ import {
   DialogTitle,
   Button,
 } from '@mui/material';
-import StatusLegend from '../../Projects/StatusLegend';
+import CheckpointModal from '../../Projects/CheckpointModal';
 import Loading from '../../Loading/Loading';
 
-interface Project {
-  projectID: number;
-  reference_number: string;
+interface ArchivedBatch {
+  batchID: number;
   title: string;
-  description: string;
-  status: number;
+  projType: string;
+  targetYear: string;
+  budget: number;
   submittedDate: string;
-  file_path: string;
-  file_name: string;
-  remarks: string | null;
-  reviewedBy: string | null;
-  submittedBy: string;
+  barangayName: string;
   statusName: string;
+  currentStatusID: number;
 }
 
 interface Status {
@@ -36,22 +33,16 @@ interface Status {
 }
 
 const ProjArchive: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<ArchivedBatch[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [fileLoading, setFileLoading] = useState<number | null>(null);
   const navigate = useNavigate();
 
-  const [showFileViewer, setShowFileViewer] = useState<boolean>(false);
-  const [viewingFileUrl, setViewingFileUrl] = useState<string>('');
-  const [viewingFileName, setViewingFileName] = useState<string>('');
-
   const [showRestoreConfirm, setShowRestoreConfirm] = useState<boolean>(false);
-  const [projectToRestore, setProjectToRestore] = useState<Project | null>(null);
+  const [batchToRestore, setBatchToRestore] = useState<ArchivedBatch | null>(null);
 
   const [statusList, setStatusList] = useState<Status[]>([]);
-  const [showStatusLegend, setShowStatusLegend] = useState<boolean>(false);
-  const infoIconRef = useRef<HTMLButtonElement>(null);
+  const [showCheckpointModal, setShowCheckpointModal] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -91,7 +82,7 @@ const ProjArchive: React.FC = () => {
   useEffect(() => {
     const fetchStatuses = async () => {
         try {
-            const response = await axiosInstance.get('/api/projects/statuses');
+            const response = await axiosInstance.get('/api/admin/proj-archive/statuses');
             if (response.data.success) {
                 setStatusList(response.data.statuses);
             }
@@ -102,92 +93,31 @@ const ProjArchive: React.FC = () => {
     fetchStatuses();
   }, []);
 
-  const openFileViewer = (url: string, fileName: string) => {
-    setViewingFileUrl(url);
-    setViewingFileName(fileName);
-    setShowFileViewer(true);
-  };
-
-  const handleCloseFileViewer = () => {
-    setShowFileViewer(false);
-    setViewingFileUrl('');
-    setViewingFileName('');
-  };
-
-  const handleViewPdf = async (project: Project) => {
-    if (!project.file_name) {
-        toast.error('No file associated with this project.');
-        return;
-    }
-
-    setFileLoading(project.projectID);
-    try {
-        const response = await axiosInstance.get(`/api/admin/proj-archive/file-url/${project.projectID}`);
-        if (response.data.success && response.data.url) {
-            openFileViewer(response.data.url, project.file_name);
-        } else {
-            throw new Error(response.data.message || 'Could not retrieve file URL.');
-        }
-    } catch (error) {
-        if (import.meta.env.DEV) console.error("Error getting file URL:", error);
-        toast.error("Could not retrieve the file. Please try again.");
-    } finally {
-        setFileLoading(null);
-    }
-  };
-
-  const handleDownloadFile = async (project: Project) => {
-    if (!project.file_name) {
-        toast.error('No file associated with this project.');
-        return;
-    }
-
-    setFileLoading(project.projectID);
-    try {
-        const response = await axiosInstance.get(`/api/admin/proj-archive/file-url/${project.projectID}`);
-        if (response.data.success && response.data.url) {
-            const link = document.createElement('a');
-            link.href = response.data.url;
-            link.setAttribute('download', project.file_name);
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-        } else {
-            throw new Error(response.data.message || 'Could not retrieve file URL.');
-        }
-    } catch (error) {
-        if (import.meta.env.DEV) console.error("Error getting file URL:", error);
-        toast.error("Could not retrieve the file. Please try again.");
-    } finally {
-        setFileLoading(null);
-    }
-  };
-
-  const handleRestore = (project: Project) => {
-    setProjectToRestore(project);
+  const handleRestore = (batch: ArchivedBatch) => {
+    setBatchToRestore(batch);
     setShowRestoreConfirm(true);
   };
 
   const handleCancelRestore = () => {
-    setProjectToRestore(null);
+    setBatchToRestore(null);
     setShowRestoreConfirm(false);
   };
 
   const handleConfirmRestore = async () => {
-    if (!projectToRestore) return;
+    if (!batchToRestore) return;
 
     try {
-      const response = await axiosInstance.post(`/api/admin/proj-archive/restore/${projectToRestore.projectID}`);
+      const response = await axiosInstance.post(`/api/admin/proj-archive/restore/batch/${batchToRestore.batchID}`);
       if (response.data.success) {
-        toast.success('Project restored successfully!');
-        setProjects(prevProjects => prevProjects.filter(p => p.projectID !== projectToRestore.projectID));
+        toast.success('Project batch restored successfully!');
+        setProjects(prevProjects => prevProjects.filter(p => p.batchID !== batchToRestore.batchID));
       } else {
-        throw new Error(response.data.message || 'Failed to restore project');
+        throw new Error(response.data.message || 'Failed to restore project batch');
       }
     } catch (error) {
-      if (import.meta.env.DEV) console.error('Error restoring project:', error);
+      if (import.meta.env.DEV) console.error('Error restoring project batch:', error);
       const axiosError = error as AxiosError;
-      toast.error((axiosError.response?.data as any)?.message || 'An error occurred while restoring the project.');
+      toast.error((axiosError.response?.data as any)?.message || 'An error occurred while restoring the project batch.');
     } finally {
       handleCancelRestore();
     }
@@ -196,14 +126,6 @@ const ProjArchive: React.FC = () => {
   const getStatusClassName = (status: string) => {
     if (!status) return 'status-default';
     return 'status-' + status.toLowerCase().replace(/[^a-z0-9]/g, '-');
-  };
-
-  const iconButtonStyle = {
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-    padding: '5px',
-    color: '#555'
   };
 
   if (loading) {
@@ -218,7 +140,7 @@ const ProjArchive: React.FC = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3>Archived Projects</h3>
-        <button ref={infoIconRef} onClick={() => setShowStatusLegend(!showStatusLegend)} style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#646cff'}}>
+        <button onClick={() => setShowCheckpointModal(true)} style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#646cff'}}>
             <FaInfoCircle />
         </button>
       </div>
@@ -228,53 +150,31 @@ const ProjArchive: React.FC = () => {
         <table className="archive-table">
           <thead>
             <tr>
-              <th>Reference Number</th>
-              <th>Proposer</th>
               <th>Title</th>
+              <th>Type</th>
+              <th>Target Year</th>
+              <th>Budget</th>
               <th>Status</th>
               <th>Submitted</th>
-              <th>Reviewed By</th>
-              <th>Remarks</th>
-              <th>Check Files</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {projects.map((proj) => (
-              <tr key={proj.projectID}>
-                <td>{proj.reference_number}</td>
-                <td>{proj.submittedBy}</td>
-                <td>{proj.title}</td>
+            {projects.map((batch) => (
+              <tr key={batch.batchID}>
+                <td>{batch.title}</td>
+                <td>{batch.projType}</td>
+                <td>{batch.targetYear}</td>
+                <td>{Number(batch.budget).toLocaleString()}</td>
                 <td>
-                  <span className={`status-badge ${getStatusClassName(proj.statusName)}`}>
-                    {proj.statusName}
+                  <span className={`status-badge ${getStatusClassName(batch.statusName)}`}>
+                    {batch.statusName}
                   </span>
                 </td>
-                <td>{new Date(proj.submittedDate).toLocaleDateString()}</td>
-                <td>{proj.reviewedBy || 'N/A'}</td>
-                <td>{proj.remarks || 'N/A'}</td>
-                <td>
-                  <div className="action-btn-group">
-                    {fileLoading === proj.projectID ? (
-                      <FaSpinner className="animate-spin" />
-                    ) : (
-                      proj.file_name && (
-                        proj.file_name.toLowerCase().endsWith('.pdf') ? (
-                          <button onClick={() => handleViewPdf(proj)} style={iconButtonStyle} title="View PDF">
-                            <FaEye />
-                          </button>
-                        ) : (
-                          <button onClick={() => handleDownloadFile(proj)} style={iconButtonStyle} title="Download Document">
-                            <FaDownload />
-                          </button>
-                        )
-                      )
-                    )}
-                  </div>
-                </td>
+                <td>{new Date(batch.submittedDate).toLocaleDateString()}</td>
                 <td>
                   <button
-                    onClick={() => handleRestore(proj)}
+                    onClick={() => handleRestore(batch)}
                     className="restore-btn"
                   >
                     Restore
@@ -284,20 +184,6 @@ const ProjArchive: React.FC = () => {
             ))}
           </tbody>
         </table>
-      )}
-
-      {showFileViewer && (
-        <div className="modal-overlay">
-          <div className="file-viewer-modal">
-            <div className="file-viewer-header">
-              <h3 className="file-viewer-title">{viewingFileName}</h3>
-              <button className="file-viewer-close" onClick={handleCloseFileViewer}>×</button>
-            </div>
-            <div className="file-viewer-content">
-              <iframe className="file-viewer-iframe" src={viewingFileUrl} title="File Viewer" allowFullScreen></iframe>
-            </div>
-          </div>
-        </div>
       )}
 
       <Dialog
@@ -322,7 +208,7 @@ const ProjArchive: React.FC = () => {
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to restore the project "{projectToRestore?.title}"?
+            Are you sure you want to restore the project "{batchToRestore?.title}"?
           </DialogContentText>
         </DialogContent>
         <DialogActions sx={{ p: 3, gap: 1 }}>
@@ -356,11 +242,10 @@ const ProjArchive: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {showStatusLegend && (
-        <StatusLegend 
+      {showCheckpointModal && (
+        <CheckpointModal 
           statusList={statusList} 
-          onClose={() => setShowStatusLegend(false)} 
-          triggerRef={infoIconRef} 
+          onClose={() => setShowCheckpointModal(false)}
         />
       )}
     </div>

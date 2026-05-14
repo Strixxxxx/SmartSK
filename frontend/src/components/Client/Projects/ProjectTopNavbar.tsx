@@ -13,13 +13,10 @@ interface ProjectTopNavbarProps {
     currentUser?: any;
     onCreateNew: () => void;
     onUpdateStatus?: (statusID: number) => void;
-    onAdjustBudget?: () => void;
-    canAdjustBudget?: boolean;
 }
 
 const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({ 
-    project, canCreate, collaborators, currentUser, onCreateNew, 
-    onAdjustBudget, canAdjustBudget 
+    project, canCreate, collaborators, currentUser, onCreateNew
 }) => {
     const navigate = useNavigate();
     const [isExportingExcel, setIsExportingExcel] = useState(false);
@@ -125,20 +122,8 @@ const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({
                                 {isExportingPDF ? 'Exporting...' : 'PDF'}
                             </Button>
                         </Tooltip>
-                        {canAdjustBudget && project?.projType === 'ABYIP' && (
-                            <Tooltip title="Adjust Budget Allocation">
-                                <Button
-                                    size="small"
-                                    variant="outlined"
-                                    color="primary"
-                                    onClick={onAdjustBudget}
-                                    sx={{ textTransform: 'none', borderRadius: 2 }}
-                                >
-                                    Budget
-                                </Button>
-                            </Tooltip>
-                        )}
                         <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+
                     </>
                 )}
                 {canCreate && (

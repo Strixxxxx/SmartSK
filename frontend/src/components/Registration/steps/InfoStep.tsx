@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { TextField, MenuItem, Box, Typography } from '@mui/material';
+import { toast } from 'react-toastify';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import './InfoStep.css';
 
@@ -21,6 +22,10 @@ const InfoStep: React.FC<InfoStepProps> = ({ formData, setFormData, attachment, 
   const handleFileChange = (files: FileList | null) => {
     const file = files?.[0];
     if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Only image files (JPEG, JPG, PNG) are allowed.');
+        return;
+      }
       setAttachment(file);
     }
   };
@@ -49,6 +54,10 @@ const InfoStep: React.FC<InfoStepProps> = ({ formData, setFormData, attachment, 
   const handleFileChangeBack = (files: FileList | null) => {
     const file = files?.[0];
     if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Only image files (JPEG, JPG, PNG) are allowed.');
+        return;
+      }
       setAttachmentBack(file);
     }
   };
@@ -195,7 +204,7 @@ const InfoStep: React.FC<InfoStepProps> = ({ formData, setFormData, attachment, 
             type="file"
             hidden
             onChange={(e) => handleFileChange(e.target.files)}
-            accept="image/jpeg,image/png,application/pdf"
+            accept="image/jpeg,image/png,image/jpg"
           />
           {preview ? (
             <img src={preview} alt="ID Preview" className="preview-image" />
@@ -218,7 +227,7 @@ const InfoStep: React.FC<InfoStepProps> = ({ formData, setFormData, attachment, 
             type="file"
             hidden
             onChange={(e) => handleFileChangeBack(e.target.files)}
-            accept="image/jpeg,image/png,application/pdf"
+            accept="image/jpeg,image/png,image/jpg"
           />
           {previewBack ? (
             <img src={previewBack} alt="Back of ID Preview" className="preview-image" />

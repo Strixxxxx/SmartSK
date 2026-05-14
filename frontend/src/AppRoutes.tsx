@@ -33,7 +33,6 @@ import DashboardAdmin from './components/Admin/Dashboard/DashboardAdmin';
 import AccountManagement from './components/Admin/AccountManagement/AccountManagement';
 import AdminProjects from './components/Admin/Projects/AdminProjects';
 import AdminProjectDetailView from './components/Admin/Projects/AdminProjectDetailView';
-import RawData from './components/Admin/Raw Data/rawdata';
 import AuditTrail from './components/Admin/Audit Trail/audit';
 import SessionLog from './components/Admin/Session Log/sessions';
 import Backup from './components/Admin/Backup/Backup';
@@ -130,7 +129,6 @@ const AppRoutes: React.FC = () => {
           <Route path="dashboard" element={<DashboardAdmin />} />
           <Route path="account-management" element={<AccountManagement />} />
           <Route path="projects" element={<AdminProjects />} />
-          <Route path="raw-data" element={<RawData />} />
           <Route path="sessions" element={<SessionLog />} />
           <Route path="audit-trail" element={<AuditTrail />} />
           <Route path="archive" element={<Archive />} />
