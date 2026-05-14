@@ -1,6 +1,11 @@
 import sys
 import os
 import asyncio
+import os
+
+# Suppress TensorFlow noise for faster and cleaner startup
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
 
 # Add AI, database, util, and projects folders to path
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -53,25 +58,6 @@ else:
 
 from contextlib import asynccontextmanager
 
-def ping_node_backend(attempts=3):
-    # Node.js now runs on NODE_PORT (default 8000)
-    port = os.getenv("NODE_PORT", "8000")
-    url = f"http://127.0.0.1:{port}/health" # Using 127.0.0.1 for stability
-    print(f"Starting connectivity check to Node.js Backend: {url}")
-    
-    for i in range(1, attempts + 1):
-        try:
-            response = requests.get(url, timeout=2)
-            if response.status_code == 200 or response.status_code == 404: # 404 is fine if health route isn't defined yet, as long as it responds
-                print(f"[Attempt {i}] Node.js Backend is REACHABLE.")
-                return
-        except Exception as e:
-            print(f"[Attempt {i}] Node.js Backend is NOT reachable. (Error: {str(e)})")
-        
-        if i < attempts:
-            time.sleep(2)
-    print("Node.js Backend connectivity check failed after 3 attempts. Continuing startup...")
-
 from excel_sync import sync_all_active_projects, sync_excel_from_db
 import datetime
 
@@ -112,13 +98,6 @@ async def ai_job_worker():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Run Node.js connectivity check
-    async def delayed_ping():
-        await asyncio.sleep(60)
-        ping_node_backend()
-    
-    asyncio.create_task(delayed_ping())
-    
     # Start the AI job worker
     worker_task = asyncio.create_task(ai_job_worker())
     

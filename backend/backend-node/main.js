@@ -49,32 +49,7 @@ if (!process.env.AI_SERVICE_URL) {
 
 const axios = require('axios');
 
-// --- AI Service Exponential Backoff Startup Check ---
-// Attempts to reach the FastAPI sidecar with escalating wait times.
-// Formula: min(1000 * 2^(n-1), 15000ms) — Max 15 attempts.
-const pingAIServiceWithBackoff = async (maxAttempts = 15) => {
-  const url = `${process.env.AI_SERVICE_URL}/health`;
-  console.log(`[AI Startup] Starting exponential backoff connectivity check to: ${url}`);
-
-  for (let i = 1; i <= maxAttempts; i++) {
-    try {
-      const response = await axios.get(url, { timeout: 3000 });
-      if (response.status === 200) {
-        console.log(`[AI Startup] AI Service is REACHABLE on attempt ${i}.`);
-        return true;
-      }
-    } catch (error) {
-      const delay = Math.min(1000 * Math.pow(2, i - 1), 15000);
-      console.log(`[AI Startup] Attempt ${i}/${maxAttempts} failed. Retrying in ${delay}ms... (${error.message})`);
-      if (i < maxAttempts) await new Promise(resolve => setTimeout(resolve, delay));
-    }
-  }
-  console.warn('[AI Startup] AI Service unreachable after all attempts. Continuing without it.');
-  return false;
-};
-
-// Begin the exponential backoff check immediately on startup (no blind wait)
-pingAIServiceWithBackoff();
+// AI service status is checked on-demand via the /health route and functional circuit breakers.
 
 
 // Import the other js files
@@ -183,19 +158,21 @@ if (disclosureRouter && typeof disclosureRouter === 'function') {
   console.error('disclosureRouter is not a valid middleware function');
 }
 
-// Health Check Endpoint — Bidirectional (checks Node AND FastAPI)
+// Health Check Endpoint — Verifies Node.js and pings FastAPI
 app.get('/health', async (req, res) => {
-  const aiStatus = { reachable: false };
+  let aiServiceStatus = 'unreachable';
   try {
-    const aiRes = await axios.get(`${process.env.AI_SERVICE_URL}/health`, { timeout: 3000 });
-    if (aiRes.status === 200) aiStatus.reachable = true;
+    // Quick ping to FastAPI health endpoint
+    const aiRes = await axios.get(`${process.env.AI_SERVICE_URL}/health`, { timeout: 2000 });
+    if (aiRes.status === 200) aiServiceStatus = 'reachable';
   } catch (_) {
-    // AI service unreachable; report it but don't crash
+    // Suppress error; it's handled by the 'unreachable' status
   }
+
   res.status(200).json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    aiService: aiStatus.reachable ? 'reachable' : 'unreachable'
+    aiService: aiServiceStatus
   });
 });
 
