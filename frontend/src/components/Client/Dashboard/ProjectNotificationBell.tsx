@@ -10,7 +10,7 @@ import './ProjectNotificationBell.css';
 interface ProjectNotification {
     notificationID: number;
     batchID: number;
-    notifType: 'DEADLINE_WARNING' | 'URGENT' | 'AI_TRIGGERED';
+    notifType: 'DEADLINE_WARNING' | 'URGENT' | 'AI_TRIGGERED' | 'FISCAL_DEADLINE';
     message: string;
     isRead: boolean;
     createdAt: string;
@@ -60,6 +60,7 @@ const ProjectNotificationBell: React.FC = () => {
     };
 
     const getIcon = (type: string) => {
+        if (type === 'FISCAL_DEADLINE') return <WarningAmberIcon sx={{ color: '#b71c1c', fontSize: 18 }} />;
         if (type === 'URGENT') return <WarningAmberIcon sx={{ color: '#c62828', fontSize: 18 }} />;
         if (type === 'AI_TRIGGERED') return <PrecisionManufacturingIcon sx={{ color: '#1565c0', fontSize: 18 }} />;
         return <InfoOutlinedIcon sx={{ color: '#e65100', fontSize: 18 }} />;
