@@ -102,16 +102,15 @@ router.get('/term-status', authMiddleware, async (req, res) => {
         // 1. Get current term for barangay
         const termResult = await pool.request()
             .input('barangayID', sql.Int, barangayID)
-            .query('SELECT TOP 1 termID, officialListJSON FROM skTerms WHERE barangayID = @barangayID AND isCurrent = 1 ORDER BY termID DESC');
+            .query('SELECT TOP 1 termID, officialListJSON, isLocked FROM skTerms WHERE barangayID = @barangayID AND isCurrent = 1 ORDER BY termID DESC');
 
         let currentTermID = null;
         let isFinalized = false;
 
         if (termResult.recordset.length > 0) {
             currentTermID = termResult.recordset[0].termID;
-            // Consider finalized if json is not empty and not "[]"
-            const jsonStr = termResult.recordset[0].officialListJSON;
-            isFinalized = jsonStr && jsonStr !== '[]' && jsonStr.length > 5;
+            // Use isLocked flag from database for true finalization status
+            isFinalized = !!termResult.recordset[0].isLocked;
         }
 
         // 2. Count approved, active users for this term
@@ -175,13 +174,13 @@ router.post('/finalize-term', authMiddleware, async (req, res) => {
             await pool.request()
                 .input('termID', sql.Int, termResult.recordset[0].termID)
                 .input('jsonContent', sql.NVarChar(sql.MAX), jsonContent)
-                .query('UPDATE skTerms SET officialListJSON = @jsonContent WHERE termID = @termID');
+                .query('UPDATE skTerms SET officialListJSON = @jsonContent, isLocked = 1, lockedAt = GETDATE() WHERE termID = @termID');
         } else {
             // Need to initialize first term
             await pool.request()
                 .input('barangayID', sql.Int, barangayID)
                 .input('jsonContent', sql.NVarChar(sql.MAX), jsonContent)
-                .query('INSERT INTO skTerms (barangayID, officialListJSON, isCurrent) VALUES (@barangayID, @jsonContent, 1)');
+                .query('INSERT INTO skTerms (barangayID, officialListJSON, isCurrent, isLocked, lockedAt) VALUES (@barangayID, @jsonContent, 1, 1, GETDATE())');
         }
 
         addAuditTrail({
@@ -228,7 +227,7 @@ router.post('/start-new-term', authMiddleware, async (req, res) => {
             await pool.request()
                 .input('barangayID', sql.Int, barangayID)
                 .input('termID', sql.Int, currentTermID)
-                .query('UPDATE userInfo SET isArchived = 1 WHERE barangay = @barangayID AND termID = @termID');
+                .query('UPDATE userInfo SET isArchived = 1 WHERE barangay = @barangayID AND termID = @termID AND position != 1');
 
             // 2. Lock the current term
             await pool.request()

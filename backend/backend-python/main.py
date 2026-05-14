@@ -40,6 +40,7 @@ from projects.excel_to_json import excel_to_fortune_json
 
 from AI.accountAIJobs import main as verify_registration_job
 from AI.aiJobs import main as run_ai_batch_job
+from automation.official_sync import sync_user_to_official_list
 from storage.storage import download_blob_to_memory, upload_blob_from_memory, blob_exists
 import uvicorn
 import requests
@@ -127,6 +128,10 @@ class SyncBatchRequest(BaseModel):
     file_path: Optional[str] = None
     file_name: Optional[str] = None
 
+class SyncAccountRequest(BaseModel):
+    user_id: int
+    term_id: Optional[int] = None
+
 @app.post("/sync-project")
 def trigger_sync_project(req: SyncBatchRequest):
     temp_local_path = None
@@ -196,6 +201,14 @@ def trigger_verify_registration(req: VerifyRegistrationRequest, background_tasks
     try:
         background_tasks.add_task(verify_registration_job, req.user_id)
         return {"status": "ok", "message": f"Verification triggered for user {req.user_id}."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/sync-account-official")
+def trigger_sync_account(req: SyncAccountRequest, background_tasks: BackgroundTasks):
+    try:
+        background_tasks.add_task(sync_user_to_official_list, req.user_id, req.term_id)
+        return {"status": "ok", "message": f"Sync triggered for user {req.user_id}."}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

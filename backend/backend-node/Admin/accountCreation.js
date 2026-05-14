@@ -6,6 +6,18 @@ const { authMiddleware } = require('../session/session');
 const { sendAccountCreationEmail } = require('../Email/email');
 const { addAuditTrail } = require('../audit/auditService');
 const { decrypt } = require('../utils/crypto');
+const axios = require('axios');
+const { downloadBlobAsText, registerContainerName } = require('../Storage/storage');
+
+/**
+ * Normalizes name for comparison (lowercase, alphanumeric parts).
+ * Handles variations in dots and commas.
+ */
+const normalizeName = (name) => {
+  if (!name) return new Set();
+  const cleanName = name.toLowerCase().replace(/[.,]/g, ' ');
+  return new Set(cleanName.split(/\s+/).filter(part => part.length > 0));
+};
 
 // Get all users
 router.get('/', authMiddleware, async (req, res) => {
@@ -138,6 +150,60 @@ router.post('/create-account', authMiddleware, async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    // Get current termID for the barangay
+    const termResult = await pool.request()
+      .input('barangayID', sql.Int, barangayID)
+      .query('SELECT TOP 1 termID FROM skTerms WHERE barangayID = @barangayID AND isCurrent = 1 ORDER BY termID DESC');
+    
+    const currentTermID = termResult.recordset.length > 0 ? termResult.recordset[0].termID : null;
+
+    // --- Intelligent Matching Logic ---
+    let finalTermID = null;
+
+    // 1. Get Barangay Name for official list retrieval
+    const barangayResult = await pool.request()
+      .input('barangayID', sql.Int, barangayID)
+      .query('SELECT barangayName FROM barangays WHERE barangayID = @barangayID');
+    
+    const barangayName = barangayResult.recordset.length > 0 ? barangayResult.recordset[0].barangayName : null;
+
+    if (barangayName && currentTermID) {
+      try {
+        const blobName = `SK OFFICIAL - ${barangayName}.json`;
+        const listData = await downloadBlobAsText(registerContainerName, blobName);
+        const officialsList = JSON.parse(listData);
+
+        const userParts = normalizeName(fullName);
+        
+        const match = officialsList.find(official => {
+          const offName = official.fullName || '';
+          const offParts = normalizeName(offName);
+          
+          if (userParts.size === 0 || offParts.size === 0) return false;
+
+          // Check for subset matching (smart logic: Juan Dela Cruz matches Juan C. Dela Cruz)
+          const userArr = Array.from(userParts);
+          const offArr = Array.from(offParts);
+          const isSubset = userArr.every(part => offParts.has(part)) || 
+                           offArr.every(part => userParts.has(part));
+
+          // Also check position (e.g. 'SKC' in JSON matches 'SKC' in position request)
+          const positionMatch = String(official.position).toUpperCase() === String(position).toUpperCase();
+
+          return isSubset && positionMatch;
+        });
+
+        if (match) {
+          console.log(`[SmartSync] Match confirmed: ${fullName} matches official list for ${barangayName}. Assigning Term ${currentTermID}.`);
+          finalTermID = currentTermID;
+        } else {
+          console.log(`[SmartSync] No match found in official list for ${fullName} (${position}) in ${barangayName}.`);
+        }
+      } catch (err) {
+        console.error(`[SmartSync] Verification skipped or failed: ${err.message}`);
+      }
+    }
+
     // Encrypt user data
     const encryptedUsername = encrypt(username);
     const encryptedFullName = encrypt(fullName);
@@ -155,6 +221,7 @@ router.post('/create-account', authMiddleware, async (req, res) => {
       .input('positionID', sql.Int, positionID)
       .input('emailHash', sql.VarChar, emailHash)
       .input('usernameHash', sql.VarChar, usernameHash)
+      .input('termID', sql.Int, finalTermID)
       .query(`
         INSERT INTO userInfo (
           username,
@@ -166,7 +233,8 @@ router.post('/create-account', authMiddleware, async (req, res) => {
           position,
           isDefaultPassword,
           emailHash,
-          usernameHash
+          usernameHash,
+          termID
         )
         VALUES (
           @username,
@@ -178,7 +246,8 @@ router.post('/create-account', authMiddleware, async (req, res) => {
           @positionID,
           1,
           @emailHash,
-          @usernameHash
+          @usernameHash,
+          @termID
         );
         SELECT SCOPE_IDENTITY() AS userID;
       `);
@@ -200,6 +269,13 @@ router.post('/create-account', authMiddleware, async (req, res) => {
       newValue: `Username: ${username}`,
       descriptions: `Admin ${req.user.fullName} created a new account for ${username}`
     });
+
+    // Trigger Python sync logic in the background
+    const pyPort = process.env.PY_PORT || 8080;
+    axios.post(`http://127.0.0.1:${pyPort}/sync-account-official`, {
+      user_id: userId,
+      term_id: currentTermID
+    }).catch(err => console.error("Failed to trigger Python account sync:", err.message));
 
     return res.status(201).json({
       success: true,

@@ -387,7 +387,7 @@ const RegistrationSummary: React.FC = () => {
                             color="warning"
                             startIcon={<Autorenew />}
                             onClick={() => setIsNewTermDialogOpen(true)}
-                            disabled={approvedCount < 11}
+                            disabled={approvedCount < 10}
                         >
                             Create New SK Official List
                         </Button>
