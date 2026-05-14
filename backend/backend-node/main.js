@@ -483,7 +483,7 @@ server.listen(NODE_PORT, HOST, () => {
         JOIN StatusLookup sl ON pt.statusID = sl.StatusID
         WHERE CAST(pn.createdAt AS DATE) = CAST(GETDATE() AS DATE)
           AND pn.isRead = 0
-          AND pn.notifType IN ('DEADLINE_WARNING', 'URGENT')
+          AND pn.notifType IN ('DEADLINE_WARNING', 'URGENT', 'FISCAL_DEADLINE')
       `);
 
       // 3. Send an email per notification and broadcast via WebSocket

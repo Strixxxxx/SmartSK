@@ -46,9 +46,17 @@ const STATUS_STEPS: { label: string; icon: React.ReactNode }[] = [
     { label: 'Project Closure', icon: <FlagIcon /> },
 ];
 
-const getStatusAge = (updatedAt?: string) => {
+const getStatusAge = (statusID: number, updatedAt?: string) => {
     if (!updatedAt) return { days: 0, level: 'ok' as const };
     const days = Math.floor((Date.now() - new Date(updatedAt).getTime()) / 86_400_000);
+    
+    // Status 3 (Internal Finalization) and 4 (Barangay Endorsement) follow the 7/10 rule
+    if (statusID === 3 || statusID === 4) {
+        const level = days >= 10 ? 'urgent' : days >= 7 ? 'warn' : ('ok' as const);
+        return { days, level };
+    }
+    
+    // Standard 15/30 rule for other statuses
     const level = days >= 30 ? 'urgent' : days >= 15 ? 'warn' : ('ok' as const);
     return { days, level };
 };
@@ -141,8 +149,11 @@ const ProjectTrackerList: React.FC = () => {
             <h3 className="ptl-title">Active Project Tracking</h3>
             <div className="ptl-list">
                 {activeBatches.map(batch => {
-                    const { days, level } = getStatusAge(batch.updatedAt);
+                    const { days, level } = getStatusAge(batch.currentStatusID, batch.updatedAt);
                     const isAIStep = batch.currentStatusID === 6 && batch.projType === 'ABYIP';
+                    
+                    const isRegulatoryStep = batch.currentStatusID === 3 || batch.currentStatusID === 4;
+                    const isNearOct16 = new Date().getMonth() === 9 && new Date().getDate() <= 16 && batch.projType === 'ABYIP' && batch.currentStatusID < 3;
 
                     return (
                         <div
@@ -224,14 +235,19 @@ const ProjectTrackerList: React.FC = () => {
                             )}
 
                             {/* ── Deadline Warnings ─────────────────────────── */}
+                            {isNearOct16 && (
+                                <p className="ptl-warn-text ptl-warn-text--urgent">
+                                    📅 FISCAL DEADLINE: October 16 is approaching. Budget submission required per JMC 2019.
+                                </p>
+                            )}
                             {level === 'urgent' && (
                                 <p className="ptl-warn-text ptl-warn-text--urgent">
-                                    ⚠️ URGENT: Over 30 days stalled. Legal compliance may be at risk.
+                                    ⚠️ {isRegulatoryStep ? 'LEGAL BREACH: Over 10 days in review phase (JMC 2019).' : 'URGENT: Over 30 days stalled. Legal compliance at risk.'}
                                 </p>
                             )}
                             {level === 'warn' && (
                                 <p className="ptl-warn-text ptl-warn-text--warn">
-                                    📋 Reminder: Over 15 days in this status. Please review.
+                                    📋 {isRegulatoryStep ? 'COMPLIANCE WARNING: Approaching 10-day legal limit (7 days elapsed).' : 'Reminder: Over 15 days in this status. Please review.'}
                                 </p>
                             )}
 

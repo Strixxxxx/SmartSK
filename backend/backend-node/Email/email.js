@@ -162,23 +162,42 @@ const createProjectStatusEmail = (project, status, remarks) => {
 
 const createProjectDeadlineEmail = (projName, projType, statusName, daysStuck, notifType) => {
   const isUrgent = notifType === 'URGENT';
-  const headerColor = isUrgent ? '#c62828' : '#f57c00';
-  const title = isUrgent ? '⚠️ URGENT: Project Deadline Alert' : '📋 Project Status Reminder';
+  const isFiscal = notifType === 'FISCAL_DEADLINE';
+  
+  let headerColor = '#f57c00'; // Warning (Orange)
+  let title = '📋 Project Status Reminder';
+  let legalBasis = 'RA 10742';
+
+  if (isUrgent) {
+    headerColor = '#c62828'; // Urgent (Red)
+    title = '⚠️ URGENT: Project Deadline Alert';
+  } else if (isFiscal) {
+    headerColor = '#d32f2f'; // Fiscal (Dark Red)
+    title = '📅 CRITICAL: Fiscal Year Deadline';
+    legalBasis = 'JMC No. 1 s. 2019';
+  }
+
   return `
   <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
     <div style="background-color: ${headerColor}; padding: 15px; text-align: center;">
       <h2 style="color: white; margin: 0;">${title}</h2>
     </div>
     <div style="padding: 20px;">
-      <p>This is an automated reminder from the Smart SK system.</p>
+      <p>This is an automated regulatory alert from the Smart SK system.</p>
       <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid ${headerColor}; margin: 15px 0;">
         <p><strong>Project:</strong> ${projName} (${projType})</p>
         <p><strong>Current Status:</strong> ${statusName}</p>
-        <p><strong>Days in Current Status:</strong> ${daysStuck} day(s)</p>
+        ${!isFiscal ? `<p><strong>Days in Current Status:</strong> ${daysStuck} day(s)</p>` : ''}
       </div>
-      ${isUrgent
-      ? '<p style="color: #c62828; font-weight: bold;">⚠️ IMMEDIATE ACTION REQUIRED: This project has been stalled for over 30 days. Failure to advance may result in legal non-compliance per RA 10742.</p>'
-      : '<p>Please log in to Smart SK and advance this project to its next milestone to stay on track with submission deadlines.</p>'}
+      
+      ${isFiscal 
+        ? `<p style="color: #d32f2f; font-weight: bold;">⚠️ CRITICAL ACTION REQUIRED: The October 16 deadline for budget submission is approaching. Per ${legalBasis}, failure to finalize your ABYIP may delay the release of SK funds for the next fiscal year.</p>`
+        : isUrgent
+          ? `<p style="color: #c62828; font-weight: bold;">⚠️ IMMEDIATE ACTION REQUIRED: This project phase has exceeded the allowed timeline. Failure to advance may result in legal non-compliance per ${legalBasis}.</p>`
+          : `<p>Please log in to Smart SK and advance this project to its next milestone to stay on track with legal submission deadlines (7-day review rule).</p>`
+      }
+      
+      <p style="font-size: 12px; color: #666; margin-top: 20px;">Reference: ${legalBasis} and SK Reform Act Guidelines.</p>
       <p>Best regards,<br>Smart SK System</p>
     </div>
   </div>
@@ -468,9 +487,15 @@ const sendProjectDeadlineEmail = async (barangayID, projName, projType, statusNa
       .join(',');
 
     const isUrgent = notifType === 'URGENT';
-    const subject = isUrgent
-      ? `⚠️ URGENT: Project "${projName}" Deadline Alert`
-      : `📋 Reminder: Project "${projName}" Status Update Needed`;
+    const isFiscal = notifType === 'FISCAL_DEADLINE';
+    
+    let subject = `📋 Reminder: Project "${projName}" Status Update Needed`;
+    
+    if (isFiscal) {
+      subject = `📅 CRITICAL: October 16 Budget Deadline Alert ("${projName}")`;
+    } else if (isUrgent) {
+      subject = `⚠️ URGENT: Project "${projName}" Deadline Alert`;
+    }
 
     const htmlContent = createProjectDeadlineEmail(projName, projType, statusName, daysStuck, notifType);
 
