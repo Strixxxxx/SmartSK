@@ -182,18 +182,18 @@ router.post('/webhook/ai-status', async (req, res) => {
         if (!batchID) return res.status(400).json({ success: false, message: 'Missing batchID' });
 
         const pool = await getConnection();
-        
+
         // Find the barangayID for this batch
         const batchResult = await pool.request()
             .input('batchID', sql.Int, batchID)
             .query('SELECT barangayID FROM projectBatch WHERE batchID = @batchID');
-            
+
         if (!batchResult.recordset.length) {
             return res.status(404).json({ success: false, message: 'Batch not found' });
         }
-        
+
         const barangayID = batchResult.recordset[0].barangayID;
-        
+
         let message = '';
         let notifType = '';
         if (status === 'success') {
@@ -213,13 +213,13 @@ router.post('/webhook/ai-status', async (req, res) => {
                 INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
                 VALUES (@batchID, @barangayID, @notifType, @message)
             `);
-            
+
         // Broadcast via websocket
-        broadcastToRoom(batchID, { 
-            type: 'ai_report_status', 
-            batchID, 
-            status, 
-            message 
+        broadcastToRoom(batchID, {
+            type: 'ai_report_status',
+            batchID,
+            status,
+            message
         });
 
         res.json({ success: true, message: 'Callback received' });
@@ -970,7 +970,7 @@ router.get('/:batchID/budget-summary', authMiddleware, async (req, res) => {
             };
             const colPrefix = thematicMap[center];
             let allocatedInCat = colPrefix ? (batch[`${colPrefix}_amount`] || 0) : 0;
-            
+
             // Smart Fallback: If amount is 0 and percentage is set, calculate it
             if (allocatedInCat === 0 && colPrefix && batch[`${colPrefix}_pct`] > 0) {
                 allocatedInCat = (budget * batch[`${colPrefix}_pct`]) / 100;
@@ -1129,13 +1129,14 @@ router.post('/:batchID/reallocate-budget', authMiddleware, async (req, res) => {
         const noteContent = `${displayRole} ${req.user.fullName} changed the budget allocations within the project. The reason for change is as follows: ${reason}`;
         const noteRes = await pool.request()
             .input('batchID', sql.Int, batchID)
+            .input('userID', sql.Int, userID)
             .input('content', sql.NVarChar, noteContent)
             .query(`
                 INSERT INTO projectNotes (batchID, userID, content) 
                 OUTPUT INSERTED.noteID, INSERTED.batchID, INSERTED.userID, INSERTED.content, INSERTED.createdAt
-                VALUES (@batchID, NULL, @content)
+                VALUES (@batchID, @userID, @content)
             `);
-        
+
         const newNote = noteRes.recordset[0];
         const enrichedNote = {
             ...newNote,
