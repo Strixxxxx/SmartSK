@@ -6,6 +6,7 @@ from datetime import datetime, timezone, timedelta
 import pandas as pd
 from dotenv import load_dotenv
 import io
+import time
 
 from .forecast import generate_forecast_report
 from .pa_logic import generate_project_analysis
@@ -48,14 +49,23 @@ def get_data_from_sql():
       AND tracker.maxStatus >= 6
     ORDER BY pb.targetYear DESC, pa.sheetRowIndex ASC;
     """
-    try:
-        with engine.connect() as conn:
-            df = pd.read_sql(text(query), conn)
-            logger.info(f"Successfully fetched {len(df)} finalized ABYIP rows from SQL database.")
-            return df
-    except Exception as e:
-        logger.error(f"Error fetching data from SQL: {e}", exc_info=True)
-        return pd.DataFrame()
+    max_retries = 3
+    retry_delay = 5
+
+    for attempt in range(max_retries):
+        try:
+            with engine.connect() as conn:
+                df = pd.read_sql(text(query), conn)
+                logger.info(f"Successfully fetched {len(df)} finalized ABYIP rows from SQL database.")
+                return df
+        except Exception as e:
+            logger.error(f"Error fetching data from SQL (Attempt {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                logger.info(f"Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                logger.error("Max retries reached. Returning empty DataFrame.", exc_info=True)
+                return pd.DataFrame()
 
 # ==============================================================================
 # Report Upload

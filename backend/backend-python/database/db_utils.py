@@ -18,7 +18,13 @@ from sqlalchemy import create_engine, text
 # For Mssql + pyodbc, SQLAlchemy requires a specific connection string format
 # format: mssql+pyodbc:///?odbc_connect={params}
 params = urllib.parse.quote_plus(f'DRIVER={DB_DRIVER};SERVER={DB_SERVER};DATABASE={DB_DATABASE};UID={DB_USER};PWD={DB_PASSWORD}')
-engine = create_engine(f"mssql+pyodbc:///?odbc_connect={params}")
+engine = create_engine(
+    f"mssql+pyodbc:///?odbc_connect={params}",
+    pool_pre_ping=True,
+    pool_recycle=1800,
+    pool_size=10,
+    max_overflow=20
+)
 
 def get_raw_data_from_db(category=None):
     """
