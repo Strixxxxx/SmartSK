@@ -48,8 +48,9 @@ def process_input_data(df):
             df['budget'] = df[col]
             budget_cols.append('budget')
     
-    # Fill any remaining NaN values in the DataFrame with 0
-    df.fillna(0, inplace=True)
+    # Fill any remaining NaN values in numeric columns with 0
+    numeric_cols = df.select_dtypes(include=[np.number]).columns
+    df[numeric_cols] = df[numeric_cols].fillna(0)
 
     if df.empty:
         logger.warning("DataFrame is empty after processing (all rows had invalid budget data).")
