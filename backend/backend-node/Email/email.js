@@ -562,11 +562,11 @@ const sendProjectReviewVerdictEmail = async (barangayID, projName, action, notes
         SELECT u.emailAddress
         FROM userInfo u
         JOIN roles r ON u.position = r.roleID
-        JOIN barangayTerms bt ON u.termID = bt.termID
+        JOIN skTerms bt ON u.termID = bt.termID
         WHERE u.barangay = @barangayID
           AND r.roleName IN ('SKC', 'SKS')
           AND u.isArchived = 0
-          AND bt.isActive = 1
+          AND bt.isCurrent = 1
       `);
 
     if (userResult.recordset.length === 0) {
@@ -639,11 +639,11 @@ const sendBcptOverrideEmail = async (barangayID, projName) => {
         SELECT u.emailAddress
         FROM userInfo u
         JOIN roles r ON u.position = r.roleID
-        JOIN barangayTerms bt ON u.termID = bt.termID
+        JOIN skTerms bt ON u.termID = bt.termID
         WHERE u.barangay = @barangayID
           AND r.roleName IN ('SKC', 'SKS')
           AND u.isArchived = 0
-          AND bt.isActive = 1
+          AND bt.isCurrent = 1
       `);
 
     if (userResult.recordset.length === 0) {
@@ -702,11 +702,11 @@ const sendExecutionCompleteEmailToBCPT = async (barangayID, projName) => {
         SELECT u.emailAddress
         FROM userInfo u
         JOIN roles r ON u.position = r.roleID
-        JOIN barangayTerms bt ON u.termID = bt.termID
+        JOIN skTerms bt ON u.termID = bt.termID
         WHERE u.barangay = @barangayID
           AND r.roleName = 'BCPT'
           AND u.isArchived = 0
-          AND bt.isActive = 1
+          AND bt.isCurrent = 1
       `);
 
     if (userResult.recordset.length === 0) {

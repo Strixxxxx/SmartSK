@@ -181,7 +181,7 @@ const ProfilingPortal: React.FC<ProfilingPortalProps> = ({ project, user }) => {
     const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({ open: false, message: '', severity: 'info' });
 
     const fetchSubmissionDetails = useCallback(async () => {
-        if (!project?.termID) return;
+        if (!project?.cycleID) return;
         try {
             const res = await axiosInstance.get(`/api/project-tracker/profiling/submission/${project.cycleID}`);
             if (res.data.success && res.data.data) {
@@ -204,7 +204,7 @@ const ProfilingPortal: React.FC<ProfilingPortalProps> = ({ project, user }) => {
         } catch (err) {
             console.error('[ProfilingPortal] failed to load submission:', err);
         }
-    }, [project?.termID]);
+    }, [project?.cycleID]);
 
     // Load existing submission on mount
     useEffect(() => {

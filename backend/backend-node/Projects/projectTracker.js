@@ -82,6 +82,7 @@ router.post('/initialize-cycle', authMiddleware, async (req, res) => {
                 SELECT cycleID, targetFiscalYear FROM projectCycles
                 WHERE barangayID = @barangayID
                   AND currentStatusID < 14
+                  AND isArchived = 0
             `);
 
         if (activeCycleCheck.recordset.length > 0) {
@@ -101,6 +102,7 @@ router.post('/initialize-cycle', authMiddleware, async (req, res) => {
                 WHERE barangayID = @barangayID
                   AND termID = @termID
                   AND targetFiscalYear = @targetFiscalYear
+                  AND isArchived = 0
             `);
 
         if (existingCheck.recordset.length > 0) {
@@ -197,6 +199,7 @@ router.get('/active-cycle', authMiddleware, async (req, res) => {
                 WHERE barangayID = @barangayID
                   AND termID = @termID
                   AND currentStatusID < 14
+                  AND isArchived = 0
                 ORDER BY createdAt DESC
             `);
 
@@ -226,6 +229,7 @@ router.get('/cycles', authMiddleware, async (req, res) => {
                 SELECT *
                 FROM projectCycles
                 WHERE barangayID = @barangayID
+                  AND isArchived = 0
                 ORDER BY targetFiscalYear DESC
             `);
 
@@ -335,16 +339,16 @@ router.get('/status/:batchID', authMiddleware, async (req, res) => {
 
         // Fetch PPAs if Step 11 (Project Execution) or 12 (Closure)
         let ppas = [];
-        if (currentStatusID === 11 || currentStatusID === 12) {
+        if ([11, 12, 13, 14].includes(currentStatusID)) {
             if (batch.projType === 'ABYIP') {
                 const ppasRes = await pool.request()
                     .input('batchID', sql.Int, batchID)
-                    .query('SELECT abyipID as rowID, PPA, [Description], expectedResult, total, isExecuted FROM projectABYIP WHERE projbatchID = @batchID ORDER BY abyipID ASC');
+                    .query('SELECT abyipID as rowID, PPA, [Description], expectedResult, total, isExecuted, centerOfParticipation, period FROM projectABYIP WHERE projbatchID = @batchID ORDER BY abyipID ASC');
                 ppas = ppasRes.recordset;
             } else {
                 const ppasRes = await pool.request()
                     .input('batchID', sql.Int, batchID)
-                    .query('SELECT cbydpID as rowID, YDC, objective, PPAs, budget, isExecuted FROM projectCBYDP WHERE projbatchID = @batchID ORDER BY cbydpID ASC');
+                    .query('SELECT cbydpID as rowID, YDC, objective, PPAs, budget, isExecuted, centerOfParticipation FROM projectCBYDP WHERE projbatchID = @batchID ORDER BY cbydpID ASC');
                 ppas = ppasRes.recordset;
             }
         }
@@ -519,7 +523,7 @@ router.post('/reschedule-meeting', authMiddleware, async (req, res) => {
             return res.status(400).json({ success: false, message: 'Batch ID, meeting date, and reason are required.' });
         }
 
-        // Backend Validation: Must be at least 3 days from today
+        // Backend Validation: Must not be in the past
         const requestedDate = new Date(meetingDate);
         const currentDate = new Date();
         currentDate.setHours(0, 0, 0, 0); // Start of today
@@ -528,8 +532,8 @@ router.post('/reschedule-meeting', authMiddleware, async (req, res) => {
         const diffTime = requestedDate.getTime() - currentDate.getTime();
         const diffDays = diffTime / (1000 * 3600 * 24);
 
-        if (diffDays < 3) {
-            return res.status(400).json({ success: false, message: 'The SK Session must be scheduled at least 3 days from today to allow for adequate review.' });
+        if (diffDays <= 0) {
+            return res.status(400).json({ success: false, message: 'The meeting must be scheduled for a future date (tomorrow onwards).' });
         }
 
         const pool = await getConnection();
@@ -1052,6 +1056,7 @@ router.post('/update-ppa-execution', authMiddleware, hasAccessControl('trackerCo
         // Get batch type
         const batchRes = await pool.request()
             .input('batchID', sql.Int, batchID)
+            .input('barangayID', sql.Int, barangayID)
             .query('SELECT projType FROM projectBatch WHERE batchID = @batchID AND barangayID = @barangayID');
 
         if (!batchRes.recordset.length) {
@@ -1060,14 +1065,14 @@ router.post('/update-ppa-execution', authMiddleware, hasAccessControl('trackerCo
 
         const { projType } = batchRes.recordset[0];
 
-        // Ensure project is at checkpoint 11 (Project Execution)
+        // Ensure project is at checkpoint 13 (Project Execution)
         const statusRes = await pool.request()
             .input('batchID', sql.Int, batchID)
-            .query('SELECT TOP 1 statusID FROM projectTracker WHERE batchID = @batchID ORDER BY updatedAt DESC');
+            .query('SELECT TOP 1 pt.statusID FROM projectTracker pt JOIN projectBatch pb ON pt.cycleID = pb.cycleID WHERE pb.batchID = @batchID ORDER BY pt.updatedAt DESC');
 
         const currentStatus = statusRes.recordset[0]?.statusID;
-        if (currentStatus !== 11) {
-            return res.status(400).json({ success: false, message: 'PPA execution checklist can only be toggled during Checkpoint 11 (Project Execution).' });
+        if (currentStatus !== 13) {
+            return res.status(400).json({ success: false, message: 'PPA execution checklist can only be toggled during Checkpoint 13 (Project Execution).' });
         }
 
         // Update the execution status in the correct table
@@ -1156,14 +1161,14 @@ router.post('/validate-closure', authMiddleware, async (req, res) => {
             return res.status(403).json({ success: false, message: 'Unauthorized. Only the Barangay Captain can sign off on project closure.' });
         }
 
-        // Verify current checkpoint is 11
+        // Verify current checkpoint is 13
         const statusRes = await pool.request()
             .input('batchID', sql.Int, batchID)
-            .query('SELECT TOP 1 statusID FROM projectTracker WHERE batchID = @batchID ORDER BY updatedAt DESC');
+            .query('SELECT TOP 1 pt.statusID FROM projectTracker pt JOIN projectBatch pb ON pt.cycleID = pb.cycleID WHERE pb.batchID = @batchID ORDER BY pt.updatedAt DESC');
 
         const currentStatus = statusRes.recordset[0]?.statusID;
-        if (currentStatus !== 11) {
-            return res.status(400).json({ success: false, message: 'Closure can only be validated if the project is in Checkpoint 11 (Project Execution).' });
+        if (currentStatus !== 13) {
+            return res.status(400).json({ success: false, message: 'Closure can only be validated if the project is in Checkpoint 13 (Project Execution).' });
         }
 
         // Fetch batch details
@@ -1194,10 +1199,10 @@ router.post('/validate-closure', authMiddleware, async (req, res) => {
             return res.status(400).json({ success: false, message: `Cannot validate closure. There are still ${unexecutedCount} unexecuted PPAs in this plan.` });
         }
 
-        // Advance to Checkpoint 12 (Project Closure & Evaluation)
+        // Advance to Checkpoint 14 (Project Closure & Evaluation)
         await pool.request()
             .input('batchID', sql.Int, batchID)
-            .input('statusID', sql.Int, 12)
+            .input('statusID', sql.Int, 14)
             .input('userID', sql.Int, userID)
             .query('INSERT INTO projectTracker (cycleID, statusID, updatedBy) SELECT cycleID, @statusID, @userID FROM projectBatch WHERE batchID = @batchID; UPDATE projectCycles SET currentStatusID = @statusID, updatedAt = GETDATE() WHERE cycleID = (SELECT cycleID FROM projectBatch WHERE batchID = @batchID);');
 
@@ -1210,7 +1215,7 @@ router.post('/validate-closure', authMiddleware, async (req, res) => {
             .query('INSERT INTO projectNotes (batchID, userID, content) VALUES (@batchID, @userID, @content)');
 
         // Create Notification
-        const notifMsg = `Barangay Captain has validated the closure checklist for project plan "${projName}". It has been successfully advanced to Checkpoint 12: Project Closure & Evaluation.`;
+        const notifMsg = `Barangay Captain has validated the closure checklist for project plan "${projName}". It has been successfully advanced to Checkpoint 14: Project Closure & Evaluation.`;
         await pool.request()
             .input('batchID', sql.Int, batchID)
             .input('barangayID', sql.Int, barangayID)
@@ -1218,9 +1223,9 @@ router.post('/validate-closure', authMiddleware, async (req, res) => {
 
         // Broadcast notifications & updates
         broadcast({ type: 'new_notification', barangayID });
-        broadcastToRoom(batchID, { type: 'checkpoint_updated', statusID: 12 });
+        broadcastToRoom(batchID, { type: 'checkpoint_updated', statusID: 14 });
 
-        res.json({ success: true, message: 'Project closure validated. Advanced to Checkpoint 12.' });
+        res.json({ success: true, message: 'Project closure validated. Advanced to Checkpoint 14.' });
     } catch (err) {
         console.error('[projectTracker] POST /validate-closure error:', err.message);
         res.status(500).json({ success: false, message: 'Failed to validate project closure.' });
@@ -1230,7 +1235,7 @@ router.post('/validate-closure', authMiddleware, async (req, res) => {
 // --- Checkpoint Proof Upload & Validation (CP5-CP10) ---
 
 const CHECKPOINT_FOLDER_MAP = {
-    4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven'
+    4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven', 12: 'twelve'
 };
 
 function getAttemptSuffix(count) {
@@ -1267,20 +1272,34 @@ router.post('/upload-checkpoint-proof', authMiddleware, hasAccessControl('tracke
         // Sanitize original filename (replace spaces with underscores, etc)
         const safeFilename = req.file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
         
-        // Pre-flight check: count existing tracker arrivals to determine attempt folder suffix
         const pool = await getConnection();
-        const trackerCheck = await pool.request()
+        const batchCheck = await pool.request()
             .input('batchID', sql.Int, batchID)
-            .input('statusID', sql.Int, checkpointID)
-            .query(`SELECT COUNT(*) as count FROM projectTracker WHERE batchID = @batchID AND statusID = @statusID`);
-        const arrivalsCount = trackerCheck.recordset[0].count;
-        const attemptSuffix = getAttemptSuffix(Math.max(0, arrivalsCount - 1));
-
-        const blobName = `Checkpoints/${folderName}/${batchID}/${attemptSuffix}/${timestamp}-${safeFilename}`;
+            .query(`SELECT barangayID, cycleID FROM projectBatch WHERE batchID = @batchID`);
+            
+        if (batchCheck.recordset.length === 0) {
+            return res.status(404).json({ success: false, message: 'Project not found.' });
+        }
+        
+        const { barangayID, cycleID } = batchCheck.recordset[0];
+        
+        let blobName;
+        if (checkpointID >= 8 && checkpointID <= 12) {
+            // Count existing tracker arrivals to determine the active attempt suffix
+            const trackerCheck = await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('statusID', sql.Int, checkpointID)
+                .query(`SELECT COUNT(*) as count FROM projectTracker WHERE batchID = @batchID AND statusID = @statusID`);
+            const arrivalsCount = trackerCheck.recordset[0].count;
+            const attemptSuffix = getAttemptSuffix(Math.max(0, arrivalsCount - 1));
+            blobName = `Checkpoints/${folderName}/${barangayID}/${cycleID}/${attemptSuffix}/${timestamp}-${safeFilename}`;
+        } else {
+            blobName = `Checkpoints/${folderName}/${barangayID}/${cycleID}/${timestamp}-${safeFilename}`;
+        }
         
         await uploadBlob(docContainerName, blobName, req.file.buffer, req.file.mimetype);
         
-        res.json({ success: true, message: `Proof file uploaded successfully under ${attemptSuffix} attempt.`, path: blobName, attempt: attemptSuffix });
+        res.json({ success: true, message: `Proof file uploaded successfully.`, path: blobName });
     } catch (err) {
         console.error('[projectTracker] POST /upload-checkpoint-proof error:', err.message);
         res.status(500).json({ success: false, message: 'Failed to upload proof file.' });
@@ -1297,34 +1316,33 @@ router.get('/checkpoint-proof/:batchID/:checkpointID', authMiddleware, async (re
             return res.status(400).json({ success: false, message: 'Invalid checkpoint ID.' });
         }
         
-        // Count existing tracker arrivals to determine the current active attempt suffix
         const pool = await getConnection();
-        const trackerCheck = await pool.request()
+        const batchCheck = await pool.request()
             .input('batchID', sql.Int, batchID)
-            .input('statusID', sql.Int, checkpointID)
-const blobs = await listBlobsWithProperties(docContainerName, { prefix });
+            .query(`SELECT barangayID, cycleID FROM projectBatch WHERE batchID = @batchID`);
+            
+        if (batchCheck.recordset.length === 0) {
+            return res.status(404).json({ success: false, message: 'Project not found.' });
+        }
+        
+        const { barangayID, cycleID } = batchCheck.recordset[0];
+        let prefix = `Checkpoints/${folderName}/${barangayID}/${cycleID}/`;
+        
+        const blobs = await listBlobsWithProperties(docContainerName, { prefix });
         
         const files = [];
         for (const blob of blobs) {
-            // Expected blob.name format: Checkpoints/five/12/1st/174982734-file.jpg
             const parts = blob.name.split('/');
-            let attempt = '1st';
-            if (parts.length >= 5) {
-                attempt = parts[3];
-            } else {
-                attempt = '1st';
-            }
-            
-            // Strictly filter by active attempt suffix to ensure isolation
-            if (attempt !== attemptSuffix) {
-                continue;
-            }
-            
+            let attempt = null;
             const sasUrl = await generateSasUrl(docContainerName, blob.name);
             const filename = parts.pop();
-            const nameParts = filename.split('-');
-            nameParts.shift(); // remove timestamp
-            const originalName = nameParts.join('-') || filename;
+            let originalName = filename;
+            
+            if (checkpointID < 8 || checkpointID > 12) {
+                const nameParts = filename.split('-');
+                nameParts.shift(); // remove timestamp
+                originalName = nameParts.join('-') || filename;
+            }
             
             files.push({
                 name: originalName,
@@ -1362,7 +1380,12 @@ router.post('/validate-budget', authMiddleware, async (req, res) => {
         // Ensure batch is currently at status 5
         const batchRes = await pool.request()
             .input('batchID', sql.Int, batchID)
-            .query(`SELECT currentStatusID, currentProjType FROM projectBatches WHERE batchID = @batchID`);
+            .query(`
+                SELECT pc.currentStatusID, pb.projType as currentProjType 
+                FROM projectBatch pb
+                JOIN projectCycles pc ON pb.cycleID = pc.cycleID
+                WHERE pb.batchID = @batchID
+            `);
             
         if (batchRes.recordset.length === 0) {
             return res.status(404).json({ success: false, message: 'Batch not found.' });
@@ -1379,7 +1402,7 @@ router.post('/validate-budget', authMiddleware, async (req, res) => {
             .query(`
                 SELECT pc.targetFiscalYear 
                 FROM projectCycles pc
-                JOIN projectBatches pb ON pc.cycleID = pb.cycleID
+                JOIN projectBatch pb ON pc.cycleID = pb.cycleID
                 WHERE pb.batchID = @batchID
             `);
             
@@ -1392,18 +1415,18 @@ router.post('/validate-budget', authMiddleware, async (req, res) => {
             await pool.request()
                 .input('batchID', sql.Int, batchID)
                 .input('statusID', sql.Int, newStatusID)
-                .query(`UPDATE projectBatches SET currentStatusID = @statusID WHERE batchID = @batchID`);
+                .query(`UPDATE projectCycles SET currentStatusID = @statusID, updatedAt = GETDATE() WHERE cycleID = (SELECT cycleID FROM projectBatch WHERE batchID = @batchID)`);
 
             await pool.request()
                 .input('batchID', sql.Int, batchID)
                 .input('statusID', sql.Int, newStatusID)
                 .input('updatedBy', sql.Int, userID)
-                .query(`INSERT INTO projectTracker (batchID, statusID, updatedBy) VALUES (@batchID, @statusID, @updatedBy)`);
+                .query(`INSERT INTO projectTracker (cycleID, statusID, updatedBy) SELECT cycleID, @statusID, @updatedBy FROM projectBatch WHERE batchID = @batchID`);
 
             // Also clear any stuck notifications
             await pool.request()
                 .input('batchID', sql.Int, batchID)
-                .query(`UPDATE notifications SET isRead = 1 WHERE batchID = @batchID AND notifType IN ('URGENT', 'DEADLINE')`);
+                .query(`UPDATE projectNotifications SET isRead = 1 WHERE batchID = @batchID AND notifType IN ('URGENT', 'DEADLINE')`);
 
             res.json({ success: true, message: 'Estimated Annual Budget approved. Advanced to Checkpoint 6.' });
         } else if (action === 'reject') {
@@ -1417,7 +1440,7 @@ router.post('/validate-budget', authMiddleware, async (req, res) => {
                 .input('batchID', sql.Int, batchID)
                 .input('remarks', sql.NVarChar, remarks || 'No remarks provided.')
                 .query(`
-                    INSERT INTO notifications (userID, notifType, message, batchID, isRead, createdAt)
+                    INSERT INTO projectNotifications (userID, notifType, message, batchID, isRead, createdAt)
                     SELECT userID, 'SYSTEM', 'Budget Rejected: ' + @remarks, @batchID, 0, GETDATE()
                     FROM userInfo
                     WHERE barangay = @barangayID AND position IN (SELECT roleID FROM roles WHERE roleName IN ('SKC', 'SKS')) AND isArchived = 0
@@ -1455,55 +1478,37 @@ router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
         
         const pool = await getConnection();
         
-        // Count existing tracker arrivals to determine the active attempt suffix
-        const trackerCheck = await pool.request()
-            .input('batchID', sql.Int, batchID)
-            .input('statusID', sql.Int, fromCP)
-            .query(`SELECT COUNT(*) as count FROM projectTracker WHERE batchID = @batchID AND statusID = @statusID`);
-        const arrivalsCount = trackerCheck.recordset[0].count;
-        const attemptSuffix = getAttemptSuffix(Math.max(0, arrivalsCount - 1));
-        
-        const folderName = CHECKPOINT_FOLDER_MAP[fromCP];
-        const prefix = `Checkpoints/${folderName}/${batchID}/`;
-        const blobs = await listBlobsWithProperties(docContainerName, { prefix });
-        
-        // Filter blobs to only include files matching the active attempt
-        const activeBlobs = blobs.filter(blob => {
-            const parts = blob.name.split('/');
-            let attempt = '1st';
-            if (parts.length >= 5) {
-                attempt = parts[3];
-            } else {
-                attempt = '1st';
-            }
-            return attempt === attemptSuffix;
-        });
-        
-        if (activeBlobs.length === 0) {
-            return res.status(400).json({ success: false, message: `Cannot process: No proof files have been uploaded for the current attempt (${attemptSuffix}).` });
-        }
-        
         // Ensure current status matches fromCheckpoint
         const batchCheck = await pool.request()
             .input('batchID', sql.Int, batchID)
-            .query(`SELECT projName, barangayID FROM projectBatch WHERE batchID = @batchID`);
+            .query(`SELECT projName, barangayID, cycleID FROM projectBatch WHERE batchID = @batchID`);
             
         if (batchCheck.recordset.length === 0) {
             return res.status(404).json({ success: false, message: 'Project not found.' });
         }
 
+        const projName = batchCheck.recordset[0].projName;
+        const barangayID = batchCheck.recordset[0].barangayID;
+        const cycleID = batchCheck.recordset[0].cycleID;
+        
+        const folderName = CHECKPOINT_FOLDER_MAP[fromCP];
+        let prefix = `Checkpoints/${folderName}/${barangayID}/${cycleID}/`;
+        
+        const activeBlobs = await listBlobsWithProperties(docContainerName, { prefix });
+        
+        if (activeBlobs.length === 0) {
+            return res.status(400).json({ success: false, message: `Cannot process: No proof files have been uploaded.` });
+        }
+
         const statusRes = await pool.request()
-            .input('batchID', sql.Int, batchID)
-            .query(`SELECT TOP 1 statusID FROM projectTracker WHERE batchID = @batchID ORDER BY updatedAt DESC`);
+            .input('cycleID', sql.Int, cycleID)
+            .query(`SELECT TOP 1 statusID FROM projectTracker WHERE cycleID = @cycleID ORDER BY updatedAt DESC`);
 
         const currentStatusID = statusRes.recordset.length ? statusRes.recordset[0].statusID : 2;
         
         if (currentStatusID !== fromCP) {
             return res.status(400).json({ success: false, message: `Project is not at checkpoint ${fromCP}.` });
         }
-        
-        const projName = batchCheck.recordset[0].projName;
-        const barangayID = batchCheck.recordset[0].barangayID;
         
         let nextStatusID = fromCP + 1;
         let taggedNote = '';
@@ -1517,23 +1522,9 @@ router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
             notifType = 'CHECKPOINT_VALIDATED';
         } else {
             // Rejection / Revert request
-            if (fromCP >= 4 && fromCP <= 6) {
-                nextStatusID = 2; // Revert all the way back to Proposal Compilation (Checkpoint 2)
-                notifMessage = `Barangay Captain requested REVISIONS for project "${projName}" during Checkpoint ${fromCP} validation. Status has reverted to Checkpoint 2: CBYDP Drafting.`;
-                notifType = 'BCPT_REVISION_REQUESTED';
-            } else if (fromCP >= 7 && fromCP <= 11) {
-                nextStatusID = 5; // Revert to ABYIP Budget Draft (Checkpoint 5)
-                notifMessage = `Barangay Captain requested REVISIONS for project "${projName}" during Checkpoint ${fromCP} validation. Status has reverted to Checkpoint 5: ABYIP Budget Draft.`;
-                notifType = 'BCPT_REVISION_REQUESTED';
-            } else if (fromCP === 12) {
-                nextStatusID = 12; // Maintain the rollback which would be staying to the checkpoint 12
-                notifMessage = `Barangay Captain requested REVISIONS for project "${projName}" during Checkpoint 12 validation. Status remains at Checkpoint 12: Procurement Phase.`;
-                notifType = 'BCPT_REVISION_REQUESTED';
-            } else {
-                nextStatusID = fromCP;
-                notifMessage = `Barangay Captain requested revisions for project "${projName}" during Checkpoint ${fromCP} validation.`;
-                notifType = 'BCPT_REVISION_REQUESTED';
-            }
+            nextStatusID = fromCP;
+            notifMessage = `Barangay Captain requested REVISIONS for project "${projName}" during Checkpoint ${fromCP} validation. Status remains at Checkpoint ${fromCP}.`;
+            notifType = 'BCPT_REVISION_REQUESTED';
             taggedNote = `[BCPT Rejection: CP${fromCP}] ${validationNote}`;
         }
         
@@ -1549,12 +1540,6 @@ router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
                 .input('updatedBy', sql.Int, req.user.userID)
                 .query(`INSERT INTO projectTracker (cycleID, statusID, updatedBy) SELECT cycleID, @statusID, @updatedBy FROM projectBatch WHERE batchID = @batchID; UPDATE projectCycles SET currentStatusID = @statusID, updatedAt = GETDATE() WHERE cycleID = (SELECT cycleID FROM projectBatch WHERE batchID = @batchID);`);
                 
-            if (nextStatusID === 2 || nextStatusID === 5) {
-                // Revert request means a whole new session is required. Delete old attendance/approvals.
-                await transaction.request()
-                    .input('batchID', sql.Int, batchID)
-                    .query(`DELETE FROM projectCheckpointApprovals WHERE batchID = @batchID`);
-            }
                 
             // Insert validation/rejection note in projectNotes (using correct column names: userID, content)
             await transaction.request()

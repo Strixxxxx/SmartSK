@@ -18,7 +18,7 @@ interface SupportingDocumentsModalProps {
     onStatusChange?: () => void;
 }
 
-type CategoryType = 'PPMP_or_APP' | 'Activity_Design' | 'SK_Resolution' | 'LYDP' | 'KK_Minutes' | 'EstIncomeCert' | 'IncomeCert' | 'KK_Attendance' | 'KK_Photo_Doc' | 'YP_Notice_Letter' | 'YP_Campaign_Proof' | 'YP_Master_Dataset';
+type CategoryType = 'PPMP_or_APP' | 'Activity_Design' | 'SK_Resolution' | 'LYDP' | 'KK_Minutes' | 'EstIncomeCert' | 'IncomeCert' | 'KK_Attendance' | 'KK_Photo_Doc' | 'YP_Notice_Letter' | 'YP_Campaign_Proof' | 'YP_Master_Dataset' | 'QCYDO_Review_Doc' | 'QC_SK_Fed_Review_Doc' | 'City_Budget_Review_Doc' | 'City_Council_Hearing_Doc' | 'Procurement_Doc';
 
 interface DocumentFile {
     name: string;
@@ -48,7 +48,12 @@ const CATEGORY_LABELS: Record<string, string> = {
     'KK_Photo_Doc': 'Photo Documentation',
     'YP_Notice_Letter': 'Notice Letter',
     'YP_Campaign_Proof': 'Campaign Proof',
-    'YP_Master_Dataset': 'Master Dataset'
+    'YP_Master_Dataset': 'Master Dataset',
+    'QCYDO_Review_Doc': 'QCYDO Review Document',
+    'QC_SK_Fed_Review_Doc': 'QC SK Federation Review Document',
+    'City_Budget_Review_Doc': 'City Budget Review Document',
+    'City_Council_Hearing_Doc': 'City Council Hearing Document',
+    'Procurement_Doc': 'Procurement Document'
 };
 
 const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ open, onClose, batchID, projName, onStatusChange }) => {
@@ -90,6 +95,11 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                 if (res.data.data.categories) {
                     const allCats = Object.keys(res.data.data.categories) as CategoryType[];
                     filteredCats = allCats.filter(cat => {
+                        if (cat === 'Procurement_Doc') return statusID >= 12;
+                        if (cat === 'City_Council_Hearing_Doc') return statusID >= 11;
+                        if (cat === 'City_Budget_Review_Doc') return statusID >= 10;
+                        if (cat === 'QC_SK_Fed_Review_Doc') return statusID >= 9;
+                        if (cat === 'QCYDO_Review_Doc') return statusID >= 8;
                         if (cat === 'SK_Resolution') return statusID >= 6;
                         if (cat === 'EstIncomeCert' || cat === 'IncomeCert') return statusID >= 5;
                         if (cat === 'KK_Minutes' || cat === 'KK_Attendance' || cat === 'KK_Photo_Doc') return statusID >= 4;
@@ -383,10 +393,40 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
         if (selectedCategory === 'LYDP') return statusID === 2;
         if (selectedCategory === 'EstIncomeCert' || selectedCategory === 'IncomeCert') return statusID === 5;
         if (selectedCategory === 'SK_Resolution') return statusID === 6;
+        if (selectedCategory === 'QCYDO_Review_Doc') return statusID === 8;
+        if (selectedCategory === 'QC_SK_Fed_Review_Doc') return statusID === 9;
+        if (selectedCategory === 'City_Budget_Review_Doc') return statusID === 10;
+        if (selectedCategory === 'City_Council_Hearing_Doc') return statusID === 11;
+        if (selectedCategory === 'Procurement_Doc') return statusID === 12;
         return true;
     };
 
     const CHECKPOINT_GROUPS = [
+        {
+            checkpoint: 12,
+            label: 'Checkpoint 12: Procurement Phase',
+            categories: ['Procurement_Doc']
+        },
+        {
+            checkpoint: 11,
+            label: 'Checkpoint 11: City Council Budget Hearing',
+            categories: ['City_Council_Hearing_Doc']
+        },
+        {
+            checkpoint: 10,
+            label: 'Checkpoint 10: City Budget Review',
+            categories: ['City_Budget_Review_Doc']
+        },
+        {
+            checkpoint: 9,
+            label: 'Checkpoint 9: QC SK Federation Review',
+            categories: ['QC_SK_Fed_Review_Doc']
+        },
+        {
+            checkpoint: 8,
+            label: 'Checkpoint 8: QCYDO Review',
+            categories: ['QCYDO_Review_Doc']
+        },
         {
             checkpoint: 6,
             label: 'Checkpoint 6',

@@ -7,7 +7,7 @@ import styles from './CheckpointProofUploadModal.module.css';
 import { FilePreviewModal } from './FilePreviewModal';
 
 const CHECKPOINT_FOLDER_MAP: Record<number, string> = {
-    5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten'
+    4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven', 12: 'twelve'
 };
 
 interface ProofFile {
@@ -121,36 +121,21 @@ const CheckpointProofUploadModal: React.FC<CheckpointProofUploadModalProps> = ({
         });
     };
 
-    // Group files by attempt folder (e.g. "1st", "2nd", "3rd", etc)
-    const groupedFiles: Record<string, ProofFile[]> = {};
     const folderName = CHECKPOINT_FOLDER_MAP[checkpointID];
     
-    // Strict client-side isolation to prevent leaks from other checkpoints
+    // Strict client-side isolation to prevent leaks from other checkpoints (fallback)
     const filteredFiles = files.filter(file => {
         if (!folderName) return false;
-        const expectedSegment = `/Checkpoints/${folderName}/${batchID}/`;
-        const expectedSegmentBackslash = `\\Checkpoints\\${folderName}\\${batchID}\\`;
-        return file.path.includes(expectedSegment) || file.path.includes(expectedSegmentBackslash) || file.path.includes(`Checkpoints/${folderName}/${batchID}/`);
+        return file.path.includes(`Checkpoints/${folderName}/`);
     });
 
-    filteredFiles.forEach(file => {
-        let key = file.attempt || '1st';
-        // Safeguard to ensure legacy parsing defaults neatly to '1st' instead of showing filename
-        if (key.includes('.') || key.includes('-') || key.length > 5) {
-            key = '1st';
-        }
-        if (!groupedFiles[key]) {
-            groupedFiles[key] = [];
-        }
-        groupedFiles[key].push(file);
-    });
-
-    // Order attempt keys nicely (1st, 2nd, 3rd, etc)
-    const sortedAttemptKeys = Object.keys(groupedFiles).sort((a, b) => {
-        const valA = parseInt(a) || 0;
-        const valB = parseInt(b) || 0;
-        return valA - valB;
-    });
+    const isGrouped = checkpointID >= 8 && checkpointID <= 12;
+    const groupedFiles = isGrouped ? filteredFiles.reduce((acc, file) => {
+        const attempt = file.attempt || '1st';
+        if (!acc[attempt]) acc[attempt] = [];
+        acc[attempt].push(file);
+        return acc;
+    }, {} as Record<string, ProofFile[]>) : null;
 
     return (
         <>
@@ -166,28 +151,45 @@ const CheckpointProofUploadModal: React.FC<CheckpointProofUploadModalProps> = ({
                             <div style={{ display: 'flex', justifyContent: 'center', padding: '10px' }}>
                                 <CircularProgress size={24} />
                             </div>
-                        ) : files.length > 0 ? (
-                            sortedAttemptKeys.map(attemptKey => (
-                                <div key={attemptKey} className={styles.attemptGroup}>
-                                    <div className={styles.attemptHeader}>
-                                        {attemptKey.toUpperCase()} ATTEMPT
-                                    </div>
-                                    {groupedFiles[attemptKey].map((file, idx) => (
-                                        <div key={idx} className={styles.fileItem}>
-                                            <div className={styles.fileInfo}>
-                                                <span className={styles.fileName}>
-                                                    <InsertDriveFileIcon style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 4, color: '#1a73e8' }} />
-                                                    {file.name}
-                                                </span>
-                                                <span className={styles.fileMeta}>{formatBytes(file.size)} • {formatDate(file.uploadedAt)}</span>
+                        ) : filteredFiles.length > 0 ? (
+                            isGrouped ? (
+                                Object.keys(groupedFiles!).map(attempt => (
+                                    <div key={attempt} style={{ marginBottom: '16px' }}>
+                                        <h4 style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#4b5563', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                            {attempt} Attempt
+                                        </h4>
+                                        {groupedFiles![attempt].map((file, idx) => (
+                                            <div key={idx} className={styles.fileItem}>
+                                                <div className={styles.fileInfo}>
+                                                    <span className={styles.fileName}>
+                                                        <InsertDriveFileIcon style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 4, color: '#1a73e8' }} />
+                                                        {file.name}
+                                                    </span>
+                                                    <span className={styles.fileMeta}>{formatBytes(file.size)} • {formatDate(file.uploadedAt)}</span>
+                                                </div>
+                                                <button className={styles.downloadBtn} onClick={(e) => handlePreview(e, file)}>
+                                                    View
+                                                </button>
                                             </div>
-                                            <button className={styles.downloadBtn} onClick={(e) => handlePreview(e, file)}>
-                                                View
-                                            </button>
+                                        ))}
+                                    </div>
+                                ))
+                            ) : (
+                                filteredFiles.map((file, idx) => (
+                                    <div key={idx} className={styles.fileItem}>
+                                        <div className={styles.fileInfo}>
+                                            <span className={styles.fileName}>
+                                                <InsertDriveFileIcon style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 4, color: '#1a73e8' }} />
+                                                {file.name}
+                                            </span>
+                                            <span className={styles.fileMeta}>{formatBytes(file.size)} • {formatDate(file.uploadedAt)}</span>
                                         </div>
-                                    ))}
-                                </div>
-                            ))
+                                        <button className={styles.downloadBtn} onClick={(e) => handlePreview(e, file)}>
+                                            View
+                                        </button>
+                                    </div>
+                                ))
+                            )
                         ) : (
                             <p className={styles.noFiles}>No proof files uploaded yet.</p>
                         )}

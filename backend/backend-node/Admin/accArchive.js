@@ -41,6 +41,64 @@ router.get('/', authMiddleware, async (req, res) => {
     }
 });
 
+// POST to archive an account by username
+router.post('/by-username', authMiddleware, async (req, res) => {
+    const { userName } = req.body;
+    
+    if (!userName) {
+        return res.status(400).json({ success: false, message: 'Username is required.' });
+    }
+
+    const { generateUsernameHash } = require('../utils/crypto');
+    const usernameHash = generateUsernameHash(userName);
+
+    const pool = await getConnection();
+    const transaction = new sql.Transaction(pool);
+
+    try {
+        await transaction.begin();
+
+        const userToArchiveResult = await transaction.request()
+            .input('usernameHash', sql.VarChar, usernameHash)
+            .query('SELECT userID FROM userInfo WHERE usernameHash = @usernameHash');
+
+        if (userToArchiveResult.recordset.length === 0) {
+            await transaction.rollback();
+            return res.status(404).json({ success: false, message: 'User not found.' });
+        }
+        
+        const userId = userToArchiveResult.recordset[0].userID;
+
+        // 1. Archive the user account
+        await transaction.request()
+            .input('userID', sql.Int, userId)
+            .query('UPDATE userInfo SET isArchived = 1 WHERE userID = @userID');
+
+        // Removed invalid 'posts' table update here.
+
+        await transaction.commit();
+
+        addAuditTrail({
+            actor: 'A',
+            module: 'D',
+            userID: req.user.userId, // Keep the actor's ID as is since it's from token
+            actions: 'archive-account',
+            descriptions: `Admin ${req.user.fullName} archived account for user: ${userName}.`
+        });
+
+        res.json({ success: true, message: 'Account has been archived successfully.' });
+
+    } catch (error) {
+        try {
+            await transaction.rollback();
+        } catch (rollbackError) {
+            console.error(`Error rolling back transaction for account archive ${userName}:`, rollbackError);
+        }
+        console.error(`Error archiving account ${userName}:`, error);
+        res.status(500).json({ success: false, message: 'Failed to archive account.' });
+    }
+});
+
 // POST to archive an account
 router.post('/:userId', authMiddleware, async (req, res) => {
     const { userId } = req.params;
@@ -65,11 +123,7 @@ router.post('/:userId', authMiddleware, async (req, res) => {
             .input('userID', sql.Int, userId)
             .query('UPDATE userInfo SET isArchived = 1 WHERE userID = @userID');
 
-        // 2. Archive all posts by that user
-        await transaction.request()
-            .input('userID', sql.Int, userId)
-            .input('archivedAt', sql.DateTime, new Date())
-            .query('UPDATE posts SET isArchived = 1, archivedAt = @archivedAt WHERE userID = @userID');
+        // Removed invalid 'posts' table update here.
 
         await transaction.commit();
 
@@ -78,10 +132,10 @@ router.post('/:userId', authMiddleware, async (req, res) => {
             module: 'D',
             userID: req.user.userId,
             actions: 'archive-account',
-            descriptions: `Admin ${req.user.fullName} archived account for user: ${decryptedUsername}. All associated posts were also archived.`
+            descriptions: `Admin ${req.user.fullName} archived account for user: ${decryptedUsername}.`
         });
 
-        res.json({ success: true, message: 'Account and all associated posts have been archived successfully.' });
+        res.json({ success: true, message: 'Account has been archived successfully.' });
 
     } catch (error) {
         try {

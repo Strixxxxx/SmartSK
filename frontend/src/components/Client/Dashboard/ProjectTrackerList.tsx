@@ -202,7 +202,9 @@ const ProjectTrackerList: React.FC = () => {
             const active = cycles.filter(c => c.currentStatusID <= 14);
             for (const c of active) {
                 const primaryBatchID = c.batches?.find(b => b.projType === 'CBYDP')?.batchID || c.batches?.[0]?.batchID;
+                const abyipBatchID = c.batches?.find(b => b.projType === 'ABYIP')?.batchID;
                 if (primaryBatchID) await refreshBatchDetails(primaryBatchID);
+                if (abyipBatchID && abyipBatchID !== primaryBatchID) await refreshBatchDetails(abyipBatchID);
             }
         };
         if (cycles.length > 0) {
@@ -214,7 +216,9 @@ const ProjectTrackerList: React.FC = () => {
             const active = cycles.filter(c => c.currentStatusID <= 14);
             active.forEach(c => {
                 const primaryBatchID = c.batches?.find(b => b.projType === 'CBYDP')?.batchID || c.batches?.[0]?.batchID;
+                const abyipBatchID = c.batches?.find(b => b.projType === 'ABYIP')?.batchID;
                 if (primaryBatchID) refreshBatchDetails(primaryBatchID);
+                if (abyipBatchID && abyipBatchID !== primaryBatchID) refreshBatchDetails(abyipBatchID);
             });
         }, 5000);
 
@@ -844,8 +848,8 @@ const ProjectTrackerList: React.FC = () => {
                                         </div>
                                     )}
 
-                                    {/* --- Checkpoints 4, 6, 8, 9, 10, 11 Validation & Proof --- */}
-                                    {[4, 6, 8, 9, 10, 11].includes(batch.currentStatusID) && (
+                                    {/* --- Checkpoints 6, 8, 9, 10, 11, 12 Validation & Proof --- */}
+                                    {[6, 8, 9, 10, 11, 12].includes(batch.currentStatusID) && (
                                         <div className="ptl-detail-section" style={{ marginTop: '12px' }}>
                                             <p className="ptl-detail-title">
                                                 <VerifiedIcon sx={{ fontSize: 16 }} /> Checkpoint {batch.currentStatusID} Validation & Proof
@@ -870,8 +874,10 @@ const ProjectTrackerList: React.FC = () => {
                                                 <button
                                                     className="ptl-btn ptl-btn--primary"
                                                     onClick={() => {
-                                                        setChecklistModalBatchID(batch.batchID);
-                                                        const cats = Array.from(new Set((detail.ppas || []).map((p: any) => p.centerOfParticipation).filter(Boolean)));
+                                                        const targetBatchID = abyipBatch ? abyipBatch.batchID : batch.batchID;
+                                                        setChecklistModalBatchID(targetBatchID);
+                                                        const targetDetail = details[targetBatchID] || detail;
+                                                        const cats = Array.from(new Set((targetDetail.ppas || []).map((p: any) => p.centerOfParticipation).filter(Boolean)));
                                                         setSelectedChecklistCategory(cats.length > 0 ? (cats[0] as string) : '');
                                                     }}
                                                     style={{
@@ -898,7 +904,7 @@ const ProjectTrackerList: React.FC = () => {
                             {/* ── Action Rows ────────────────────────────────── */}
                             <div className="ptl-actions-row">
                                 {/* ── Standard Advance Button (Hidden for custom states to prevent accidental skips) ── */}
-                                {isBcpt && batch.currentStatusID < 14 && ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13].includes(batch.currentStatusID) && (
+                                {isBcpt && batch.currentStatusID < 14 && ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(batch.currentStatusID) && (
                                     <button
                                         className="ptl-advance-btn"
                                         onClick={(e) => handleAdvance(e, batch)}
@@ -918,8 +924,8 @@ const ProjectTrackerList: React.FC = () => {
                                     </button>
                                 )}
 
-                                {/* ── Validate Checkpoint Button (Checkpoint 4, 6, 8, 9, 10, 11) ── */}
-                                {[4, 6, 8, 9, 10, 11].includes(batch.currentStatusID) && isBcpt && (
+                                {/* ── Validate Checkpoint Button (Checkpoint 6, 8, 9, 10, 11, 12) ── */}
+                                {[6, 8, 9, 10, 11, 12].includes(batch.currentStatusID) && isBcpt && (
                                     <button
                                         className="ptl-docs-btn"
                                         style={{ backgroundColor: '#1a73e8', color: '#ffffff', border: '1px solid #1a73e8' }}

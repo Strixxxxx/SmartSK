@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import { FilePreviewModal } from './FilePreviewModal';
 
 const CHECKPOINT_FOLDER_MAP: Record<number, string> = {
-    4: 'four', 5: 'five', 6: 'six', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven'
+    4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven', 12: 'twelve'
 };
 
 interface ProofFile {
@@ -134,35 +134,13 @@ const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ o
 
     const folderName = CHECKPOINT_FOLDER_MAP[checkpointID];
     
-    // Strict client-side isolation to prevent leaks from other checkpoints
+    // Strict client-side isolation to prevent leaks from other checkpoints (fallback)
     const filteredFiles = files.filter(file => {
         if (!folderName) return false;
-        const expectedSegment = `/Checkpoints/${folderName}/${batchID}/`;
-        const expectedSegmentBackslash = `\\Checkpoints\\${folderName}\\${batchID}\\`;
-        return file.path.includes(expectedSegment) || file.path.includes(expectedSegmentBackslash) || file.path.includes(`Checkpoints/${folderName}/${batchID}/`);
+        return file.path.includes(`Checkpoints/${folderName}/`);
     });
 
     const hasFiles = filteredFiles.length > 0;
-
-    // Group files by attempt folder
-    const groupedFiles: Record<string, ProofFile[]> = {};
-    filteredFiles.forEach(file => {
-        let key = file.attempt || '1st';
-        // Safeguard to ensure legacy parsing defaults neatly to '1st' instead of showing filename
-        if (key.includes('.') || key.includes('-') || key.length > 5) {
-            key = '1st';
-        }
-        if (!groupedFiles[key]) {
-            groupedFiles[key] = [];
-        }
-        groupedFiles[key].push(file);
-    });
-
-    const sortedAttemptKeys = Object.keys(groupedFiles).sort((a, b) => {
-        const valA = parseInt(a) || 0;
-        const valB = parseInt(b) || 0;
-        return valA - valB;
-    });
 
     return (
         <>
@@ -179,25 +157,18 @@ const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ o
                                 <CircularProgress size={24} />
                             </div>
                         ) : hasFiles ? (
-                            sortedAttemptKeys.map(attemptKey => (
-                                <div key={attemptKey} className={styles.attemptGroup}>
-                                    <div className={styles.attemptHeader}>
-                                        {attemptKey.toUpperCase()} ATTEMPT
+                            filteredFiles.map((file, idx) => (
+                                <div key={idx} className={styles.fileItem}>
+                                    <div className={styles.fileInfo}>
+                                        <span className={styles.fileName}>
+                                            <InsertDriveFileIcon style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 4, color: '#1a73e8' }} />
+                                            {file.name}
+                                        </span>
+                                        <span className={styles.fileMeta}>{formatBytes(file.size)} • {formatDate(file.uploadedAt)}</span>
                                     </div>
-                                    {groupedFiles[attemptKey].map((file, idx) => (
-                                        <div key={idx} className={styles.fileItem}>
-                                            <div className={styles.fileInfo}>
-                                                <span className={styles.fileName}>
-                                                    <InsertDriveFileIcon style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 4, color: '#1a73e8' }} />
-                                                    {file.name}
-                                                </span>
-                                                <span className={styles.fileMeta}>{formatBytes(file.size)} • {formatDate(file.uploadedAt)}</span>
-                                            </div>
-                                            <button className={styles.downloadBtn} onClick={(e) => handlePreview(e, file)}>
-                                                Review File
-                                            </button>
-                                        </div>
-                                    ))}
+                                    <button className={styles.downloadBtn} onClick={(e) => handlePreview(e, file)}>
+                                        Review File
+                                    </button>
                                 </div>
                             ))
                         ) : (

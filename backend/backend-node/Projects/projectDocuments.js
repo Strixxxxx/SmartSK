@@ -38,7 +38,7 @@ async function getProjectDetails(batchID) {
  * Project Categories Definition
  */
 const PROJECT_CATEGORIES = {
-    ABYIP: ['PPMP_or_APP', 'Activity_Design', 'SK_Resolution', 'EstIncomeCert', 'IncomeCert', 'LYDP', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'],
+    ABYIP: ['PPMP_or_APP', 'Activity_Design', 'SK_Resolution', 'EstIncomeCert', 'IncomeCert', 'LYDP', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset', 'QCYDO_Review_Doc', 'QC_SK_Fed_Review_Doc', 'City_Budget_Review_Doc', 'City_Council_Hearing_Doc', 'Procurement_Doc'],
     CBYDP: ['LYDP', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'],
 };
 
@@ -52,7 +52,7 @@ router.get('/:batchID', authMiddleware, async (req, res) => {
         const { projName, projType, cycleID, barangayID, currentStatusID } = await getProjectDetails(batchID);
         
         const PROJECT_CATEGORIES = {
-            ABYIP: ['PPMP_or_APP', 'Activity_Design', 'SK_Resolution', 'EstIncomeCert', 'IncomeCert', 'LYDP', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'],
+            ABYIP: ['PPMP_or_APP', 'Activity_Design', 'SK_Resolution', 'EstIncomeCert', 'IncomeCert', 'LYDP', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset', 'QCYDO_Review_Doc', 'QC_SK_Fed_Review_Doc', 'City_Budget_Review_Doc', 'City_Council_Hearing_Doc', 'Procurement_Doc'],
             CBYDP: ['LYDP', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'],
         };
 
@@ -70,14 +70,24 @@ router.get('/:batchID', authMiddleware, async (req, res) => {
         for (const category of categories) {
             let blobs = [];
 
-            const useNewStructure = ['LYDP', 'EstIncomeCert', 'IncomeCert', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'].includes(category);
+            const useNewStructure = ['LYDP', 'EstIncomeCert', 'IncomeCert', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset', 'QCYDO_Review_Doc', 'QC_SK_Fed_Review_Doc', 'City_Budget_Review_Doc', 'City_Council_Hearing_Doc', 'Procurement_Doc'].includes(category);
             
             // Primary Check: New brgyID/cycleID structure
             if (useNewStructure) {
                 const baseType = (category === 'LYDP' || category.startsWith('KK_') || category.startsWith('YP_')) ? 'CBYDP' : projType;
                 let newPrefix = `${baseType}/${category}/${barangayID}/${cycleID}/`;
                 
-                if (category === 'YP_Notice_Letter') {
+                if (category === 'QCYDO_Review_Doc') {
+                    newPrefix = `Checkpoints/eight/${barangayID}/${cycleID}/`;
+                } else if (category === 'QC_SK_Fed_Review_Doc') {
+                    newPrefix = `Checkpoints/nine/${barangayID}/${cycleID}/`;
+                } else if (category === 'City_Budget_Review_Doc') {
+                    newPrefix = `Checkpoints/ten/${barangayID}/${cycleID}/`;
+                } else if (category === 'City_Council_Hearing_Doc') {
+                    newPrefix = `Checkpoints/eleven/${barangayID}/${cycleID}/`;
+                } else if (category === 'Procurement_Doc') {
+                    newPrefix = `Checkpoints/twelve/${barangayID}/${cycleID}/`;
+                } else if (category === 'YP_Notice_Letter') {
                     newPrefix = `CBYDP/Youth_Profile/${barangayID}/${cycleID}/Notice_Letter/`;
                 } else if (category === 'YP_Campaign_Proof') {
                     newPrefix = `CBYDP/Youth_Profile/${barangayID}/${cycleID}/Campaign_Proof/`;
@@ -311,14 +321,24 @@ router.post('/:batchID/upload', authMiddleware, hasAccessControl('docsControl'),
             return res.status(400).json({ success: false, message: 'Invalid category for this project type' });
         }
 
-        const useNewStructure = ['LYDP', 'EstIncomeCert', 'IncomeCert', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'].includes(category);
+        const useNewStructure = ['LYDP', 'EstIncomeCert', 'IncomeCert', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset', 'QCYDO_Review_Doc', 'QC_SK_Fed_Review_Doc', 'City_Budget_Review_Doc', 'City_Council_Hearing_Doc', 'Procurement_Doc'].includes(category);
 
         let blobName = '';
         if (useNewStructure) {
             const baseType = (category === 'LYDP' || category.startsWith('KK_') || category.startsWith('YP_')) ? 'CBYDP' : projType;
             let newPrefix = `${baseType}/${category}/${barangayID}/${cycleID}/`;
 
-            if (category === 'YP_Notice_Letter') {
+            if (category === 'QCYDO_Review_Doc') {
+                newPrefix = `Checkpoints/eight/${barangayID}/${cycleID}/`;
+            } else if (category === 'QC_SK_Fed_Review_Doc') {
+                newPrefix = `Checkpoints/nine/${barangayID}/${cycleID}/`;
+            } else if (category === 'City_Budget_Review_Doc') {
+                newPrefix = `Checkpoints/ten/${barangayID}/${cycleID}/`;
+            } else if (category === 'City_Council_Hearing_Doc') {
+                newPrefix = `Checkpoints/eleven/${barangayID}/${cycleID}/`;
+            } else if (category === 'Procurement_Doc') {
+                newPrefix = `Checkpoints/twelve/${barangayID}/${cycleID}/`;
+            } else if (category === 'YP_Notice_Letter') {
                 newPrefix = `CBYDP/Youth_Profile/${barangayID}/${cycleID}/Notice_Letter/`;
             } else if (category === 'YP_Campaign_Proof') {
                 newPrefix = `CBYDP/Youth_Profile/${barangayID}/${cycleID}/Campaign_Proof/`;

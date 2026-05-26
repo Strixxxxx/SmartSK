@@ -5,6 +5,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { toast } from 'react-toastify';
 import Loading from '../../Loading/Loading';
 import AdminProjectCard from './AdminProjectCard';
+import ArchiveCycleModal from './ArchiveCycleModal';
 import styles from './AdminProjects.module.css';
 import { Switch, FormControlLabel, Paper, Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 
@@ -36,6 +37,7 @@ const AdminProjects: React.FC = () => {
 
     const [showArchiveConfirm, setShowArchiveConfirm] = useState(false);
     const [archivingBatchId, setArchivingBatchId] = useState<number | null>(null);
+    const [showCycleModal, setShowCycleModal] = useState(false);
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -132,6 +134,17 @@ const AdminProjects: React.FC = () => {
                             />
                         </Box>
                     </Box>
+
+                    <Box sx={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', paddingRight: '1rem' }}>
+                        <Button 
+                            variant="outlined" 
+                            color="error" 
+                            onClick={() => setShowCycleModal(true)}
+                            sx={{ fontWeight: 'bold' }}
+                        >
+                            Archive Project Cycle
+                        </Button>
+                    </Box>
                 </Paper>
 
                 <main className={styles.mainBulletins}>
@@ -164,6 +177,12 @@ const AdminProjects: React.FC = () => {
                     )}
                 </main>
             </div>
+
+            <ArchiveCycleModal
+                open={showCycleModal}
+                onClose={() => setShowCycleModal(false)}
+                onArchiveSuccess={() => window.location.reload()}
+            />
 
             <Dialog
                 open={showArchiveConfirm}

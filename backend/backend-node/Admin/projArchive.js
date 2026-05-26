@@ -24,7 +24,7 @@ router.get('/', authMiddleware, async (req, res) => {
         CROSS APPLY (
             SELECT TOP 1 pt.statusID
             FROM projectTracker pt
-            WHERE pt.batchID = pb.batchID
+            WHERE pt.cycleID = pb.cycleID
             ORDER BY pt.updatedAt DESC
         ) ls
         JOIN StatusLookup sl ON ls.statusID = sl.StatusID
@@ -119,6 +119,208 @@ router.post('/restore/batch/:batchID', authMiddleware, async (req, res) => {
     } catch (error) {
         console.error(`Error restoring project batch ${batchID}:`, error);
         res.status(500).json({ success: false, message: 'Failed to restore project batch.' });
+    }
+});
+
+// GET all unarchived project cycles
+router.get('/cycles', authMiddleware, async (req, res) => {
+    try {
+        const pool = await getConnection();
+        const result = await pool.request()
+            .input('barangayID', sql.Int, req.user.barangay)
+            .query(`
+                SELECT cycleID, targetFiscalYear, termStartYear, termEndYear, createdAt
+                FROM projectCycles
+                WHERE isArchived = 0 AND barangayID = @barangayID
+                ORDER BY createdAt DESC
+            `);
+            
+        const cycles = result.recordset.map(c => ({
+            ...c,
+            displayName: `Term ${c.termStartYear}-${c.termEndYear} (FY ${c.targetFiscalYear})`
+        }));
+
+        res.json({ success: true, cycles });
+    } catch (error) {
+        console.error('Error fetching unarchived project cycles:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch unarchived project cycles.' });
+    }
+});
+
+// GET all archived project cycles
+router.get('/archived-cycles', authMiddleware, async (req, res) => {
+    try {
+        const pool = await getConnection();
+        const result = await pool.request()
+            .input('barangayID', sql.Int, req.user.barangay)
+            .query(`
+                SELECT cycleID, targetFiscalYear, termStartYear, termEndYear, createdAt
+                FROM projectCycles
+                WHERE isArchived = 1 AND barangayID = @barangayID
+                ORDER BY createdAt DESC
+            `);
+            
+        const cycles = result.recordset.map(c => ({
+            ...c,
+            displayName: `Term ${c.termStartYear}-${c.termEndYear} (FY ${c.targetFiscalYear})`
+        }));
+
+        res.json({ success: true, cycles });
+    } catch (error) {
+        console.error('Error fetching archived project cycles:', error);
+        res.status(500).json({ success: false, message: 'Failed to fetch archived project cycles.' });
+    }
+});
+
+// POST to archive a project cycle (cascading)
+router.post('/cycles/:cycleID', authMiddleware, async (req, res) => {
+    const { cycleID } = req.params;
+    try {
+        const pool = await getConnection();
+        const request = pool.request();
+        
+        const cycleCheck = await request
+            .input('cycleID', sql.Int, cycleID)
+            .input('barangayID', sql.Int, req.user.barangay)
+            .query('SELECT * FROM projectCycles WHERE cycleID = @cycleID AND barangayID = @barangayID');
+            
+        if (cycleCheck.recordset.length === 0) {
+            return res.status(404).json({ success: false, message: 'Project cycle not found.' });
+        }
+
+        const transaction = new sql.Transaction(pool);
+        await transaction.begin();
+
+        try {
+            const reqTx = new sql.Request(transaction);
+            reqTx.input('cycleID', sql.Int, cycleID);
+
+            await reqTx.query('UPDATE projectCycles SET isArchived = 1 WHERE cycleID = @cycleID');
+            await reqTx.query('UPDATE projectBatch SET isArchived = 1 WHERE cycleID = @cycleID');
+            
+            const updateBatchChildren = `
+                DECLARE @batchIDs TABLE (batchID INT);
+                INSERT INTO @batchIDs SELECT batchID FROM projectBatch WHERE cycleID = @cycleID;
+                
+                UPDATE projectABYIP SET isArchived = 1 WHERE projbatchID IN (SELECT batchID FROM @batchIDs);
+                UPDATE projectCBYDP SET isArchived = 1 WHERE projbatchID IN (SELECT batchID FROM @batchIDs);
+                UPDATE projectNotifications SET isArchived = 1 WHERE batchID IN (SELECT batchID FROM @batchIDs);
+                UPDATE projectCheckpointApprovals SET isArchived = 1 WHERE batchID IN (SELECT batchID FROM @batchIDs);
+            `;
+            await reqTx.query(updateBatchChildren);
+            
+            await reqTx.query('UPDATE youth_profile_analytics SET isArchived = 1 WHERE termID = (SELECT termID FROM projectCycles WHERE cycleID = @cycleID)');
+            await reqTx.query('UPDATE youth_profiling_submissions SET isArchived = 1 WHERE cycleID = @cycleID');
+            await reqTx.query('UPDATE kk_general_assembly_submissions SET isArchived = 1 WHERE cycleID = @cycleID');
+            
+            const updateSubChildren = `
+                DECLARE @ypSubIDs TABLE (subID INT);
+                INSERT INTO @ypSubIDs SELECT submissionID FROM youth_profiling_submissions WHERE cycleID = @cycleID;
+                UPDATE youth_profiling_proof_attachments SET isArchived = 1 WHERE submissionID IN (SELECT subID FROM @ypSubIDs);
+                
+                DECLARE @kkSubIDs TABLE (subID INT);
+                INSERT INTO @kkSubIDs SELECT submissionID FROM kk_general_assembly_submissions WHERE cycleID = @cycleID;
+                UPDATE kk_general_assembly_proof_attachments SET isArchived = 1 WHERE submissionID IN (SELECT subID FROM @kkSubIDs);
+            `;
+            await reqTx.query(updateSubChildren);
+
+            await transaction.commit();
+
+            const c = cycleCheck.recordset[0];
+            const displayName = `Term ${c.termStartYear}-${c.termEndYear} (FY ${c.targetFiscalYear})`;
+
+            addAuditTrail({
+                actor: 'A',
+                module: 'D',
+                userID: req.user.userId,
+                actions: 'archive-cycle',
+                descriptions: `Admin ${req.user.fullName} archived project cycle: ${displayName}`
+            });
+
+            res.json({ success: true, message: 'Project cycle archived successfully.' });
+        } catch (txErr) {
+            await transaction.rollback();
+            throw txErr;
+        }
+    } catch (error) {
+        console.error(`Error archiving project cycle ${cycleID}:`, error);
+        res.status(500).json({ success: false, message: 'Failed to archive project cycle.' });
+    }
+});
+
+// POST to restore a project cycle (cascading)
+router.post('/restore/cycles/:cycleID', authMiddleware, async (req, res) => {
+    const { cycleID } = req.params;
+    try {
+        const pool = await getConnection();
+        const request = pool.request();
+        
+        const cycleCheck = await request
+            .input('cycleID', sql.Int, cycleID)
+            .input('barangayID', sql.Int, req.user.barangay)
+            .query('SELECT * FROM projectCycles WHERE cycleID = @cycleID AND barangayID = @barangayID');
+            
+        if (cycleCheck.recordset.length === 0) {
+            return res.status(404).json({ success: false, message: 'Project cycle not found.' });
+        }
+
+        const transaction = new sql.Transaction(pool);
+        await transaction.begin();
+
+        try {
+            const reqTx = new sql.Request(transaction);
+            reqTx.input('cycleID', sql.Int, cycleID);
+
+            await reqTx.query('UPDATE projectCycles SET isArchived = 0 WHERE cycleID = @cycleID');
+            await reqTx.query('UPDATE projectBatch SET isArchived = 0 WHERE cycleID = @cycleID');
+            
+            const updateBatchChildren = `
+                DECLARE @batchIDs TABLE (batchID INT);
+                INSERT INTO @batchIDs SELECT batchID FROM projectBatch WHERE cycleID = @cycleID;
+                
+                UPDATE projectABYIP SET isArchived = 0 WHERE projbatchID IN (SELECT batchID FROM @batchIDs);
+                UPDATE projectCBYDP SET isArchived = 0 WHERE projbatchID IN (SELECT batchID FROM @batchIDs);
+                UPDATE projectNotifications SET isArchived = 0 WHERE batchID IN (SELECT batchID FROM @batchIDs);
+                UPDATE projectCheckpointApprovals SET isArchived = 0 WHERE batchID IN (SELECT batchID FROM @batchIDs);
+            `;
+            await reqTx.query(updateBatchChildren);
+            
+            await reqTx.query('UPDATE youth_profile_analytics SET isArchived = 0 WHERE termID = (SELECT termID FROM projectCycles WHERE cycleID = @cycleID)');
+            await reqTx.query('UPDATE youth_profiling_submissions SET isArchived = 0 WHERE cycleID = @cycleID');
+            await reqTx.query('UPDATE kk_general_assembly_submissions SET isArchived = 0 WHERE cycleID = @cycleID');
+            
+            const updateSubChildren = `
+                DECLARE @ypSubIDs TABLE (subID INT);
+                INSERT INTO @ypSubIDs SELECT submissionID FROM youth_profiling_submissions WHERE cycleID = @cycleID;
+                UPDATE youth_profiling_proof_attachments SET isArchived = 0 WHERE submissionID IN (SELECT subID FROM @ypSubIDs);
+                
+                DECLARE @kkSubIDs TABLE (subID INT);
+                INSERT INTO @kkSubIDs SELECT submissionID FROM kk_general_assembly_submissions WHERE cycleID = @cycleID;
+                UPDATE kk_general_assembly_proof_attachments SET isArchived = 0 WHERE submissionID IN (SELECT subID FROM @kkSubIDs);
+            `;
+            await reqTx.query(updateSubChildren);
+
+            await transaction.commit();
+
+            const c = cycleCheck.recordset[0];
+            const displayName = `Term ${c.termStartYear}-${c.termEndYear} (FY ${c.targetFiscalYear})`;
+
+            addAuditTrail({
+                actor: 'A',
+                module: 'D',
+                userID: req.user.userId,
+                actions: 'restore-cycle',
+                descriptions: `Admin ${req.user.fullName} restored archived project cycle: ${displayName}`
+            });
+
+            res.json({ success: true, message: 'Project cycle restored successfully.' });
+        } catch (txErr) {
+            await transaction.rollback();
+            throw txErr;
+        }
+    } catch (error) {
+        console.error(`Error restoring project cycle ${cycleID}:`, error);
+        res.status(500).json({ success: false, message: 'Failed to restore project cycle.' });
     }
 });
 
