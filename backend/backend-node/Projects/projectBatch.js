@@ -112,9 +112,9 @@ router.post('/update-status', authMiddleware, hasAccessControl('trackerControl')
 
         const { projType, barangayID } = batchResult.recordset[0];
 
-        // --- CIRCUIT BREAKER: Pre-flight health check before City Approval AI trigger ---
-        if (statusID === 6 && projType === 'ABYIP') {
-            console.log(`[Circuit Breaker] Checkpoint 6 reached for batch ${batchID}. Checking AI service health...`);
+        // --- CIRCUIT BREAKER: Pre-flight health check before Project Execution AI trigger ---
+        if (statusID === 13 && projType === 'ABYIP') {
+            console.log(`[Circuit Breaker] Checkpoint 13 reached for batch ${batchID}. Checking AI service health...`);
             try {
                 const aiHealthUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/health`;
                 await axios.get(aiHealthUrl, { timeout: 3000 });
@@ -123,7 +123,7 @@ router.post('/update-status', authMiddleware, hasAccessControl('trackerControl')
                 console.error('[Circuit Breaker] TRIPPED — AI Service is unreachable. Blocking status transition.', healthErr.message);
                 return res.status(503).json({
                     success: false,
-                    message: 'AI Service is temporarily down. Cannot transition to City Approval. Please try again later.'
+                    message: 'AI Service is temporarily down. Cannot transition to Project Execution. Please try again later.'
                 });
             }
         }
@@ -133,11 +133,11 @@ router.post('/update-status', authMiddleware, hasAccessControl('trackerControl')
             .input('batchID', sql.Int, batchID)
             .input('statusID', sql.Int, statusID)
             .input('userID', sql.Int, userID)
-            .query('INSERT INTO projectTracker (batchID, statusID, updatedBy) VALUES (@batchID, @statusID, @userID)');
+            .query('INSERT INTO projectTracker (cycleID, statusID, updatedBy) SELECT cycleID, @statusID, @userID FROM projectBatch WHERE batchID = @batchID; UPDATE projectCycles SET currentStatusID = @statusID, updatedAt = GETDATE() WHERE cycleID = (SELECT cycleID FROM projectBatch WHERE batchID = @batchID);');
 
-        // City Approval (statusID = 6) on ABYIP only -> trigger AI job
-        if (statusID === 6 && projType === 'ABYIP') {
-            console.log(`[AI Trigger] ABYIP batch ${batchID} reached City Approval. Triggering AI Job via HTTP...`);
+        // Project Execution (statusID = 13) on ABYIP only -> trigger AI job
+        if (statusID === 13 && projType === 'ABYIP') {
+            console.log(`[AI Trigger] ABYIP batch ${batchID} reached Project Execution (CP13). Triggering AI Job via HTTP...`);
 
             // Fire-and-forget HTTP call to Python microservice
             const pythonUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/run-ai-batch-job`;
@@ -152,7 +152,7 @@ router.post('/update-status', authMiddleware, hasAccessControl('trackerControl')
                 .input('barangayID', sql.Int, barangayID)
                 .input('notifType', sql.NVarChar, 'AI_TRIGGERED')
                 .input('message', sql.NVarChar,
-                    `AI historical data sync triggered for ABYIP project (Batch #${batchID}) upon City Approval. Reports will be updated shortly.`)
+                    `AI historical data sync triggered for ABYIP project (Batch #${batchID}) upon Project Execution. Reports will be updated shortly.`)
                 .query(`
                     INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
                     VALUES (@batchID, @barangayID, @notifType, @message)
@@ -165,7 +165,7 @@ router.post('/update-status', authMiddleware, hasAccessControl('trackerControl')
         res.json({
             success: true,
             message: `Project status updated to Step ${statusID}`,
-            aiTriggered: statusID === 6 && projType === 'ABYIP'
+            aiTriggered: statusID === 13 && projType === 'ABYIP'
         });
 
     } catch (error) {
@@ -288,10 +288,27 @@ router.get('/all-files', authMiddleware, async (req, res) => {
         const azureBlobs = await listBlobs(projectBatchContainerName);
         const blobSet = new Set(azureBlobs);
 
+        const { docContainerName, listBlobsWithProperties } = require('../Storage/storage');
+        const lydpBlobs = await listBlobsWithProperties(docContainerName, { prefix: 'CBYDP/LYDP/' });
+        const lydpBlobNames = lydpBlobs.map(b => b.name);
+
         const batches = result.recordset.map((batch) => {
+            let hasLYDP = false;
+            if (batch.projType === 'CBYDP' && batch.projName) {
+                const prefixNew = `CBYDP/LYDP/${barangayID}/${batch.cycleID}/`;
+                const prefixOld1 = `CBYDP/LYDP/${batch.projName}/`;
+                const prefixOld2 = `CBYDP/LYDP/${batch.projName.split('.').slice(0, -1).join('.')}/`;
+                hasLYDP = lydpBlobs.some(b => 
+                    (b.name.startsWith(prefixNew) || b.name.startsWith(prefixOld1) || b.name.startsWith(prefixOld2)) && 
+                    !b.name.endsWith('/') && 
+                    b.properties?.contentLength > 0
+                );
+            }
+
             return {
                 ...batch,
-                fileExists: batch.projName ? blobSet.has(batch.projName) : false
+                fileExists: batch.projName ? blobSet.has(batch.projName) : false,
+                hasLYDP
             };
         });
 
@@ -586,6 +603,33 @@ router.patch('/:batchID/rows/:rowID', authMiddleware, async (req, res) => {
         res.json({ success: true, message: 'Cell updated.' });
     } catch (error) {
         console.error('Error updating cell:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+// 10.5. Update the total budget for a project batch (e.g. from OCR extraction)
+router.patch('/:batchID/budget', authMiddleware, async (req, res) => {
+    try {
+        const { batchID } = req.params;
+        const { budget } = req.body;
+        
+        if (budget == null || isNaN(Number(budget))) {
+            return res.status(400).json({ success: false, message: 'A valid numeric budget is required.' });
+        }
+
+        const pool = await getConnection();
+
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('budget', sql.Decimal(18, 2), Number(budget))
+            .query('UPDATE projectBatch SET budget = @budget WHERE batchID = @batchID');
+            
+        // Broadcast budget update
+        broadcastToRoom(batchID, { type: 'budget_updated', batchID, budget });
+
+        res.json({ success: true, message: 'Budget updated successfully.' });
+    } catch (error) {
+        console.error('Error updating budget:', error);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 });

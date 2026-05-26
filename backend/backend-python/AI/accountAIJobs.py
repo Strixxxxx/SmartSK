@@ -115,6 +115,11 @@ def analyze_id_card(id_image_data, id_back_image_data):
     You are an expert document analyzer for the Sangguniang Kabataan (SK). 
     Your task is to identify and extract data from the provided images (front and back of an ID card).
 
+    CRITICAL SECURITY CHECK:
+    - First, analyze the ID card for any physical stickers, digital overlays, drawings, redactions, deliberate obfuscations (e.g., lines drawn over text, blur blocks), or evidence that the ID is purely synthetic/digitally generated (e.g., stock photo usage, unnatural clean template lacking physical card textures/lighting).
+    - EXCEPTION: The watermarks "FOR VERIFICATION ONLY" and "smartSK © 2025" are system-generated. Do NOT flag the ID as tampered if you see these specific watermarks.
+    - If ANY tampering or digital forgery (OTHER than the exempted watermarks) is detected, set "is_tampered" to true and describe the forgery/tampering in "tamper_reason". Do NOT attempt to guess the redacted information.
+
     1. IDENTIFICATION:
        - Determine the type of ID card (e.g., PASSPORT, DRIVERS_LICENSE, PRC_ID, QCID, NATIONAL_ID, PHILHEALTH_ID).
     
@@ -125,6 +130,8 @@ def analyze_id_card(id_image_data, id_back_image_data):
 
     Respond ONLY with a flat JSON object in this format:
     {
+      "is_tampered": boolean,
+      "tamper_reason": "...",
       "id_type": "TYPE_NAME",
       "first_name": "...",
       "middle_name": "...",
@@ -148,8 +155,7 @@ def analyze_id_card(id_image_data, id_back_image_data):
     # Use the retry utility (handles fallback internally)
     response_json = call_gemini_with_retry(
         prompt=contents,
-        validation_func=lambda x: "id_type" in x,
-        model_name=PRIMARY_MODEL
+        validation_func=lambda x: "id_type" in x and "is_tampered" in x
     )
     
     if response_json:
@@ -325,22 +331,31 @@ def main(user_id):
             id_data = id_analysis_result
             id_type = id_data.get("id_type", "Unknown")
             
-            passed = id_type != "Unknown"
-            report_lines.append(f"- ID Format Check: {'PASSED' if passed else 'FAILED'}. ID identified as: {id_type}.")
-            if not passed: all_checks_passed = False
-            
-            # Now run the other checks with the extracted data
-            passed, reason = verify_name_and_role(user_data["fullName"], user_data["roleName"], id_data, sk_officials_list_str)
-            report_lines.append(f"- Name & Role Match: {'PASSED' if passed else 'FAILED'}. {reason}")
-            if not passed: all_checks_passed = False
+            # New Check: Tampering Detection
+            is_tampered = id_data.get("is_tampered", False)
+            if is_tampered:
+                tamper_reason = id_data.get("tamper_reason", "Physical or digital obfuscation detected.")
+                report_lines.append(f"- Security Check: FAILED. {tamper_reason}")
+                all_checks_passed = False
+            else:
+                report_lines.append("- Security Check: PASSED. No digital overlays or physical obfuscation detected.")
+                
+                passed = id_type != "Unknown"
+                report_lines.append(f"- ID Format Check: {'PASSED' if passed else 'FAILED'}. ID identified as: {id_type}.")
+                if not passed: all_checks_passed = False
+                
+                # Now run the other checks with the extracted data
+                passed, reason = verify_name_and_role(user_data["fullName"], user_data["roleName"], id_data, sk_officials_list_str)
+                report_lines.append(f"- Name & Role Match: {'PASSED' if passed else 'FAILED'}. {reason}")
+                if not passed: all_checks_passed = False
 
-            passed, reason = verify_dob(user_data["dateOfBirth"], id_data.get("dob_str"))
-            report_lines.append(f"- Date of Birth Match: {'PASSED' if passed else 'FAILED'}. {reason}")
-            if not passed: all_checks_passed = False
+                passed, reason = verify_dob(user_data["dateOfBirth"], id_data.get("dob_str"))
+                report_lines.append(f"- Date of Birth Match: {'PASSED' if passed else 'FAILED'}. {reason}")
+                if not passed: all_checks_passed = False
 
-            passed, reason = verify_barangay(user_data["barangayName"], id_data.get("address"))
-            report_lines.append(f"- Barangay Match: {'PASSED' if passed else 'FAILED'}. {reason}")
-            if not passed: all_checks_passed = False
+                passed, reason = verify_barangay(user_data["barangayName"], id_data.get("address"))
+                report_lines.append(f"- Barangay Match: {'PASSED' if passed else 'FAILED'}. {reason}")
+                if not passed: all_checks_passed = False
 
         decision = 'approved' if all_checks_passed else 'rejected'
         final_rejection_reason = next((line.split('. ')[1] for line in report_lines if "FAILED" in line), "Multiple criteria failed.")

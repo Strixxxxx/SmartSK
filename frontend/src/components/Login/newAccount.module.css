@@ -1,0 +1,271 @@
+.backdrop {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 600px;
+    background-color: #ffffff;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    padding: 32px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-sizing: border-box;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    outline: none;
+}
+
+/* Thin premium scrollbar */
+.backdrop::-webkit-scrollbar {
+    width: 6px;
+}
+.backdrop::-webkit-scrollbar-track {
+    background: transparent;
+}
+.backdrop::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 20px;
+}
+
+.title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 8px 0;
+    letter-spacing: -0.025em;
+    text-align: center;
+}
+
+.instruction {
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.5;
+    margin: 0 0 24px 0;
+    text-align: center;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    width: 100%;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.label {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    background-color: #ffffff;
+    color: #1f2937;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    outline: none;
+}
+
+.input:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+}
+
+.passwordWrapper {
+    position: relative;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.passwordInput {
+    padding-right: 42px;
+}
+
+.toggleBtn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    padding: 4px;
+    border-radius: 4px;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+.toggleBtn:hover {
+    color: #374151;
+    background-color: #f3f4f6;
+}
+
+.requirementsBox {
+    background-color: #f9fafb;
+    border: 1px solid #f3f4f6;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 10px 0;
+    box-sizing: border-box;
+}
+
+.requirementsTitle {
+    font-size: 13px;
+    font-weight: 600;
+    color: #4b5563;
+    margin: 0 0 12px 0;
+}
+
+.requirementsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+@media (max-width: 500px) {
+    .requirementsGrid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.requirementPill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11.5px;
+    font-weight: 500;
+    background-color: #f3f4f6;
+    color: #6b7280;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.requirementPillActive {
+    background-color: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+}
+
+.icon {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.legalSection {
+    background-color: #f9fafb;
+    border: 1px solid #f3f4f6;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 10px;
+    box-sizing: border-box;
+}
+
+.legalTitle {
+    font-size: 14px;
+    font-weight: 700;
+    color: #374151;
+    margin: 0 0 4px 0;
+}
+
+.legalInstruction {
+    font-size: 12.5px;
+    color: #6b7280;
+    margin: 0 0 14px 0;
+}
+
+.legalButtons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.legalButtons button {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    background-color: #ffffff;
+    color: #4b5563;
+    font-size: 12.5px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.legalButtons button:hover {
+    border-color: #c7d2fe;
+    color: #4f46e5;
+    background-color: #f5f3ff;
+}
+
+.checkboxContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #374151;
+    font-weight: 500;
+}
+
+.checkboxInput {
+    margin-top: 2px;
+    cursor: pointer;
+    accent-color: #4f46e5;
+    width: 16px;
+    height: 16px;
+}
+
+.submitBtn {
+    width: 100%;
+    padding: 12px 24px;
+    background-color: #4f46e5;
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.submitBtn:hover:not(:disabled) {
+    background-color: #4338ca;
+}
+
+.submitBtn:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.7;
+}

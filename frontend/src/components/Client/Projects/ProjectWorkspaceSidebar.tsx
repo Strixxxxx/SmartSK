@@ -163,7 +163,13 @@ const ProjectWorkspaceSidebar: React.FC<ProjectWorkspaceSidebarProps> = ({
                         </Typography>
                     ) : (
                         <List dense sx={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden', pt: 0, pb: 0 }}>
-                            {batches.map((batch) => (
+                            {batches
+                                .filter(batch => {
+                                    if (batch.projType === 'CBYDP') return batch.currentStatusID >= 2 && batch.hasLYDP === true;
+                                    if (batch.projType === 'ABYIP') return batch.currentStatusID >= 5;
+                                    return true;
+                                })
+                                .map((batch) => (
                                 <React.Fragment key={batch.batchID}>
                                     {batch.projName ? (
                                         <ListItem

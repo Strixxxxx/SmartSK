@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import './Login.css';
-import { Modal, Box, Typography, Button, Dialog, DialogActions, DialogContent, DialogTitle, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
+import styles from './newAccount.module.css';
+import { Modal, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import axiosInstance from '../../backend connection/axiosConfig';
 import Loading from '../Loading/Loading';
 import LegalTextViewer from '../Registration/steps/LegalTextViewer';
@@ -24,12 +24,9 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 600,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4,
-  maxHeight: '90vh',
-  overflowY: 'auto',
+  width: '100%',
+  maxWidth: 600,
+  outline: 'none',
 };
 
 const NewAccount: React.FC<NewAccountProps> = ({ open, onClose, userID, currentUsername }) => {
@@ -59,10 +56,10 @@ const NewAccount: React.FC<NewAccountProps> = ({ open, onClose, userID, currentU
   }, [currentUsername, open]);
 
   const passwordRequirements: PasswordRequirement[] = [
-    { met: /[A-Z]/.test(newPassword), label: 'At least one uppercase letter' },
-    { met: /[a-z]/.test(newPassword), label: 'At least one lowercase letter' },
-    { met: /[0-9]/.test(newPassword), label: 'At least one number' },
-    { met: /[!@#$%^&*(),.?":{}|<>]/ .test(newPassword), label: 'At least one special character' },
+    { met: /[A-Z]/.test(newPassword), label: 'One uppercase letter' },
+    { met: /[a-z]/.test(newPassword), label: 'One lowercase letter' },
+    { met: /[0-9]/.test(newPassword), label: 'One number' },
+    { met: /[!@#$%^&*(),.?":{}|<>]/ .test(newPassword), label: 'One special character' },
     { met: newPassword.length >= 8 && newPassword.length <= 16, label: '8-16 characters long' },
     { met: confirmPassword.length > 0 && newPassword === confirmPassword, label: 'Passwords match' }
   ];
@@ -107,7 +104,7 @@ const NewAccount: React.FC<NewAccountProps> = ({ open, onClose, userID, currentU
       });
 
       if (response.data.success) {
-        toast.success('Credentials successfully changed. Please log in again.');
+        toast.success('Your Account is fully Active! Please Login again.');
         onClose();
       } else {
         throw new Error(response.data.message || 'Failed to change credentials');
@@ -158,69 +155,140 @@ const NewAccount: React.FC<NewAccountProps> = ({ open, onClose, userID, currentU
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Box sx={style}>
-          <div className="change-password-form">
-            <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ marginBottom: 2 }}>
-              Setup Your New Account
-            </Typography>
-            <p className="password-instruction">
-              Please change your default credentials and accept the terms to continue.
-            </p>
+        <Box sx={style} className={styles.backdrop}>
+          <h2 className={styles.title} id="modal-modal-title">
+            Setup Your New Account
+          </h2>
+          <p className={styles.instruction}>
+            Please change your default credentials and accept the terms to continue.
+          </p>
 
-            <form onSubmit={handleSubmit}>
-              {/* Password Fields */}
-              <div className="form-group">
-                <label htmlFor="newUsername">New Username</label>
-                <input type="text" id="newUsername" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} required />
-              </div>
-              <div className="form-group">
-                <label htmlFor="newPassword">New Password</label>
-                <div className="password-input-wrapper">
-                  <input type={showNewPassword ? "text" : "password"} id="newPassword" value={newPassword} onChange={(e) => handlePasswordChange(e)} minLength={8} maxLength={16} required />
-                  <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="toggle-password" tabIndex={-1}>
-                    <span className="material-icons">{showNewPassword ? 'visibility_off' : 'visibility'}</span>
-                  </button>
-                </div>
-              </div>
-              <div className="form-group">
-                <label htmlFor="confirmPassword">Confirm Password</label>
-                <div className="password-input-wrapper">
-                  <input type={showConfirmPassword ? "text" : "password"} id="confirmPassword" value={confirmPassword} onChange={(e) => handlePasswordChange(e, true)} minLength={8} maxLength={16} required />
-                  <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="toggle-password" tabIndex={-1}>
-                    <span className="material-icons">{showConfirmPassword ? 'visibility_off' : 'visibility'}</span>
-                  </button>
-                </div>
-              </div>
-              <div className="password-requirements">
-                <p>Your new password must meet the following requirements:</p>
-                <div className="requirements-list">
-                  {passwordRequirements.map((req, index) => (<div key={index} className={`requirement ${req.met ? 'valid' : ''}`}>{req.label}</div>))}
-                </div>
-              </div>
+          <form onSubmit={handleSubmit} className={styles.form}>
+            {/* Username field */}
+            <div className={styles.formGroup}>
+              <label htmlFor="newUsername" className={styles.label}>New Username</label>
+              <input 
+                type="text" 
+                id="newUsername" 
+                className={styles.input} 
+                value={newUsername} 
+                onChange={(e) => setNewUsername(e.target.value)} 
+                required 
+              />
+            </div>
 
-              {/* Legal Agreements Section */}
-              <div className="legal-agreements-section" style={{ marginTop: '24px', borderTop: '1px solid #eee', paddingTop: '16px' }}>
-                <Typography variant="h6" gutterBottom sx={{ fontSize: '1.1rem' }}>Legal Agreements</Typography>
-                <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                  Please read and accept our terms and policies to activate your account.
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 2 }}>
-                  <Button variant="outlined" onClick={() => handleOpenLegalModal('terms')}>Read Terms and Conditions</Button>
-                  <Button variant="outlined" onClick={() => handleOpenLegalModal('policy')}>Read Privacy Policy</Button>
-                </Box>
-                <FormGroup>
-                  <FormControlLabel control={<Checkbox checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} />} label="I have read and agree to the Terms and Conditions." />
-                  <FormControlLabel control={<Checkbox checked={policyAccepted} onChange={(e) => setPolicyAccepted(e.target.checked)} />} label="I have read and agree to the Privacy Policy." />
-                </FormGroup>
-              </div>
-
-              <div className="form-actions">
-                <button type="submit" className="submit-btn" disabled={loading || !allPasswordRequirementsMet || !allAgreementsAccepted}>
-                  {loading ? <Loading /> : 'Confirm and Finish Setup'}
+            {/* New Password field */}
+            <div className={styles.formGroup}>
+              <label htmlFor="newPassword" className={styles.label}>New Password</label>
+              <div className={styles.passwordWrapper}>
+                <input 
+                  type={showNewPassword ? "text" : "password"} 
+                  id="newPassword" 
+                  className={`${styles.input} ${styles.passwordInput}`} 
+                  value={newPassword} 
+                  onChange={(e) => handlePasswordChange(e)} 
+                  minLength={8} 
+                  maxLength={16} 
+                  required 
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowNewPassword(!showNewPassword)} 
+                  className={styles.toggleBtn} 
+                  tabIndex={-1}
+                >
+                  <span className="material-icons">{showNewPassword ? 'visibility_off' : 'visibility'}</span>
                 </button>
               </div>
-            </form>
-          </div>
+            </div>
+
+            {/* Confirm Password field */}
+            <div className={styles.formGroup}>
+              <label htmlFor="confirmPassword" className={styles.label}>Confirm Password</label>
+              <div className={styles.passwordWrapper}>
+                <input 
+                  type={showConfirmPassword ? "text" : "password"} 
+                  id="confirmPassword" 
+                  className={`${styles.input} ${styles.passwordInput}`} 
+                  value={confirmPassword} 
+                  onChange={(e) => handlePasswordChange(e, true)} 
+                  minLength={8} 
+                  maxLength={16} 
+                  required 
+                />
+                <button 
+                  type="button" 
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)} 
+                  className={styles.toggleBtn} 
+                  tabIndex={-1}
+                >
+                  <span className="material-icons">{showConfirmPassword ? 'visibility_off' : 'visibility'}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Password Requirements Badges */}
+            <div className={styles.requirementsBox}>
+              <p className={styles.requirementsTitle}>Password Requirements</p>
+              <div className={styles.requirementsGrid}>
+                {passwordRequirements.map((req, index) => (
+                  <div 
+                    key={index} 
+                    className={`${styles.requirementPill} ${req.met ? styles.requirementPillActive : ''}`}
+                  >
+                    <span className={styles.icon}>{req.met ? '✓' : '✕'}</span>
+                    {req.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Legal Agreements Section */}
+            <div className={styles.legalSection}>
+              <h3 className={styles.legalTitle}>Legal Agreements</h3>
+              <p className={styles.legalInstruction}>
+                Please read and accept our terms and policies to activate your account.
+              </p>
+              
+              <div className={styles.legalButtons}>
+                <button type="button" onClick={() => handleOpenLegalModal('terms')}>
+                  Read Terms and Conditions
+                </button>
+                <button type="button" onClick={() => handleOpenLegalModal('policy')}>
+                  Read Privacy Policy
+                </button>
+              </div>
+
+              <div className={styles.checkboxContainer}>
+                <label className={styles.checkboxLabel}>
+                  <input 
+                    type="checkbox" 
+                    className={styles.checkboxInput} 
+                    checked={termsAccepted} 
+                    onChange={(e) => setTermsAccepted(e.target.checked)} 
+                  />
+                  I have read and agree to the Terms and Conditions.
+                </label>
+                <label className={styles.checkboxLabel}>
+                  <input 
+                    type="checkbox" 
+                    className={styles.checkboxInput} 
+                    checked={policyAccepted} 
+                    onChange={(e) => setPolicyAccepted(e.target.checked)} 
+                  />
+                  I have read and agree to the Privacy Policy.
+                </label>
+              </div>
+            </div>
+
+            <button 
+              type="submit" 
+              className={styles.submitBtn} 
+              disabled={loading || !allPasswordRequirementsMet || !allAgreementsAccepted}
+            >
+              {loading ? <Loading /> : 'Confirm and Finish Setup'}
+            </button>
+          </form>
         </Box>
       </Modal>
 

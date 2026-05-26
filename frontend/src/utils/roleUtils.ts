@@ -13,6 +13,7 @@ export const ROLE_NAME_MAP: Record<string, string> = {
     "SKK5": "SK Kagawad V",
     "SKK6": "SK Kagawad VI",
     "SKK7": "SK Kagawad VII",
+    "BCPT": "Barangay Captain",
     "Admin": "Administrator"
 };
 

@@ -210,7 +210,7 @@ router.post('/create-account', authMiddleware, async (req, res) => {
     const encryptedEmail = encrypt(emailAddress);
     const encryptedPhone = encrypt(phoneNumber);
 
-    // Insert new user
+    // Insert new user using an atomic transaction to ensure global ID synchronization
     const result = await pool.request()
       .input('username', sql.NVarChar, encryptedUsername)
       .input('fullName', sql.NVarChar, encryptedFullName)
@@ -223,33 +223,79 @@ router.post('/create-account', authMiddleware, async (req, res) => {
       .input('usernameHash', sql.VarChar, usernameHash)
       .input('termID', sql.Int, finalTermID)
       .query(`
-        INSERT INTO userInfo (
-          username,
-          fullName,
-          barangay,
-          emailAddress,
-          phoneNumber,
-          passKey,
-          position,
-          isDefaultPassword,
-          emailHash,
-          usernameHash,
-          termID
-        )
-        VALUES (
-          @username,
-          @fullName,
-          @barangayID,
-          @emailAddress,
-          @phoneNumber,
-          @passKey,
-          @positionID,
-          1,
-          @emailHash,
-          @usernameHash,
-          @termID
-        );
-        SELECT SCOPE_IDENTITY() AS userID;
+        BEGIN TRANSACTION;
+        BEGIN TRY
+          -- 1. Reserve the userID by inserting into preUserInfo first
+          INSERT INTO preUserInfo (
+            username,
+            passKey,
+            fullName,
+            position,
+            barangay,
+            emailAddress,
+            phoneNumber,
+            isDefaultPassword,
+            isArchived,
+            emailHash,
+            usernameHash
+          )
+          VALUES (
+            @username,
+            @passKey,
+            @fullName,
+            @positionID,
+            @barangayID,
+            @emailAddress,
+            @phoneNumber,
+            1,
+            0,
+            @emailHash,
+            @usernameHash
+          );
+          
+          DECLARE @newUserID INT = SCOPE_IDENTITY();
+          
+          -- 2. Insert into userInfo using the reserved userID
+          SET IDENTITY_INSERT userInfo ON;
+          INSERT INTO userInfo (
+            userID,
+            username,
+            passKey,
+            fullName,
+            position,
+            barangay,
+            emailAddress,
+            phoneNumber,
+            isDefaultPassword,
+            isArchived,
+            emailHash,
+            usernameHash,
+            termID
+          )
+          VALUES (
+            @newUserID,
+            @username,
+            @passKey,
+            @fullName,
+            @positionID,
+            @barangayID,
+            @emailAddress,
+            @phoneNumber,
+            1,
+            0,
+            @emailHash,
+            @usernameHash,
+            @termID
+          );
+          SET IDENTITY_INSERT userInfo OFF;
+          
+          COMMIT TRANSACTION;
+          SELECT @newUserID AS userID;
+        END TRY
+        BEGIN CATCH
+          IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+          THROW;
+        END CATCH
       `);
 
     const userId = result.recordset[0].userID;

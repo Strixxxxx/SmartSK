@@ -113,7 +113,7 @@ class TemplateService {
      */
     async initializeNewProject(data) {
         const { 
-            barangayID, projType, targetYear, budget, userID, termID, 
+            barangayID, projType, targetYear, budget, userID, cycleID, 
             governance_pct, active_citizenship_pct, economic_empowerment_pct, global_mobility_pct, agriculture_pct, environment_pct, PBS_pct, SIE_pct, education_pct, health_pct, GAP_pct, MOOE_pct,
             governance_amount, active_citizenship_amount, economic_empowerment_amount, global_mobility_amount, agriculture_amount, environment_amount, PBS_amount, SIE_amount, education_amount, health_amount, GAP_amount, MOOE_amount
         } = data;
@@ -122,7 +122,7 @@ class TemplateService {
             const pool = await getConnection();
             // 1. Generate naming convention
             const abbr = this.getBarangayAbbr(barangayID);
-            const newFileName = `${projType}_${abbr}_${targetYear}.xlsx`;
+            const newFileName = data.fileName || `${projType}_${abbr}_${targetYear}.xlsx`;
             const destinationPath = `azure:${projectBatchContainerName}/${newFileName}`;
 
             // 2. Call Stored Procedure to create DB entries (projectBatch + initial projectTracker)
@@ -145,7 +145,7 @@ class TemplateService {
                 .input('health_pct', sql.Decimal(5, 2), health_pct || 0)
                 .input('GAP_pct', sql.Decimal(5, 2), GAP_pct || 0)
                 .input('MOOE_pct', sql.Decimal(5, 2), MOOE_pct || 0)
-                .input('termID', sql.Int, termID)
+                .input('cycleID', sql.Int, cycleID)
                 .input('governance_amount', sql.Decimal(18, 2), governance_amount || 0)
                 .input('active_citizenship_amount', sql.Decimal(18, 2), active_citizenship_amount || 0)
                 .input('economic_empowerment_amount', sql.Decimal(18, 2), economic_empowerment_amount || 0)

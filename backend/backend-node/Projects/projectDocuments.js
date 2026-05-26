@@ -21,7 +21,12 @@ async function getProjectDetails(batchID) {
     const pool = await getConnection();
     const result = await pool.request()
         .input('batchID', sql.Int, batchID)
-        .query('SELECT projName, projType FROM projectBatch WHERE batchID = @batchID');
+        .query(`
+            SELECT pb.projName, pb.projType, pb.cycleID, pb.barangayID, pc.currentStatusID 
+            FROM projectBatch pb
+            JOIN projectCycles pc ON pb.cycleID = pc.cycleID
+            WHERE pb.batchID = @batchID
+        `);
     
     if (result.recordset.length === 0) {
         throw new Error('Project not found');
@@ -33,8 +38,8 @@ async function getProjectDetails(batchID) {
  * Project Categories Definition
  */
 const PROJECT_CATEGORIES = {
-    ABYIP: ['PPMP_or_APP', 'Activity_Design', 'SK_Resolution'],
-    CBYDP: ['LYDP', 'KK_Minutes', 'Youth_Profile'],
+    ABYIP: ['PPMP_or_APP', 'Activity_Design', 'SK_Resolution', 'EstIncomeCert', 'IncomeCert', 'LYDP', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'],
+    CBYDP: ['LYDP', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'],
 };
 
 /**
@@ -44,11 +49,11 @@ const PROJECT_CATEGORIES = {
 router.get('/:batchID', authMiddleware, async (req, res) => {
     try {
         const { batchID } = req.params;
-        const { projName, projType } = await getProjectDetails(batchID);
+        const { projName, projType, cycleID, barangayID, currentStatusID } = await getProjectDetails(batchID);
         
         const PROJECT_CATEGORIES = {
-            ABYIP: ['PPMP_or_APP', 'Activity_Design', 'SK_Resolution'],
-            CBYDP: ['LYDP', 'KK_Minutes', 'Youth_Profile'],
+            ABYIP: ['PPMP_or_APP', 'Activity_Design', 'SK_Resolution', 'EstIncomeCert', 'IncomeCert', 'LYDP', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'],
+            CBYDP: ['LYDP', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'],
         };
 
         // Match normalized type
@@ -63,21 +68,54 @@ router.get('/:batchID', authMiddleware, async (req, res) => {
 
         const documents = {};
         for (const category of categories) {
-            let prefix = `${projType}/${category}/${projName}/`;
-            let blobs = await listBlobsWithProperties(docContainerName, { prefix });
+            let blobs = [];
+
+            const useNewStructure = ['LYDP', 'EstIncomeCert', 'IncomeCert', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'].includes(category);
             
-            // Fallback 1: If no blobs found and projName has NO extension, try with .xlsx suffix
-            if (blobs.length === 0 && !projName.includes('.')) {
-                const altPrefix = `${projType}/${category}/${projName}.xlsx/`;
-                blobs = await listBlobsWithProperties(docContainerName, { prefix: altPrefix });
+            // Primary Check: New brgyID/cycleID structure
+            if (useNewStructure) {
+                const baseType = (category === 'LYDP' || category.startsWith('KK_') || category.startsWith('YP_')) ? 'CBYDP' : projType;
+                let newPrefix = `${baseType}/${category}/${barangayID}/${cycleID}/`;
+                
+                if (category === 'YP_Notice_Letter') {
+                    newPrefix = `CBYDP/Youth_Profile/${barangayID}/${cycleID}/Notice_Letter/`;
+                } else if (category === 'YP_Campaign_Proof') {
+                    newPrefix = `CBYDP/Youth_Profile/${barangayID}/${cycleID}/Campaign_Proof/`;
+                } else if (category === 'YP_Master_Dataset') {
+                    newPrefix = `CBYDP/Youth_Profile/${barangayID}/${cycleID}/Master_Dataset/`;
+                } else if (category === 'KK_Minutes') {
+                    newPrefix = `CBYDP/KK_Assembly/${barangayID}/${cycleID}/Minutes/`;
+                } else if (category === 'KK_Attendance') {
+                    newPrefix = `CBYDP/KK_Assembly/${barangayID}/${cycleID}/Attendance/`;
+                } else if (category === 'KK_Photo_Doc') {
+                    newPrefix = `CBYDP/KK_Assembly/${barangayID}/${cycleID}/Photos/`;
+                }
+                
+                blobs = await listBlobsWithProperties(docContainerName, { prefix: newPrefix });
             }
-            
-            // Fallback 2: If still no blobs and projName HAS an extension, try stripping it
-            if (blobs.length === 0 && projName.includes('.')) {
-                const strippedName = projName.split('.').slice(0, -1).join('.');
-                const altPrefix2 = `${projType}/${category}/${strippedName}/`;
-                blobs = await listBlobsWithProperties(docContainerName, { prefix: altPrefix2 });
+
+            // Legacy Check: If empty (or not LYDP), check old projName prefix
+            if (blobs.length === 0) {
+                const baseType = category === 'LYDP' ? 'CBYDP' : projType;
+                let prefix = `${baseType}/${category}/${projName}/`;
+                blobs = await listBlobsWithProperties(docContainerName, { prefix });
+                
+                // Fallback 1: If no blobs found and projName has NO extension, try with .xlsx suffix
+                if (blobs.length === 0 && !projName.includes('.')) {
+                    const altPrefix = `${baseType}/${category}/${projName}.xlsx/`;
+                    blobs = await listBlobsWithProperties(docContainerName, { prefix: altPrefix });
+                }
+                
+                // Fallback 2: If still no blobs and projName HAS an extension, try stripping it
+                if (blobs.length === 0 && projName.includes('.')) {
+                    const strippedName = projName.split('.').slice(0, -1).join('.');
+                    const altPrefix2 = `${baseType}/${category}/${strippedName}/`;
+                    blobs = await listBlobsWithProperties(docContainerName, { prefix: altPrefix2 });
+                }
             }
+
+            // Filter out directory blobs
+            blobs = blobs.filter(b => !b.name.endsWith('/') && b.properties?.contentLength > 0);
             
             documents[category] = blobs.map(blob => {
                 const parts = blob.name.split('/');
@@ -91,10 +129,142 @@ router.get('/:batchID', authMiddleware, async (req, res) => {
             });
         }
 
-        res.json({ success: true, data: { projName, projType, categories: documents } });
+        res.json({ success: true, data: { projName, projType, currentStatusID, categories: documents } });
     } catch (error) {
         console.error('Error fetching project documents:', error);
         res.status(500).json({ success: false, message: 'Failed to fetch documents' });
+    }
+});
+
+/**
+ * GET /api/project-documents/:batchID/check-lydp
+ * Lightweight check if LYDP exists for a CBYDP project.
+ */
+router.get('/:batchID/check-lydp', authMiddleware, async (req, res) => {
+    try {
+        const { batchID } = req.params;
+        const { projName, projType, cycleID, barangayID } = await getProjectDetails(batchID);
+
+        let mappedType = '';
+        if (projType.includes('ABYIP')) mappedType = 'ABYIP';
+        else if (projType.includes('CBYDP')) mappedType = 'CBYDP';
+
+        if (mappedType !== 'CBYDP') {
+            return res.json({ success: true, hasLYDP: true }); // Not applicable to non-CBYDP
+        }
+
+        const category = 'LYDP';
+        
+        // Primary Check: New brgyID/cycleID structure
+        const newPrefix = `${projType}/${category}/${barangayID}/${cycleID}/`;
+        let blobs = await listBlobsWithProperties(docContainerName, { prefix: newPrefix });
+
+        // Legacy Check: Fallback to old projName structure
+        if (blobs.length === 0) {
+            let prefix = `${projType}/${category}/${projName}/`;
+            blobs = await listBlobsWithProperties(docContainerName, { prefix });
+
+            if (blobs.length === 0 && !projName.includes('.')) {
+                const altPrefix = `${projType}/${category}/${projName}.xlsx/`;
+                blobs = await listBlobsWithProperties(docContainerName, { prefix: altPrefix });
+            }
+
+            if (blobs.length === 0 && projName.includes('.')) {
+                const strippedName = projName.split('.').slice(0, -1).join('.');
+                const altPrefix2 = `${projType}/${category}/${strippedName}/`;
+                blobs = await listBlobsWithProperties(docContainerName, { prefix: altPrefix2 });
+            }
+        }
+
+        const validBlobs = blobs.filter(b => !b.name.endsWith('/') && b.properties?.contentLength > 0);
+
+        res.json({ success: true, hasLYDP: validBlobs.length > 0 });
+    } catch (error) {
+        console.error('Error checking LYDP:', error);
+        res.status(500).json({ success: false, message: 'Failed to check LYDP status' });
+    }
+});
+
+/**
+ * GET /api/project-documents/:batchID/check-income-certs
+ * Lightweight check if Income Certifications exist for Checkpoint 5 ABYIP.
+ */
+router.get('/:batchID/check-income-certs', authMiddleware, async (req, res) => {
+    try {
+        const { batchID } = req.params;
+        const { projType, cycleID, barangayID } = await getProjectDetails(batchID);
+
+        let mappedType = '';
+        if (projType.includes('ABYIP')) mappedType = 'ABYIP';
+
+        if (mappedType !== 'ABYIP') {
+            return res.json({ success: true, hasEstIncomeCert: true, hasIncomeCert: true });
+        }
+
+        const estPrefix = `${projType}/EstIncomeCert/${barangayID}/${cycleID}/`;
+        const incomePrefix = `${projType}/IncomeCert/${barangayID}/${cycleID}/`;
+
+        const estBlobs = await listBlobsWithProperties(docContainerName, { prefix: estPrefix });
+        const validEstBlobs = estBlobs.filter(b => !b.name.endsWith('/') && b.properties?.contentLength > 0);
+
+        const incomeBlobs = await listBlobsWithProperties(docContainerName, { prefix: incomePrefix });
+        const validIncomeBlobs = incomeBlobs.filter(b => !b.name.endsWith('/') && b.properties?.contentLength > 0);
+
+        res.json({ 
+            success: true, 
+            hasEstIncomeCert: validEstBlobs.length > 0,
+            hasIncomeCert: validIncomeBlobs.length > 0
+        });
+    } catch (error) {
+        console.error('Error checking Income Certs:', error);
+        res.status(500).json({ success: false, message: 'Failed to check Income Certifications status' });
+    }
+});
+
+/**
+ * POST /api/project-documents/:batchID/ocr-preview
+ * Sends document to Python OCR service without saving to Azure Blob Storage
+ */
+router.post('/:batchID/ocr-preview', authMiddleware, hasAccessControl('docsControl'), upload.single('document'), async (req, res) => {
+    try {
+        const file = req.file;
+        if (!file) {
+            return res.status(400).json({ success: false, message: 'No file provided' });
+        }
+
+        const axios = require('axios');
+        const FormData = require('form-data');
+        
+        const form = new FormData();
+        form.append('file', file.buffer, {
+            filename: file.originalname,
+            contentType: file.mimetype
+        });
+
+        const pythonUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/automation/ocr/extract-budget`;
+        
+        const response = await axios.post(pythonUrl, form, {
+            headers: {
+                ...form.getHeaders()
+            }
+        });
+
+        if (response.data && response.data.success) {
+            res.json({
+                success: true,
+                extractedBudget: response.data.extracted_budget
+            });
+        } else {
+            res.json({ success: false, message: 'OCR failed' });
+        }
+    } catch (error) {
+        console.error('OCR Preview Error:', error.response?.data || error.message);
+        res.json({
+            success: false,
+            message: 'OCR extraction failed. Please enter budget manually.',
+            ocrFailed: true,
+            extractedBudget: null
+        });
     }
 });
 
@@ -129,7 +299,7 @@ router.post('/:batchID/upload', authMiddleware, hasAccessControl('docsControl'),
             });
         }
 
-        const { projName, projType } = await getProjectDetails(batchID);
+        const { projName, projType, cycleID, barangayID } = await getProjectDetails(batchID);
 
         // Match normalized type
         let mappedType = '';
@@ -141,11 +311,39 @@ router.post('/:batchID/upload', authMiddleware, hasAccessControl('docsControl'),
             return res.status(400).json({ success: false, message: 'Invalid category for this project type' });
         }
 
-        const blobName = `${projType}/${category}/${projName}/${file.originalname}`;
+        const useNewStructure = ['LYDP', 'EstIncomeCert', 'IncomeCert', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'].includes(category);
+
+        let blobName = '';
+        if (useNewStructure) {
+            const baseType = (category === 'LYDP' || category.startsWith('KK_') || category.startsWith('YP_')) ? 'CBYDP' : projType;
+            let newPrefix = `${baseType}/${category}/${barangayID}/${cycleID}/`;
+
+            if (category === 'YP_Notice_Letter') {
+                newPrefix = `CBYDP/Youth_Profile/${barangayID}/${cycleID}/Notice_Letter/`;
+            } else if (category === 'YP_Campaign_Proof') {
+                newPrefix = `CBYDP/Youth_Profile/${barangayID}/${cycleID}/Campaign_Proof/`;
+            } else if (category === 'YP_Master_Dataset') {
+                newPrefix = `CBYDP/Youth_Profile/${barangayID}/${cycleID}/Master_Dataset/`;
+            } else if (category === 'KK_Minutes') {
+                newPrefix = `CBYDP/KK_Assembly/${barangayID}/${cycleID}/Minutes/`;
+            } else if (category === 'KK_Attendance') {
+                newPrefix = `CBYDP/KK_Assembly/${barangayID}/${cycleID}/Attendance/`;
+            } else if (category === 'KK_Photo_Doc') {
+                newPrefix = `CBYDP/KK_Assembly/${barangayID}/${cycleID}/Photos/`;
+            }
+
+            blobName = `${newPrefix}${file.originalname}`;
+        } else {
+            blobName = `${projType}/${category}/${projName}/${file.originalname}`;
+        }
         
         await uploadBlob(docContainerName, blobName, file.buffer, file.mimetype);
 
-        res.json({ success: true, message: 'Document uploaded successfully', fileName: file.originalname });
+        res.json({ 
+            success: true, 
+            message: 'Document uploaded successfully', 
+            fileName: file.originalname
+        });
     } catch (error) {
         console.error('Error uploading document:', error);
         res.status(500).json({ success: false, message: 'Failed to upload document' });
@@ -166,8 +364,11 @@ router.delete('/:batchID/delete', authMiddleware, hasAccessControl('docsControl'
         }
 
         // Verify the document belongs to this project
-        const { projName } = await getProjectDetails(batchID);
-        if (!documentPath.includes(`/${projName}/`)) {
+        const { projName, barangayID, cycleID } = await getProjectDetails(batchID);
+        const hasLegacyAuth = documentPath.includes(`/${projName}/`) || documentPath.includes(`/${projName}.xlsx/`);
+        const hasNewAuth = documentPath.includes(`/${barangayID}/${cycleID}/`);
+        
+        if (!hasLegacyAuth && !hasNewAuth) {
             return res.status(403).json({ success: false, message: 'Unauthorized file deletion' });
         }
 
@@ -195,8 +396,11 @@ router.get('/:batchID/download', authMiddleware, async (req, res) => {
         }
 
         // Verify the document belongs to this project
-        const { projName } = await getProjectDetails(batchID);
-        if (!documentPath.includes(`/${projName}/`)) {
+        const { projName, barangayID, cycleID } = await getProjectDetails(batchID);
+        const hasLegacyAuth = documentPath.includes(`/${projName}/`) || documentPath.includes(`/${projName}.xlsx/`);
+        const hasNewAuth = documentPath.includes(`/${barangayID}/${cycleID}/`);
+        
+        if (!hasLegacyAuth && !hasNewAuth) {
             return res.status(403).json({ success: false, message: 'Unauthorized file access' });
         }
 

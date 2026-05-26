@@ -204,6 +204,45 @@ const createProjectDeadlineEmail = (projName, projType, statusName, daysStuck, n
   `;
 };
 
+const createMeetingScheduledEmail = (projName, meetingDate) => {
+  return `
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+    <div style="background-color: #4285f4; padding: 15px; text-align: center;">
+      <h2 style="color: white; margin: 0;">Meeting Scheduled</h2>
+    </div>
+    <div style="padding: 20px;">
+      <p>Dear SK Council,</p>
+      <p>A finalization meeting for project plan <strong>"${projName}"</strong> has been officially scheduled.</p>
+      <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid #4285f4; margin: 15px 0;">
+        <p><strong>Scheduled Date & Time:</strong> ${meetingDate}</p>
+      </div>
+      <p>Please make sure to attend and check your calendar.</p>
+      <p>Best regards,<br>Smart SK System</p>
+    </div>
+  </div>
+  `;
+};
+
+const createMeetingRescheduledEmail = (projName, meetingDate, reason) => {
+  return `
+  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+    <div style="background-color: #f57c00; padding: 15px; text-align: center;">
+      <h2 style="color: white; margin: 0;">Meeting Rescheduled</h2>
+    </div>
+    <div style="padding: 20px;">
+      <p>Dear SK Council,</p>
+      <p>The finalization meeting for project plan <strong>"${projName}"</strong> has been rescheduled.</p>
+      <div style="background-color: #fff3e0; padding: 15px; border-left: 4px solid #f57c00; margin: 15px 0;">
+        <p><strong>New Date & Time:</strong> ${meetingDate}</p>
+        <p><strong>Reason for Rescheduling:</strong><br/>${reason}</p>
+      </div>
+      <p>Please update your calendar accordingly and ensure your attendance.</p>
+      <p>Best regards,<br>Smart SK System</p>
+    </div>
+  </div>
+  `;
+};
+
 // OTP Logic for Forgot Password
 
 const generateOTP = () => {
@@ -514,6 +553,358 @@ const sendProjectDeadlineEmail = async (barangayID, projName, projType, statusNa
   }
 };
 
+const sendProjectReviewVerdictEmail = async (barangayID, projName, action, notes) => {
+  try {
+    const pool = await getConnection();
+    const userResult = await pool.request()
+      .input('barangayID', sql.Int, barangayID)
+      .query(`
+        SELECT u.emailAddress
+        FROM userInfo u
+        JOIN roles r ON u.position = r.roleID
+        JOIN barangayTerms bt ON u.termID = bt.termID
+        WHERE u.barangay = @barangayID
+          AND r.roleName IN ('SKC', 'SKS')
+          AND u.isArchived = 0
+          AND bt.isActive = 1
+      `);
+
+    if (userResult.recordset.length === 0) {
+      console.warn(`[VerdictEmail] No active SKC/SKS found for barangayID ${barangayID}.`);
+      return { success: false, message: 'No recipients found.' };
+    }
+
+    const recipients = userResult.recordset
+      .map(r => decrypt(r.emailAddress))
+      .filter(Boolean)
+      .join(',');
+
+    const isApproval = action === 'approve';
+    const subject = isApproval
+      ? `✅ SmartSK: Barangay Captain Endorsed & Approved "${projName}"`
+      : `⚠️ SmartSK: Revision Requested by Barangay Captain for "${projName}"`;
+
+    const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+      <div style="background-color: ${isApproval ? '#2e7d32' : '#c62828'}; padding: 15px; text-align: center;">
+        <h2 style="color: white; margin: 0;">Barangay Captain Review Verdict</h2>
+      </div>
+      <div style="padding: 20px;">
+        <p>Dear SK Council,</p>
+        <p>This is to notify you that the Barangay Captain has completed the review of your project plan:</p>
+        <div style="background-color: #f5f5f5; padding: 15px; border-left: 4px solid ${isApproval ? '#2e7d32' : '#c62828'}; margin: 15px 0;">
+          <p><strong>Project Plan:</strong> ${projName}</p>
+          <p><strong>Review Verdict:</strong> <span style="color: ${isApproval ? '#2e7d32' : '#c62828'}; font-weight: bold;">${isApproval ? 'APPROVED / ENDORSED' : 'REVISIONS REQUIRED'}</span></p>
+        </div>
+        
+        <div style="margin: 20px 0;">
+          <h3 style="margin-bottom: 5px;">Captain's Verdict Notes:</h3>
+          <div style="background-color: #f9f9f9; padding: 15px; border: 1px solid #eee; border-radius: 4px; font-style: italic; white-space: pre-line;">
+            ${notes.trim()}
+          </div>
+        </div>
+
+        <p>${isApproval 
+          ? 'The project has successfully advanced to <strong>Checkpoint 5: QCYDO Validation</strong>.' 
+          : 'The project has been returned to <strong>Checkpoint 2: Proposal Compilation</strong>. Please coordinate a session and make the requested corrections.'}</p>
+        
+        <p>Please log in to the <a href="http://localhost:5173" style="color: #4285f4; text-decoration: none; font-weight: bold;">SmartSK</a> platform to view the updated work notes and agenda section.</p>
+        
+        <p>Best regards,<br>Smart SK System</p>
+      </div>
+    </div>
+    `;
+
+    await transporter.sendMail({
+      from: '"Smart SK" <smartsk2025@gmail.com>',
+      to: recipients,
+      subject,
+      html: htmlContent
+    });
+
+    console.log(`[VerdictEmail] Sent email notification to ${recipients}.`);
+    return { success: true };
+  } catch (error) {
+    console.error('[VerdictEmail] Error sending review verdict email:', error.message);
+    return { success: false, error: error.message };
+  }
+};
+
+const sendBcptOverrideEmail = async (barangayID, projName) => {
+  try {
+    const pool = await getConnection();
+    const userResult = await pool.request()
+      .input('barangayID', sql.Int, barangayID)
+      .query(`
+        SELECT u.emailAddress
+        FROM userInfo u
+        JOIN roles r ON u.position = r.roleID
+        JOIN barangayTerms bt ON u.termID = bt.termID
+        WHERE u.barangay = @barangayID
+          AND r.roleName IN ('SKC', 'SKS')
+          AND u.isArchived = 0
+          AND bt.isActive = 1
+      `);
+
+    if (userResult.recordset.length === 0) {
+      console.warn(`[OverrideEmail] No active SKC/SKS found for barangayID ${barangayID}.`);
+      return { success: false, message: 'No recipients found.' };
+    }
+
+    const recipients = userResult.recordset
+      .map(r => decrypt(r.emailAddress))
+      .filter(Boolean)
+      .join(',');
+
+    const subject = `⚠️ SmartSK: Barangay Captain Bypassed SK Session for "${projName}"`;
+
+    const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+      <div style="background-color: #b45309; padding: 15px; text-align: center;">
+        <h2 style="color: white; margin: 0;">Barangay Captain: Session Override Notice</h2>
+      </div>
+      <div style="padding: 20px;">
+        <p>Dear SK Council,</p>
+        <p>This is an official transparency notice. The Barangay Captain has used the administrative override to bypass the SK Session attendance requirement for the following project plan:</p>
+        <div style="background-color: #fef3c7; padding: 15px; border-left: 4px solid #b45309; margin: 15px 0;">
+          <p><strong>Project Plan:</strong> ${projName}</p>
+          <p><strong>Action:</strong> <span style="color: #b45309; font-weight: bold;">SK Session Bypassed — Progressed to Checkpoint 4: Brgy. Captain's Approval</span></p>
+          <p><strong>Reason:</strong> Full attendance quorum could not be met. The Barangay Captain exercised discretionary administrative authority.</p>
+        </div>
+        <p>The project plan will now proceed directly to the Barangay Captain's formal review and endorsement phase.</p>
+        <p>Please log in to the <a href="http://localhost:5173" style="color: #4285f4; text-decoration: none; font-weight: bold;">SmartSK</a> platform to review the updated project tracker and work notes.</p>
+        <p>Best regards,<br>Smart SK System</p>
+      </div>
+    </div>
+    `;
+
+    await transporter.sendMail({
+      from: '"Smart SK" <smartsk2025@gmail.com>',
+      to: recipients,
+      subject,
+      html: htmlContent
+    });
+
+    console.log(`[OverrideEmail] Sent bypass notification to ${recipients}.`);
+    return { success: true };
+  } catch (error) {
+    console.error('[OverrideEmail] Error sending override notification email:', error.message);
+    return { success: false, error: error.message };
+  }
+};
+
+const sendExecutionCompleteEmailToBCPT = async (barangayID, projName) => {
+  try {
+    const pool = await getConnection();
+    const userResult = await pool.request()
+      .input('barangayID', sql.Int, barangayID)
+      .query(`
+        SELECT u.emailAddress
+        FROM userInfo u
+        JOIN roles r ON u.position = r.roleID
+        JOIN barangayTerms bt ON u.termID = bt.termID
+        WHERE u.barangay = @barangayID
+          AND r.roleName = 'BCPT'
+          AND u.isArchived = 0
+          AND bt.isActive = 1
+      `);
+
+    if (userResult.recordset.length === 0) {
+      console.warn(`[ExecutionEmail] No active BCPT found for barangayID ${barangayID}.`);
+      return { success: false, message: 'No recipients found.' };
+    }
+
+    const recipients = userResult.recordset
+      .map(r => decrypt(r.emailAddress))
+      .filter(Boolean)
+      .join(',');
+
+    const subject = `📢 SmartSK: Checkpoint 11 PPA Execution Complete for "${projName}"`;
+
+    const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+      <div style="background-color: #0284c7; padding: 15px; text-align: center;">
+        <h2 style="color: white; margin: 0;">PPA Execution Checklist Completed</h2>
+      </div>
+      <div style="padding: 20px;">
+        <p>Dear Barangay Captain,</p>
+        <p>This is to notify you that the SK Council has completed execution of all programs/PPAs for the project plan:</p>
+        <div style="background-color: #f0f9ff; padding: 15px; border-left: 4px solid #0284c7; margin: 15px 0;">
+          <p><strong>Project Plan:</strong> ${projName}</p>
+          <p><strong>Status:</strong> All PPAs checked off and executed.</p>
+        </div>
+        <p>Please log in to the <a href="http://localhost:5173" style="color: #4285f4; text-decoration: none; font-weight: bold;">SmartSK</a> platform to validate this execution checklist, sign off, and formally close this project plan.</p>
+        <p>Best regards,<br>Smart SK System</p>
+      </div>
+    </div>
+    `;
+
+    await transporter.sendMail({
+      from: '"Smart SK" <smartsk2025@gmail.com>',
+      to: recipients,
+      subject,
+      html: htmlContent
+    });
+
+    console.log(`[ExecutionEmail] Sent bypass notification to ${recipients}.`);
+    return { success: true };
+  } catch (error) {
+    console.error('[ExecutionEmail] Error sending override notification email:', error.message);
+    return { success: false, error: error.message };
+  }
+};
+
+const sendMeetingScheduledEmail = async (barangayID, projName, meetingDate) => {
+  try {
+    const pool = await getConnection();
+    const userResult = await pool.request()
+      .input('barangayID', sql.Int, barangayID)
+      .query(`
+        SELECT u.emailAddress
+        FROM userInfo u
+        JOIN roles r ON u.position = r.roleID
+        WHERE u.barangay = @barangayID
+          AND r.roleName IN ('SKC', 'SKS', 'SKK', 'SKT')
+          AND u.isArchived = 0
+      `);
+
+    if (userResult.recordset.length === 0) {
+      console.warn(`[MeetingEmail] No active SK members found for barangayID ${barangayID}.`);
+      return { success: false, message: 'No recipients found.' };
+    }
+
+    const recipients = userResult.recordset
+      .map(r => decrypt(r.emailAddress))
+      .filter(Boolean)
+      .join(',');
+
+    const subject = `📅 SmartSK: Meeting Scheduled for "${projName}"`;
+    const htmlContent = createMeetingScheduledEmail(projName, meetingDate);
+
+    await transporter.sendMail({
+      from: '"Smart SK" <smartsk2025@gmail.com>',
+      to: recipients,
+      subject,
+      html: htmlContent
+    });
+
+    console.log(`[MeetingEmail] Sent scheduled notification to ${recipients}.`);
+    return { success: true };
+  } catch (error) {
+    console.error('[MeetingEmail] Error sending scheduled notification email:', error.message);
+    return { success: false, error: error.message };
+  }
+};
+
+const sendMeetingRescheduledEmail = async (barangayID, projName, meetingDate, reason) => {
+  try {
+    const pool = await getConnection();
+    const userResult = await pool.request()
+      .input('barangayID', sql.Int, barangayID)
+      .query(`
+        SELECT u.emailAddress
+        FROM userInfo u
+        JOIN roles r ON u.position = r.roleID
+        WHERE u.barangay = @barangayID
+          AND r.roleName IN ('SKC', 'SKS', 'SKK', 'SKT')
+          AND u.isArchived = 0
+      `);
+
+    if (userResult.recordset.length === 0) {
+      console.warn(`[MeetingEmail] No active SK members found for barangayID ${barangayID}.`);
+      return { success: false, message: 'No recipients found.' };
+    }
+
+    const recipients = userResult.recordset
+      .map(r => decrypt(r.emailAddress))
+      .filter(Boolean)
+      .join(',');
+
+    const subject = `🔄 SmartSK: Meeting Rescheduled for "${projName}"`;
+    const htmlContent = createMeetingRescheduledEmail(projName, meetingDate, reason);
+
+    await transporter.sendMail({
+      from: '"Smart SK" <smartsk2025@gmail.com>',
+      to: recipients,
+      subject,
+      html: htmlContent
+    });
+
+    console.log(`[MeetingEmail] Sent rescheduled notification to ${recipients}.`);
+    return { success: true };
+  } catch (error) {
+    console.error('[MeetingEmail] Error sending rescheduled notification email:', error.message);
+    return { success: false, error: error.message };
+  }
+};
+
+const sendBudgetRejectionEmail = async (barangayID, projName, remarks) => {
+  try {
+    const pool = await getConnection();
+    const userResult = await pool.request()
+      .input('barangayID', sql.Int, barangayID)
+      .query(`
+        SELECT u.emailAddress
+        FROM userInfo u
+        JOIN roles r ON u.position = r.roleID
+        WHERE u.barangay = @barangayID
+          AND r.roleName IN ('SKC', 'SKS')
+          AND u.isArchived = 0
+      `);
+
+    if (userResult.recordset.length === 0) {
+      console.warn(`[BudgetEmail] No active SKC/SKS found for barangayID ${barangayID}.`);
+      return { success: false, message: 'No recipients found.' };
+    }
+
+    const recipients = userResult.recordset
+      .map(r => decrypt(r.emailAddress))
+      .filter(Boolean)
+      .join(',');
+
+    const subject = `⚠️ SmartSK: Barangay Captain Rejected Estimated Annual Budget for "${projName}"`;
+
+    const htmlContent = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
+      <div style="background-color: #c62828; padding: 15px; text-align: center;">
+        <h2 style="color: white; margin: 0;">Budget Validation Rejected</h2>
+      </div>
+      <div style="padding: 20px;">
+        <p>Dear SK Council,</p>
+        <p>The Barangay Captain has reviewed the Estimated Annual Budget submitted for the project plan:</p>
+        <div style="background-color: #ffebee; padding: 15px; border-left: 4px solid #c62828; margin: 15px 0;">
+          <p><strong>Project Plan:</strong> ${projName}</p>
+          <p><strong>Status:</strong> <span style="color: #c62828; font-weight: bold;">REJECTED</span></p>
+        </div>
+        
+        <div style="margin: 20px 0;">
+          <h3 style="margin-bottom: 5px;">Captain's Remarks:</h3>
+          <div style="background-color: #f9f9f9; padding: 15px; border: 1px solid #eee; border-radius: 4px; font-style: italic; white-space: pre-line;">
+            ${remarks.trim()}
+          </div>
+        </div>
+
+        <p>The project remains at <strong>Checkpoint 5</strong>. Please log in to the <a href="http://localhost:5173" style="color: #4285f4; text-decoration: none; font-weight: bold;">SmartSK</a> platform to correct the budget input in the Supporting Documents modal and re-submit for validation.</p>
+        <p>Best regards,<br>Smart SK System</p>
+      </div>
+    </div>
+    `;
+
+    await transporter.sendMail({
+      from: '"Smart SK" <smartsk2025@gmail.com>',
+      to: recipients,
+      subject,
+      html: htmlContent
+    });
+
+    console.log(`[BudgetEmail] Sent rejection email to ${recipients}.`);
+    return { success: true };
+  } catch (error) {
+    console.error('[BudgetEmail] Error sending budget rejection email:', error.message);
+    return { success: false, error: error.message };
+  }
+};
+
 // API Routes for sending emails
 
 router.post('/send-password-reset', async (req, res) => {
@@ -559,5 +950,11 @@ module.exports = {
   sendRegistrationApprovalEmail,
   sendRegistrationRejectionEmail,
   sendProjectDeadlineEmail,
+  sendProjectReviewVerdictEmail,
+  sendBcptOverrideEmail,
+  sendExecutionCompleteEmailToBCPT,
+  sendMeetingScheduledEmail,
+  sendMeetingRescheduledEmail,
+  sendBudgetRejectionEmail,
   generateOTP
 };

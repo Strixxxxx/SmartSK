@@ -1,0 +1,244 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(17, 24, 39, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.modalContent {
+    background-color: #ffffff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 550px;
+    padding: 24px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.closeBtn:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+}
+
+.fileListArea {
+    margin-bottom: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 16px;
+    background-color: #f9fafb;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.sectionTitle {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 12px 0;
+}
+
+.fileItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 12px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    margin-bottom: 8px;
+}
+
+.fileItem:last-child {
+    margin-bottom: 0;
+}
+
+.fileInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.fileName {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1f2937;
+    word-break: break-all;
+}
+
+.fileMeta {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.downloadBtn {
+    background: none;
+    border: none;
+    color: #4f46e5;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    text-decoration: none;
+}
+
+.downloadBtn:hover {
+    background-color: #e0e7ff;
+}
+
+.noFiles {
+    font-size: 13px;
+    color: #dc2626;
+    text-align: center;
+    background-color: #fee2e2;
+    padding: 12px;
+    border-radius: 6px;
+    margin: 0;
+    font-weight: 500;
+}
+
+.noteArea {
+    margin-bottom: 24px;
+}
+
+.textArea {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    color: #1f2937;
+    background-color: #ffffff;
+    outline: none;
+    resize: vertical;
+    min-height: 100px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textArea:focus {
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.btnPrimary {
+    background-color: #059669;
+    color: #ffffff;
+}
+
+.btnPrimary:hover:not(:disabled) {
+    background-color: #047857;
+}
+
+.btnPrimary:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.btnSecondary {
+    background-color: #ffffff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.btnSecondary:hover:not(:disabled) {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.btnSecondary:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.btnDanger {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.btnDanger:hover:not(:disabled) {
+    background-color: #b91c1c;
+}
+
+.btnDanger:disabled {
+    background-color: #fca5a5;
+    color: #ffffff;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.attemptGroup {
+    margin-bottom: 16px;
+}
+
+.attemptGroup:last-child {
+    margin-bottom: 0;
+}
+
+.attemptHeader {
+    font-size: 10px;
+    font-weight: 700;
+    color: #4f46e5;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    background: #e0e7ff;
+    padding: 3px 8px;
+    border-radius: 4px;
+    display: inline-block;
+}

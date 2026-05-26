@@ -46,7 +46,7 @@ def get_data_from_sql():
         GROUP BY batchID
     ) tracker ON pb.batchID = tracker.batchID
     WHERE pb.projType = 'ABYIP' 
-      AND tracker.maxStatus >= 6
+      AND tracker.maxStatus >= 9
     ORDER BY pb.targetYear DESC, pa.sheetRowIndex ASC;
     """
     max_retries = 3

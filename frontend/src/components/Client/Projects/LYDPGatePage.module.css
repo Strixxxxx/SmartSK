@@ -1,0 +1,87 @@
+.gateContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    background-color: #f4f6f8;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.gateCard {
+    max-width: 500px;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border-radius: 16px !important;
+    background-color: #ffffff;
+    box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.05) !important;
+}
+
+.iconWrapper {
+    background-color: #fff4e5;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.warningIcon {
+    font-size: 40px !important;
+    color: #ed6c02;
+}
+
+.title {
+    font-weight: 700 !important;
+    color: #1f2937;
+    margin-bottom: 16px !important;
+}
+
+.badge {
+    background-color: #fdeded;
+    color: #d32f2f;
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 24px;
+}
+
+.description {
+    color: #4b5563;
+    line-height: 1.6 !important;
+    margin-bottom: 16px !important;
+}
+
+.subtext {
+    color: #6b7280;
+    margin-bottom: 32px !important;
+}
+
+.actionContainer {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.dashboardButton {
+    padding: 10px 24px !important;
+    border-radius: 8px !important;
+    text-transform: none !important;
+    font-weight: 600 !important;
+    font-size: 1rem !important;
+    background-color: #4f46e5 !important;
+    box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1), 0 2px 4px -1px rgba(79, 70, 229, 0.06) !important;
+}
+
+.dashboardButton:hover {
+    background-color: #4338ca !important;
+}

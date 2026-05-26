@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { IconButton, Button, CircularProgress } from '@mui/material';
+import { IconButton, Button, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, TextField, Typography, Box } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import FolderIcon from '@mui/icons-material/Folder';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
@@ -7,6 +7,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import axios from '../../../backend connection/axiosConfig';
+import { useAuth } from '../../../context/AuthContext';
 import styles from './SupportingDocumentsModal.module.css';
 
 interface SupportingDocumentsModalProps {
@@ -14,9 +15,10 @@ interface SupportingDocumentsModalProps {
     onClose: () => void;
     batchID: number;
     projName: string;
+    onStatusChange?: () => void;
 }
 
-type CategoryType = 'PPMP_or_APP' | 'Activity_Design' | 'SK_Resolution' | 'LYDP' | 'KK_Minutes' | 'Youth_Profile';
+type CategoryType = 'PPMP_or_APP' | 'Activity_Design' | 'SK_Resolution' | 'LYDP' | 'KK_Minutes' | 'EstIncomeCert' | 'IncomeCert' | 'KK_Attendance' | 'KK_Photo_Doc' | 'YP_Notice_Letter' | 'YP_Campaign_Proof' | 'YP_Master_Dataset';
 
 interface DocumentFile {
     name: string;
@@ -31,6 +33,7 @@ interface ProjectDocumentsResponse {
     categories: {
         [key in CategoryType]?: DocumentFile[];
     };
+    currentStatusID?: number;
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -38,16 +41,41 @@ const CATEGORY_LABELS: Record<string, string> = {
     'Activity_Design': 'Activity Designs',
     'SK_Resolution': 'SK Resolution',
     'LYDP': 'LYDP',
-    'KK_Minutes': 'Consultation Minutes',
-    'Youth_Profile': 'Youth Profile'
+    'KK_Minutes': 'KK Minutes',
+    'EstIncomeCert': 'Cert of Estimated Income',
+    'IncomeCert': 'Cert of Income from Barangay',
+    'KK_Attendance': 'KK Attendance',
+    'KK_Photo_Doc': 'Photo Documentation',
+    'YP_Notice_Letter': 'Notice Letter',
+    'YP_Campaign_Proof': 'Campaign Proof',
+    'YP_Master_Dataset': 'Master Dataset'
 };
 
-const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ open, onClose, batchID, projName }) => {
+const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ open, onClose, batchID, projName, onStatusChange }) => {
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [docData, setDocData] = useState<ProjectDocumentsResponse | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<CategoryType | null>(null);
+    const [selectedFileForUpload, setSelectedFileForUpload] = useState<File | null>(null);
+    const [confirmUploadOpen, setConfirmUploadOpen] = useState(false);
+    const [confirmSkResUploadOpen, setConfirmSkResUploadOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const { user } = useAuth();
+    
+    // Preview Modal State
+    const [previewModalOpen, setPreviewModalOpen] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string>('');
+    const [previewFileType, setPreviewFileType] = useState<'pdf' | 'image' | ''>('');
+    const [previewFileName, setPreviewFileName] = useState<string>('');
+    const [previewCategory, setPreviewCategory] = useState<CategoryType | null>(null);
+
+    // Budget Validation State
+    const [budgetInput, setBudgetInput] = useState<string>('');
+    const [isValidatingOCR, setIsValidatingOCR] = useState(false);
+    const [ocrWarningModalOpen, setOcrWarningModalOpen] = useState(false);
+    const [ocrWarningMessage, setOcrWarningMessage] = useState('');
+    const [budgetConfirmModalOpen, setBudgetConfirmModalOpen] = useState(false);
+    const [isSavingBudget, setIsSavingBudget] = useState(false);
 
     const fetchDocuments = async () => {
         setLoading(true);
@@ -55,12 +83,36 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
             const res = await axios.get(`/api/project-documents/${batchID}`);
             if (res.data.success) {
                 setDocData(res.data.data);
+                // Apply Checkpoint Visibility Rules
+                const statusID = res.data.data.currentStatusID || 0;
+                let filteredCats: CategoryType[] = [];
+
+                if (res.data.data.categories) {
+                    const allCats = Object.keys(res.data.data.categories) as CategoryType[];
+                    filteredCats = allCats.filter(cat => {
+                        if (cat === 'SK_Resolution') return statusID >= 6;
+                        if (cat === 'EstIncomeCert' || cat === 'IncomeCert') return statusID >= 5;
+                        if (cat === 'KK_Minutes' || cat === 'KK_Attendance' || cat === 'KK_Photo_Doc') return statusID >= 4;
+                        if (cat === 'LYDP') return statusID >= 2;
+                        if (cat === 'YP_Notice_Letter' || cat === 'YP_Campaign_Proof' || cat === 'YP_Master_Dataset') return statusID >= 1;
+                        return false;
+                    });
+
+                    // Only keep the allowed categories in the state so the tabs don't render
+                    const filteredCategoriesData: any = {};
+                    filteredCats.forEach(c => {
+                        filteredCategoriesData[c] = res.data.data.categories[c];
+                    });
+                    res.data.data.categories = filteredCategoriesData;
+                }
+
+                setDocData(res.data.data);
+
                 // Auto-select first category if none selected
-                if (!selectedCategory && res.data.data.categories) {
-                    const availableCats = Object.keys(res.data.data.categories) as CategoryType[];
-                    if (availableCats.length > 0) {
-                        setSelectedCategory(availableCats[0]);
-                    }
+                if (!selectedCategory && filteredCats.length > 0) {
+                    setSelectedCategory(filteredCats[0]);
+                } else if (!filteredCats.includes(selectedCategory as CategoryType)) {
+                    setSelectedCategory(filteredCats.length > 0 ? filteredCats[0] : null);
                 }
             }
         } catch (error) {
@@ -78,14 +130,34 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
             // Reset state on close
             setDocData(null);
             setSelectedCategory(null);
+            setSelectedFileForUpload(null);
         }
     }, [open, batchID]);
 
     const handleUploadClick = () => {
-        fileInputRef.current?.click();
+        if (!selectedFileForUpload || !selectedCategory) return;
+        if (selectedCategory === 'LYDP') {
+            if (user?.position !== 'SKC') {
+                alert('Only the SK Chairperson can upload the LYDP.');
+                setSelectedFileForUpload(null);
+                if (fileInputRef.current) fileInputRef.current.value = '';
+                return;
+            }
+            setConfirmUploadOpen(true);
+        } else if (selectedCategory === 'SK_Resolution') {
+            if (user?.position !== 'SKC') {
+                alert('Only the SK Chairperson can upload the SK Resolution.');
+                setSelectedFileForUpload(null);
+                if (fileInputRef.current) fileInputRef.current.value = '';
+                return;
+            }
+            setConfirmSkResUploadOpen(true);
+        } else {
+            executeUpload();
+        }
     };
 
-    const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file || !selectedCategory) return;
 
@@ -100,9 +172,16 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
             return;
         }
 
+        setSelectedFileForUpload(file);
+    };
+
+    const executeUpload = async () => {
+        if (!selectedFileForUpload || !selectedCategory) return;
         setUploading(true);
+        setConfirmUploadOpen(false);
+
         const formData = new FormData();
-        formData.append('document', file);
+        formData.append('document', selectedFileForUpload);
         formData.append('category', selectedCategory);
 
         try {
@@ -111,12 +190,30 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
             });
             if (res.data.success) {
                 await fetchDocuments();
+                if (onStatusChange) onStatusChange();
+                setSelectedFileForUpload(null);
+                if (fileInputRef.current) fileInputRef.current.value = '';
+
+                if (selectedCategory === 'SK_Resolution' && docData?.currentStatusID === 6) {
+                    try {
+                        await axios.post('/api/project-batch/update-status', {
+                            batchID: batchID,
+                            statusID: 7,
+                        });
+                        alert('Project has successfully advanced to Checkpoint 7: Barangay Captain\'s Approval.');
+                        if (onStatusChange) onStatusChange();
+                    } catch (error) {
+                        console.error('Failed to advance to Checkpoint 7:', error);
+                        alert('Uploaded SK Resolution successfully, but failed to auto-advance to Checkpoint 7.');
+                    }
+                }
             }
         } catch (error: any) {
             alert(error.response?.data?.message || 'Failed to upload document.');
+            setSelectedFileForUpload(null);
+            if (fileInputRef.current) fileInputRef.current.value = '';
         } finally {
             setUploading(false);
-            if (fileInputRef.current) fileInputRef.current.value = '';
         }
     };
 
@@ -129,6 +226,7 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
             });
             if (res.data.success) {
                 await fetchDocuments();
+                if (onStatusChange) onStatusChange();
             }
         } catch (error) {
             alert('Failed to delete document.');
@@ -141,10 +239,125 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                 params: { documentPath }
             });
             if (res.data.success && res.data.url) {
-                window.open(res.data.url, '_blank');
+                // Fetch the blob from the SAS URL to force a download
+                const response = await fetch(res.data.url);
+                const blob = await response.blob();
+                const blobUrl = window.URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = blobUrl;
+                const parts = documentPath.split('/');
+                a.download = parts[parts.length - 1] || 'downloaded_file';
+                
+                document.body.appendChild(a);
+                a.click();
+                
+                window.URL.revokeObjectURL(blobUrl);
+                document.body.removeChild(a);
             }
         } catch (error) {
             alert('Failed to get download link.');
+        }
+    };
+
+    const handlePreview = async (documentPath: string, fileName: string) => {
+        const lowerName = fileName.toLowerCase();
+        const isPdf = lowerName.endsWith('.pdf');
+        const isImage = lowerName.match(/\.(jpg|jpeg|png|gif|webp)$/);
+
+        if (!isPdf && !isImage) {
+            alert('Preview is only available for PDF and image files. Please download the file instead.');
+            return;
+        }
+
+        try {
+            const res = await axios.get(`/api/project-documents/${batchID}/download`, {
+                params: { documentPath }
+            });
+            if (res.data.success && res.data.url) {
+                setPreviewUrl(res.data.url);
+                setPreviewFileType(isPdf ? 'pdf' : 'image');
+                setPreviewFileName(fileName);
+                setPreviewCategory(selectedCategory);
+                setBudgetInput('');
+                setBudgetConfirmModalOpen(false);
+                setOcrWarningModalOpen(false);
+                setPreviewModalOpen(true);
+            }
+        } catch (error) {
+            console.error('Failed to load preview:', error);
+            alert('Failed to load preview.');
+        }
+    };
+
+    const handleValidateBudget = async () => {
+        const numericBudget = parseFloat(budgetInput.replace(/,/g, ''));
+        if (isNaN(numericBudget) || numericBudget <= 0) {
+            alert('Please enter a valid positive number for the budget.');
+            return;
+        }
+
+        setIsValidatingOCR(true);
+        try {
+            const response = await fetch(previewUrl);
+            const blob = await response.blob();
+            const file = new File([blob], previewFileName, { type: blob.type });
+
+            const formData = new FormData();
+            formData.append('document', file);
+
+            const ocrRes = await axios.post(`/api/project-documents/${batchID}/ocr-preview`, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+
+            if (ocrRes.data.success && ocrRes.data.extractedBudget) {
+                const extractedBudget = parseFloat(ocrRes.data.extractedBudget);
+                if (extractedBudget !== numericBudget) {
+                    setOcrWarningMessage(`The entered amount (₱${numericBudget.toLocaleString()}) does not match the amount extracted from the file (₱${extractedBudget.toLocaleString()}). Please type the exact amount.`);
+                    setOcrWarningModalOpen(true);
+                    setIsValidatingOCR(false);
+                    return;
+                }
+            } else if (ocrRes.data.ocrFailed) {
+                setOcrWarningMessage(ocrRes.data.message || 'OCR extraction failed. Please ensure you uploaded a clear document with the exact budget format.');
+                setOcrWarningModalOpen(true);
+                setIsValidatingOCR(false);
+                return;
+            } else if (!ocrRes.data.success) {
+                setOcrWarningMessage(ocrRes.data.message || 'Validation failed. Please try again.');
+                setOcrWarningModalOpen(true);
+                setIsValidatingOCR(false);
+                return;
+            }
+
+            setBudgetConfirmModalOpen(true);
+        } catch (error: any) {
+            setOcrWarningMessage('Failed to validate the document with the server. Please check your connection and try again.');
+            setOcrWarningModalOpen(true);
+        } finally {
+            setIsValidatingOCR(false);
+        }
+    };
+
+    const handleSaveBudget = async () => {
+        const numericBudget = parseFloat(budgetInput.replace(/,/g, ''));
+        setIsSavingBudget(true);
+        try {
+            const res = await axios.patch(`/api/project-batch/${batchID}/budget`, {
+                budget: numericBudget
+            });
+            if (res.data.success) {
+                alert('Budget successfully recorded!');
+                setBudgetConfirmModalOpen(false);
+                setPreviewModalOpen(false);
+                fetchDocuments();
+                if (onStatusChange) onStatusChange();
+            }
+        } catch (error: any) {
+            alert(error.response?.data?.message || 'Failed to save budget.');
+        } finally {
+            setIsSavingBudget(false);
         }
     };
 
@@ -153,9 +366,60 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
     const availableCategories = docData ? Object.keys(docData.categories) as CategoryType[] : [];
     const currentFiles = (selectedCategory && docData?.categories[selectedCategory]) || [];
 
+    const isSkc = user?.role === 'SKC' || user?.position?.toLowerCase().includes('chairperson') || user?.position?.toUpperCase() === 'SKC';
+    const isBcpt = user?.role === 'BCPT' || user?.position?.toLowerCase().includes('captain') || user?.position?.toUpperCase() === 'BCPT';
+    const hasDocsControl = isSkc || user?.permissions?.docsControl === true;
+
+    const READ_ONLY_CATEGORIES = [
+        'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 
+        'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'
+    ];
+
+    const canUpload = () => {
+        if (!selectedCategory || isBcpt || !hasDocsControl) return false;
+        if (READ_ONLY_CATEGORIES.includes(selectedCategory)) return false;
+        
+        const statusID = docData?.currentStatusID || 0;
+        if (selectedCategory === 'LYDP') return statusID === 2;
+        if (selectedCategory === 'EstIncomeCert' || selectedCategory === 'IncomeCert') return statusID === 5;
+        if (selectedCategory === 'SK_Resolution') return statusID === 6;
+        return true;
+    };
+
+    const CHECKPOINT_GROUPS = [
+        {
+            checkpoint: 6,
+            label: 'Checkpoint 6',
+            categories: ['SK_Resolution']
+        },
+        {
+            checkpoint: 5,
+            label: 'Checkpoint 5',
+            categories: ['EstIncomeCert', 'IncomeCert']
+        },
+        {
+            checkpoint: 4,
+            label: 'Checkpoint 4: KK General Assembly',
+            categories: ['KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc']
+        },
+        {
+            checkpoint: 2,
+            label: 'Checkpoint 2',
+            categories: ['LYDP']
+        },
+        {
+            checkpoint: 1,
+            label: 'Checkpoint 1: Youth Profiling',
+            categories: ['YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset']
+        }
+    ];
+
+    const showUpload = canUpload();
+
     return (
-        <div className={styles.modalOverlay} onClick={onClose}>
-            <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+        <>
+            <div className={styles.modalOverlay} onClick={onClose}>
+                <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
                 <div className={styles.modalHeader}>
                     <h2>Supporting Documents: {projName}</h2>
                     <IconButton onClick={onClose} size="small">
@@ -171,31 +435,81 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                     <div className={styles.modalBody}>
                         {/* Sidebar */}
                         <div className={styles.sidebar}>
-                            {availableCategories.map(cat => (
-                                <div
-                                    key={cat}
-                                    className={`${styles.folderItem} ${selectedCategory === cat ? styles.active : ''}`}
-                                    onClick={() => setSelectedCategory(cat)}
-                                >
-                                    <FolderIcon className={styles.folderIcon} />
-                                    <span>{CATEGORY_LABELS[cat] || cat}</span>
-                                </div>
-                            ))}
+                            {CHECKPOINT_GROUPS.map(group => {
+                                const groupCategories = group.categories.filter(cat => availableCategories.includes(cat as CategoryType));
+                                if (groupCategories.length === 0) return null;
+                                
+                                return (
+                                    <div key={group.checkpoint} style={{ marginBottom: '16px' }}>
+                                        <div style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#556270', padding: '0 12px 8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                                            {group.label}
+                                        </div>
+                                        {groupCategories.map(cat => (
+                                            <div
+                                                key={cat}
+                                                className={`${styles.folderItem} ${selectedCategory === cat ? styles.active : ''}`}
+                                                onClick={() => setSelectedCategory(cat as CategoryType)}
+                                                style={{ marginLeft: '8px' }}
+                                            >
+                                                <FolderIcon className={styles.folderIcon} />
+                                                <span>{CATEGORY_LABELS[cat] || cat}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                );
+                            })}
                         </div>
 
                         {/* Main Content */}
                         <div className={styles.mainContent}>
-                            <div className={styles.contentHeader}>
-                                <h3>{selectedCategory ? CATEGORY_LABELS[selectedCategory] : 'Select a folder'}</h3>
-                                <Button
-                                    variant="contained"
-                                    startIcon={uploading ? <CircularProgress size={20} color="inherit" /> : <CloudUploadIcon />}
-                                    className={styles.uploadButton}
-                                    onClick={handleUploadClick}
-                                    disabled={!selectedCategory || uploading}
-                                >
-                                    Upload File
-                                </Button>
+                            {availableCategories.length === 0 ? (
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', color: '#88939e', fontSize: '1rem', fontStyle: 'italic' }}>
+                                    No supporting documents are required at this stage.
+                                </div>
+                            ) : (
+                                <>
+                                    <div className={styles.contentHeader}>
+                                        <h3>{selectedCategory ? CATEGORY_LABELS[selectedCategory] : 'Select a folder'}</h3>
+                                {showUpload && (
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                        {selectedFileForUpload && (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '10px' }}>
+                                                <span style={{ fontSize: '14px', maxWidth: '200px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                    {selectedFileForUpload.name}
+                                                </span>
+                                                <Button
+                                                    variant="contained"
+                                                    color="primary"
+                                                    startIcon={uploading ? <CircularProgress size={20} color="inherit" /> : <CloudUploadIcon />}
+                                                    onClick={handleUploadClick}
+                                                    disabled={uploading}
+                                                >
+                                                    Upload
+                                                </Button>
+                                                <Button
+                                                    variant="outlined"
+                                                    color="inherit"
+                                                    size="small"
+                                                    onClick={() => { setSelectedFileForUpload(null); if (fileInputRef.current) fileInputRef.current.value = ''; }}
+                                                    disabled={uploading}
+                                                >
+                                                    Cancel
+                                                </Button>
+                                            </div>
+                                        )}
+                                        {!selectedFileForUpload && (
+                                            <Button
+                                                variant="outlined"
+                                                startIcon={<InsertDriveFileIcon />}
+                                                className={styles.uploadButton}
+                                                onClick={() => fileInputRef.current?.click()}
+                                                disabled={!selectedCategory || uploading}
+                                            >
+                                                Select File
+                                            </Button>
+                                        )}
+                                    </div>
+                                )}
                                 <input
                                     type="file"
                                     ref={fileInputRef}
@@ -214,26 +528,217 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                                 <div className={styles.fileGrid}>
                                     {currentFiles.map(file => (
                                         <div key={file.path} className={styles.fileCard}>
-                                            <InsertDriveFileIcon className={styles.fileIcon} style={{ color: file.name.endsWith('.pdf') ? '#ea4335' : file.name.endsWith('.xlsx') ? '#34a853' : '#4285f4' }} />
-                                            <div className={styles.fileName}>{file.name}</div>
+                                            <InsertDriveFileIcon 
+                                                className={styles.fileIcon} 
+                                                style={{ color: file.name.endsWith('.pdf') ? '#ea4335' : file.name.endsWith('.xlsx') ? '#34a853' : '#4285f4', cursor: 'pointer' }} 
+                                                onClick={() => handlePreview(file.path, file.name)}
+                                            />
+                                            <div 
+                                                className={styles.fileName} 
+                                                style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                                                onClick={() => handlePreview(file.path, file.name)}
+                                            >
+                                                {file.name}
+                                            </div>
                                             <div className={styles.fileMeta}>
                                                 {(file.size / 1024).toFixed(1)} KB
                                                 <br />
                                                 {new Date(file.lastModified).toLocaleDateString()}
                                             </div>
                                             <div className={styles.fileActions}>
-                                                <DownloadIcon className={styles.actionIcon} onClick={() => handleDownload(file.path)} />
-                                                <DeleteIcon className={`${styles.actionIcon} ${styles.deleteIcon}`} onClick={() => handleDelete(file.path)} />
+                                                <IconButton size="small" onClick={() => handleDownload(file.path)}>
+                                                    <DownloadIcon fontSize="small" />
+                                                </IconButton>
+                                                {showUpload && (selectedCategory !== 'LYDP' || currentFiles.length >= 2) && (
+                                                    <IconButton size="small" onClick={() => handleDelete(file.path)}>
+                                                        <DeleteIcon fontSize="small" />
+                                                    </IconButton>
+                                                )}
                                             </div>
                                         </div>
                                     ))}
                                 </div>
                             )}
-                        </div>
+                        </>
+                    )}
+                </div>
                     </div>
                 )}
             </div>
-        </div>
+            </div>
+
+            {/* LYDP Upload Confirmation Dialog */}
+            <Dialog open={confirmUploadOpen} onClose={() => setConfirmUploadOpen(false)}>
+                <DialogTitle>Confirm LYDP Upload</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        If you upload a wrong file, please upload the correct one first. The delete button will appear once there are 2 or more LYDP files, allowing you to delete the incorrect one. It will be hidden again when only 1 LYDP file remains.
+                        <br /><br />
+                        Continue with upload?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setConfirmUploadOpen(false)} color="inherit">
+                        Cancel
+                    </Button>
+                    <Button onClick={executeUpload} color="primary" variant="contained" disabled={uploading}>
+                        {uploading ? 'Uploading...' : 'Continue'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* SK Resolution Upload Confirmation Dialog */}
+            <Dialog open={confirmSkResUploadOpen} onClose={() => setConfirmSkResUploadOpen(false)}>
+                <DialogTitle>Confirm SK Resolution Upload</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Are you sure this is the correct SK Resolution file? Uploading this will automatically advance the project cycle to Checkpoint 7: Barangay Captain's Approval.
+                        <br /><br />
+                        Continue with upload?
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setConfirmSkResUploadOpen(false)} color="inherit">
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={() => {
+                            setConfirmSkResUploadOpen(false);
+                            executeUpload();
+                        }} 
+                        color="primary" 
+                        variant="contained" 
+                        disabled={uploading}
+                    >
+                        {uploading ? 'Uploading...' : 'Continue'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Document Preview & Budget Modal */}
+            <Dialog 
+                open={previewModalOpen && !budgetConfirmModalOpen} 
+                onClose={() => setPreviewModalOpen(false)} 
+                maxWidth="lg" 
+                fullWidth
+                disableEscapeKeyDown={isValidatingOCR}
+                sx={{ '& .MuiDialog-paper': { height: '85vh', maxHeight: '900px' } }}
+            >
+                <DialogTitle>
+                    {previewCategory === 'EstIncomeCert' ? 'Estimated Annual Budget' : 'Document Preview'}
+                    <IconButton onClick={() => setPreviewModalOpen(false)} style={{ position: 'absolute', right: 8, top: 8 }} disabled={isValidatingOCR}>
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+                <DialogContent sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', pb: 2 }}>
+                    <Box sx={{ flexGrow: 1, width: '100%', minHeight: 0, border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden', mb: previewCategory === 'EstIncomeCert' ? 2 : 0, mt: 1 }}>
+                        {previewFileType === 'pdf' ? (
+                            <iframe src={previewUrl} width="100%" height="100%" style={{ border: 'none' }} title="Document Preview" />
+                        ) : (
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', backgroundColor: '#f5f5f5' }}>
+                                <img src={previewUrl} alt="Preview" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                            </div>
+                        )}
+                    </Box>
+
+                    {previewCategory === 'EstIncomeCert' && isSkc && (
+                        <Box sx={{ flexShrink: 0 }}>
+                            <Typography sx={{ mb: 2 }}>
+                                Please enter the Estimated Annual Budget extracted from this document for the ABYIP.
+                            </Typography>
+                            <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+                                <TextField
+                                    autoFocus
+                                    margin="dense"
+                                    label="Estimated Annual Budget (PHP)"
+                                    type="number"
+                                    fullWidth
+                                    variant="outlined"
+                                    value={budgetInput}
+                                    onChange={(e) => setBudgetInput(e.target.value)}
+                                    disabled={isValidatingOCR}
+                                    InputProps={{
+                                        startAdornment: <Typography sx={{ mr: 1 }}>₱</Typography>
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && budgetInput.trim() && !isValidatingOCR) {
+                                            handleValidateBudget();
+                                        }
+                                    }}
+                                    sx={{ mt: 0 }}
+                                />
+                                <Button 
+                                    onClick={handleValidateBudget} 
+                                    color="primary" 
+                                    variant="contained" 
+                                    disabled={!budgetInput.trim() || isValidatingOCR}
+                                    startIcon={isValidatingOCR ? <CircularProgress size={20} color="inherit" /> : null}
+                                    sx={{ mt: 0, height: '56px', px: 4 }}
+                                >
+                                    {isValidatingOCR ? 'Validating...' : 'Confirm'}
+                                </Button>
+                            </div>
+                        </Box>
+                    )}
+                </DialogContent>
+            </Dialog>
+
+            {/* Budget Allocation Confirmation Modal */}
+            <Dialog 
+                open={budgetConfirmModalOpen} 
+                onClose={(_event, reason) => {
+                    if (reason === 'backdropClick') return;
+                    if (!isSavingBudget) setBudgetConfirmModalOpen(false);
+                }} 
+                maxWidth="xs" 
+                fullWidth
+            >
+                <DialogTitle>Confirm Allocation</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        Is this the correct estimated annual budget?
+                        <br /><br />
+                        <Typography variant="h6" color="primary" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
+                            ₱{parseFloat(budgetInput.replace(/,/g, '') || '0').toLocaleString()}
+                        </Typography>
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setBudgetConfirmModalOpen(false)} color="inherit" disabled={isSavingBudget}>
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={handleSaveBudget} 
+                        color="primary" 
+                        variant="contained" 
+                        disabled={isSavingBudget}
+                        startIcon={isSavingBudget ? <CircularProgress size={20} color="inherit" /> : null}
+                    >
+                        {isSavingBudget ? 'Saving...' : 'Yes, Confirm'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* OCR Warning Modal */}
+            <Dialog 
+                open={ocrWarningModalOpen} 
+                onClose={() => setOcrWarningModalOpen(false)} 
+                maxWidth="xs" 
+                fullWidth
+            >
+                <DialogTitle sx={{ color: '#ef4444', fontWeight: 'bold' }}>Validation Failed</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>
+                        {ocrWarningMessage}
+                    </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOcrWarningModalOpen(false)} variant="contained" color="error">
+                        Understood
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
     );
 };
 

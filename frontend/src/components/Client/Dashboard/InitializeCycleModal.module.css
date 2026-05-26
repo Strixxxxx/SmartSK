@@ -1,0 +1,368 @@
+/* InitializeCycleModal.module.css */
+/* Matches system-wide modal pattern: white bg, 12px radius, clean shadows */
+/* Reference: CheckpointProofUploadModal.module.css, Dashboard.css */
+
+/* ── Overlay ─────────────────────────────────────────────────────────────── */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(17, 24, 39, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+}
+
+/* ── Modal Panel ─────────────────────────────────────────────────────────── */
+.modalContent {
+    background-color: #ffffff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    overflow: hidden;
+    animation: slideUp 0.22s ease;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px 24px 16px 24px;
+}
+
+.headerLeft {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.headerIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    background-color: #e3f2fd;
+    border-radius: 8px;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 3px 0;
+    line-height: 1.3;
+}
+
+.subtitle {
+    font-size: 12px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.closeBtn {
+    background: none;
+    border: none;
+    color: #9ca3af;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 4px 6px;
+    border-radius: 6px;
+    line-height: 1;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    flex-shrink: 0;
+}
+
+.closeBtn:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.closeBtn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ── Divider ─────────────────────────────────────────────────────────────── */
+.divider {
+    height: 1px;
+    background-color: #e5e7eb;
+}
+
+/* ── Info Box ────────────────────────────────────────────────────────────── */
+.infoBox {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 16px 24px 0 24px;
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 12px 14px;
+}
+
+.infoText {
+    font-size: 12.5px;
+    color: #1e40af;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ── Error Box ───────────────────────────────────────────────────────────── */
+.errorBox {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 12px 24px 0 24px;
+    background-color: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 12.5px;
+    color: #b91c1c;
+    animation: fadeIn 0.2s ease;
+}
+
+.errorDismiss {
+    background: none;
+    border: none;
+    color: #b91c1c;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0 2px;
+    line-height: 1;
+    flex-shrink: 0;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+}
+
+.errorDismiss:hover {
+    opacity: 1;
+}
+
+/* ── Warning Box ─────────────────────────────────────────────────────────── */
+.warnBox {
+    margin: 12px 24px 0 24px;
+    background-color: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    padding: 10px 14px;
+    animation: fadeIn 0.2s ease;
+}
+
+.warnText {
+    font-size: 12.5px;
+    color: #92400e;
+    margin: 0 0 4px 0;
+}
+
+.warnText:last-child {
+    margin-bottom: 0;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ── Field Section ───────────────────────────────────────────────────────── */
+.fieldSection {
+    padding: 16px 24px 0 24px;
+}
+
+.sectionLabel {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #6b7280;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+}
+
+/* Two-column year row */
+.yearRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+}
+
+.yearSeparator {
+    font-size: 20px;
+    color: #d1d5db;
+    padding: 0 10px;
+    margin-top: 30px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.fieldGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.fieldLabel {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    cursor: default;
+}
+
+.yearInput {
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+    font-family: inherit;
+    outline: none;
+    background-color: #ffffff;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.yearInput:focus {
+    border-color: #1565c0;
+    box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
+}
+
+.yearInput:disabled {
+    background-color: #f9fafb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.yearInput::placeholder {
+    color: #9ca3af;
+    font-weight: 400;
+}
+
+/* Full-width fiscal year input */
+.yearInputFull {
+    max-width: 220px;
+}
+
+.fieldHint {
+    font-size: 11px;
+    color: #9ca3af;
+}
+
+/* ── Cycle Preview ───────────────────────────────────────────────────────── */
+.previewBox {
+    margin: 16px 24px 16px 24px;
+    background-color: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    animation: fadeIn 0.25s ease;
+}
+
+.previewLabel {
+    font-size: 10px;
+    font-weight: 700;
+    color: #166534;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.previewContent {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 13px;
+    color: #15803d;
+}
+
+.previewDot {
+    color: #86efac;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 24px;
+}
+
+.btnCancel {
+    background-color: #ffffff;
+    color: #374151;
+    border: 1px solid #d1d5db;
+    padding: 8px 18px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btnCancel:hover:not(:disabled) {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.btnCancel:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btnPrimary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #1565c0;
+    color: #ffffff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    min-width: 148px;
+}
+
+.btnPrimary:hover:not(:disabled) {
+    background-color: #1251a3;
+    transform: translateY(-1px);
+}
+
+.btnPrimary:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btnPrimary:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.7;
+    transform: none;
+}

@@ -38,3 +38,6 @@ pycryptodome
 # Document Parsing
 pypdf
 python-docx
+pdfplumber
+pytesseract
+word2number

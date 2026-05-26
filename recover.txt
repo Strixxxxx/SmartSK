@@ -1,0 +1,1784 @@
+Created At: 2026-05-26T03:11:14Z
+Completed At: 2026-05-26T03:11:14Z
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Admin\\accessControl.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Admin\\archive.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Admin\\projArchive.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Admin\\projList.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Email\\email.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Posting\\managePost.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Posting\\postPublic.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Posting\\pubTaggedProj.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Posting\\taggedProjects.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Projects\\projectAudit.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Projects\\projectBatch.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Projects\\projectDocuments.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Projects\\projectNotes.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Projects\\projectTracker.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\Storage\\storage.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\bulletinboard\\disclosure.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\fetchBatch.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\fetchTracker.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\main.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\routeGuard\\routeGuard.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\utils\\templateService.js"}
+{"File":"d:\\Projects\\Projects\\smartSK\\backend\\backend-node\\websockets\\websocket.js"}
+Created At: 2026-05-26T03:11:21Z
+Completed At: 2026-05-26T03:11:21Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1 to 800
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1: const express = require('express');
+2: const router = express.Router();
+3: const { getConnection, sql } = require('../database/database');
+4: const { authMiddleware } = require('../session/session');
+5: const { hasAccessControl } = require('../routeGuard/routeGuard');
+6: const { broadcast, broadcastToRoom } = require('../websockets/websocket');
+7: const { decrypt } = require('../utils/crypto');
+8: const multer = require('multer');
+9: const upload = multer({ storage: multer.memoryStorage() });
+10: const { uploadBlob, listBlobsWithProperties, generateSasUrl, docContainerName, deleteBlob } = require('../Storage/storage');
+11: const { sendProjectReviewVerdictEmail, sendBcptOverrideEmail, sendExecutionCompleteEmailToBCPT, sendMeetingScheduledEmail, sendMeetingRescheduledEmail } = require('../Email/email');
+12: const templateService = require('../utils/templateService');
+13: 
+14: /**
+15:  * Custom Checkpoint-based Project Tracker Router
+16:  * Mounted at /api/project-tracker
+17:  */
+18: 
+19: // helper to check if a user is BCPT
+20: function isBCPT(req) {
+21:     return req.user && (req.user.position === 'BCPT' || req.user.positionName === 'BCPT');
+22: }
+23: 
+24: // helper to check if a user is SKC
+25: function isSKC(req) {
+26:     return req.user && (req.user.position === 'SKC' || req.user.positionName === 'SKC');
+27: }
+28: 
+29: // ── Annual Project Cycle Initializer ─────────────────────────────────────────
+30: // Placed here (before all /:id
+<truncated 38441 bytes>
+          .input('comments', sql.NVarChar(sql.MAX), comments || null)
+771:             .query(`
+772:                 MERGE projectCheckpointApprovals AS target
+773:                 USING (SELECT @batchID AS batchID, @userID AS userID) AS source
+774:                 ON (target.batchID = source.batchID AND target.userID = source.userID)
+775:                 WHEN MATCHED THEN
+776:                     UPDATE SET attended = @attended, comments = @comments
+777:                 WHEN NOT MATCHED THEN
+778:                     INSERT (batchID, userID, attended, comments) VALUES (source.batchID, source.userID, @attended, @comments);
+779:             `);
+780: 
+781:         // Get total active term members count (excluding Admin/BCPT)
+782:         const membersCountRes = await pool.request()
+783:             .input('termID', sql.Int, activeTermID)
+784:             .query(`
+785:                 SELECT COUNT(*) as count 
+786:                 FROM userInfo u
+787:                 JOIN roles r ON u.position = r.roleID
+788:                 WHERE u.termID = @termID AND u.isArchived = 0 AND r.roleName NOT IN ('Admin', 'BCPT')
+789:             `);
+790:         const totalActiveTermMembers = membersCountRes.recordset[0].count;
+791: 
+792:         // Get count of present attendees for this batch
+793:         const presentAttendeesRes = await pool.request()
+794:             .input('batchID', sql.Int, batchID)
+795:             .query('SELECT COUNT(*) as count FROM projectCheckpointApprovals WHERE batchID = @batchID AND attended = 1');
+796:         const presentAttendees = presentAttendeesRes.recordset[0].count;
+797: 
+798:         let advanced = false;
+799:         if (totalActiveTermMembers > 0 && presentAttendees >= totalActiveTermMembers) {
+800:             // Automatically advance to Checkpoint 4 (Brgy. Captain's Approval)
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Based on my scan of the frontend and backend codebase, here is a step-by-step explanation of how the **Annual Project Cycle** works in smartSK. 
+
+The process is designed as a rigid, state-driven workflow consisting of **14 sequential checkpoints** that guide Sangguniang Kabataan (SK) projects from inception (profiling) through execution and closure.
+
+---
+
+### Phase 1: Initialization (Backend Logic)
+The process starts in the backend (`projectTracker.js`) via the `POST /initialize-cycle` endpoint. 
+1. **Trigger:** Only the **SK Chairperson (SKC)** can trigger this.
+2. **Validation:** The system checks if the term duration is exactly 3 years, the fiscal year is within bounds, and no other active cycle exists.
+3. **Creation:** It creates a new `projectCycles` record in the database starting at **Status ID 1**.
+4. **Auto-Generation:** It automatically generates initial templates/batches for the **CBYDP** (Comprehensive Barangay Youth Development Plan) and the **ABYIP** (Annual Barangay Youth Investment Program) and stores them via Azure Blob Storage.
+
+---
+
+### Phase 2: The 14-Step Checkpoint Tracker (Frontend & Backend Synchronization)
+Once initialized, the cycle progresses through 14 distinct checkpoints defined in the frontend (`ProjectTrackerList.tsx`) and controlled by the backend.
+
+**Step 1: Youth Profiling**
+* The initial state. Gathering data to understand the youth demographic.
+
+**Step 2: CBYDP Drafting**
+* The SK Council works on drafting the 3-year plan. 
+* **Validation:** Before advancing, the backend checks Azure Blob Storage to ensure the Local Youth Development Plan (LYDP) document is uploaded.
+
+**Step 3: CBYDP SK Session**
+* **Scheduling:** The SKC schedules an official finalization meeting (`POST /schedule-meeting`).
+* **Attendance:** All active term members must check in their attendance (`POST /submit-self-attendance` or `POST /submit-attendance`). 
+* **Progression:** Once 100% of the active council is marked as present, the system *automatically* advances to the next step.
+
+**Step 4: KK General Asse
+<truncated 966 bytes>
+rative hurdles where the system acts as a tracking monitor for physical/external document statuses.
+
+**Step 12: Procurement Phase**
+* The approved budget is used to procure necessary materials/services.
+
+**Step 13: Project Execution**
+* **PPA Tracking:** The SKC can dynamically toggle the execution status of individual Programs, Projects, and Activities (PPAs) via `POST /update-ppa-execution`.
+* **AI Historical Sync:** Advancing to this step triggers an AI warning on the frontend, notifying the user that the project is locked for editing and AI historical sync will begin.
+
+**Step 14: Project Closure**
+* **Validation:** The SKC triggers `POST /validate-closure` to finalize the fiscal year. 
+* Once closed, a new cycle can be initialized for the next fiscal year.
+
+---
+
+### Key System Mechanisms (Cross-Cutting Features)
+
+1. **Role-Based Access Control (RBAC):**
+   * **SKC (Chairperson):** Holds primary control over advancing checkpoints, scheduling meetings, and finalizing plans.
+   * **BCPT (Barangay Captain):** Primarily an observer with specific approval gates (like Budget Validation at Step 5) and emergency override powers.
+   * **Standard SK Members:** Participate heavily in attendance and document viewing.
+
+2. **Real-time Synchronization (WebSockets):**
+   * Whenever a status changes, a meeting is scheduled, or attendance is logged, the backend fires `broadcastToRoom()` via WebSockets. The frontend listens for these events to update the progress bar without requiring a page refresh.
+
+3. **Time-Based Warnings & Compliance:**
+   * The frontend continuously calculates the "age" of a status (`getStatusAge`). 
+   * It enforces the **7/10 rule** for SK Sessions/Approvals (Warning at 7 days, Urgent at 10 days) and a **15/30 rule** for standard phases to ensure compliance with JMC 2019 legal limits.
+
+4. **Document Gates (Azure Blob Storage):**
+   * The backend actively prevents progression unless specific documents (like LYDPs or Income Certificates) are physically verified to exist in the Azure Blob Storage container.
+Created At: 2026-05-26T03:42:06Z
+Completed At: 2026-05-26T03:42:06Z
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js"}
+Created At: 2026-05-26T03:47:38Z
+Completed At: 2026-05-26T03:47:40Z
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1437,"LineContent":"// 3. POST /validate-checkpoint"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1438,"LineContent":"router.post('/validate-checkpoint', authMiddleware, async (req, res) =\u003e {"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1588,"LineContent":"        console.error('[projectTracker] POST /validate-checkpoint error:', err.message);"}
+Created At: 2026-05-26T03:47:42Z
+Completed At: 2026-05-26T03:47:42Z
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":834,"LineContent":"// 4. POST /override-finalization — Barangay Captain override of Checkpoint 3 (Manual override to Checkpoint 4)"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":835,"LineContent":"router.post('/override-finalization', authMiddleware, async (req, res) =\u003e {"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":917,"LineContent":"        console.error('[projectTracker] POST /override-finalization error:', err.message);"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1137,"LineContent":"// 7. POST /validate-closure — BCPT validation of Checkpoint 8 checklist and sign off to advance to Checkpoint 9"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1138,"LineContent":"router.post('/validate-closure', authMiddleware, async (req, res) =\u003e {"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1225,"LineContent":"        console.error('[projectTracker] POST /validate-closure error:', err.message);"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1244,"LineContent":"// 1. POST /upload-checkpoint-proof"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1245,"LineContent":"router.post('/upload-checkpoint-proof', authMiddleware, hasAccessControl('trackerControl'), upload.single('proofFile'), async (req, res) =\u003e {"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1285,"LineContent":"        console.error('[projectTracker] POST /upload-checkpoint-proof error:', err.message);"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1346,"LineContent":"// POST /validate-budget"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1347,"LineContent":"router.post('/validate-budget', authMiddleware, async (req, res) =\u003e {"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1432,"LineContent":"        console.error('[projectTracker] POST /validate-budget error:', err.message);"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1437,"LineContent":"// 3. POST /validate-checkpoint"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1438,"LineContent":"router.post('/validate-checkpoint', authMiddleware, async (req, res) =\u003e {"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1588,"LineContent":"        console.error('[projectTracker] POST /validate-checkpoint error:', err.message);"}
+Created At: 2026-05-26T03:47:51Z
+Completed At: 2026-05-26T03:47:52Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1137 to 1440
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1137: // 7. POST /validate-closure — BCPT validation of Checkpoint 8 checklist and sign off to advance to Checkpoint 9
+1138: router.post('/validate-closure', authMiddleware, async (req, res) => {
+1139:     try {
+1140:         const { batchID } = req.body;
+1141:         const { userID, barangay: barangayID } = req.user;
+1142: 
+1143:         if (!batchID) {
+1144:             return res.status(400).json({ success: false, message: 'Batch ID is required.' });
+1145:         }
+1146: 
+1147:         const pool = await getConnection();
+1148: 
+1149:         // Verify BCPT role
+1150:         const userRes = await pool.request()
+1151:             .input('userID', sql.Int, userID)
+1152:             .query('SELECT r.roleName FROM userInfo u JOIN roles r ON u.position = r.roleID WHERE u.userID = @userID');
+1153: 
+1154:         const role = userRes.recordset[0]?.roleName;
+1155:         if (role !== 'BCPT') {
+1156:             return res.status(403).json({ success: false, message: 'Unauthorized. Only the Barangay Captain can sign off on project closure.' });
+1157:         }
+1158: 
+1159:         // Verify current checkpoint is 11
+1160:         const statusRes = await pool.request()
+1161:             .input('batchID', sql.Int, batchID)
+1162:             .query('SELECT TOP 1 statusID FROM projectTracker WHERE batchID = @batchID ORDER BY updatedAt DESC');
+1163: 
+1164:         const currentStatus = statusRes.recordset[0]?.statusID;
+1165:         if (currentStatus !== 11) {
+1166:             return res.status(400).json({ success: false, messa
+<truncated 13139 bytes>
+proved. Advanced to Checkpoint 6.' });
+1409:         } else if (action === 'reject') {
+1410:             // Keep at Checkpoint 5, send rejection email, and insert notification
+1411:             const { sendBudgetRejectionEmail } = require('../Email/email');
+1412:             await sendBudgetRejectionEmail(barangayID, projName, remarks || 'No remarks provided.');
+1413:             
+1414:             // Send system notification to SKC/SKS
+1415:             await pool.request()
+1416:                 .input('barangayID', sql.Int, barangayID)
+1417:                 .input('batchID', sql.Int, batchID)
+1418:                 .input('remarks', sql.NVarChar, remarks || 'No remarks provided.')
+1419:                 .query(`
+1420:                     INSERT INTO notifications (userID, notifType, message, batchID, isRead, createdAt)
+1421:                     SELECT userID, 'SYSTEM', 'Budget Rejected: ' + @remarks, @batchID, 0, GETDATE()
+1422:                     FROM userInfo
+1423:                     WHERE barangay = @barangayID AND position IN (SELECT roleID FROM roles WHERE roleName IN ('SKC', 'SKS')) AND isArchived = 0
+1424:                 `);
+1425: 
+1426:             res.json({ success: true, message: 'Budget rejected. Notification sent to SK Council.' });
+1427:         } else {
+1428:             return res.status(400).json({ success: false, message: 'Invalid action.' });
+1429:         }
+1430: 
+1431:     } catch (err) {
+1432:         console.error('[projectTracker] POST /validate-budget error:', err.message);
+1433:         res.status(500).json({ success: false, message: 'Failed to process budget validation.' });
+1434:     }
+1435: });
+1436: 
+1437: // 3. POST /validate-checkpoint
+1438: router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
+1439:     try {
+1440:         if (!isBCPT(req)) {
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T03:47:52Z
+Completed At: 2026-05-26T03:47:52Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1438 to 1600
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1438: router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
+1439:     try {
+1440:         if (!isBCPT(req)) {
+1441:             return res.status(403).json({ success: false, message: 'Unauthorized. Only Barangay Captain can validate checkpoints.' });
+1442:         }
+1443:         
+1444:                 const { batchID, fromCheckpoint, validationNote, action } = req.body;
+1445:         const fromCP = parseInt(fromCheckpoint, 10);
+1446:         
+1447:         if (!batchID || isNaN(fromCP) || (!CHECKPOINT_FOLDER_MAP[fromCP] && fromCP !== 12)) {
+1448:             return res.status(400).json({ success: false, message: 'Invalid parameters. fromCheckpoint must be a valid checkpoint ID (4-12).' });
+1449:         }
+1450:         if (!validationNote || validationNote.trim() === '') {
+1451:             return res.status(400).json({ success: false, message: 'Remarks/Note is required.' });
+1452:         }
+1453: 
+1454:         const act = action === 'reject' ? 'reject' : 'approve';
+1455:         
+1456:         const pool = await getConnection();
+1457:         
+1458:         // Count existing tracker arrivals to determine the active attempt suffix
+1459:         const trackerCheck = await pool.request()
+1460:             .input('batchID', sql.Int, batchID)
+1461:             .input('statusID', sql.Int, fromCP)
+1462:             .query(`SELECT COUNT(*) as count FROM projectTracker WHERE batchID = @batchID AND statusID = @statusID`);
+1463:         const arrivalsCount = trackerCheck.recordset[0].count;
+1464:         const a
+<truncated 6547 bytes>
+tchID)
+1569:                 .input('barangayID', sql.Int, barangayID)
+1570:                 .input('notifType', sql.VarChar(50), notifType)
+1571:                 .input('message', sql.NVarChar(sql.MAX), notifMessage)
+1572:                 .query(`INSERT INTO projectNotifications (batchID, barangayID, notifType, message) VALUES (@batchID, @barangayID, @notifType, @message)`);
+1573:                 
+1574:             await transaction.commit();
+1575:             
+1576:             // Broadcasts
+1577:             broadcastToRoom(batchID.toString(), { type: 'checkpoint_updated', statusID: nextStatusID });
+1578:             broadcastToRoom(batchID.toString(), { type: 'new_note' });
+1579:             broadcast({ type: 'new_notification', barangayID });
+1580:             
+1581:             res.json({ success: true, message: act === 'approve' ? `Checkpoint ${fromCP} validated. Project advanced to Checkpoint ${nextStatusID}.` : `Checkpoint ${fromCP} validation rejected. Project set to Checkpoint ${nextStatusID}.` });
+1582:         } catch (txnErr) {
+1583:             await transaction.rollback();
+1584:             throw txnErr;
+1585:         }
+1586:         
+1587:     } catch (err) {
+1588:         console.error('[projectTracker] POST /validate-checkpoint error:', err.message);
+1589:         res.status(500).json({ success: false, message: 'Failed to process checkpoint validation.' });
+1590:     }
+1591: });
+1592: 
+1593: 
+1594: // ============================================================================
+1595: // CHECKPOINT 1: Youth Profiling Endpoints
+1596: // Implements DILG MC No. 2022-033 — Annex 4 upload, validation, and gating.
+1597: // ============================================================================
+1598: 
+1599: const axios = require('axios');
+1600: const uploadFields = upload.fields([
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T03:47:59Z
+Completed At: 2026-05-26T03:48:01Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1594 to 1900
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1594: // ============================================================================
+1595: // CHECKPOINT 1: Youth Profiling Endpoints
+1596: // Implements DILG MC No. 2022-033 — Annex 4 upload, validation, and gating.
+1597: // ============================================================================
+1598: 
+1599: const axios = require('axios');
+1600: const uploadFields = upload.fields([
+1601:     { name: 'barangay_notice_letter', maxCount: 1 },
+1602:     { name: 'campaign_proof_images', maxCount: 20 },
+1603:     { name: 'master_youth_dataset', maxCount: 1 },
+1604: ]);
+1605: 
+1606: // Helper: get or create the submission record for this term+barangay
+1607: async function getOrCreateSubmission(pool, cycleID, barangayID, userID) {
+1608:     const existing = await pool.request()
+1609:         .input('cycleID', sql.Int, cycleID)
+1610:         .input('barangayID', sql.Int, barangayID)
+1611:         .query(`
+1612:             SELECT submissionID, status, hasInformedConsentVerified, attemptCount
+1613:             FROM youth_profiling_submissions
+1614:             WHERE cycleID = @cycleID AND barangayID = @barangayID
+1615:         `);
+1616: 
+1617:     if (existing.recordset.length) {
+1618:         return existing.recordset[0];
+1619:     }
+1620: 
+1621:     const created = await pool.request()
+1622:         .input('cycleID', sql.Int, cycleID)
+1623:         .input('barangayID', sql.Int, barangayID)
+1624:         .query(`
+1625:             INSERT INTO youth_profiling_submissions (cycleID, barangayID)
+1626:             OUTPUT I
+<truncated 13141 bytes>
+submissions
+1869:                 SET status = 'CHECKPOINT_1_COMPLETE',
+1870:                     revisionComment = NULL,
+1871:                     revisionYear = ISNULL(revisionYear, @revisionYear),
+1872:                     minorVersion = ISNULL(minorVersion, @minorVersion),
+1873:                     updatedAt = GETDATE()
+1874:                 WHERE submissionID = @submissionID
+1875:             `);
+1876: 
+1877:         // Fetch active cycle for this term + barangay
+1878:         const cycleRes = await pool.request()
+1879:             .input('cycleID', sql.Int, sub.cycleID)
+1880:             .input('barangayID', sql.Int, sub.barangayID)
+1881:             .query(`
+1882:                 SELECT cycleID, termID, termStartYear, termEndYear, targetFiscalYear, currentStatusID
+1883:                 FROM projectCycles
+1884:                 WHERE cycleID = @cycleID AND barangayID = @barangayID
+1885:             `);
+1886: 
+1887:         let activeCycle = null;
+1888:         if (cycleRes.recordset.length > 0) {
+1889:             activeCycle = cycleRes.recordset[0];
+1890:             const barangayPrefix = sub.barangayID > 100 ? 'NN' : 'SB';
+1891:             const cbydpFilename = `CBYDP_${barangayPrefix}_${activeCycle.termStartYear}-${activeCycle.termEndYear}_Rev${activeCycle.targetFiscalYear}_v1.0.xlsx`;
+1892: 
+1893:             // Update submission with Checkpoint 2 initialization info
+1894:             await pool.request()
+1895:                 .input('submissionID', sql.Int, sub.submissionID)
+1896:                 .input('termStart', sql.Int, activeCycle.termStartYear)
+1897:                 .input('termEnd', sql.Int, activeCycle.termEndYear)
+1898:                 .query(`
+1899:                     UPDATE youth_profiling_submissions
+1900:                     SET termStart = @termStart, termEnd = @termEnd
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T03:48:09Z
+Completed At: 2026-05-26T03:48:11Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1900 to 2100
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1900:                     SET termStart = @termStart, termEnd = @termEnd
+1901:                     WHERE submissionID = @submissionID
+1902:                 `);
+1903: 
+1904:             // Only advance to CP2 if cycle is still at CP1 (idempotency guard)
+1905:             if (activeCycle.currentStatusID === 1) {
+1906:                 // Advance project cycle to Checkpoint 2
+1907:                 await pool.request()
+1908:                     .input('cycleID', sql.Int, activeCycle.cycleID)
+1909:                     .query(`UPDATE projectCycles SET currentStatusID = 2, updatedAt = GETDATE() WHERE cycleID = @cycleID`);
+1910: 
+1911:                 // Insert into projectTracker
+1912:                 await pool.request()
+1913:                     .input('cycleID', sql.Int, activeCycle.cycleID)
+1914:                     .input('updatedBy', sql.Int, req.user.userID)
+1915:                     .query(`INSERT INTO projectTracker (cycleID, statusID, updatedBy) VALUES (@cycleID, 2, @updatedBy)`);
+1916:             }
+1917:         }
+1918: 
+1919:         // Trigger fire-and-forget background analytics computation in Python FastAPI service
+1920:         const pyUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/api/v1/checkpoints/profiling/analytics`;
+1921:         const pyPayload = {
+1922:             term_id: activeCycle ? activeCycle.termID : null, // AI backend uses term_id parameter
+1923:             barangay_id: sub.barangayID,
+1924:             submission_id: sub.submissionID,
+1925:             master_dataset_blob: sub.ma
+<truncated 7139 bytes>
+.files['master_youth_dataset']?.[0];
+2069:             if (!masterDataset) {
+2070:                 return res.status(400).json({ success: false, message: 'Master dataset file is required for replacement.' });
+2071:             }
+2072: 
+2073:             // Delete old dataset from storage
+2074:             if (sub.masterDatasetBlobName) {
+2075:                 try {
+2076:                     await deleteBlob(container, sub.masterDatasetBlobName);
+2077:                 } catch (delErr) {
+2078:                     console.error('[projectTracker] Failed to delete old master dataset:', delErr.message);
+2079:                 }
+2080:             }
+2081: 
+2082:             // Upload new dataset
+2083:             const safe = masterDataset.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+2084:             const blobName = `CBYDP/Youth_Profile/${barangayID}/${cycleID}/Master_Dataset/${attemptCount}/${ts}-${safe}`;
+2085:             await uploadBlob(container, blobName, masterDataset.buffer, masterDataset.mimetype);
+2086: 
+2087:             // Update database
+2088:             await pool.request()
+2089:                 .input('submissionID', sql.Int, submissionID)
+2090:                 .input('blobName', sql.NVarChar(255), blobName)
+2091:                 .query(`
+2092:                     UPDATE youth_profiling_submissions
+2093:                     SET masterDatasetBlobName = @blobName, masterDatasetUploadedAt = GETDATE(), updatedAt = GETDATE()
+2094:                     WHERE submissionID = @submissionID
+2095:                 `);
+2096: 
+2097:         } else if (annexType === 'campaignProofs') {
+2098:             // Campaign proofs: newly uploaded get isIncluded=1, existing checked ones get isIncluded=1, unchecked get isIncluded=0.
+2099:             // Also supports deletion from the library.
+2100:             
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T03:48:20Z
+Completed At: 2026-05-26T03:48:20Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 834 to 920
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+834: // 4. POST /override-finalization — Barangay Captain override of Checkpoint 3 (Manual override to Checkpoint 4)
+835: router.post('/override-finalization', authMiddleware, async (req, res) => {
+836:     try {
+837:         const { batchID } = req.body;
+838:         const { userID, barangay: barangayID } = req.user;
+839: 
+840:         if (!batchID) {
+841:             return res.status(400).json({ success: false, message: 'Batch ID is required.' });
+842:         }
+843: 
+844:         const pool = await getConnection();
+845: 
+846:         // Verify BCPT role
+847:         const userRes = await pool.request()
+848:             .input('userID', sql.Int, userID)
+849:             .query('SELECT r.roleName FROM userInfo u JOIN roles r ON u.position = r.roleID WHERE u.userID = @userID');
+850: 
+851:         const role = userRes.recordset[0]?.roleName;
+852:         if (role !== 'BCPT') {
+853:             return res.status(403).json({ success: false, message: 'Unauthorized. Only the Barangay Captain can perform a finalization override.' });
+854:         }
+855: 
+856:         // Fetch batch info and cycleID
+857:         const batchRes = await pool.request()
+858:             .input('batchID', sql.Int, batchID)
+859:             .query('SELECT projName, cycleID FROM projectBatch WHERE batchID = @batchID');
+860:         
+861:         if (!batchRes.recordset.length) {
+862:             return res.status(404).json({ success: false, message: 'Project batch not found.' });
+863:         }
+864: 
+865:         const batchName = batchRes.recordse
+<truncated 1672 bytes>
+chID, userID, content) VALUES (@batchID, @userID, @content)');
+892: 
+893:         // Notification
+894:         const notifMsg = `Barangay Captain has manually overridden the SK Session checkpoint for project plan "${batchName}". The project has progressed to Checkpoint 4: Brgy. Captain's Approval.`;
+895:         await pool.request()
+896:             .input('batchID', sql.Int, batchID)
+897:             .input('barangayID', sql.Int, barangayID)
+898:             .input('message', sql.NVarChar(sql.MAX), notifMsg)
+899:             .query('INSERT INTO projectNotifications (batchID, barangayID, notifType, message) VALUES (@batchID, @barangayID, \'BCPT_OVERRIDE\', @message)');
+900: 
+901:         broadcast({ type: 'new_notification', barangayID });
+902:         broadcastToRoom(batchID, { type: 'checkpoint_updated', statusID: 4 });
+903:         broadcastToRoom(batchID, {
+904:             type: 'bcpt_override_applied',
+905:             projName: batchName,
+906:             message: `⚠️ Barangay Captain has used the Force Advance override for "${batchName}". The project has been moved to Checkpoint 4: Brgy. Captain's Approval. Please check the Work Notes & Agenda for details.`
+907:         });
+908: 
+909:         // Send async transparency email to SKC/SKS
+910:         sendBcptOverrideEmail(barangayID, batchName).catch(err => {
+911:             console.error('[OverrideEmail] Failed to send override email:', err.message);
+912:         });
+913: 
+914:         res.json({ success: true, message: 'Barangay Captain override successful. Project advanced to Checkpoint 4.' });
+915: 
+916:     } catch (err) {
+917:         console.error('[projectTracker] POST /override-finalization error:', err.message);
+918:         res.status(500).json({ success: false, message: 'Failed to override finalization.' });
+919:     }
+920: });
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+[Model Identity: Claude Sonnet 4.6 (Thinking)]
+
+I now have the complete picture from the source code. Let me verify every single one of your points against what the code actually says.
+
+---
+
+## Full Validation Report
+
+### ✅ Checkpoint 1 — **YOUR CLAIM IS CORRECT. The code already implements this.**
+
+The backend (`projectTracker.js` lines 1638–1941) has a **fully implemented, dedicated CP1 system**:
+- **Upload** (`POST /profiling/upload`) — restricted to **SK Secretary (SKS)** only. Accepts exactly 3 document types: `barangay_notice_letter`, `master_youth_dataset`, and `campaign_proof_images`.
+- **Validate** (`POST /profiling/validate`) — restricted to **SK Chairperson (SKC)** only. Will **block** approval if any of the 3 uploads are missing.
+- **Request Revision** (`POST /profiling/request-revision`) — also **SKC only**, sends the submission back to the SK Secretary.
+
+**The problem is the frontend.** The `ProjectTrackerList.tsx` has **no UI panel at all for Checkpoint 1**. There is zero rendering logic for `batch.currentStatusID === 1`. The backend is built correctly, the frontend just never exposes it.
+
+---
+
+### ✅ Checkpoint 3 Reschedule — **YOUR CLAIM IS CORRECT. The 3-day rule is still there.**
+
+The backend `/reschedule-meeting` route (lines 522–533) still enforces `diffDays < 3` as a blocker. The initial `/schedule-meeting` was already changed to block only today/past. These two are **out of sync** — reschedule should match the same logic (block only today and past).
+
+---
+
+### ❌ Checkpoint 4 — **YOUR CLAIM IS PARTIALLY WRONG. The BCPT is correct for the general validate-checkpoint route, but the context matters.**
+
+From the code at line 1440: `validate-checkpoint` is **BCPT-only** for checkpoints 4, 6, 8, 9, 10, 11. This means:
+- **CP4 (KK General Assembly)** — the **Brgy. Captain** validates proof. This seems intentional based on the code design, where the BCPT is the "external authority" validator throughout the process.
+
+> [!IMPORTANT]
+> **Open Question for you:** Should the KK Ge
+<truncated 744 bytes>
+–CP6 → reverts to **Checkpoint 2** ✅ (reasonable for early stages)
+- Rejecting **CP7–CP11** → reverts to **Checkpoint 5** ❌ (should stay at CP7 for revision loop)
+
+Your logic is right: Checkpoint 7 should **stay at CP7** and the SK Council revises within the workspace until the BCPT approves it.
+
+---
+
+### ✅ Checkpoint 8–11 — **YOUR CLAIM IS CORRECT. The revert to CP5 is wrong.**
+
+The same block in lines 1524–1527 confirms that rejecting any of CPs 8–11 also reverts to **CP5**. This forces re-uploading the SK Resolution which is unnecessary. Each checkpoint should maintain its own status on rejection.
+
+---
+
+### ✅ Checkpoint 12 — **YOUR CLAIM IS CORRECT. The code is missing this.**
+
+The `CHECKPOINT_FOLDER_MAP` in the backend (line 1233) only covers CPs 4–11: `{ 4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven' }`. CP12 is excluded from proof uploads. The frontend's `validate-checkpoint` button array at line 922 only includes `[4, 6, 8, 9, 10, 11]` — **CP12 is missing**. The BCPT cannot currently validate procurement documents.
+
+---
+
+## Summary of What Needs Fixing
+
+| # | Issue | Where |
+|---|-------|--------|
+| **CP1** | Frontend has no UI panel for CP1 profiling — upload & validate flow is invisible | `ProjectTrackerList.tsx` |
+| **CP3** | Reschedule still enforces 3-day minimum, doesn't match schedule-meeting logic | `projectTracker.js` `/reschedule-meeting` |
+| **CP4** | ⚠️ *Open question — awaiting your confirmation on who validates* | — |
+| **CP7** | Rejection reverts to CP5 instead of staying at CP7 | `projectTracker.js` `/validate-checkpoint` |
+| **CP8–11** | Rejection reverts to CP5 instead of staying at current checkpoint | `projectTracker.js` `/validate-checkpoint` |
+| **CP12** | Missing from proof upload map and validate-checkpoint button — BCPT can't validate procurement | `projectTracker.js` + `ProjectTrackerList.tsx` |
+
+Updating the implementation plan now to reflect the accurate findings before you approve execution.
+Your claim on both points is **fully validated**:
+
+- ✅ **CP1** — `ProfilingPortal` lives in `ProjectWorkspacePage.tsx` (CP `0 || 1`). The backend routes are correct.
+- ✅ **CP4** — `KkAssemblyPortal.tsx` is a fully-built standalone component. It already implements the **SKS uploads → SKC validates** pattern. The portal UI explicitly labels the validator as "SK Chairperson" in the info boxes. This matches your design exactly.
+
+The [Implementation Plan](file:///C:/Users/Shiroooo/.gemini/antigravity/brain/286f53a2-7c2d-4da7-b654-d044c1cd49b5/implementation_plan.md) has been finalized. Here's the clean summary of what will actually change:
+
+| # | Change | File |
+|---|--------|------|
+| CP4 | Remove the incorrect BCPT "Validate Checkpoint" button from the dashboard tracker | `ProjectTrackerList.tsx`, `CheckpointValidationModal.tsx` |
+| CP3 | Align reschedule to allow tomorrow (remove 3-day rule) | `projectTracker.js` |
+| CP7–11 | Rejection stays at current checkpoint, not revert to CP5 | `projectTracker.js`, `CheckpointValidationModal.tsx` |
+| CP12 | Add procurement proof upload + BCPT validation support | `projectTracker.js`, `ProjectTrackerList.tsx`, both modals |
+
+No changes to `KkAssemblyPortal.tsx`, `ProfilingPortal`, or `ProjectWorkspacePage.tsx`. Ready to execute on your approval.
+Created At: 2026-05-26T04:00:47Z
+Completed At: 2026-05-26T04:00:49Z
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1279,"LineContent":"        const blobName = `Checkpoints/${folderName}/${batchID}/${attemptSuffix}/${timestamp}-${safeFilename}`;"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1309,"LineContent":"            // Expected blob.name format: Checkpoints/five/12/1st/174982734-file.jpg"}
+{"File":"d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js","LineNumber":1467,"LineContent":"        const prefix = `Checkpoints/${folderName}/${batchID}/`;"}
+Created At: 2026-05-26T04:00:56Z
+Completed At: 2026-05-26T04:00:59Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1244 to 1295
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1244: // 1. POST /upload-checkpoint-proof
+1245: router.post('/upload-checkpoint-proof', authMiddleware, hasAccessControl('trackerControl'), upload.single('proofFile'), async (req, res) => {
+1246:     try {
+1247:         const batchID = parseInt(req.body.batchID, 10);
+1248:         const checkpointID = parseInt(req.body.checkpointID, 10);
+1249:         
+1250:         if (!batchID || isNaN(checkpointID) || !CHECKPOINT_FOLDER_MAP[checkpointID]) {
+1251:             return res.status(400).json({ success: false, message: 'Invalid batch ID or checkpoint ID.' });
+1252:         }
+1253:         
+1254:         if (!req.file) {
+1255:             return res.status(400).json({ success: false, message: 'No proof file provided.' });
+1256:         }
+1257: 
+1258:         // Validate file extension
+1259:         const allowedExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.webm', '.pdf'];
+1260:         const fileExt = req.file.originalname.toLowerCase().substring(req.file.originalname.lastIndexOf('.'));
+1261:         if (!allowedExtensions.includes(fileExt)) {
+1262:             return res.status(400).json({ success: false, message: 'Invalid file format. Only png, jpg, jpeg, webp, webm, and pdf files are allowed.' });
+1263:         }
+1264:         
+1265:         const folderName = CHECKPOINT_FOLDER_MAP[checkpointID];
+1266:         const timestamp = Date.now();
+1267:         // Sanitize original filename (replace spaces with underscores, etc)
+1268:         const safeFilename = req.file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+1269:         
+1270:         // Pre-flight check: count existing tracker arrivals to determine attempt folder suffix
+1271:         const pool = await getConnection();
+1272:         const trackerCheck = await pool.request()
+1273:             .input('batchID', sql.Int, batchID)
+1274:             .input('statusID', sql.Int, checkpointID)
+1275:             .query(`SELECT COUNT(*) as count FROM projectTracker WHERE batchID = @batchID AND statusID = @statusID`);
+1276:         const arrivalsCount = trackerCheck.recordset[0].count;
+1277:         const attemptSuffix = getAttemptSuffix(Math.max(0, arrivalsCount - 1));
+1278: 
+1279:         const blobName = `Checkpoints/${folderName}/${batchID}/${attemptSuffix}/${timestamp}-${safeFilename}`;
+1280:         
+1281:         await uploadBlob(docContainerName, blobName, req.file.buffer, req.file.mimetype);
+1282:         
+1283:         res.json({ success: true, message: `Proof file uploaded successfully under ${attemptSuffix} attempt.`, path: blobName, attempt: attemptSuffix });
+1284:     } catch (err) {
+1285:         console.error('[projectTracker] POST /upload-checkpoint-proof error:', err.message);
+1286:         res.status(500).json({ success: false, message: 'Failed to upload proof file.' });
+1287:     }
+1288: });
+1289: 
+1290: // 2. GET /checkpoint-proof/:batchID/:checkpointID
+1291: router.get('/checkpoint-proof/:batchID/:checkpointID', authMiddleware, async (req, res) => {
+1292:     try {
+1293:         const { batchID, checkpointID } = req.params;
+1294:         const folderName = CHECKPOINT_FOLDER_MAP[checkpointID];
+1295:         
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:02:35Z
+Completed At: 2026-05-26T04:02:35Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1244 to 1345
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1244: // 1. POST /upload-checkpoint-proof
+1245: router.post('/upload-checkpoint-proof', authMiddleware, hasAccessControl('trackerControl'), upload.single('proofFile'), async (req, res) => {
+1246:     try {
+1247:         const batchID = parseInt(req.body.batchID, 10);
+1248:         const checkpointID = parseInt(req.body.checkpointID, 10);
+1249:         
+1250:         if (!batchID || isNaN(checkpointID) || !CHECKPOINT_FOLDER_MAP[checkpointID]) {
+1251:             return res.status(400).json({ success: false, message: 'Invalid batch ID or checkpoint ID.' });
+1252:         }
+1253:         
+1254:         if (!req.file) {
+1255:             return res.status(400).json({ success: false, message: 'No proof file provided.' });
+1256:         }
+1257: 
+1258:         // Validate file extension
+1259:         const allowedExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.webm', '.pdf'];
+1260:         const fileExt = req.file.originalname.toLowerCase().substring(req.file.originalname.lastIndexOf('.'));
+1261:         if (!allowedExtensions.includes(fileExt)) {
+1262:             return res.status(400).json({ success: false, message: 'Invalid file format. Only png, jpg, jpeg, webp, webm, and pdf files are allowed.' });
+1263:         }
+1264:         
+1265:         const folderName = CHECKPOINT_FOLDER_MAP[checkpointID];
+1266:         const timestamp = Date.now();
+1267:         // Sanitize original filename (replace spaces with underscores, etc)
+1268:         const safeFilename = req.file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+1269:        
+<truncated 2024 bytes>
+nt, batchID)
+1304:             .input('statusID', sql.Int, checkpointID)
+1305: const blobs = await listBlobsWithProperties(docContainerName, { prefix });
+1306:         
+1307:         const files = [];
+1308:         for (const blob of blobs) {
+1309:             // Expected blob.name format: Checkpoints/five/12/1st/174982734-file.jpg
+1310:             const parts = blob.name.split('/');
+1311:             let attempt = '1st';
+1312:             if (parts.length >= 5) {
+1313:                 attempt = parts[3];
+1314:             } else {
+1315:                 attempt = '1st';
+1316:             }
+1317:             
+1318:             // Strictly filter by active attempt suffix to ensure isolation
+1319:             if (attempt !== attemptSuffix) {
+1320:                 continue;
+1321:             }
+1322:             
+1323:             const sasUrl = await generateSasUrl(docContainerName, blob.name);
+1324:             const filename = parts.pop();
+1325:             const nameParts = filename.split('-');
+1326:             nameParts.shift(); // remove timestamp
+1327:             const originalName = nameParts.join('-') || filename;
+1328:             
+1329:             files.push({
+1330:                 name: originalName,
+1331:                 path: blob.name,
+1332:                 url: sasUrl,
+1333:                 size: blob.properties.contentLength,
+1334:                 uploadedAt: blob.properties.lastModified,
+1335:                 attempt: attempt
+1336:             });
+1337:         }
+1338:         
+1339:         res.json({ success: true, data: files });
+1340:     } catch (err) {
+1341:         console.error('[projectTracker] GET /checkpoint-proof error:', err.message);
+1342:         res.status(500).json({ success: false, message: 'Failed to fetch proof files.' });
+1343:     }
+1344: });
+1345: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:04:34Z
+Completed At: 2026-05-26T04:04:35Z
+The following changes were made by the multi_replace_file_content tool to: C:\Users\Shiroooo\.gemini\antigravity\brain\286f53a2-7c2d-4da7-b654-d044c1cd49b5\implementation_plan.md. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -1,5 +1,8 @@
+ # Checkpoint Logic Alignment — Final Implementation Plan
+ 
++> [!NOTE]
++> **Azure Blob Storage path already cleaned.** The user has manually deleted the old proof blobs from Azure. The `Checkpoints/` container now only contains the correct folder names: `eight`, `nine`, `ten`, `eleven`, `twelve`. The new path schema can be applied to a clean slate.
++
+ Validated against full source code scan of:
+ - [`projectTracker.js`](file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js)
+ - [`ProjectTrackerList.tsx`](file:///d:/Projects/Projects/smartSK/frontend/src/components/Client/Dashboard/ProjectTrackerList.tsx)
+@@ -92,6 +92,61 @@
+ 
+ ---
+ 
++---
++
++## Issue 6 — CP8–CP12: Blob Path Migration to barangayID/cycleID Schema
++
++**Root Cause:** The current proof upload path uses `batchID` as the sub-folder identifier:
++```
++Checkpoints/{folderName}/{batchID}/{attemptSuffix}/{timestamp}-file
++```
++This is a **legacy artifact** from the original 9-checkpoint system design. The new schema must follow the consistent project storage convention used elsewhere in the system (`barangayID/cycleID`) and drop the attempt suffix since the retry grouping UI is being simplified.
++
++**New target path:**
++```
++Checkpoints/{folderName}/{barangayID}/{cycleID}/{timestamp}-{filename}
++```
++
++The user has already cleared all old proof blobs from Azure Storage. Azure now shows only clean empty folders: `eight`, `nine`, `ten`, `eleven`, `twelve`.
++
++#### [MODIFY] [projectTracker.js](file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js)
++
++**1. POST `/upload-checkpoint-proof`:**
++- Add `barangayID` and 
+<truncated 1235 bytes>
+b prefix using `batchID`. Update to resolve `barangayID` and `cycleID` from the DB (via the `batchID` already available in the request body), then build the prefix as:
++  `` `Checkpoints/${folderName}/${barangayID}/${cycleID}/` ``
++- Remove the attempt-suffix blob filtering logic from within the validation route.
++
++#### [MODIFY] [CheckpointProofUploadModal.tsx](file:///d:/Projects/Projects/smartSK/frontend/src/components/Client/Dashboard/CheckpointProofUploadModal.tsx)
++- The upload `POST` call sends `batchID` and `checkpointID`. Also add `barangayID` and `cycleID` to the `FormData` payload.
++- Update the GET call from `/checkpoint-proof/${batchID}/${checkpointID}` to `/checkpoint-proof/${barangayID}/${cycleID}/${checkpointID}`.
++- The component's props currently only receive `batchID`. Add `barangayID` and `cycleID` as new required props, passed down from `ProjectTrackerList.tsx`.
++- Update the client-side path isolation filter to match the new path structure:
++  - **Old:** checks for `` `/Checkpoints/${folderName}/${batchID}/` ``
++  - **New:** checks for `` `/Checkpoints/${folderName}/${barangayID}/${cycleID}/` ``
++
++#### [MODIFY] [CheckpointValidationModal.tsx](file:///d:/Projects/Projects/smartSK/frontend/src/components/Client/Dashboard/CheckpointValidationModal.tsx)
++- Same changes as above: add `barangayID` and `cycleID` props and update the GET call URL and path isolation filter.
++
++#### [MODIFY] [ProjectTrackerList.tsx](file:///d:/Projects/Projects/smartSK/frontend/src/components/Client/Dashboard/ProjectTrackerList.tsx)
++- When opening `CheckpointProofUploadModal` and `CheckpointValidationModal`, pass `barangayID` and `cycleID` from the batch/cycle data already available in the component state.
++
++---
++
+ ## Summary of Files to Modify
+ 
+ | File | Issues Addressed |
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+Created At: 2026-05-26T04:04:59Z
+Completed At: 2026-05-26T04:05:00Z
+The following changes were made by the replace_file_content tool to: C:\Users\Shiroooo\.gemini\antigravity\brain\286f53a2-7c2d-4da7-b654-d044c1cd49b5\implementation_plan.md. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -155,10 +155,10 @@
+ 
+ | File | Issues Addressed |
+ |------|-----------------|
+-| [projectTracker.js](file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js) | CP3 reschedule fix, CP7–11 rejection stay-fix, CP12 folder map |
+-| [ProjectTrackerList.tsx](file:///d:/Projects/Projects/smartSK/frontend/src/components/Client/Dashboard/ProjectTrackerList.tsx) | Remove CP4 from BCPT button, add CP12 button + panel |
+-| [CheckpointProofUploadModal.tsx](file:///d:/Projects/Projects/smartSK/frontend/src/components/Client/Dashboard/CheckpointProofUploadModal.tsx) | Add CP12 folder map |
+-| [CheckpointValidationModal.tsx](file:///d:/Projects/Projects/smartSK/frontend/src/components/Client/Dashboard/CheckpointValidationModal.tsx) | Remove CP4 from folder map, add CP12, update toast messages |
++| [projectTracker.js](file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js) | CP3 reschedule fix, CP7–11 rejection stay-fix, CP12 folder map, blob path migration (Issue 6) |
++| [ProjectTrackerList.tsx](file:///d:/Projects/Projects/smartSK/frontend/src/components/Client/Dashboard/ProjectTrackerList.tsx) | Remove CP4 from BCPT button, add CP12 button + panel, pass `barangayID`/`cycleID` to modals |
++| [CheckpointProofUploadModal.tsx](file:///d:/Projects/Projects/smartSK/frontend/src/components/Client/Dashboard/CheckpointProofUploadModal.tsx) | Add CP12 folder map, new `barangayID`/`cycleID` props, updated GET URL and path filter |
++| [CheckpointValidationModal.tsx](file:///d:/Projects/Projects/smartSK/frontend/src/components/Client/Dashboard/CheckpointValidationModal.tsx) | Remove CP4 from folder map, add CP12, update toast messages, new `barangayID`/`cycleID` props |
+ 
+ **No changes needed to:** `KkAssemblyPortal.tsx`, `ProfilingPortal`, `ProjectWorkspacePage.tsx`, or any backend CP1/CP4 routes.
+ 
+[diff_block_end]
+
+Please note that the above snippet only shows the MODIFIED lines from the last change. It shows up to 3 lines of unchanged lines before and after the modified lines. The actual file contents may have many more lines not shown.
+Created At: 2026-05-26T04:08:53Z
+Completed At: 2026-05-26T04:08:54Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 500 to 600
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+500:         broadcastToRoom(batchID, { type: 'checkpoint_updated', statusID: nextStatusID, meetingDate });
+501:         
+502:         // Send email notification
+503:         await sendMeetingScheduledEmail(barangayID, batch.projName, formattedDate);
+504: 
+505:         res.json({ success: true, message: `Meeting scheduled and project advanced to Checkpoint ${nextStatusID}.` });
+506:     } catch (err) {
+507:         console.error('[projectTracker] POST /schedule-meeting error:', err.message);
+508:         res.status(500).json({ success: false, message: 'Failed to schedule meeting.' });
+509:     }
+510: });
+511: 
+512: // 2.5 POST /reschedule-meeting — Reschedule the finalization meeting
+513: router.post('/reschedule-meeting', authMiddleware, async (req, res) => {
+514:     try {
+515:         const { batchID, meetingDate, reason } = req.body;
+516:         const { userID, barangay: barangayID } = req.user;
+517: 
+518:         if (!batchID || !meetingDate || !reason) {
+519:             return res.status(400).json({ success: false, message: 'Batch ID, meeting date, and reason are required.' });
+520:         }
+521: 
+522:         // Backend Validation: Must be at least 3 days from today
+523:         const requestedDate = new Date(meetingDate);
+524:         const currentDate = new Date();
+525:         currentDate.setHours(0, 0, 0, 0); // Start of today
+526: 
+527:         // Calculate difference in days
+528:         const diffTime = requestedDate.getTime() - currentDate.getTime();
+529:         const diffDays = diffTime / (1000 * 3600
+<truncated 2183 bytes>
+ification
+571:         const notifMsg = `The finalization meeting for project plan "${batch.projName}" has been rescheduled to ${formattedDate}. Reason: ${reason}`;
+572:         await pool.request()
+573:             .input('batchID', sql.Int, batchID)
+574:             .input('barangayID', sql.Int, barangayID)
+575:             .input('message', sql.NVarChar(sql.MAX), notifMsg)
+576:             .query('INSERT INTO projectNotifications (batchID, barangayID, notifType, message) VALUES (@batchID, @barangayID, \'MEETING_RESCHEDULED\', @message)');
+577: 
+578:         // Broadcast notifications & socket updates
+579:         broadcast({ type: 'new_notification', barangayID });
+580:         broadcastToRoom(batchID, { type: 'checkpoint_updated', statusID: 3, meetingDate });
+581:         
+582:         // Send email notification
+583:         await sendMeetingRescheduledEmail(barangayID, batch.projName, formattedDate, reason);
+584: 
+585:         res.json({ success: true, message: 'Meeting rescheduled successfully.' });
+586:     } catch (err) {
+587:         console.error('[projectTracker] POST /reschedule-meeting error:', err.message);
+588:         res.status(500).json({ success: false, message: 'Failed to reschedule meeting.' });
+589:     }
+590: });
+591: 
+592: // 3. POST /submit-attendance — Save attendance and check automatic progression to Checkpoint 4
+593: router.post('/submit-attendance', authMiddleware, async (req, res) => {
+594:     try {
+595:         const { batchID, attendance } = req.body; // attendance: Array of { userID, attended: boolean }
+596:         const { userID, barangay: barangayID } = req.user;
+597: 
+598:         if (!batchID || !Array.isArray(attendance)) {
+599:             return res.status(400).json({ success: false, message: 'Batch ID and attendance list are required.' });
+600:         }
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:08:54Z
+Completed At: 2026-05-26T04:08:54Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1230 to 1350
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1230: // --- Checkpoint Proof Upload & Validation (CP5-CP10) ---
+1231: 
+1232: const CHECKPOINT_FOLDER_MAP = {
+1233:     4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven'
+1234: };
+1235: 
+1236: function getAttemptSuffix(count) {
+1237:     const num = count + 1;
+1238:     if (num === 1) return '1st';
+1239:     if (num === 2) return '2nd';
+1240:     if (num === 3) return '3rd';
+1241:     return `${num}th`;
+1242: }
+1243: 
+1244: // 1. POST /upload-checkpoint-proof
+1245: router.post('/upload-checkpoint-proof', authMiddleware, hasAccessControl('trackerControl'), upload.single('proofFile'), async (req, res) => {
+1246:     try {
+1247:         const batchID = parseInt(req.body.batchID, 10);
+1248:         const checkpointID = parseInt(req.body.checkpointID, 10);
+1249:         
+1250:         if (!batchID || isNaN(checkpointID) || !CHECKPOINT_FOLDER_MAP[checkpointID]) {
+1251:             return res.status(400).json({ success: false, message: 'Invalid batch ID or checkpoint ID.' });
+1252:         }
+1253:         
+1254:         if (!req.file) {
+1255:             return res.status(400).json({ success: false, message: 'No proof file provided.' });
+1256:         }
+1257: 
+1258:         // Validate file extension
+1259:         const allowedExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.webm', '.pdf'];
+1260:         const fileExt = req.file.originalname.toLowerCase().substring(req.file.originalname.lastIndexOf('.'));
+1261:         if (!allowedExtensions.includes(fileExt)) {
+1262:             retu
+<truncated 2802 bytes>
+points/five/12/1st/174982734-file.jpg
+1310:             const parts = blob.name.split('/');
+1311:             let attempt = '1st';
+1312:             if (parts.length >= 5) {
+1313:                 attempt = parts[3];
+1314:             } else {
+1315:                 attempt = '1st';
+1316:             }
+1317:             
+1318:             // Strictly filter by active attempt suffix to ensure isolation
+1319:             if (attempt !== attemptSuffix) {
+1320:                 continue;
+1321:             }
+1322:             
+1323:             const sasUrl = await generateSasUrl(docContainerName, blob.name);
+1324:             const filename = parts.pop();
+1325:             const nameParts = filename.split('-');
+1326:             nameParts.shift(); // remove timestamp
+1327:             const originalName = nameParts.join('-') || filename;
+1328:             
+1329:             files.push({
+1330:                 name: originalName,
+1331:                 path: blob.name,
+1332:                 url: sasUrl,
+1333:                 size: blob.properties.contentLength,
+1334:                 uploadedAt: blob.properties.lastModified,
+1335:                 attempt: attempt
+1336:             });
+1337:         }
+1338:         
+1339:         res.json({ success: true, data: files });
+1340:     } catch (err) {
+1341:         console.error('[projectTracker] GET /checkpoint-proof error:', err.message);
+1342:         res.status(500).json({ success: false, message: 'Failed to fetch proof files.' });
+1343:     }
+1344: });
+1345: 
+1346: // POST /validate-budget
+1347: router.post('/validate-budget', authMiddleware, async (req, res) => {
+1348:     try {
+1349:         if (!isBCPT(req)) {
+1350:             return res.status(403).json({ success: false, message: 'Unauthorized. Only Barangay Captain can validate the budget.' });
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:08:54Z
+Completed At: 2026-05-26T04:08:54Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1440 to 1550
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1440:         if (!isBCPT(req)) {
+1441:             return res.status(403).json({ success: false, message: 'Unauthorized. Only Barangay Captain can validate checkpoints.' });
+1442:         }
+1443:         
+1444:                 const { batchID, fromCheckpoint, validationNote, action } = req.body;
+1445:         const fromCP = parseInt(fromCheckpoint, 10);
+1446:         
+1447:         if (!batchID || isNaN(fromCP) || (!CHECKPOINT_FOLDER_MAP[fromCP] && fromCP !== 12)) {
+1448:             return res.status(400).json({ success: false, message: 'Invalid parameters. fromCheckpoint must be a valid checkpoint ID (4-12).' });
+1449:         }
+1450:         if (!validationNote || validationNote.trim() === '') {
+1451:             return res.status(400).json({ success: false, message: 'Remarks/Note is required.' });
+1452:         }
+1453: 
+1454:         const act = action === 'reject' ? 'reject' : 'approve';
+1455:         
+1456:         const pool = await getConnection();
+1457:         
+1458:         // Count existing tracker arrivals to determine the active attempt suffix
+1459:         const trackerCheck = await pool.request()
+1460:             .input('batchID', sql.Int, batchID)
+1461:             .input('statusID', sql.Int, fromCP)
+1462:             .query(`SELECT COUNT(*) as count FROM projectTracker WHERE batchID = @batchID AND statusID = @statusID`);
+1463:         const arrivalsCount = trackerCheck.recordset[0].count;
+1464:         const attemptSuffix = getAttemptSuffix(Math.max(0, arrivalsCount - 1));
+1465:         
+1466:         co
+<truncated 3426 bytes>
+angay Captain requested REVISIONS for project "${projName}" during Checkpoint ${fromCP} validation. Status has reverted to Checkpoint 5: ABYIP Budget Draft.`;
+1527:                 notifType = 'BCPT_REVISION_REQUESTED';
+1528:             } else if (fromCP === 12) {
+1529:                 nextStatusID = 12; // Maintain the rollback which would be staying to the checkpoint 12
+1530:                 notifMessage = `Barangay Captain requested REVISIONS for project "${projName}" during Checkpoint 12 validation. Status remains at Checkpoint 12: Procurement Phase.`;
+1531:                 notifType = 'BCPT_REVISION_REQUESTED';
+1532:             } else {
+1533:                 nextStatusID = fromCP;
+1534:                 notifMessage = `Barangay Captain requested revisions for project "${projName}" during Checkpoint ${fromCP} validation.`;
+1535:                 notifType = 'BCPT_REVISION_REQUESTED';
+1536:             }
+1537:             taggedNote = `[BCPT Rejection: CP${fromCP}] ${validationNote}`;
+1538:         }
+1539:         
+1540:         // Perform updates inside a transaction
+1541:         const transaction = new sql.Transaction(pool);
+1542:         await transaction.begin();
+1543:         
+1544:         try {
+1545:             // Insert projectTracker record
+1546:             await transaction.request()
+1547:                 .input('batchID', sql.Int, batchID)
+1548:                 .input('statusID', sql.Int, nextStatusID)
+1549:                 .input('updatedBy', sql.Int, req.user.userID)
+1550:                 .query(`INSERT INTO projectTracker (cycleID, statusID, updatedBy) SELECT cycleID, @statusID, @updatedBy FROM projectBatch WHERE batchID = @batchID; UPDATE projectCycles SET currentStatusID = @statusID, updatedAt = GETDATE() WHERE cycleID = (SELECT cycleID FROM projectBatch WHERE batchID = @batchID);`);
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:09:17Z
+Completed At: 2026-05-26T04:09:17Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1290 to 1320
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1290: // 2. GET /checkpoint-proof/:batchID/:checkpointID
+1291: router.get('/checkpoint-proof/:batchID/:checkpointID', authMiddleware, async (req, res) => {
+1292:     try {
+1293:         const { batchID, checkpointID } = req.params;
+1294:         const folderName = CHECKPOINT_FOLDER_MAP[checkpointID];
+1295:         
+1296:         if (!folderName) {
+1297:             return res.status(400).json({ success: false, message: 'Invalid checkpoint ID.' });
+1298:         }
+1299:         
+1300:         // Count existing tracker arrivals to determine the current active attempt suffix
+1301:         const pool = await getConnection();
+1302:         const trackerCheck = await pool.request()
+1303:             .input('batchID', sql.Int, batchID)
+1304:             .input('statusID', sql.Int, checkpointID)
+1305: const blobs = await listBlobsWithProperties(docContainerName, { prefix });
+1306:         
+1307:         const files = [];
+1308:         for (const blob of blobs) {
+1309:             // Expected blob.name format: Checkpoints/five/12/1st/174982734-file.jpg
+1310:             const parts = blob.name.split('/');
+1311:             let attempt = '1st';
+1312:             if (parts.length >= 5) {
+1313:                 attempt = parts[3];
+1314:             } else {
+1315:                 attempt = '1st';
+1316:             }
+1317:             
+1318:             // Strictly filter by active attempt suffix to ensure isolation
+1319:             if (attempt !== attemptSuffix) {
+1320:                 continue;
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:09:51Z
+Completed At: 2026-05-26T04:09:51Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1285 to 1345
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1285:         console.error('[projectTracker] POST /upload-checkpoint-proof error:', err.message);
+1286:         res.status(500).json({ success: false, message: 'Failed to upload proof file.' });
+1287:     }
+1288: });
+1289: 
+1290: // 2. GET /checkpoint-proof/:batchID/:checkpointID
+1291: router.get('/checkpoint-proof/:batchID/:checkpointID', authMiddleware, async (req, res) => {
+1292:     try {
+1293:         const { batchID, checkpointID } = req.params;
+1294:         const folderName = CHECKPOINT_FOLDER_MAP[checkpointID];
+1295:         
+1296:         if (!folderName) {
+1297:             return res.status(400).json({ success: false, message: 'Invalid checkpoint ID.' });
+1298:         }
+1299:         
+1300:         // Count existing tracker arrivals to determine the current active attempt suffix
+1301:         const pool = await getConnection();
+1302:         const trackerCheck = await pool.request()
+1303:             .input('batchID', sql.Int, batchID)
+1304:             .input('statusID', sql.Int, checkpointID)
+1305: const blobs = await listBlobsWithProperties(docContainerName, { prefix });
+1306:         
+1307:         const files = [];
+1308:         for (const blob of blobs) {
+1309:             // Expected blob.name format: Checkpoints/five/12/1st/174982734-file.jpg
+1310:             const parts = blob.name.split('/');
+1311:             let attempt = '1st';
+1312:             if (parts.length >= 5) {
+1313:                 attempt = parts[3];
+1314:             } else {
+1315:                 attempt = '1st';
+1316:             }
+1317:             
+1318:             // Strictly filter by active attempt suffix to ensure isolation
+1319:             if (attempt !== attemptSuffix) {
+1320:                 continue;
+1321:             }
+1322:             
+1323:             const sasUrl = await generateSasUrl(docContainerName, blob.name);
+1324:             const filename = parts.pop();
+1325:             const nameParts = filename.split('-');
+1326:             nameParts.shift(); // remove timestamp
+1327:             const originalName = nameParts.join('-') || filename;
+1328:             
+1329:             files.push({
+1330:                 name: originalName,
+1331:                 path: blob.name,
+1332:                 url: sasUrl,
+1333:                 size: blob.properties.contentLength,
+1334:                 uploadedAt: blob.properties.lastModified,
+1335:                 attempt: attempt
+1336:             });
+1337:         }
+1338:         
+1339:         res.json({ success: true, data: files });
+1340:     } catch (err) {
+1341:         console.error('[projectTracker] GET /checkpoint-proof error:', err.message);
+1342:         res.status(500).json({ success: false, message: 'Failed to fetch proof files.' });
+1343:     }
+1344: });
+1345: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:10:31Z
+Completed At: 2026-05-26T04:10:31Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1540 to 1600
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1540:         // Perform updates inside a transaction
+1541:         const transaction = new sql.Transaction(pool);
+1542:         await transaction.begin();
+1543:         
+1544:         try {
+1545:             // Insert projectTracker record
+1546:             await transaction.request()
+1547:                 .input('batchID', sql.Int, batchID)
+1548:                 .input('statusID', sql.Int, nextStatusID)
+1549:                 .input('updatedBy', sql.Int, req.user.userID)
+1550:                 .query(`INSERT INTO projectTracker (cycleID, statusID, updatedBy) SELECT cycleID, @statusID, @updatedBy FROM projectBatch WHERE batchID = @batchID; UPDATE projectCycles SET currentStatusID = @statusID, updatedAt = GETDATE() WHERE cycleID = (SELECT cycleID FROM projectBatch WHERE batchID = @batchID);`);
+1551:                 
+1552:             if (nextStatusID === 2 || nextStatusID === 5) {
+1553:                 // Revert request means a whole new session is required. Delete old attendance/approvals.
+1554:                 await transaction.request()
+1555:                     .input('batchID', sql.Int, batchID)
+1556:                     .query(`DELETE FROM projectCheckpointApprovals WHERE batchID = @batchID`);
+1557:             }
+1558:                 
+1559:             // Insert validation/rejection note in projectNotes (using correct column names: userID, content)
+1560:             await transaction.request()
+1561:                 .input('batchID', sql.Int, batchID)
+1562:                 .input('userID', sql.Int, req.user.userID)
+1563:  
+<truncated 400 bytes>
+tchID)
+1569:                 .input('barangayID', sql.Int, barangayID)
+1570:                 .input('notifType', sql.VarChar(50), notifType)
+1571:                 .input('message', sql.NVarChar(sql.MAX), notifMessage)
+1572:                 .query(`INSERT INTO projectNotifications (batchID, barangayID, notifType, message) VALUES (@batchID, @barangayID, @notifType, @message)`);
+1573:                 
+1574:             await transaction.commit();
+1575:             
+1576:             // Broadcasts
+1577:             broadcastToRoom(batchID.toString(), { type: 'checkpoint_updated', statusID: nextStatusID });
+1578:             broadcastToRoom(batchID.toString(), { type: 'new_note' });
+1579:             broadcast({ type: 'new_notification', barangayID });
+1580:             
+1581:             res.json({ success: true, message: act === 'approve' ? `Checkpoint ${fromCP} validated. Project advanced to Checkpoint ${nextStatusID}.` : `Checkpoint ${fromCP} validation rejected. Project set to Checkpoint ${nextStatusID}.` });
+1582:         } catch (txnErr) {
+1583:             await transaction.rollback();
+1584:             throw txnErr;
+1585:         }
+1586:         
+1587:     } catch (err) {
+1588:         console.error('[projectTracker] POST /validate-checkpoint error:', err.message);
+1589:         res.status(500).json({ success: false, message: 'Failed to process checkpoint validation.' });
+1590:     }
+1591: });
+1592: 
+1593: 
+1594: // ============================================================================
+1595: // CHECKPOINT 1: Youth Profiling Endpoints
+1596: // Implements DILG MC No. 2022-033 — Annex 4 upload, validation, and gating.
+1597: // ============================================================================
+1598: 
+1599: const axios = require('axios');
+1600: const uploadFields = upload.fields([
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:12:41Z
+Completed At: 2026-05-26T04:13:22Z
+The following changes were made by the multi_replace_file_content tool to: d:\Projects\Projects\smartSK\backend\backend-node\Projects\projectTracker.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -504,1055 +504,6 @@
+ 
+         res.json({ success: true, message: `Meeting scheduled and project advanced to Checkpoint ${nextStatusID}.` });
+     } catch (err) {
+-        console.error('[projectTracker] POST /schedule-meeting error:', err.message);
+-        res.status(500).json({ success: false, message: 'Failed to schedule meeting.' });
+-    }
+-});
+-
+-// 2.5 POST /reschedule-meeting — Reschedule the finalization meeting
+-router.post('/reschedule-meeting', authMiddleware, async (req, res) => {
+-    try {
+-        const { batchID, meetingDate, reason } = req.body;
+-        const { userID, barangay: barangayID } = req.user;
+-
+-        if (!batchID || !meetingDate || !reason) {
+-            return res.status(400).json({ success: false, message: 'Batch ID, meeting date, and reason are required.' });
+-        }
+-
+-        // Backend Validation: Must be at least 3 days from today
+-        const requestedDate = new Date(meetingDate);
+-        const currentDate = new Date();
+-        currentDate.setHours(0, 0, 0, 0); // Start of today
+-
+-        // Calculate difference in days
+-        const diffTime = requestedDate.getTime() - currentDate.getTime();
+-        const diffDays = diffTime / (1000 * 3600 * 24);
+-
+-        if (diffDays < 3) {
+-            return res.status(400).json({ success: false, message: 'The SK Session must be scheduled at least 3 days from today to allow for adequate review.' });
+-        }
+-
+-        const pool = await getConnection();
+-
+-        // Verify batch exists
+-        const batchRes = await pool.request()
+-            .input('batchID', sql.Int, batchID)
+-            .input('barangayID', sql.Int, barangayID)
+-
+<truncated 45282 bytes>
+-            await sendBudgetRejectionEmail(barangayID, projName, remarks || 'No remarks provided.');
+-            
+-            // Send system notification to SKC/SKS
+-            await pool.request()
+-                .input('barangayID', sql.Int, barangayID)
+-                .input('batchID', sql.Int, batchID)
+-                .input('remarks', sql.NVarChar, remarks || 'No remarks provided.')
+-                .query(`
+-                    INSERT INTO notifications (userID, notifType, message, batchID, isRead, createdAt)
+-                    SELECT userID, 'SYSTEM', 'Budget Rejected: ' + @remarks, @batchID, 0, GETDATE()
+-                    FROM userInfo
+-                    WHERE barangay = @barangayID AND position IN (SELECT roleID FROM roles WHERE roleName IN ('SKC', 'SKS')) AND isArchived = 0
+-                `);
+-
+-            res.json({ success: true, message: 'Budget rejected. Notification sent to SK Council.' });
+-        } else {
+-            return res.status(400).json({ success: false, message: 'Invalid action.' });
+-        }
+-
+-    } catch (err) {
+-        console.error('[projectTracker] POST /validate-budget error:', err.message);
+-        res.status(500).json({ success: false, message: 'Failed to process budget validation.' });
+-    }
+-});
+-
+-// 3. POST /validate-checkpoint
+-router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
+-    try {
+-        if (!isBCPT(req)) {
+-            return res.status(403).json({ success: false, message: 'Unauthorized. Only Barangay Captain can validate checkpoints.' });
+-        }
+-        
+-                const { batchID, fromCheckpoint, validationNote, action } = req.body;
+-        const fromCP = parseInt(fromCheckpoint, 10);
+-        
+-        if (!batchID || isNaN(fromCP) || (!CHECKPOINT_FOLDER_MAP[fromCP] && fromCP !== 12)) {
+-            return res.s
+<truncated 6628 bytes>
+
+NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.
+Created At: 2026-05-26T04:14:14Z
+Completed At: 2026-05-26T04:14:17Z
+
+				The command failed with exit code: 1
+				Output:
+				D:\Projects\Projects\smartSK\backend\backend-node\Projects\projectTracker.js:507
+                    .query(`DELETE FROM projectCheckpointApprovals WHERE batchID = @batchID`);
+                    ^
+
+SyntaxError: Unexpected token '.'
+    at wrapSafe (node:internal/modules/cjs/loader:1638:18)
+    at checkSyntax (node:internal/main/check_syntax:78:3)
+
+Node.js v22.19.0
+
+
+Created At: 2026-05-26T04:15:36Z
+Completed At: 2026-05-26T04:15:37Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 510 to 540
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+510: });
+511: 
+512: // 2.5 POST /reschedule-meeting — Reschedule the finalization meeting
+513: router.post('/reschedule-meeting', authMiddleware, async (req, res) => {
+514:     try {
+515:         const { batchID, meetingDate, reason } = req.body;
+516:         const { userID, barangay: barangayID } = req.user;
+517: 
+518:         if (!batchID || !meetingDate || !reason) {
+519:             return res.status(400).json({ success: false, message: 'Batch ID, meeting date, and reason are required.' });
+520:         }
+521: 
+522:         // Backend Validation: Must be at least 3 days from today
+523:         const requestedDate = new Date(meetingDate);
+524:         const currentDate = new Date();
+525:         currentDate.setHours(0, 0, 0, 0); // Start of today
+526: 
+527:         // Calculate difference in days
+528:         const diffTime = requestedDate.getTime() - currentDate.getTime();
+529:         const diffDays = diffTime / (1000 * 3600 * 24);
+530: 
+531:         if (diffDays < 3) {
+532:             return res.status(400).json({ success: false, message: 'The SK Session must be scheduled at least 3 days from today to allow for adequate review.' });
+533:         }
+534: 
+535:         const pool = await getConnection();
+536: 
+537:         // Verify batch exists
+538:         const batchRes = await pool.request()
+539:             .input('batchID', sql.Int, batchID)
+540:             .input('barangayID', sql.Int, barangayID)
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:15:37Z
+Completed At: 2026-05-26T04:15:37Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1230 to 1345
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1230: // --- Checkpoint Proof Upload & Validation (CP5-CP10) ---
+1231: 
+1232: const CHECKPOINT_FOLDER_MAP = {
+1233:     4: 'four', 5: 'five', 6: 'six', 7: 'seven', 8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven'
+1234: };
+1235: 
+1236: function getAttemptSuffix(count) {
+1237:     const num = count + 1;
+1238:     if (num === 1) return '1st';
+1239:     if (num === 2) return '2nd';
+1240:     if (num === 3) return '3rd';
+1241:     return `${num}th`;
+1242: }
+1243: 
+1244: // 1. POST /upload-checkpoint-proof
+1245: router.post('/upload-checkpoint-proof', authMiddleware, hasAccessControl('trackerControl'), upload.single('proofFile'), async (req, res) => {
+1246:     try {
+1247:         const batchID = parseInt(req.body.batchID, 10);
+1248:         const checkpointID = parseInt(req.body.checkpointID, 10);
+1249:         
+1250:         if (!batchID || isNaN(checkpointID) || !CHECKPOINT_FOLDER_MAP[checkpointID]) {
+1251:             return res.status(400).json({ success: false, message: 'Invalid batch ID or checkpoint ID.' });
+1252:         }
+1253:         
+1254:         if (!req.file) {
+1255:             return res.status(400).json({ success: false, message: 'No proof file provided.' });
+1256:         }
+1257: 
+1258:         // Validate file extension
+1259:         const allowedExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.webm', '.pdf'];
+1260:         const fileExt = req.file.originalname.toLowerCase().substring(req.file.originalname.lastIndexOf('.'));
+1261:         if (!allowedExtensions.includes(fileExt)) {
+1262:             retu
+<truncated 2500 bytes>
+nt, batchID)
+1304:             .input('statusID', sql.Int, checkpointID)
+1305: const blobs = await listBlobsWithProperties(docContainerName, { prefix });
+1306:         
+1307:         const files = [];
+1308:         for (const blob of blobs) {
+1309:             // Expected blob.name format: Checkpoints/five/12/1st/174982734-file.jpg
+1310:             const parts = blob.name.split('/');
+1311:             let attempt = '1st';
+1312:             if (parts.length >= 5) {
+1313:                 attempt = parts[3];
+1314:             } else {
+1315:                 attempt = '1st';
+1316:             }
+1317:             
+1318:             // Strictly filter by active attempt suffix to ensure isolation
+1319:             if (attempt !== attemptSuffix) {
+1320:                 continue;
+1321:             }
+1322:             
+1323:             const sasUrl = await generateSasUrl(docContainerName, blob.name);
+1324:             const filename = parts.pop();
+1325:             const nameParts = filename.split('-');
+1326:             nameParts.shift(); // remove timestamp
+1327:             const originalName = nameParts.join('-') || filename;
+1328:             
+1329:             files.push({
+1330:                 name: originalName,
+1331:                 path: blob.name,
+1332:                 url: sasUrl,
+1333:                 size: blob.properties.contentLength,
+1334:                 uploadedAt: blob.properties.lastModified,
+1335:                 attempt: attempt
+1336:             });
+1337:         }
+1338:         
+1339:         res.json({ success: true, data: files });
+1340:     } catch (err) {
+1341:         console.error('[projectTracker] GET /checkpoint-proof error:', err.message);
+1342:         res.status(500).json({ success: false, message: 'Failed to fetch proof files.' });
+1343:     }
+1344: });
+1345: 
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:15:37Z
+Completed At: 2026-05-26T04:15:37Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1430 to 1540
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1430: 
+1431:     } catch (err) {
+1432:         console.error('[projectTracker] POST /validate-budget error:', err.message);
+1433:         res.status(500).json({ success: false, message: 'Failed to process budget validation.' });
+1434:     }
+1435: });
+1436: 
+1437: // 3. POST /validate-checkpoint
+1438: router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
+1439:     try {
+1440:         if (!isBCPT(req)) {
+1441:             return res.status(403).json({ success: false, message: 'Unauthorized. Only Barangay Captain can validate checkpoints.' });
+1442:         }
+1443:         
+1444:                 const { batchID, fromCheckpoint, validationNote, action } = req.body;
+1445:         const fromCP = parseInt(fromCheckpoint, 10);
+1446:         
+1447:         if (!batchID || isNaN(fromCP) || (!CHECKPOINT_FOLDER_MAP[fromCP] && fromCP !== 12)) {
+1448:             return res.status(400).json({ success: false, message: 'Invalid parameters. fromCheckpoint must be a valid checkpoint ID (4-12).' });
+1449:         }
+1450:         if (!validationNote || validationNote.trim() === '') {
+1451:             return res.status(400).json({ success: false, message: 'Remarks/Note is required.' });
+1452:         }
+1453: 
+1454:         const act = action === 'reject' ? 'reject' : 'approve';
+1455:         
+1456:         const pool = await getConnection();
+1457:         
+1458:         // Count existing tracker arrivals to determine the active attempt suffix
+1459:         const trackerCheck = await pool.request()
+1460:             .inp
+<truncated 3069 bytes>
+t ${nextStatusID}.`;
+1517:             notifType = 'CHECKPOINT_VALIDATED';
+1518:         } else {
+1519:             // Rejection / Revert request
+1520:             if (fromCP >= 4 && fromCP <= 6) {
+1521:                 nextStatusID = 2; // Revert all the way back to Proposal Compilation (Checkpoint 2)
+1522:                 notifMessage = `Barangay Captain requested REVISIONS for project "${projName}" during Checkpoint ${fromCP} validation. Status has reverted to Checkpoint 2: CBYDP Drafting.`;
+1523:                 notifType = 'BCPT_REVISION_REQUESTED';
+1524:             } else if (fromCP >= 7 && fromCP <= 11) {
+1525:                 nextStatusID = 5; // Revert to ABYIP Budget Draft (Checkpoint 5)
+1526:                 notifMessage = `Barangay Captain requested REVISIONS for project "${projName}" during Checkpoint ${fromCP} validation. Status has reverted to Checkpoint 5: ABYIP Budget Draft.`;
+1527:                 notifType = 'BCPT_REVISION_REQUESTED';
+1528:             } else if (fromCP === 12) {
+1529:                 nextStatusID = 12; // Maintain the rollback which would be staying to the checkpoint 12
+1530:                 notifMessage = `Barangay Captain requested REVISIONS for project "${projName}" during Checkpoint 12 validation. Status remains at Checkpoint 12: Procurement Phase.`;
+1531:                 notifType = 'BCPT_REVISION_REQUESTED';
+1532:             } else {
+1533:                 nextStatusID = fromCP;
+1534:                 notifMessage = `Barangay Captain requested revisions for project "${projName}" during Checkpoint ${fromCP} validation.`;
+1535:                 notifType = 'BCPT_REVISION_REQUESTED';
+1536:             }
+1537:             taggedNote = `[BCPT Rejection: CP${fromCP}] ${validationNote}`;
+1538:         }
+1539:         
+1540:         // Perform updates inside a transaction
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:16:03Z
+Completed At: 2026-05-26T04:16:03Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 2730
+Total Bytes: 134523
+Showing lines 1295 to 1310
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+1295:         
+1296:         if (!folderName) {
+1297:             return res.status(400).json({ success: false, message: 'Invalid checkpoint ID.' });
+1298:         }
+1299:         
+1300:         // Count existing tracker arrivals to determine the current active attempt suffix
+1301:         const pool = await getConnection();
+1302:         const trackerCheck = await pool.request()
+1303:             .input('batchID', sql.Int, batchID)
+1304:             .input('statusID', sql.Int, checkpointID)
+1305: const blobs = await listBlobsWithProperties(docContainerName, { prefix });
+1306:         
+1307:         const files = [];
+1308:         for (const blob of blobs) {
+1309:             // Expected blob.name format: Checkpoints/five/12/1st/174982734-file.jpg
+1310:             const parts = blob.name.split('/');
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:17:04Z
+Completed At: 2026-05-26T04:17:46Z
+The following changes were made by the multi_replace_file_content tool to: d:\Projects\Projects\smartSK\backend\backend-node\Projects\projectTracker.js. If relevant, proactively run terminal commands to execute this code for the USER. Don't ask for permission.
+[diff_block_start]
+@@ -504,1036 +504,6 @@
+ 
+         res.json({ success: true, message: `Meeting scheduled and project advanced to Checkpoint ${nextStatusID}.` });
+     } catch (err) {
+-        console.error('[projectTracker] POST /schedule-meeting error:', err.message);
+-        res.status(500).json({ success: false, message: 'Failed to schedule meeting.' });
+-    }
+-});
+-
+-// 2.5 POST /reschedule-meeting — Reschedule the finalization meeting
+-router.post('/reschedule-meeting', authMiddleware, async (req, res) => {
+-    try {
+-        const { batchID, meetingDate, reason } = req.body;
+-        const { userID, barangay: barangayID } = req.user;
+-
+-        if (!batchID || !meetingDate || !reason) {
+-            return res.status(400).json({ success: false, message: 'Batch ID, meeting date, and reason are required.' });
+-        }
+-
+-        // Backend Validation: Must be at least 3 days from today
+-        const requestedDate = new Date(meetingDate);
+-        const currentDate = new Date();
+-        currentDate.setHours(0, 0, 0, 0); // Start of today
+-
+-        // Calculate difference in days
+-        const diffTime = requestedDate.getTime() - currentDate.getTime();
+-        const diffDays = diffTime / (1000 * 3600 * 24);
+-
+-        if (diffDays < 3) {
+-            return res.status(400).json({ success: false, message: 'The SK Session must be scheduled at least 3 days from today to allow for adequate review.' });
+-        }
+-
+-        const pool = await getConnection();
+-
+-        // Verify batch exists
+-        const batchRes = await pool.request()
+-            .input('batchID', sql.Int, batchID)
+-            .input('barangayID', sql.Int, barangayID)
+-
+<truncated 45282 bytes>
+-            await sendBudgetRejectionEmail(barangayID, projName, remarks || 'No remarks provided.');
+-            
+-            // Send system notification to SKC/SKS
+-            await pool.request()
+-                .input('barangayID', sql.Int, barangayID)
+-                .input('batchID', sql.Int, batchID)
+-                .input('remarks', sql.NVarChar, remarks || 'No remarks provided.')
+-                .query(`
+-                    INSERT INTO notifications (userID, notifType, message, batchID, isRead, createdAt)
+-                    SELECT userID, 'SYSTEM', 'Budget Rejected: ' + @remarks, @batchID, 0, GETDATE()
+-                    FROM userInfo
+-                    WHERE barangay = @barangayID AND position IN (SELECT roleID FROM roles WHERE roleName IN ('SKC', 'SKS')) AND isArchived = 0
+-                `);
+-
+-            res.json({ success: true, message: 'Budget rejected. Notification sent to SK Council.' });
+-        } else {
+-            return res.status(400).json({ success: false, message: 'Invalid action.' });
+-        }
+-
+-    } catch (err) {
+-        console.error('[projectTracker] POST /validate-budget error:', err.message);
+-        res.status(500).json({ success: false, message: 'Failed to process budget validation.' });
+-    }
+-});
+-
+-// 3. POST /validate-checkpoint
+-router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
+-    try {
+-        if (!isBCPT(req)) {
+-            return res.status(403).json({ success: false, message: 'Unauthorized. Only Barangay Captain can validate checkpoints.' });
+-        }
+-        
+-                const { batchID, fromCheckpoint, validationNote, action } = req.body;
+-        const fromCP = parseInt(fromCheckpoint, 10);
+-        
+-        if (!batchID || isNaN(fromCP) || (!CHECKPOINT_FOLDER_MAP[fromCP] && fromCP !== 12)) {
+-            return res.s
+<truncated 5444 bytes>
+
+NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.
+Created At: 2026-05-26T04:17:55Z
+Completed At: 2026-05-26T04:17:59Z
+
+				The command failed with exit code: 1
+				Output:
+				D:\Projects\Projects\smartSK\backend\backend-node\Projects\projectTracker.js:557
+    } catch (err) {
+    ^
+
+SyntaxError: missing ) after argument list
+    at wrapSafe (node:internal/modules/cjs/loader:1638:18)
+    at checkSyntax (node:internal/main/check_syntax:78:3)
+
+Node.js v22.19.0
+
+
+Created At: 2026-05-26T04:18:08Z
+Completed At: 2026-05-26T04:18:08Z
+File Path: `file:///d:/Projects/Projects/smartSK/backend/backend-node/Projects/projectTracker.js`
+Total Lines: 1700
+Total Bytes: 81867
+Showing lines 530 to 580
+The following code has been modified to include a line number before every line, in the format: <line_number>: <original_line>. Please note that any changes targeting the original code should remove the line number, colon, and leading space.
+530:             await transaction.request()
+531:                 .input('batchID', sql.Int, batchID)
+532:                 .input('userID', sql.Int, req.user.userID)
+533:                 .input('content', sql.NVarChar(sql.MAX), taggedNote)
+534:                 .query(`INSERT INTO projectNotes (batchID, userID, content) VALUES (@batchID, @userID, @content)`);
+535:                 
+536:             // Insert Notification in projectNotifications with correct fields
+537:             await transaction.request()
+538:                 .input('batchID', sql.Int, batchID)
+539:                 .input('barangayID', sql.Int, barangayID)
+540:                 .input('notifType', sql.VarChar(50), notifType)
+541:                 .input('message', sql.NVarChar(sql.MAX), notifMessage)
+542:                 .query(`INSERT INTO projectNotifications (batchID, barangayID, notifType, message) VALUES (@batchID, @barangayID, @notifType, @message)`);
+543:                 
+544:             await transaction.commit();
+545:             
+546:             // Broadcasts
+547:             broadcastToRoom(batchID.toString(), { type: 'checkpoint_updated', statusID: nextStatusID });
+548:             broadcastToRoom(batchID.toString(), { type: 'new_note' });
+549:             broadcast({ type: 'new_notification', barangayID });
+550:             
+551:             res.json({ success: true, message: act === 'approve' ? `Checkpoint ${fromCP} validated. Project advanced to Checkpoint ${nextStatusID}.` : `Checkpoint ${fromCP} validation rejected. Project set to Checkpoint ${nextStatusID}.` });
+552:         } catch (txnErr) {
+553:             await transaction.rollback();
+554:             throw txnErr;
+555:         }
+556:         
+557:     } catch (err) {
+558:         console.error('[projectTracker] POST /validate-checkpoint error:', err.message);
+559:         res.status(500).json({ success: false, message: 'Failed to process checkpoint validation.' });
+560:     }
+561: });
+562: 
+563: 
+564: // ============================================================================
+565: // CHECKPOINT 1: Youth Profiling Endpoints
+566: // Implements DILG MC No. 2022-033 — Annex 4 upload, validation, and gating.
+567: // ============================================================================
+568: 
+569: const axios = require('axios');
+570: const uploadFields = upload.fields([
+571:     { name: 'barangay_notice_letter', maxCount: 1 },
+572:     { name: 'campaign_proof_images', maxCount: 20 },
+573:     { name: 'master_youth_dataset', maxCount: 1 },
+574: ]);
+575: 
+576: // Helper: get or create the submission record for this term+barangay
+577: async function getOrCreateSubmission(pool, cycleID, barangayID, userID) {
+578:     const existing = await pool.request()
+579:         .input('cycleID', sql.Int, cycleID)
+580:         .input('barangayID', sql.Int, barangayID)
+The above content does NOT show the entire file contents. If you need to view any lines of the file which were not shown to complete your task, call this tool again to view those lines.
+
+Created At: 2026-05-26T04:18:17Z
+Completed At: 2026-05-26T04:18:22Z
+
+				The command failed with exit code: 1
+				Output:
+				error: pathspec 'projectTracker.js' did not match any file(s) known to git
+
+
+Created At: 2026-05-26T04:18:29Z
+Completed At: 2026-05-26T04:18:31Z
+
+				The command failed with exit code: 1
+				Output:
+				error: pathspec 'backend/backend-node/Projects/projectTracker.js' did not match any file(s) known to git
+
+
+Created At: 2026-05-26T04:20:38Z
+Completed At: 2026-05-26T04:20:38Z
+{"name":"projectAudit.js", "sizeBytes":"9857"}
+{"name":"projectBatch.js", "sizeBytes":"55530"}
+{"name":"projectDocuments.js", "sizeBytes":"18094"}
+{"name":"projectNotes.js", "sizeBytes":"3339"}
+{"name":"projectTracker.js", "sizeBytes":"81867"}
+
+Summary: This directory contains 0 subdirectories and 5 files.
+The following is a <SYSTEM_MESSAGE> not actually sent by the user. It is provided by the system as important information to pay attention to.
+
+<SYSTEM_MESSAGE>
+[Message] timestamp=2026-05-26T04:20:24Z sender=286f53a2-7c2d-4da7-b654-d044c1cd49b5/task-134 priority=MESSAGE_PRIORITY_HIGH content=Task id "286f53a2-7c2d-4da7-b654-d044c1cd49b5/task-134" finished with result:
+
+				The command completed successfully.
+				Output:
+				
+
+    Directory: D:\Projects\Projects\smartSK\backend\backend-node\Projects
+
+
+Mode                 LastWriteTime         Length Name                                                                 
+----                 -------------         ------ ----                                                                 
+-a----          5/1/2026   1:19 PM           9857 projectAudit.js                                                      
+-a----         5/25/2026   8:56 AM          55530 projectBatch.js                                                      
+-a----         5/25/2026  12:02 PM          18094 projectDocuments.js                                                  
+-a----         4/30/2026  10:49 AM           3339 projectNotes.js                                                      
+-a----         5/26/2026  12:17 PM          81867 projectTracker.js                                                    
+
+
+
+
+Log: file:///C:/Users/Shiroooo/.gemini/antigravity/brain/286f53a2-7c2d-4da7-b654-d044c1cd49b5/.system_generated/tasks/task-134.log
+</SYSTEM_MESSAGE>
+Created At: 2026-05-26T04:21:06Z
+Tool is running as a background task with task id: 286f53a2-7c2d-4da7-b654-d044c1cd49b5/task-141
+Task Description: python -c "import json; log_file = r'C:\Users\Shiroooo\.gemini\antigravity\brain\286f53a2-7c2d-4da7-b654-d044c1cd49b5\.system_generated\logs\transcript.jsonl'; lines = [json.loads(line) for line in open(log_file, 'r', encoding='utf-8')]; print(sum(1 for step in lines if 'projectTracker.js' in str(step)))"
+Task logs are available at: file:///C:/Users/Shiroooo/.gemini/antigravity/brain/286f53a2-7c2d-4da7-b654-d044c1cd49b5/.system_generated/tasks/task-141.log
+Created At: 2026-05-26T04:22:43Z
+Tool is running as a background task with task id: 286f53a2-7c2d-4da7-b654-d044c1cd49b5/task-153
+Task Description: python -c "import json; log_file = r'C:\Users\Shiroooo\.gemini\antigravity\brain\286f53a2-7c2d-4da7-b654-d044c1cd49b5\.system_generated\logs\transcript.jsonl'; lines = [json.loads(line) for line in open(log_file, 'r', encoding='utf-8')]; res = [step['content'] for step in lines if 'content' in step and 'projectTracker.js' in step['content']]; open('recover.txt', 'w', encoding='utf-8').write('\n'.join(res))"
+Task logs are available at: file:///C:/Users/Shiroooo/.gemini/antigravity/brain/286f53a2-7c2d-4da7-b654-d044c1cd49b5/.system_generated/tasks/task-153.log

@@ -111,6 +111,12 @@ app = FastAPI(title="smartSK AI Service", description="FastAPI Microservice for 
 from export_service import router as export_router
 app.include_router(export_router, prefix="/automation/export")
 
+from automation.ocr_extraction import router as ocr_router
+app.include_router(ocr_router, prefix="/automation/ocr")
+
+from projects.profiling_service import router as profiling_router
+app.include_router(profiling_router, prefix="/api/v1/checkpoints/profiling")
+
 # --- CORS Configuration ---
 cors_origin = os.getenv("CORS_ORIGIN", "")
 origins = [origin.strip() for origin in cors_origin.split(",") if origin.strip()]

@@ -25,6 +25,8 @@ interface UseCollaborationSocketOptions {
     onNote?: (note: any) => void;
     onAuditUpdate?: (batchID: number) => void;
     onAiReportStatus?: (msg: any) => void;
+    onBcptVerdict?: (msg: any) => void;
+    onBcptOverride?: (msg: any) => void;
 }
 
 const WS_URL = (() => {
@@ -33,7 +35,7 @@ const WS_URL = (() => {
     return backendHttpUrl.replace(/^http/, 'ws');
 })();
 
-export function useCollaborationSocket({ batchID, onCellChange, onNote, onAuditUpdate, onAiReportStatus }: UseCollaborationSocketOptions) {
+export function useCollaborationSocket({ batchID, onCellChange, onNote, onAuditUpdate, onAiReportStatus, onBcptVerdict, onBcptOverride }: UseCollaborationSocketOptions) {
     const wsRef = useRef<WebSocket | null>(null);
     const [collaborators, setCollaborators] = useState<Map<number, CollaboratorInfo>>(new Map());
     const [isConnected, setIsConnected] = useState(false);
@@ -140,6 +142,18 @@ export function useCollaborationSocket({ batchID, onCellChange, onNote, onAuditU
                 else if (msg.type === 'ai_report_status') {
                     if (onAiReportStatus) {
                         onAiReportStatus(msg);
+                    }
+                }
+
+                else if (msg.type === 'bcpt_verdict_submitted') {
+                    if (onBcptVerdict) {
+                        onBcptVerdict(msg);
+                    }
+                }
+
+                else if (msg.type === 'bcpt_override_applied') {
+                    if (onBcptOverride) {
+                        onBcptOverride(msg);
                     }
                 }
 

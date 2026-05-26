@@ -1,0 +1,540 @@
+/* ProfilingPortal.module.css
+   Checkpoint 1: Youth Profiling Portal
+   Clean, government-appropriate design — no decorative gradients or clipart.
+   Uses the project's existing neutral color palette.
+*/
+
+.portal {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 32px 32px 48px;
+    font-family: 'Inter', 'Roboto', -apple-system, sans-serif;
+}
+
+/* ── Header ─────────────────────────────────────────────────────────── */
+
+.portalHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 16px;
+}
+
+.portalHeaderLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stepBadge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #4a6fa5;
+    border: 1.5px solid #4a6fa5;
+    border-radius: 4px;
+    padding: 2px 8px;
+    width: fit-content;
+    margin-bottom: 4px;
+}
+
+.portalTitle {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    line-height: 1.2;
+}
+
+.portalSubtitle {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #6b7280;
+    font-weight: 400;
+}
+
+.completeBadge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #166534;
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+    border-radius: 6px;
+    padding: 6px 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ── Status chips ───────────────────────────────────────────────────── */
+
+.statusRow {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.statusChip {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 4px;
+    border: 1px solid transparent;
+}
+
+.chipDone {
+    color: #15803d;
+    background: #f0fdf4;
+    border-color: #86efac;
+}
+
+.chipPending {
+    color: #92400e;
+    background: #fffbeb;
+    border-color: #fcd34d;
+}
+
+/* ── Drop zones grid ─────────────────────────────────────────────────── */
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 720px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.dropZone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1.5px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 24px 16px;
+    min-height: 140px;
+    cursor: pointer;
+    background: #fafafa;
+    transition: border-color 0.15s, background 0.15s;
+    text-align: center;
+    outline: none;
+}
+
+.dropZone:hover,
+.dropZone:focus {
+    border-color: #4a6fa5;
+    background: #f0f4ff;
+}
+
+.dropZoneDragging {
+    border-color: #4a6fa5;
+    background: #e8edf8;
+}
+
+.dropZoneFilled {
+    border-style: solid;
+    border-color: #86efac;
+    background: #f0fdf4;
+}
+
+.dropZoneIcon {
+    color: #9ca3af;
+    line-height: 1;
+}
+
+.dropZoneFilled .dropZoneIcon {
+    color: #16a34a;
+}
+
+.dropZoneLabel {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+.dropZoneFileName {
+    font-size: 0.72rem;
+    color: #16a34a;
+    font-weight: 500;
+    word-break: break-all;
+    max-width: 100%;
+}
+
+.dropZoneHint {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    line-height: 1.4;
+}
+
+/* ── Consent row ─────────────────────────────────────────────────────── */
+
+.consentRow {
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-radius: 6px;
+}
+
+.consentLabel {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.8rem;
+    color: #374151;
+    line-height: 1.55;
+    cursor: pointer;
+    font-weight: 400;
+}
+
+.consentCheck {
+    flex-shrink: 0;
+    margin-top: 2px;
+    accent-color: #4a6fa5;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+/* ── Progress bar ────────────────────────────────────────────────────── */
+
+.progressBar {
+    margin-bottom: 16px;
+}
+
+/* ── Action buttons ──────────────────────────────────────────────────── */
+
+.actionRow {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.btnPrimary,
+.btnSecondary,
+.btnAdvance {
+    padding: 9px 20px;
+    font-size: 0.83rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+    font-family: inherit;
+    letter-spacing: 0.01em;
+}
+
+.btnPrimary {
+    background: #1e3a5f;
+    color: #fff;
+}
+
+.btnPrimary:hover:not(:disabled) {
+    background: #16304f;
+}
+
+.btnSecondary {
+    background: #fff;
+    color: #1e3a5f;
+    border: 1.5px solid #1e3a5f;
+}
+
+.btnSecondary:hover:not(:disabled) {
+    background: #f0f4ff;
+}
+
+.btnAdvance {
+    background: #166534;
+    color: #fff;
+}
+
+.btnAdvance:hover:not(:disabled) {
+    background: #145a2d;
+}
+
+.btnPrimary:disabled,
+.btnSecondary:disabled,
+.btnAdvance:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Error panel ─────────────────────────────────────────────────────── */
+
+.errorPanel {
+    margin-bottom: 24px;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    background: #fff5f5;
+    padding: 14px 16px;
+}
+
+.errorPanelTitle {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #991b1b;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.errorList {
+    margin: 0;
+    padding-left: 16px;
+}
+
+.errorItem {
+    font-size: 0.8rem;
+    color: #7f1d1d;
+    line-height: 1.6;
+    margin-bottom: 2px;
+}
+
+/* ── Analytics section ───────────────────────────────────────────────── */
+
+.analyticsSection {
+    border-top: 1px solid #e5e7eb;
+    padding-top: 24px;
+}
+
+.analyticsSectionTitle {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #6b7280;
+    margin-bottom: 14px;
+}
+
+.analyticsGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.analyticsCard {
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 14px 16px;
+    background: #fff;
+    text-align: center;
+}
+
+.analyticsCardValue {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+
+.analyticsCardLabel {
+    font-size: 0.7rem;
+    color: #6b7280;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+.cp2FilenameNote {
+    font-size: 0.78rem;
+    color: #374151;
+    background: #f3f4f6;
+    border-radius: 4px;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+}
+
+/* Role-based feedback boxes */
+.infoBox {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: #f0f4ff;
+    border: 1px solid #c2d2e9;
+    border-radius: 6px;
+}
+
+.infoTitle {
+    margin: 0 0 6px 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1e3a5f;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.infoText {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #4a5568;
+    line-height: 1.5;
+}
+
+.statusChipInteractive {
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.statusChipInteractive:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* ── Revision badge (in portal header) ─────────────────────────────── */
+
+.revisionBadge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #92400e;
+    background: #fffbeb;
+    border: 1.5px solid #fcd34d;
+    border-radius: 6px;
+    padding: 6px 14px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* ── Revision comment banner (shown to SKS) ─────────────────────────── */
+
+.revisionBanner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    background: #fff7ed;
+    border: 1.5px solid #fdba74;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.revisionBannerIcon {
+    color: #ea580c;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+
+.revisionBannerTitle {
+    font-size: 0.83rem;
+    font-weight: 700;
+    color: #9a3412;
+    margin-bottom: 4px;
+}
+
+.revisionBannerComment {
+    font-size: 0.82rem;
+    color: #7c2d12;
+    line-height: 1.55;
+}
+
+/* ── Revision banner for SKC (less prominent) ───────────────────────── */
+
+.revisionBannerSkc {
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: #475569;
+    margin-bottom: 16px;
+}
+
+/* ── Chip group (chip + replace button pair) ────────────────────────── */
+
+.chipGroup {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* ── Replace / Manage button ─────────────────────────────────────────── */
+
+.replaceBtn {
+    padding: 3px 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    border: 1.5px solid #4a6fa5;
+    border-radius: 4px;
+    background: transparent;
+    color: #1e3a5f;
+    cursor: pointer;
+    transition: background 0.15s;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.replaceBtn:hover {
+    background: #f0f4ff;
+}
+
+/* ── Danger button (Request Revision) ───────────────────────────────── */
+
+.btnDanger {
+    padding: 9px 20px;
+    font-size: 0.83rem;
+    font-weight: 600;
+    border: 1.5px solid #dc2626;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s, opacity 0.15s;
+    font-family: inherit;
+    letter-spacing: 0.01em;
+    background: transparent;
+    color: #dc2626;
+}
+
+.btnDanger:hover:not(:disabled) {
+    background: #fef2f2;
+}
+
+.btnDanger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ── Split Layout Modal (CampaignProofManageModal) ──────────────────── */
+
+/* Note: Most of the CampaignProofManageModal styling is handled via inline MUI Sx props 
+   in the component, but we keep these utility classes for potential future use. */
+
+.modalSplitLayout {
+    display: flex;
+    height: 70vh;
+}
+
+.modalSidebar {
+    width: 33.333%;
+    border-right: 1px solid #cbd5e1;
+    display: flex;
+    flex-direction: column;
+}
+
+.modalViewer {
+    width: 66.666%;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btnDanger:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

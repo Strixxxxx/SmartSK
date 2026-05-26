@@ -14,8 +14,8 @@ const ProjectLayout: React.FC<ProjectLayoutProps> = ({ project, onExit }) => {
     const [sheetData, setSheetData] = useState<any[] | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Logic: CBYDP never locks. ABYIP locks if StatusID >= 6 (City Approval)
-    const isReadOnly = project?.projType === 'ABYIP' && (project?.statusID || 0) >= 6;
+    // Logic: CBYDP never locks. ABYIP locks if StatusID >= 12 (Procurement Phase)
+    const isReadOnly = project?.projType === 'ABYIP' && (project?.statusID || 0) >= 12;
 
     useEffect(() => {
         if (!project?.projName) {

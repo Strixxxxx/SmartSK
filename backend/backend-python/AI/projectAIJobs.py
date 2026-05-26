@@ -70,8 +70,7 @@ def analyze_proposal_with_ai(document_text, rules_text):
     # Use the retry utility
     analysis_result = call_gemini_with_retry(
         prompt=prompt, 
-        validation_func=is_valid_proposal_response, 
-        model_name=PRIMARY_MODEL
+        validation_func=is_valid_proposal_response
     )
 
     if analysis_result:

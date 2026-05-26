@@ -109,8 +109,9 @@ const Login: React.FC<LoginProps> = ({ open, onClose }) => {
   const handleNewAccountClose = () => {
     setIsNewAccountModalOpen(false);
     setNewAccountData(null);
-    logout();
-    onClose(); // Close login modal after new account setup
+    logout(false); // Clean client-side logout to preserve state & toast without reloading
+    setUsername('');
+    setPassword('');
   };
 
   return (

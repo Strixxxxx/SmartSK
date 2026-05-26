@@ -394,6 +394,30 @@ async function getBlobProperties(containerName, blobName) {
     return await blobClient.getProperties();
 }
 
+/**
+ * Deletes a blob from a specified container.
+ * @param {string} containerName - The name of the container.
+ * @param {string} blobName - The name of the blob.
+ * @returns {Promise<void>}
+ */
+async function deleteBlob(containerName, blobName) {
+    if (!containerName || !blobName) {
+        throw new Error('containerName and blobName are required.');
+    }
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobClient = containerClient.getBlobClient(blobName);
+    try {
+        await blobClient.delete();
+        console.log(`Successfully deleted blob ${blobName} from container ${containerName}.`);
+    } catch (error) {
+        if (error.statusCode === 404) {
+            console.warn(`Blob ${blobName} not found in container ${containerName}.`);
+        } else {
+            throw error;
+        }
+    }
+}
+
 module.exports = {
     uploadFile,
     getFileSasUrl,
@@ -401,6 +425,7 @@ module.exports = {
     listBackups,
     downloadBackupFile,
     deleteFile,
+    deleteBlob,
     getBlobContent, // Export the new function
     listBlobs,      // Export the new function
     listBlobsWithProperties,

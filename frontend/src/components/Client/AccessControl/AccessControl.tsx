@@ -129,7 +129,6 @@ const AccessControl: React.FC = () => {
                 <TableRow>
                   <TableCell className={styles.tableHeadCell} sx={{ fontWeight: 'bold' }}>Council Member Name</TableCell>
                   <TableCell className={styles.tableHeadCell} align="center" sx={{ fontWeight: 'bold' }}>Template Creation Control<br /><small>(Create Project Plans)</small></TableCell>
-                  <TableCell className={styles.tableHeadCell} align="center" sx={{ fontWeight: 'bold' }}>Project Tracker Control<br /><small>(Update Project Trackers)</small></TableCell>
                   <TableCell className={styles.tableHeadCell} align="center" sx={{ fontWeight: 'bold' }}>Documents Control<br /><small>(Upload Supporting Documents)</small></TableCell>
                   <TableCell className={styles.tableHeadCell} align="center" sx={{ fontWeight: 'bold' }}>Budget Reallocation Control<br /><small>(Adjust Budget Allocations)</small></TableCell>
                 </TableRow>
@@ -137,7 +136,7 @@ const AccessControl: React.FC = () => {
               <TableBody>
                 {data.length === 0 && !loading ? (
                   <TableRow>
-                    <TableCell colSpan={5} align="center">
+                    <TableCell colSpan={4} align="center">
                       <Typography variant="body1" sx={{ py: 3, color: 'text.secondary' }}>
                         No council members found for your barangay.
                       </Typography>
@@ -160,13 +159,6 @@ const AccessControl: React.FC = () => {
                         <Switch
                           checked={row.templateControl}
                           onChange={() => handleToggle(row.userID, 'templateControl')}
-                          color="primary"
-                        />
-                      </TableCell>
-                      <TableCell align="center">
-                        <Switch
-                          checked={row.trackerControl}
-                          onChange={() => handleToggle(row.userID, 'trackerControl')}
                           color="primary"
                         />
                       </TableCell>

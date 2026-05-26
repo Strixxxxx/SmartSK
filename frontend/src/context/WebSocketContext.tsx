@@ -9,6 +9,7 @@ interface MaintenanceMessage {
 interface WebSocketContextType {
   maintenanceMessage: MaintenanceMessage | null;
   postUpdateTimestamp: number; // New state to track post updates
+  kkAssemblyTimestamp: number; // Bumped when SKS submits KK Assembly documents
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -28,6 +29,7 @@ interface WebSocketProviderProps {
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
   const [maintenanceMessage, setMaintenanceMessage] = useState<MaintenanceMessage | null>(null);
   const [postUpdateTimestamp, setPostUpdateTimestamp] = useState<number>(Date.now()); // New state
+  const [kkAssemblyTimestamp, setKkAssemblyTimestamp] = useState<number>(0);
 
   useEffect(() => {
     let ws: WebSocket;
@@ -73,6 +75,9 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
           } else if (message.type === 'POSTS_UPDATED') { // Handle the new message type
             if (import.meta.env.DEV) console.log('[WebSocket] Posts updated, triggering refresh.');
             setPostUpdateTimestamp(Date.now()); // Update timestamp to trigger re-renders
+          } else if (message.type === 'kk_assembly_submitted') {
+            if (import.meta.env.DEV) console.log('[WebSocket] KK Assembly submitted by SKS, notifying SKC.');
+            setKkAssemblyTimestamp(Date.now());
           } else if (message.type === 'user_update') {
             if (import.meta.env.DEV) console.log('[WebSocket] User profile update received.');
             
@@ -138,7 +143,7 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
   }, [maintenanceMessage]);
 
   return (
-    <WebSocketContext.Provider value={{ maintenanceMessage, postUpdateTimestamp }}>
+    <WebSocketContext.Provider value={{ maintenanceMessage, postUpdateTimestamp, kkAssemblyTimestamp }}>
       {children}
     </WebSocketContext.Provider>
   );

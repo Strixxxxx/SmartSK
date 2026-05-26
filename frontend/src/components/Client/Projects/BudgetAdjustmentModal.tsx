@@ -111,13 +111,13 @@ const BudgetAdjustmentModal: React.FC<BudgetAdjustmentModalProps> = ({ open, onC
                 {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
                 
                 <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="subtitle1" fontWeight={600}>Total Budget: ₱{formatCurrency(totalBudget)}</Typography>
+                    <Typography variant="subtitle1" fontWeight={600}>Estimated Annual Budget: ₱{formatCurrency(totalBudget)}</Typography>
                     <Box sx={{ textAlign: 'right' }}>
                         <Typography variant="subtitle1" color={isOverBudget ? 'error' : 'primary'} fontWeight={700}>
                             Remaining: ₱{formatCurrency(totalBudget - totalAllocated)}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                            Sum of categories must not exceed total budget
+                            Sum of categories must not exceed estimated annual budget
                         </Typography>
                     </Box>
                 </Box>

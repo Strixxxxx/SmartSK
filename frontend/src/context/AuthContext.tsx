@@ -33,7 +33,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (username: string, password: string) => Promise<{ success: boolean; message: string; user?: UserInfo }>;
-  logout: () => Promise<void>;
+  logout: (shouldRedirect?: boolean) => Promise<void>;
   refreshUser: () => Promise<void>;
 }
 
@@ -129,7 +129,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const logout = async () => {
+  const logout = async (shouldRedirect: boolean = true) => {
     try {
       setIsLoading(true);
 
@@ -139,13 +139,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(null);
       setIsAuthenticated(false);
 
-      // Redirect to login or home page
-      window.location.href = '/';
+      if (shouldRedirect) {
+        // Redirect to login or home page
+        window.location.href = '/';
+      }
     } catch (error) {
       if (import.meta.env.DEV) console.error('Logout error:', error);
       // Still clear local state even if API call fails
       setUser(null);
       setIsAuthenticated(false);
+      if (shouldRedirect) {
+        window.location.href = '/';
+      }
     } finally {
       setIsLoading(false);
     }

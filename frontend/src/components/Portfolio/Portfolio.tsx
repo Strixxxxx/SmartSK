@@ -12,6 +12,7 @@ const Portfolio: React.FC = () => {
 
   useEffect(() => {
     console.log('Smart SK Portfolio v2.0 (Modular) loaded');
+
     // Simple reveal animation on scroll
     const revealElements = () => {
       const reveals = document.querySelectorAll(`.${styles.reveal}`);

@@ -3,8 +3,8 @@ const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const { generateSasUrl, docContainerName, listBlobsWithProperties } = require('../Storage/storage');
 
-// Helper to fetch batches with finalized status (City Approval = 6, Procurement = 7, Execution = 8, Closure = 9)
-// The prompt states "finalized ABYIP and CBYDP projects". I will consider status >= 6 as finalized/public.
+// Helper to fetch batches with finalized status (City Approval = 9, Procurement = 10, Execution = 11, Closure = 12)
+// Projects are considered public/finalized at status >= 9.
 router.get('/', async (req, res) => {
     try {
         const { barangay, type } = req.query;
@@ -28,7 +28,7 @@ router.get('/', async (req, res) => {
                 ORDER BY pt.updatedAt DESC
             ) latestStatus
             JOIN StatusLookup sl ON latestStatus.statusID = sl.StatusID
-            WHERE pb.isArchived = 0 AND sl.StatusID >= 6
+            WHERE pb.isArchived = 0 AND sl.StatusID >= 9
         `;
 
         if (barangay) {
@@ -72,7 +72,7 @@ router.get('/:batchID/details', async (req, res) => {
                     WHERE pt.batchID = pb.batchID 
                     ORDER BY pt.updatedAt DESC
                 ) latestStatus
-                WHERE pb.batchID = @batchID AND pb.isArchived = 0 AND latestStatus.statusID >= 6
+                WHERE pb.batchID = @batchID AND pb.isArchived = 0 AND latestStatus.statusID >= 9
             `);
 
         if (!batchCheck.recordset.length) {

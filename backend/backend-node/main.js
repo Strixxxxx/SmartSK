@@ -73,6 +73,7 @@ const registerAuditRouter = require('./Admin/registerAudit');
 const dashboardRouter = require('./Admin/dashboard');
 const reportsRouter = require('./AIDataRetrieval/reports');
 const projectBatchRouter = require('./Projects/projectBatch');
+const projectTrackerRouter = require('./Projects/projectTracker');
 const projectNotesRouter = require('./Projects/projectNotes');
 const projectAuditRouter = require('./Projects/projectAudit');
 const projectDocumentsRouter = require('./Projects/projectDocuments');
@@ -331,6 +332,12 @@ if (projectBatchRouter && typeof projectBatchRouter === 'function') {
   console.error('projectBatchRouter is not a valid middleware function');
 }
 
+if (projectTrackerRouter && typeof projectTrackerRouter === 'function') {
+  app.use('/api/project-tracker', projectTrackerRouter);
+} else {
+  console.error('projectTrackerRouter is not a valid middleware function');
+}
+
 // Reports router (Forecasting/Predictive Analysis)
 if (reportsRouter && typeof reportsRouter === 'function') {
   app.use('/api/reports', reportsRouter);
@@ -432,6 +439,54 @@ server.listen(NODE_PORT, HOST, () => {
   });
 
   console.log('Monthly cloud backup job has been scheduled.');
+
+  // --- Daily Meeting Reminder Check at 9:00 AM PST ---
+  cron.schedule('0 9 * * *', async () => {
+    console.log('[Meeting Reminder Job] Running daily meeting reminder check...');
+    try {
+      const pool = await getConnection();
+
+      // Find batches where meetingDate is tomorrow and whose status is still 3 (SK Session)
+      const result = await pool.request().query(`
+        SELECT pb.batchID, pb.projName, pb.barangayID, pb.termID, pb.meetingDate
+        FROM projectBatch pb
+        CROSS APPLY (
+          SELECT TOP 1 pt.statusID 
+          FROM projectTracker pt 
+          WHERE pt.batchID = pb.batchID 
+          ORDER BY pt.updatedAt DESC
+        ) latestStatus
+        WHERE latestStatus.statusID = 3 
+          AND pb.meetingDate IS NOT NULL
+          AND CAST(pb.meetingDate AS DATE) = CAST(DATEADD(day, 1, GETDATE()) AS DATE)
+      `);
+
+      for (const batch of result.recordset) {
+        const formattedDate = new Date(batch.meetingDate).toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' });
+        const message = `Reminder: The finalization meeting for "${batch.projName}" is scheduled for tomorrow at ${formattedDate}. Please make sure to attend and do not be absent!`;
+
+        await pool.request()
+            .input('batchID', sql.Int, batch.batchID)
+            .input('barangayID', sql.Int, batch.barangayID)
+            .input('message', sql.NVarChar(sql.MAX), message)
+            .query(`
+                INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
+                VALUES (@batchID, @barangayID, 'MEETING_REMINDER', @message)
+            `);
+
+        broadcast({ type: 'new_notification', barangayID: batch.barangayID });
+      }
+
+      console.log(`[Meeting Reminder Job] Checked. Sent ${result.recordset.length} meeting reminder(s).`);
+    } catch (error) {
+      console.error('[Meeting Reminder Job] Error during meeting reminder check:', error.message);
+    }
+  }, {
+    scheduled: true,
+    timezone: 'Asia/Manila'
+  });
+
+  console.log('Daily meeting reminder check job has been scheduled.');
 
   // --- Daily Deadline Check at 10:00 AM PST ---
   cron.schedule('0 10 * * *', async () => {

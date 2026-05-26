@@ -1,22 +1,25 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Typography, Button, Tooltip, Divider, CircularProgress, IconButton } from '@mui/material';
-import { FileDownload, PictureAsPdf, AddCircleOutline, Close } from '@mui/icons-material';
+import { FileDownload, PictureAsPdf, Close } from '@mui/icons-material';
 import CollaboratorAvatars from './CollaboratorAvatars';
 import { CollaboratorInfo } from '../../../hooks/useCollaborationSocket';
 import instance from '../../../backend connection/axiosConfig';
 
 interface ProjectTopNavbarProps {
     project: any | null;
-    canCreate: boolean;
     collaborators: Map<number, CollaboratorInfo>;
     currentUser?: any;
-    onCreateNew: () => void;
     onUpdateStatus?: (statusID: number) => void;
+    onClose?: () => void;
+    isReviewMode?: boolean;
+    onApprove?: () => void;
+    onRevise?: () => void;
 }
 
 const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({ 
-    project, canCreate, collaborators, currentUser, onCreateNew
+    project, collaborators, currentUser, onClose,
+    isReviewMode = false, onApprove, onRevise
 }) => {
     const navigate = useNavigate();
     const [isExportingExcel, setIsExportingExcel] = useState(false);
@@ -88,6 +91,25 @@ const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({
                         </Typography>
                     </>
                 )}
+                {isReviewMode && (
+                    <>
+                        <Typography variant="body2" color="text.disabled">/</Typography>
+                        <Typography 
+                            variant="body2" 
+                            sx={{ 
+                                color: '#16a34a', 
+                                fontWeight: 700, 
+                                bgcolor: '#e8f5e9', 
+                                px: 1, 
+                                py: 0.25, 
+                                borderRadius: 1, 
+                                fontSize: '11px' 
+                            }}
+                        >
+                            Barangay Captain Review Mode
+                        </Typography>
+                    </>
+                )}
             </Box>
 
             {/* Right: Collaborators + Action buttons */}
@@ -95,52 +117,78 @@ const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({
                 {/* Collaborator avatars (other users in same project) */}
                 <CollaboratorAvatars collaborators={collaborators} currentUser={currentUser} />
                 {(collaborators.size > 0 || currentUser) && <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />}
+                
                 {project && (
-                    <>
-                        <Tooltip title="Export to Excel">
+                    isReviewMode ? (
+                        <>
                             <Button
                                 size="small"
-                                variant="outlined"
-                                startIcon={isExportingExcel ? <CircularProgress size={20} color="inherit" /> : <FileDownload />}
-                                onClick={() => handleExport('excel')}
-                                disabled={isExportingExcel || isExportingPDF}
-                                sx={{ textTransform: 'none', borderRadius: 2 }}
+                                variant="contained"
+                                color="success"
+                                onClick={onApprove}
+                                sx={{ 
+                                    textTransform: 'none', 
+                                    borderRadius: 2,
+                                    fontWeight: 600,
+                                    bgcolor: '#2e7d32',
+                                    '&:hover': { bgcolor: '#1b5e20' }
+                                }}
                             >
-                                {isExportingExcel ? 'Exporting...' : 'Excel'}
+                                Approve Plan
                             </Button>
-                        </Tooltip>
-                        <Tooltip title="Export to PDF">
                             <Button
                                 size="small"
                                 variant="outlined"
                                 color="error"
-                                startIcon={isExportingPDF ? <CircularProgress size={20} color="inherit" /> : <PictureAsPdf />}
-                                onClick={() => handleExport('pdf')}
-                                disabled={isExportingExcel || isExportingPDF}
-                                sx={{ textTransform: 'none', borderRadius: 2 }}
+                                onClick={onRevise}
+                                sx={{ 
+                                    textTransform: 'none', 
+                                    borderRadius: 2,
+                                    fontWeight: 600,
+                                    borderWidth: 1.5,
+                                    '&:hover': { borderWidth: 1.5 }
+                                }}
                             >
-                                {isExportingPDF ? 'Exporting...' : 'PDF'}
+                                Request Revision
                             </Button>
-                        </Tooltip>
-                        <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                        </>
+                    ) : (
+                        <>
+                            <Tooltip title="Export to Excel">
+                                <Button
+                                    size="small"
+                                    variant="outlined"
+                                    startIcon={isExportingExcel ? <CircularProgress size={20} color="inherit" /> : <FileDownload />}
+                                    onClick={() => handleExport('excel')}
+                                    disabled={isExportingExcel || isExportingPDF}
+                                    sx={{ textTransform: 'none', borderRadius: 2 }}
+                                >
+                                    {isExportingExcel ? 'Exporting...' : 'Excel'}
+                                </Button>
+                            </Tooltip>
+                            <Tooltip title="Export to PDF">
+                                <Button
+                                    size="small"
+                                    variant="outlined"
+                                    color="error"
+                                    startIcon={isExportingPDF ? <CircularProgress size={20} color="inherit" /> : <PictureAsPdf />}
+                                    onClick={() => handleExport('pdf')}
+                                    disabled={isExportingExcel || isExportingPDF}
+                                    sx={{ textTransform: 'none', borderRadius: 2 }}
+                                >
+                                    {isExportingPDF ? 'Exporting...' : 'PDF'}
+                                </Button>
+                            </Tooltip>
+                            <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+                        </>
+                    )
+                )}
 
-                    </>
-                )}
-                {canCreate && (
-                    <Button
-                        size="small"
-                        variant="contained"
-                        startIcon={<AddCircleOutline />}
-                        onClick={onCreateNew}
-                        sx={{ textTransform: 'none', borderRadius: 2 }}
-                    >
-                        Create New Project Plan
-                    </Button>
-                )}
                 <Tooltip title="Back to Dashboard">
                     <IconButton
                         size="small"
-                        onClick={() => navigate('/dashboard')}
+                        onClick={onClose || (() => navigate('/dashboard'))}
                         sx={{
                             color: 'text.secondary',
                             '&:hover': { color: 'error.main', bgcolor: 'rgba(211,47,47,0.08)' },

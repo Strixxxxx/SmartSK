@@ -387,19 +387,80 @@ router.post('/override', authMiddleware, async (req, res) => {
 
     try {
         const pool = await getConnection();
-        // Fetch termID for the user's barangay
+        // Fetch termID and barangayName for the user's barangay
         const userBrgyResult = await pool.request()
             .input('chkUserID', sql.Int, userID)
-            .query('SELECT barangay FROM preUserInfo WHERE userID = @chkUserID');
+            .query(`
+                SELECT p.barangay, b.barangayName, p.fullName, p.position 
+                FROM preUserInfo p
+                JOIN barangays b ON p.barangay = b.barangayID
+                WHERE p.userID = @chkUserID
+            `);
             
         let termID = null;
         if (userBrgyResult.recordset.length > 0) {
-            const brgyID = userBrgyResult.recordset[0].barangay;
+            const userData = userBrgyResult.recordset[0];
+            const brgyID = userData.barangay;
+            const barangayName = userData.barangayName;
+            const encryptedFullName = userData.fullName;
+            const position = userData.position;
+            
+            // Decrypt fullName for matching
+            const fullName = decrypt(encryptedFullName);
+
+            // Get current term
             const termResult = await pool.request()
                 .input('brgyID', sql.Int, brgyID)
                 .query('SELECT TOP 1 termID FROM skTerms WHERE barangayID = @brgyID AND isCurrent = 1 ORDER BY termID DESC');
-            if (termResult.recordset.length > 0) {
-                termID = termResult.recordset[0].termID;
+            
+            const currentTermID = termResult.recordset.length > 0 ? termResult.recordset[0].termID : null;
+
+            // --- Intelligent Matching Logic (SmartSync) ---
+            if (currentTermID && barangayName) {
+                try {
+                    const blobName = `SK OFFICIAL - ${barangayName}.json`;
+                    const listData = await downloadBlobAsText(registerContainerName, blobName);
+                    
+                    if (listData) {
+                        const officialsList = JSON.parse(listData);
+                        
+                        // Helper to normalize names
+                        const normalizeName = (name) => {
+                            if (!name) return new Set();
+                            const cleanName = name.toLowerCase().replace(/[.,]/g, ' ');
+                            return new Set(cleanName.split(/\s+/).filter(Boolean));
+                        };
+
+                        const userParts = normalizeName(fullName);
+                        
+                        const match = officialsList.find(official => {
+                            const offName = official.fullName || '';
+                            const offParts = normalizeName(offName);
+                            
+                            if (userParts.size === 0 || offParts.size === 0) return false;
+
+                            // Subset matching
+                            const userArr = Array.from(userParts);
+                            const offArr = Array.from(offParts);
+                            const isSubset = userArr.every(part => offParts.has(part)) || 
+                                             offArr.every(part => userParts.has(part));
+
+                            // Position match
+                            const positionMatch = String(official.position).toUpperCase() === String(position).toUpperCase();
+
+                            return isSubset && positionMatch;
+                        });
+
+                        if (match) {
+                            termID = currentTermID; // Assign termID ONLY if match is found
+                            console.log(`[Manual Override] Match confirmed for ${fullName}. Assigning Term ${currentTermID}.`);
+                        } else {
+                            console.log(`[Manual Override] No match in official list for ${fullName} (${position}). TermID remains NULL.`);
+                        }
+                    }
+                } catch (err) {
+                    console.error(`[Manual Override] SmartSync verification skipped or failed: ${err.message}`);
+                }
             }
         }
 
