@@ -134,6 +134,24 @@
     background: #e8f0fe;
 }
 
+/* AI Success — green tint for completed AI reports */
+.pnb-item--ai_success.pnb-item--unread {
+    background: #e8f5e9;
+}
+
+.pnb-item--ai_success .pnb-item__icon svg {
+    color: #2e7d32 !important;
+}
+
+/* AI Failed — red tint for failed AI reports */
+.pnb-item--ai_failed.pnb-item--unread {
+    background: #fdecea;
+}
+
+.pnb-item--ai_failed .pnb-item__icon svg {
+    color: #c62828 !important;
+}
+
 .pnb-item__icon {
     flex-shrink: 0;
     margin-top: 2px;

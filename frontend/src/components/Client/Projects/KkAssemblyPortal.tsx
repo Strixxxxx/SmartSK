@@ -18,10 +18,11 @@ interface DropZoneProps {
     multiple?: boolean;
     file: any;
     onFile: (f: any) => void;
+    onClear?: () => void;
     hint: string;
 }
 
-const DropZone: React.FC<DropZoneProps> = ({ label, accept, multiple, file, onFile, hint }) => {
+const DropZone: React.FC<DropZoneProps> = ({ label, accept, multiple, file, onFile, onClear, hint }) => {
     const [dragging, setDragging] = React.useState(false);
     const inputRef = React.useRef<HTMLInputElement>(null);
 
@@ -79,7 +80,26 @@ const DropZone: React.FC<DropZoneProps> = ({ label, accept, multiple, file, onFi
             </div>
             <div className={styles.dropZoneLabel}>{label}</div>
             {hasFile
-                ? <div className={styles.dropZoneFileName}>{fileLabel}</div>
+                ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', zIndex: 2 }}>
+                        <div className={styles.dropZoneFileName}>{fileLabel}</div>
+                        {onClear && (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onClear(); }}
+                                style={{
+                                    background: 'transparent', border: 'none', color: '#ef4444', 
+                                    cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}
+                                title="Remove file"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+                )
                 : <div className={styles.dropZoneHint}>{hint}</div>
             }
         </div>
@@ -566,6 +586,7 @@ const KkAssemblyPortal: React.FC<KkAssemblyPortalProps> = ({ project, user }) =>
                                 accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
                                 file={attendanceSheet}
                                 onFile={(f) => { setPendingAttendanceSheet(f as File); setNoticePreviewModalOpen(true); }}
+                                onClear={() => setAttendanceSheet(null)}
                                 hint="PDF, JPEG, or PNG"
                             />
                         )}
@@ -651,6 +672,7 @@ const KkAssemblyPortal: React.FC<KkAssemblyPortalProps> = ({ project, user }) =>
                                 accept=".pdf,.jpg,.jpeg,.png"
                                 file={kkMinutes}
                                 onFile={(f) => { setPendingKkMinutes(f as File); setDatasetConfirmModalOpen(true); }}
+                                onClear={() => setKkMinutes(null)}
                                 hint="PDF, JPEG, or PNG"
                             />
                         )}

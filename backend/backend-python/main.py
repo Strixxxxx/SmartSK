@@ -79,11 +79,12 @@ async def ai_job_worker():
             batch_id = req_data.get('batch_id')
             port = os.getenv("NODE_PORT", "8000")
             url = f"http://127.0.0.1:{port}/api/project-batch/webhook/ai-status"
+            print(f"[Webhook-DEBUG] AI Job SUCCESS. Firing POST to Node.js Webhook at: {url} with batchID: {batch_id}")
             try:
-                requests.post(url, json={"status": "success", "batchID": batch_id}, timeout=5)
-                print(f"Successfully sent callback to Node.js for batch {batch_id}")
+                cb_res = requests.post(url, json={"status": "success", "batchID": batch_id}, timeout=5)
+                print(f"[Webhook-DEBUG] Successfully sent callback to Node.js for batch {batch_id}. Response status: {cb_res.status_code}")
             except Exception as e:
-                print(f"Failed to send success callback to Node.js: {e}")
+                print(f"[Webhook-DEBUG] Failed to send success callback to Node.js: {e}")
                 
         except Exception as e:
             print(f"AI Job failed: {e}")

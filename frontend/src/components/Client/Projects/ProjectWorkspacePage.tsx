@@ -46,10 +46,11 @@ interface DropZoneProps {
     multiple?: boolean;
     file: File | File[] | null;
     onFile: (f: File | File[]) => void;
+    onClear?: () => void;
     hint: string;
 }
 
-const DropZone: React.FC<DropZoneProps> = ({ label, accept, multiple, file, onFile, hint }) => {
+const DropZone: React.FC<DropZoneProps> = ({ label, accept, multiple, file, onFile, onClear, hint }) => {
     const [dragging, setDragging] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -107,7 +108,26 @@ const DropZone: React.FC<DropZoneProps> = ({ label, accept, multiple, file, onFi
             </div>
             <div className={styles.dropZoneLabel}>{label}</div>
             {hasFile
-                ? <div className={styles.dropZoneFileName}>{fileLabel}</div>
+                ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', zIndex: 2 }}>
+                        <div className={styles.dropZoneFileName}>{fileLabel}</div>
+                        {onClear && (
+                            <button
+                                onClick={(e) => { e.stopPropagation(); onClear(); }}
+                                style={{
+                                    background: 'transparent', border: 'none', color: '#ef4444', 
+                                    cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                }}
+                                title="Remove file"
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <line x1="18" y1="6" x2="6" y2="18" />
+                                    <line x1="6" y1="6" x2="18" y2="18" />
+                                </svg>
+                            </button>
+                        )}
+                    </div>
+                )
                 : <div className={styles.dropZoneHint}>{hint}</div>
             }
         </div>
@@ -585,6 +605,7 @@ const ProfilingPortal: React.FC<ProfilingPortalProps> = ({ project, user }) => {
                                 accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"
                                 file={noticeLetter}
                                 onFile={(f) => { setPendingNoticeLetter(f as File); setNoticePreviewModalOpen(true); }}
+                                onClear={() => setNoticeLetter(null)}
                                 hint="PDF, JPEG, or PNG — Annex 1 (Official notice to the barangay community)"
                             />
                         )}
@@ -670,6 +691,7 @@ const ProfilingPortal: React.FC<ProfilingPortalProps> = ({ project, user }) => {
                                 accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                 file={masterDataset}
                                 onFile={(f) => { setPendingMasterDataset(f as File); setDatasetConfirmModalOpen(true); }}
+                                onClear={() => setMasterDataset(null)}
                                 hint="XLSX only — Annex 4 (Official DILG youth profiling spreadsheet)"
                             />
                         )}
@@ -1557,16 +1579,20 @@ function getAgendaColumnMap(tabName: string): string {
                 statusID
             });
             if (res.data.success) {
+                console.log(`[Update-Status-DEBUG] Frontend received success. aiTriggered flag is: ${res.data.aiTriggered}`);
                 setSelectedProject((prev: any) => ({
                     ...prev,
                     currentStatusID: statusID
                 }));
                 if (res.data.aiTriggered) {
+                    console.log(`[Update-Status-DEBUG] Opening AI Snackbar toast...`);
                     setAiSnackbar({
                         open: true,
                         message: 'City Approval reached! AI Report generation has been queued and will update shortly.',
                         severity: 'info'
                     });
+                } else {
+                    console.log(`[Update-Status-DEBUG] aiTriggered was false. Toast not shown.`);
                 }
             }
         } catch (err: any) {

@@ -45,7 +45,7 @@ const CampaignProofManageModal: React.FC<CampaignProofManageModalProps> = ({
     useEffect(() => {
         if (open) {
             // By default, only select proofs that are included
-            setCheckedAttachmentIDs(existingProofs.filter(p => (p as any).isIncluded !== false).map(p => p.attachmentID));
+            setCheckedAttachmentIDs(existingProofs.map(p => p.attachmentID));
             setDeletedAttachmentIDs([]);
             setNewFiles([]);
             setNewPreviews([]);

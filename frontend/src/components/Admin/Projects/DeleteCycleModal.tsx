@@ -11,16 +11,16 @@ interface ProjectCycle {
     displayName: string;
 }
 
-interface ArchiveCycleModalProps {
+interface DeleteCycleModalProps {
     open: boolean;
     onClose: () => void;
-    onArchiveSuccess: () => void;
+    onDeleteSuccess: () => void;
 }
 
-const ArchiveCycleModal: React.FC<ArchiveCycleModalProps> = ({ open, onClose, onArchiveSuccess }) => {
+const DeleteCycleModal: React.FC<DeleteCycleModalProps> = ({ open, onClose, onDeleteSuccess }) => {
     const [cycles, setCycles] = useState<ProjectCycle[]>([]);
     const [loading, setLoading] = useState(false);
-    const [archivingId, setArchivingId] = useState<number | null>(null);
+    const [deletingId, setDeletingId] = useState<number | null>(null);
 
     const fetchCycles = async () => {
         setLoading(true);
@@ -43,33 +43,33 @@ const ArchiveCycleModal: React.FC<ArchiveCycleModalProps> = ({ open, onClose, on
         }
     }, [open]);
 
-    const handleArchive = async (cycleID: number) => {
-        if (!window.confirm('Are you sure you want to archive this cycle? All associated projects and submissions will also be archived.')) return;
+    const handleDelete = async (cycleID: number) => {
+        if (!window.confirm('Are you sure you want to delete this cycle? All associated project batches, submissions, and files on Azure storage will be permanently deleted. This action cannot be undone.')) return;
         
-        setArchivingId(cycleID);
+        setDeletingId(cycleID);
         try {
-            const res = await axiosInstance.post(`/api/admin/proj-archive/cycles/${cycleID}`);
+            const res = await axiosInstance.delete(`/api/admin/proj-archive/cycles/${cycleID}`);
             if (res.data.success) {
-                toast.success('Project cycle archived successfully');
-                onArchiveSuccess(); // Trigger refresh on parent if needed
+                toast.success('Project cycle deleted successfully');
+                onDeleteSuccess(); // Trigger refresh on parent if needed
                 onClose(); // Close modal
             } else {
-                toast.error(res.data.message || 'Failed to archive cycle');
+                toast.error(res.data.message || 'Failed to delete cycle');
             }
         } catch (error) {
-            console.error('Archive error:', error);
-            toast.error('An error occurred while archiving');
+            console.error('Delete error:', error);
+            toast.error('An error occurred while deleting');
         } finally {
-            setArchivingId(null);
+            setDeletingId(null);
         }
     };
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle sx={{ fontWeight: 'bold' }}>Archive Project Cycle</DialogTitle>
+            <DialogTitle sx={{ fontWeight: 'bold', color: 'error.main' }}>Delete Project Cycle</DialogTitle>
             <DialogContent dividers>
                 <Typography variant="body2" color="textSecondary" sx={{ mb: 2 }}>
-                    Select an active project cycle to archive. Archiving a cycle will automatically archive all its associated project batches and submissions.
+                    Select a project cycle to delete. Deleting a cycle will automatically and permanently delete all its associated project batches, submissions, and stored files.
                 </Typography>
                 
                 {loading ? (
@@ -98,10 +98,10 @@ const ArchiveCycleModal: React.FC<ArchiveCycleModalProps> = ({ open, onClose, on
                                                 variant="outlined" 
                                                 color="error" 
                                                 size="small"
-                                                disabled={archivingId === cycle.cycleID}
-                                                onClick={() => handleArchive(cycle.cycleID)}
+                                                disabled={deletingId === cycle.cycleID}
+                                                onClick={() => handleDelete(cycle.cycleID)}
                                             >
-                                                {archivingId === cycle.cycleID ? 'Archiving...' : 'Archive'}
+                                                {deletingId === cycle.cycleID ? 'Deleting...' : 'Delete'}
                                             </Button>
                                         </TableCell>
                                     </TableRow>
@@ -118,4 +118,4 @@ const ArchiveCycleModal: React.FC<ArchiveCycleModalProps> = ({ open, onClose, on
     );
 };
 
-export default ArchiveCycleModal;
+export default DeleteCycleModal;

@@ -41,10 +41,10 @@ def get_data_from_sql():
     FROM projectBatch pb
     INNER JOIN projectABYIP pa ON pb.batchID = pa.projbatchID
     INNER JOIN (
-        SELECT batchID, MAX(statusID) as maxStatus
+        SELECT cycleID, MAX(statusID) as maxStatus
         FROM projectTracker
-        GROUP BY batchID
-    ) tracker ON pb.batchID = tracker.batchID
+        GROUP BY cycleID
+    ) tracker ON pb.cycleID = tracker.cycleID
     WHERE pb.projType = 'ABYIP' 
       AND tracker.maxStatus >= 9
     ORDER BY pb.targetYear DESC, pa.sheetRowIndex ASC;

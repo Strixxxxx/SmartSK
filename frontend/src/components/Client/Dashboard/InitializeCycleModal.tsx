@@ -37,6 +37,11 @@ const InitializeCycleModal: React.FC<InitializeCycleModalProps> = ({ open, onClo
             if (tFiscal < tStart || tFiscal > tEnd) {
                 errors.push(`Fiscal year must fall within the term range (${tStart}–${tEnd}).`);
             }
+            
+            const currentYear = new Date().getFullYear();
+            if (tFiscal < currentYear || tFiscal > currentYear + 1) {
+                errors.push(`Fiscal year must be the current year (${currentYear}) or next year (${currentYear + 1}).`);
+            }
         }
         return errors;
     }, [termStartYear, termEndYear, targetFiscalYear, tStart, tEnd, tFiscal]);

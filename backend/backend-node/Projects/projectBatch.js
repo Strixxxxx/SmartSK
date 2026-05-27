@@ -1,5 +1,5 @@
 const express = require('express');
-const { broadcastToRoom } = require('../websockets/websocket');
+const { broadcastToRoom, broadcast } = require('../websockets/websocket');
 const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const templateService = require('../utils/templateService');
@@ -101,20 +101,36 @@ router.post('/update-status', authMiddleware, hasAccessControl('trackerControl')
 
         const pool = await getConnection();
 
-        // Fetch projType to check for ABYIP AI trigger
+        // Fetch projType and cycleID to check for ABYIP AI trigger
         const batchResult = await pool.request()
             .input('batchID', sql.Int, batchID)
-            .query('SELECT projType, barangayID FROM projectBatch WHERE batchID = @batchID');
+            .query('SELECT projType, barangayID, cycleID FROM projectBatch WHERE batchID = @batchID');
 
         if (!batchResult.recordset.length) {
             return res.status(404).json({ success: false, message: 'Batch not found.' });
         }
 
-        const { projType, barangayID } = batchResult.recordset[0];
+        const { projType, barangayID, cycleID } = batchResult.recordset[0];
+        console.log(`[Update-Status-DEBUG] Advancing batch ${batchID}. Type: ${projType}, Cycle: ${cycleID}, Status->${statusID}`);
+
+        // Ensure we find the ABYIP batch ID for this cycle
+        let abyipBatchID = null;
+        if (projType === 'ABYIP') {
+            abyipBatchID = batchID;
+        } else if (cycleID) {
+            const cycleResult = await pool.request()
+                .input('cycleID', sql.Int, cycleID)
+                .query("SELECT batchID FROM projectBatch WHERE cycleID = @cycleID AND projType = 'ABYIP'");
+            if (cycleResult.recordset.length > 0) {
+                abyipBatchID = cycleResult.recordset[0].batchID;
+            }
+        }
+        
+        console.log(`[Update-Status-DEBUG] Evaluated abyipBatchID: ${abyipBatchID} for cycle ${cycleID}`);
 
         // --- CIRCUIT BREAKER: Pre-flight health check before Project Execution AI trigger ---
-        if (statusID === 13 && projType === 'ABYIP') {
-            console.log(`[Circuit Breaker] Checkpoint 13 reached for batch ${batchID}. Checking AI service health...`);
+        if (statusID === 13 && abyipBatchID) {
+            console.log(`[Circuit Breaker] Checkpoint 13 reached for cycle. Checking AI service health for ABYIP batch ${abyipBatchID}...`);
             try {
                 const aiHealthUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/health`;
                 await axios.get(aiHealthUrl, { timeout: 3000 });
@@ -135,37 +151,43 @@ router.post('/update-status', authMiddleware, hasAccessControl('trackerControl')
             .input('userID', sql.Int, userID)
             .query('INSERT INTO projectTracker (cycleID, statusID, updatedBy) SELECT cycleID, @statusID, @userID FROM projectBatch WHERE batchID = @batchID; UPDATE projectCycles SET currentStatusID = @statusID, updatedAt = GETDATE() WHERE cycleID = (SELECT cycleID FROM projectBatch WHERE batchID = @batchID);');
 
-        // Project Execution (statusID = 13) on ABYIP only -> trigger AI job
-        if (statusID === 13 && projType === 'ABYIP') {
-            console.log(`[AI Trigger] ABYIP batch ${batchID} reached Project Execution (CP13). Triggering AI Job via HTTP...`);
+        // Project Execution (statusID = 13) -> trigger AI job on the ABYIP batch
+        if (statusID === 13 && abyipBatchID) {
+            console.log(`[AI Trigger] Cycle reached Project Execution (CP13). Triggering AI Job for ABYIP batch ${abyipBatchID} via HTTP...`);
 
             // Fire-and-forget HTTP call to Python microservice
             const pythonUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/run-ai-batch-job`;
+            console.log(`[Update-Status-DEBUG] Firing POST to Python microservice at: ${pythonUrl} with batch_id: ${abyipBatchID}`);
 
-            axios.post(pythonUrl, { batch_id: batchID }).catch(err => {
+            axios.post(pythonUrl, { batch_id: abyipBatchID }).then((res) => {
+                console.log(`[Update-Status-DEBUG] Python /run-ai-batch-job responded with status: ${res.status}`);
+            }).catch(err => {
                 console.error('[AI Trigger] Failed to trigger AI job via HTTP:', err.message);
             });
 
             // Insert AI_TRIGGERED notification
             await pool.request()
-                .input('batchID', sql.Int, batchID)
+                .input('batchID', sql.Int, abyipBatchID)
                 .input('barangayID', sql.Int, barangayID)
                 .input('notifType', sql.NVarChar, 'AI_TRIGGERED')
                 .input('message', sql.NVarChar,
-                    `AI historical data sync triggered for ABYIP project (Batch #${batchID}) upon Project Execution. Reports will be updated shortly.`)
+                    `AI historical data sync triggered for ABYIP project (Batch #${abyipBatchID}) upon Project Execution. Reports will be updated shortly.`)
                 .query(`
                     INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
                     VALUES (@batchID, @barangayID, @notifType, @message)
                 `);
 
             // Broadcast real-time update
-            broadcastToRoom(batchID, { type: 'ai_triggered', batchID });
+            broadcastToRoom(abyipBatchID, { type: 'ai_triggered', batchID: abyipBatchID });
+            if (batchID !== abyipBatchID) {
+                broadcastToRoom(batchID, { type: 'ai_triggered', batchID: abyipBatchID });
+            }
         }
 
         res.json({
             success: true,
             message: `Project status updated to Step ${statusID}`,
-            aiTriggered: statusID === 13 && projType === 'ABYIP'
+            aiTriggered: statusID === 13 && !!abyipBatchID
         });
 
     } catch (error) {
@@ -175,59 +197,6 @@ router.post('/update-status', authMiddleware, hasAccessControl('trackerControl')
 });
 
 
-// Webhook for Python AI Job Callback
-router.post('/webhook/ai-status', async (req, res) => {
-    try {
-        const { status, batchID, error } = req.body;
-        if (!batchID) return res.status(400).json({ success: false, message: 'Missing batchID' });
-
-        const pool = await getConnection();
-
-        // Find the barangayID for this batch
-        const batchResult = await pool.request()
-            .input('batchID', sql.Int, batchID)
-            .query('SELECT barangayID FROM projectBatch WHERE batchID = @batchID');
-
-        if (!batchResult.recordset.length) {
-            return res.status(404).json({ success: false, message: 'Batch not found' });
-        }
-
-        const barangayID = batchResult.recordset[0].barangayID;
-
-        let message = '';
-        let notifType = '';
-        if (status === 'success') {
-            notifType = 'AI_SUCCESS';
-            message = `AI-Generated Reports for Batch #${batchID} are currently Updated. Try looking up the updated forecasts and analysis!`;
-        } else {
-            notifType = 'AI_FAILED';
-            message = `AI-Generated Reports for Batch #${batchID} failed to update. Please contact the administrator or try again later.`;
-        }
-
-        await pool.request()
-            .input('batchID', sql.Int, batchID)
-            .input('barangayID', sql.Int, barangayID)
-            .input('notifType', sql.NVarChar, notifType)
-            .input('message', sql.NVarChar, message)
-            .query(`
-                INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
-                VALUES (@batchID, @barangayID, @notifType, @message)
-            `);
-
-        // Broadcast via websocket
-        broadcastToRoom(batchID, {
-            type: 'ai_report_status',
-            batchID,
-            status,
-            message
-        });
-
-        res.json({ success: true, message: 'Callback received' });
-    } catch (err) {
-        console.error('Webhook error:', err);
-        res.status(500).json({ success: false, message: 'Internal Server Error' });
-    }
-});
 
 // 4. Force Excel Sync (Before Export)
 router.post('/sync/:batchID', authMiddleware, async (req, res) => {

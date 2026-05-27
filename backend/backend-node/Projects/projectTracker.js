@@ -1457,6 +1457,7 @@ router.post('/validate-budget', authMiddleware, async (req, res) => {
     }
 });
 
+const axios = require('axios');
 // 3. POST /validate-checkpoint
 router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
     try {
@@ -1481,7 +1482,7 @@ router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
         // Ensure current status matches fromCheckpoint
         const batchCheck = await pool.request()
             .input('batchID', sql.Int, batchID)
-            .query(`SELECT projName, barangayID, cycleID FROM projectBatch WHERE batchID = @batchID`);
+            .query(`SELECT projName, barangayID, cycleID, projType FROM projectBatch WHERE batchID = @batchID`);
             
         if (batchCheck.recordset.length === 0) {
             return res.status(404).json({ success: false, message: 'Project not found.' });
@@ -1514,6 +1515,19 @@ router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
         let taggedNote = '';
         let notifMessage = '';
         let notifType = 'CHECKPOINT_VALIDATED';
+        let abyipBatchID = null;
+
+        // Ensure we find the ABYIP batch ID for this cycle for AI sync
+        if (batchCheck.recordset[0].projType === 'ABYIP') {
+            abyipBatchID = batchID;
+        } else {
+            const cycleResult = await pool.request()
+                .input('cycleID', sql.Int, cycleID)
+                .query("SELECT batchID FROM projectBatch WHERE cycleID = @cycleID AND projType = 'ABYIP'");
+            if (cycleResult.recordset.length > 0) {
+                abyipBatchID = cycleResult.recordset[0].batchID;
+            }
+        }
         
         if (act === 'approve') {
             nextStatusID = fromCP + 1;
@@ -1528,6 +1542,21 @@ router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
             taggedNote = `[BCPT Rejection: CP${fromCP}] ${validationNote}`;
         }
         
+        if (act === 'approve' && nextStatusID === 13 && abyipBatchID) {
+            console.log(`[Circuit Breaker] Checkpoint 13 reached via BCPT validation. Checking AI service health for ABYIP batch ${abyipBatchID}...`);
+            try {
+                const aiHealthUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/health`;
+                await axios.get(aiHealthUrl, { timeout: 3000 });
+                console.log('[Circuit Breaker] AI Service is reachable. Allowing BCPT status transition.');
+            } catch (healthErr) {
+                console.error('[Circuit Breaker] TRIPPED — AI Service is unreachable. Blocking BCPT status transition.', healthErr.message);
+                return res.status(503).json({
+                    success: false,
+                    message: 'AI Service is temporarily down. Cannot transition to Project Execution. Please try again later.'
+                });
+            }
+        }
+
         // Perform updates inside a transaction
         const transaction = new sql.Transaction(pool);
         await transaction.begin();
@@ -1563,7 +1592,46 @@ router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
             broadcastToRoom(batchID.toString(), { type: 'new_note' });
             broadcast({ type: 'new_notification', barangayID });
             
-            res.json({ success: true, message: act === 'approve' ? `Checkpoint ${fromCP} validated. Project advanced to Checkpoint ${nextStatusID}.` : `Checkpoint ${fromCP} validation rejected. Project set to Checkpoint ${nextStatusID}.` });
+            let aiTriggered = false;
+
+            // Project Execution (nextStatusID = 13) -> trigger AI job on the ABYIP batch
+            if (act === 'approve' && nextStatusID === 13 && abyipBatchID) {
+                aiTriggered = true;
+                console.log(`[AI Trigger] BCPT validated CP13. Triggering AI Job for ABYIP batch ${abyipBatchID} via HTTP...`);
+
+                const pythonUrl = `${process.env.AI_SERVICE_URL || 'http://localhost:8080'}/run-ai-batch-job`;
+                console.log(`[Update-Status-DEBUG] Firing POST to Python microservice at: ${pythonUrl} with batch_id: ${abyipBatchID}`);
+
+                axios.post(pythonUrl, { batch_id: abyipBatchID }).then((response) => {
+                    console.log(`[Update-Status-DEBUG] Python /run-ai-batch-job responded with status: ${response.status}`);
+                }).catch(err => {
+                    console.error('[AI Trigger] Failed to trigger AI job via HTTP from BCPT:', err.message);
+                });
+
+                // Insert AI_TRIGGERED notification
+                await pool.request()
+                    .input('batchID', sql.Int, abyipBatchID)
+                    .input('barangayID', sql.Int, barangayID)
+                    .input('notifType', sql.NVarChar, 'AI_TRIGGERED')
+                    .input('message', sql.NVarChar,
+                        `AI historical data sync triggered for ABYIP project (Batch #${abyipBatchID}) upon Project Execution. Reports will be updated shortly.`)
+                    .query(`
+                        INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
+                        VALUES (@batchID, @barangayID, @notifType, @message)
+                    `);
+
+                // Broadcast real-time update
+                broadcastToRoom(abyipBatchID.toString(), { type: 'ai_triggered', batchID: abyipBatchID });
+                if (batchID !== abyipBatchID) {
+                    broadcastToRoom(batchID.toString(), { type: 'ai_triggered', batchID: abyipBatchID });
+                }
+            }
+            
+            res.json({ 
+                success: true, 
+                message: act === 'approve' ? `Checkpoint ${fromCP} validated. Project advanced to Checkpoint ${nextStatusID}.` : `Checkpoint ${fromCP} validation rejected. Project set to Checkpoint ${nextStatusID}.`,
+                aiTriggered
+            });
         } catch (txnErr) {
             await transaction.rollback();
             throw txnErr;
@@ -1576,12 +1644,6 @@ router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
 });
 
 
-// ============================================================================
-// CHECKPOINT 1: Youth Profiling Endpoints
-// Implements DILG MC No. 2022-033 — Annex 4 upload, validation, and gating.
-// ============================================================================
-
-const axios = require('axios');
 const uploadFields = upload.fields([
     { name: 'barangay_notice_letter', maxCount: 1 },
     { name: 'campaign_proof_images', maxCount: 20 },
@@ -2046,7 +2108,7 @@ router.patch('/profiling/replace-annex', authMiddleware, uploadFields, async (re
                 .query(`
                     UPDATE youth_profiling_submissions
                     SET noticeLetterBlobName = @blobName, noticeLetterUploadedAt = GETDATE(), updatedAt = GETDATE()
-                    WHERE submissionID = @submissionID AND isIncluded = 1
+                    WHERE submissionID = @submissionID
                 `);
 
         } else if (annexType === 'masterDataset') {

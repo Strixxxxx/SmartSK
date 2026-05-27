@@ -218,6 +218,70 @@ app.post('/api/maintenance-end', (req, res) => {
 
 // --- AUTHENTICATION MIDDLEWARE ---
 // All routes defined after this point will be protected by the authMiddleware.
+
+// --- INTERNAL AI WEBHOOK ---
+// Called by Python sidecar after AI job completes. No JWT — validated by loopback IP.
+app.post('/api/project-batch/webhook/ai-status', async (req, res) => {
+  // Loopback guard: accept only requests from the sidecar (127.0.0.1 / ::1 / ::ffff:127.0.0.1)
+  const remoteAddr = req.socket?.remoteAddress || '';
+  const isLoopback = remoteAddr === '127.0.0.1'
+    || remoteAddr === '::1'
+    || remoteAddr === '::ffff:127.0.0.1';
+
+  if (!isLoopback) {
+    console.warn(`[Webhook] Blocked non-loopback request from ${remoteAddr}`);
+    return res.status(403).json({ success: false, message: 'Forbidden' });
+  }
+
+  try {
+    const { status, batchID } = req.body;
+    if (!batchID) return res.status(400).json({ success: false, message: 'Missing batchID' });
+
+    console.log(`[Webhook] Received AI callback for batch ${batchID} — status: ${status}`);
+
+    const pool = await getConnection();
+
+    const batchResult = await pool.request()
+      .input('batchID', sql.Int, batchID)
+      .query('SELECT barangayID FROM projectBatch WHERE batchID = @batchID');
+
+    if (!batchResult.recordset.length) {
+      return res.status(404).json({ success: false, message: 'Batch not found' });
+    }
+
+    const barangayID = batchResult.recordset[0].barangayID;
+
+    const notifType = status === 'success' ? 'AI_SUCCESS' : 'AI_FAILED';
+    const message = status === 'success'
+      ? `AI-Generated Reports for Batch #${batchID} are now updated. Check the Predictive Analysis and Forecasting pages!`
+      : `AI-Generated Reports for Batch #${batchID} failed to update. Please contact the administrator or try again later.`;
+
+    await pool.request()
+      .input('batchID', sql.Int, batchID)
+      .input('barangayID', sql.Int, barangayID)
+      .input('notifType', sql.NVarChar, notifType)
+      .input('message', sql.NVarChar, message)
+      .query(`INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
+              VALUES (@batchID, @barangayID, @notifType, @message)`);
+
+    // Notify all connected WebSocket clients (not just room members)
+    broadcast({
+      type: 'ai_report_status',
+      batchID,
+      status,
+      message
+    });
+
+    // Trigger notification bell refresh for all users
+    broadcast({ type: 'new_notification', barangayID });
+
+    res.json({ success: true, message: 'Callback received' });
+  } catch (err) {
+    console.error('[Webhook] Error processing AI callback:', err.message);
+    res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
+});
+
 if (authMiddleware && typeof authMiddleware === 'function') {
   app.use(authMiddleware);
 } else {

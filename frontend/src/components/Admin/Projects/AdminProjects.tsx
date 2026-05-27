@@ -5,7 +5,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { toast } from 'react-toastify';
 import Loading from '../../Loading/Loading';
 import AdminProjectCard from './AdminProjectCard';
-import ArchiveCycleModal from './ArchiveCycleModal';
+import DeleteCycleModal from './DeleteCycleModal';
 import styles from './AdminProjects.module.css';
 import { Switch, FormControlLabel, Paper, Box, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button } from '@mui/material';
 
@@ -142,7 +142,7 @@ const AdminProjects: React.FC = () => {
                             onClick={() => setShowCycleModal(true)}
                             sx={{ fontWeight: 'bold' }}
                         >
-                            Archive Project Cycle
+                            Delete Project Cycle
                         </Button>
                     </Box>
                 </Paper>
@@ -178,10 +178,10 @@ const AdminProjects: React.FC = () => {
                 </main>
             </div>
 
-            <ArchiveCycleModal
+            <DeleteCycleModal
                 open={showCycleModal}
                 onClose={() => setShowCycleModal(false)}
-                onArchiveSuccess={() => window.location.reload()}
+                onDeleteSuccess={() => window.location.reload()}
             />
 
             <Dialog

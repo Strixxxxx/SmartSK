@@ -10,7 +10,7 @@ import './ProjectNotificationBell.css';
 interface ProjectNotification {
     notificationID: number;
     batchID: number;
-    notifType: 'DEADLINE_WARNING' | 'URGENT' | 'AI_TRIGGERED' | 'FISCAL_DEADLINE';
+    notifType: 'DEADLINE_WARNING' | 'URGENT' | 'AI_TRIGGERED' | 'AI_SUCCESS' | 'AI_FAILED' | 'FISCAL_DEADLINE';
     message: string;
     isRead: boolean;
     createdAt: string;
@@ -38,6 +38,27 @@ const ProjectNotificationBell: React.FC = () => {
         return () => clearInterval(interval);
     }, [fetchNotifications]);
 
+    // WebSocket listener for real-time bell refresh
+    useEffect(() => {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        if (!token) return;
+        const backendHttpUrl = import.meta.env.VITE_BACKEND_SERVER || 'http://localhost:8000';
+        const wsUrl = backendHttpUrl.replace(/^http/, 'ws');
+        const ws = new WebSocket(wsUrl);
+
+        ws.onopen = () => ws.send(JSON.stringify({ type: 'auth', token }));
+        ws.onmessage = (event) => {
+            try {
+                const msg = JSON.parse(event.data);
+                if (msg.type === 'new_notification' || msg.type === 'ai_report_status') {
+                    fetchNotifications();
+                }
+            } catch { /* ignore parse errors */ }
+        };
+        return () => ws.close();
+    }, [fetchNotifications]);
+
+
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
             if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
@@ -63,6 +84,8 @@ const ProjectNotificationBell: React.FC = () => {
         if (type === 'FISCAL_DEADLINE') return <WarningAmberIcon sx={{ color: '#b71c1c', fontSize: 18 }} />;
         if (type === 'URGENT') return <WarningAmberIcon sx={{ color: '#c62828', fontSize: 18 }} />;
         if (type === 'AI_TRIGGERED') return <PrecisionManufacturingIcon sx={{ color: '#1565c0', fontSize: 18 }} />;
+        if (type === 'AI_SUCCESS') return <PrecisionManufacturingIcon sx={{ color: '#2e7d32', fontSize: 18 }} />;
+        if (type === 'AI_FAILED') return <PrecisionManufacturingIcon sx={{ color: '#c62828', fontSize: 18 }} />;
         return <InfoOutlinedIcon sx={{ color: '#e65100', fontSize: 18 }} />;
     };
 

@@ -9,8 +9,10 @@ from google.genai import types
 logger = logging.getLogger(__name__)
 
 # --- Centralized Model Names ---
-PRIMARY_MODEL = "gemini-3-flash-preview"
-FALLBACK_MODEL = "gemini-3.1-flash-lite-preview"
+PRIMARY_MODEL = "gemini-3.5-flash"
+FALLBACK_MODEL = "gemini-3.1-flash-lite"
+FALLBACK_MODEL_1 = "gemini-2.5-flash"
+FALLBACK_MODEL_2 = "gemini-2.5-flash-lite"
 
 _client = None
 _active_model = PRIMARY_MODEL
@@ -68,15 +70,24 @@ def call_gemini_with_retry(prompt, validation_func, max_retries=5):
 
         except Exception as e:
             error_msg = str(e).lower()
-            if "429" in error_msg or "quota" in error_msg or "resource_exhausted" in error_msg:
-                logger.error(f"Quota Exceeded (429) for model '{_active_model}'.")
+            
+            # If we hit quota (429) or other API blocks, trigger fallback chain
+            if "429" in error_msg or "quota" in error_msg or "resource_exhausted" in error_msg or "unavailable" in error_msg or "not_found" in error_msg:
+                logger.error(f"Error '{error_msg}' encountered for model '{_active_model}'. Triggering fallback check.")
                 if _active_model == PRIMARY_MODEL:
-                    logger.warning(f"Switching session model to fallback: {FALLBACK_MODEL}")
+                    logger.warning(f"Switching session model to 1st fallback: {FALLBACK_MODEL}")
                     _active_model = FALLBACK_MODEL
-                    # Don't increment attempt, just retry with new model
+                    continue
+                elif _active_model == FALLBACK_MODEL:
+                    logger.warning(f"Switching session model to 2nd fallback: {FALLBACK_MODEL_1}")
+                    _active_model = FALLBACK_MODEL_1
+                    continue
+                elif _active_model == FALLBACK_MODEL_1:
+                    logger.warning(f"Switching session model to 3rd fallback: {FALLBACK_MODEL_2}")
+                    _active_model = FALLBACK_MODEL_2
                     continue
                 else:
-                    logger.error("Fallback model also exhausted quota.")
+                    logger.error("All fallback models exhausted or unavailable.")
                     break
             
             logger.error(f"Attempt {attempt + 1} failed with an unexpected error: {e}")

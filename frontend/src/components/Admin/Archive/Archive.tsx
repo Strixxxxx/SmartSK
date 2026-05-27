@@ -2,10 +2,7 @@ import React, { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import AccArchive from './accArchive';
 import ProjArchive from './projArchive';
-import CycleArchive from './CycleArchive';
 import './Archive.css';
-
-type ArchiveTab = 'accounts' | 'projects' | 'cycles';
 
 interface OutletContextType {
   sidebarCollapsed: boolean;
@@ -13,7 +10,7 @@ interface OutletContextType {
 
 const Archive: React.FC = () => {
   const { sidebarCollapsed } = useOutletContext<OutletContextType>();
-  const [activeTab, setActiveTab] = useState<ArchiveTab>('accounts');
+  const [activeTab, setActiveTab] = useState<'accounts' | 'projects'>('accounts');
 
   return (
     <div className={`archive-container ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
@@ -35,18 +32,11 @@ const Archive: React.FC = () => {
         >
           Archived Projects
         </button>
-        <button 
-          className={`archive-tab ${activeTab === 'cycles' ? 'active' : ''}`}
-          onClick={() => setActiveTab('cycles')}
-        >
-          Archived Project Cycles
-        </button>
       </div>
 
       <main className="archive-content">
         {activeTab === 'accounts' && <AccArchive />}
         {activeTab === 'projects' && <ProjArchive />}
-        {activeTab === 'cycles' && <CycleArchive />}
       </main>
     </div>
   );

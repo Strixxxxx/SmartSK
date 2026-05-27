@@ -85,6 +85,9 @@ const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ o
             if (res.data.success) {
                 if (action === 'approve') {
                     toast.success(`Checkpoint ${checkpointID} validated successfully.`);
+                    if (res.data.aiTriggered) {
+                        toast.info('City Approval reached! AI Report generation has been queued and will update shortly.');
+                    }
                 } else {
                     let revertMsg = '';
                     if (checkpointID >= 4 && checkpointID <= 6) {
