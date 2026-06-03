@@ -606,17 +606,24 @@ router.patch('/:batchID/budget', authMiddleware, async (req, res) => {
 // 11. Get project notifications for the logged-in user's barangay
 router.get('/notifications', authMiddleware, async (req, res) => {
     try {
-        const { barangay: barangayID } = req.user;
+        const { barangay: barangayID, userID } = req.user;
         const pool = await getConnection();
 
         const result = await pool.request()
             .input('barangayID', sql.Int, barangayID)
+            .input('userID', sql.Int, userID)
             .query(`
                 SELECT
-                    pn.notificationID, pn.batchID, pn.notifType, pn.message, pn.isRead, pn.createdAt,
-                    pb.projName, pb.projType
+                    pn.notificationID, pn.batchID, pn.cycleID, pn.notifType, pn.message, 
+                    ISNULL(unr.isRead, 0) AS isRead, 
+                    pn.createdAt,
+                    'Project Cycle ' + CAST(COALESCE(pc.cycleID, pc2.cycleID) AS VARCHAR) + ' - ' + CAST(COALESCE(pc.targetFiscalYear, pc2.targetFiscalYear) AS VARCHAR) AS projName,
+                    pb.projType
                 FROM projectNotifications pn
-                JOIN projectBatch pb ON pn.batchID = pb.batchID
+                LEFT JOIN projectBatch pb ON pn.batchID = pb.batchID
+                LEFT JOIN projectCycles pc ON pb.cycleID = pc.cycleID
+                LEFT JOIN projectCycles pc2 ON pn.cycleID = pc2.cycleID
+                LEFT JOIN userNotificationReads unr ON pn.notificationID = unr.notifID AND unr.userID = @userID
                 WHERE pn.barangayID = @barangayID
                 ORDER BY pn.createdAt DESC
             `);
@@ -628,20 +635,52 @@ router.get('/notifications', authMiddleware, async (req, res) => {
     }
 });
 
+// 11.5 Mark all notifications as read
+router.patch('/notifications/read-all', authMiddleware, async (req, res) => {
+    try {
+        const { barangay: barangayID, userID } = req.user;
+        const pool = await getConnection();
+
+        await pool.request()
+            .input('barangayID', sql.Int, barangayID)
+            .input('userID', sql.Int, userID)
+            .query(`
+                INSERT INTO userNotificationReads (userID, notifID, isRead)
+                SELECT @userID, pn.notificationID, 1
+                FROM projectNotifications pn
+                LEFT JOIN userNotificationReads unr ON pn.notificationID = unr.notifID AND unr.userID = @userID
+                WHERE pn.barangayID = @barangayID AND unr.userNotifID IS NULL
+            `);
+
+        res.json({ success: true, message: 'All notifications marked as read.' });
+    } catch (error) {
+        console.error('Error marking all notifications as read:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
 // 12. Mark a notification as read
 router.patch('/notifications/:notificationID/read', authMiddleware, async (req, res) => {
     try {
         const { notificationID } = req.params;
-        const { barangay: barangayID } = req.user;
+        const { userID } = req.user;
         const pool = await getConnection();
 
         await pool.request()
             .input('notificationID', sql.Int, notificationID)
-            .input('barangayID', sql.Int, barangayID)
+            .input('userID', sql.Int, userID)
             .query(`
-                UPDATE projectNotifications
-                SET isRead = 1
-                WHERE notificationID = @notificationID AND barangayID = @barangayID
+                IF NOT EXISTS (SELECT 1 FROM userNotificationReads WHERE notifID = @notificationID AND userID = @userID)
+                BEGIN
+                    INSERT INTO userNotificationReads (userID, notifID, isRead)
+                    VALUES (@userID, @notificationID, 1)
+                END
+                ELSE
+                BEGIN
+                    UPDATE userNotificationReads
+                    SET isRead = 1
+                    WHERE notifID = @notificationID AND userID = @userID
+                END
             `);
 
         res.json({ success: true, message: 'Notification marked as read.' });

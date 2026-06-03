@@ -51,7 +51,6 @@ def generate_gemini_trends(df, category, api_key):
           "id": 1,
           "name": "Trend Name",
           "description": "A brief description of the trend, based on patterns in the historical data.",
-          "confidence": 0.85,
           "trend": "up" or "down",
           "category": "{category}",
           "impact": "high", "medium", or "low"

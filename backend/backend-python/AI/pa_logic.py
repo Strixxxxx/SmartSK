@@ -74,7 +74,6 @@ def generate_lstm_analysis(df):
         if len(budget_series) < 3:
             logger.warning("Not enough historical data (< 3 years) for LSTM analysis. Returning placeholder values.")
             return {
-                "predicted_success_probability": 0.85, # Placeholder
                 "forecasted_budget_variance": "Not enough data"
             }
 
@@ -93,7 +92,6 @@ def generate_lstm_analysis(df):
             # Handle case with only 2 data points
             last_value = budget_series.iloc[-1]
             return {
-                "predicted_success_probability": 0.80, # Placeholder
                 "forecasted_budget_variance": "+0.0%" # Assume no change
             }
 
@@ -120,14 +118,12 @@ def generate_lstm_analysis(df):
         logger.info(f"LSTM analysis complete. Predicted budget: {predicted_budget}, Variance: {variance:.2%}")
 
         return {
-            "predicted_success_probability": 0.85, # This remains a placeholder as success metric is not in the data
             "forecasted_budget_variance": f"{variance:+.1%}"
         }
 
     except Exception as e:
         logger.error(f"Error during LSTM analysis in pa_logic: {e}", exc_info=True)
         return {
-            "predicted_success_probability": "N/A",
             "forecasted_budget_variance": "Error during calculation"
         }
 

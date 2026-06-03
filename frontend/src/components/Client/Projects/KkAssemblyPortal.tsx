@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Alert, Snackbar, LinearProgress } from '@mui/material';
+import { toastSuccess, toastError, toastInfo, showMilestoneToast } from '../../../utils/ProjectCycleToast';
+import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, LinearProgress } from '@mui/material';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import styles from './KkAssemblyPortal.module.css';
 import AnnexViewingModal from './AnnexViewingModal';
@@ -26,13 +27,34 @@ const DropZone: React.FC<DropZoneProps> = ({ label, accept, multiple, file, onFi
     const [dragging, setDragging] = React.useState(false);
     const inputRef = React.useRef<HTMLInputElement>(null);
 
+    const filterFiles = (files: File[]) => {
+        const validFiles: File[] = [];
+        const invalidFiles: string[] = [];
+
+        files.forEach(file => {
+            if (file.type.startsWith('image/') && file.size > 2 * 1024 * 1024) {
+                invalidFiles.push(file.name);
+            } else {
+                validFiles.push(file);
+            }
+        });
+
+        if (invalidFiles.length > 0) {
+            toastError(`File size limit exceeded (2MB per image) for: ${invalidFiles.join(', ')}`);
+        }
+
+        if (validFiles.length > 0) {
+            if (multiple) onFile(validFiles);
+            else onFile(validFiles[0]);
+        }
+    };
+
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setDragging(false);
         const files = Array.from(e.dataTransfer.files);
         if (!files.length) return;
-        if (multiple) onFile(files);
-        else onFile(files[0]);
+        filterFiles(files);
     };
 
     const hasFile = multiple ? (Array.isArray(file) && file.length > 0) : !!file;
@@ -60,8 +82,7 @@ const DropZone: React.FC<DropZoneProps> = ({ label, accept, multiple, file, onFi
                 onChange={(e) => {
                     const files = Array.from(e.target.files || []);
                     if (!files.length) return;
-                    if (multiple) onFile(files);
-                    else onFile(files[0]);
+                    filterFiles(files);
                     e.target.value = '';
                 }}
             />
@@ -170,7 +191,7 @@ const KkAssemblyPortal: React.FC<KkAssemblyPortalProps> = ({ project, user }) =>
     const [isRequestingRevision, setIsRequestingRevision] = useState(false);
     const [isApproving, setIsApproving] = useState(false);
 
-    const [snackbar, setSnackbar] = useState<{ open: boolean; message: string; severity: 'success' | 'error' | 'info' }>({ open: false, message: '', severity: 'info' });
+    
 
     const fetchSubmissionDetails = useCallback(async () => {
         if (!project?.cycleID) return;
@@ -214,11 +235,11 @@ const KkAssemblyPortal: React.FC<KkAssemblyPortalProps> = ({ project, user }) =>
 
     const handleUpload = async () => {
         if (!attendanceSheet || !kkMinutes || photoDocs.length === 0) {
-            setSnackbar({ open: true, message: 'Please select all three required Annex documents (Notice Letter, Campaign Proofs, and Master Dataset) before uploading.', severity: 'error' });
+            toastError('Please select all three required Annex documents (Notice Letter, Campaign Proofs, and Master Dataset) before uploading.');
             return;
         }
         if (!hasConsent) {
-            setSnackbar({ open: true, message: 'Please confirm that all youth respondents have signed the Informed Consent Form.', severity: 'error' });
+            toastError('Please confirm that all youth respondents have signed the Informed Consent Form.');
             return;
         }
         setIsUploading(true);
@@ -242,11 +263,11 @@ const KkAssemblyPortal: React.FC<KkAssemblyPortalProps> = ({ project, user }) =>
                 setAttendanceSheet(null);
                 setKkMinutes(null);
                 setCampaignProofs([]);
-                setSnackbar({ open: true, message: 'Files uploaded successfully.', severity: 'success' });
+                toastSuccess('Files uploaded successfully.');
                 await fetchSubmissionDetails();
             }
         } catch (err: any) {
-            setSnackbar({ open: true, message: err.response?.data?.message || 'Upload failed. Please try again.', severity: 'error' });
+            toastError(err.response?.data?.message || 'Upload failed. Please try again.');
         } finally {
             setIsUploading(false);
             setTimeout(() => setUploadProgress(0), 800);
@@ -255,7 +276,7 @@ const KkAssemblyPortal: React.FC<KkAssemblyPortalProps> = ({ project, user }) =>
 
     const handleValidate = async () => {
         if (!submissionID) {
-            setSnackbar({ open: true, message: 'Please upload the required documents first.', severity: 'error' });
+            toastError('Please upload the required documents first.');
             return;
         }
         setIsApproving(true);
@@ -264,13 +285,13 @@ const KkAssemblyPortal: React.FC<KkAssemblyPortalProps> = ({ project, user }) =>
             if (res.data.success) {
                 setSubmissionStatus('CHECKPOINT_4_COMPLETE');
                 setRevisionComment(null);
-                setSnackbar({ open: true, message: 'Checkpoint 4 approved. Youth profiling is complete. Analytics computing in the background.', severity: 'success' });
+                showMilestoneToast(5, user?.role || user?.position || '', project.projectName);
                 await fetchSubmissionDetails();
             } else {
-                setSnackbar({ open: true, message: res.data.message || 'Approval failed.', severity: 'error' });
+                toastError(res.data.message || 'Approval failed.');
             }
         } catch (err: any) {
-            setSnackbar({ open: true, message: err.response?.data?.message || 'Approval failed. Please try again.', severity: 'error' });
+            toastError(err.response?.data?.message || 'Approval failed. Please try again.');
         } finally {
             setIsApproving(false);
         }
@@ -287,12 +308,12 @@ const KkAssemblyPortal: React.FC<KkAssemblyPortalProps> = ({ project, user }) =>
             if (res.data.success) {
                 setSubmissionStatus('REVISION_REQUESTED');
                 setRevisionComment(comment.trim());
-                setSnackbar({ open: true, message: 'Revision requested. The SK Secretary has been notified.', severity: 'info' });
+                toastInfo('Revision requested. The SK Secretary has been notified.');
             } else {
-                setSnackbar({ open: true, message: res.data.message || 'Failed to request revision.', severity: 'error' });
+                toastError(res.data.message || 'Failed to request revision.');
             }
         } catch (err: any) {
-            setSnackbar({ open: true, message: err.response?.data?.message || 'Failed to request revision.', severity: 'error' });
+            toastError(err.response?.data?.message || 'Failed to request revision.');
         } finally {
             setIsRequestingRevision(false);
         }
@@ -316,13 +337,13 @@ const KkAssemblyPortal: React.FC<KkAssemblyPortalProps> = ({ project, user }) =>
                 setReplaceAnnexOpen(false);
                 setReplaceAnnexType(null);
                 if (res.data.status) setSubmissionStatus(res.data.status);
-                setSnackbar({ open: true, message: 'Annex replaced successfully.', severity: 'success' });
+                toastSuccess('Annex replaced successfully.');
                 await fetchSubmissionDetails();
             } else {
-                setSnackbar({ open: true, message: res.data.message || 'Replacement failed.', severity: 'error' });
+                toastError(res.data.message || 'Replacement failed.');
             }
         } catch (err: any) {
-            setSnackbar({ open: true, message: err.response?.data?.message || 'Replacement failed.', severity: 'error' });
+            toastError(err.response?.data?.message || 'Replacement failed.');
         } finally {
             setIsReplacing(false);
         }
@@ -345,13 +366,13 @@ const KkAssemblyPortal: React.FC<KkAssemblyPortalProps> = ({ project, user }) =>
             if (res.data.success) {
                 setProofManageOpen(false);
                 if (res.data.status) setSubmissionStatus(res.data.status);
-                setSnackbar({ open: true, message: 'Campaign proofs updated successfully.', severity: 'success' });
+                toastSuccess('Campaign proofs updated successfully.');
                 await fetchSubmissionDetails();
             } else {
-                setSnackbar({ open: true, message: res.data.message || 'Update failed.', severity: 'error' });
+                toastError(res.data.message || 'Update failed.');
             }
         } catch (err: any) {
-            setSnackbar({ open: true, message: err.response?.data?.message || 'Update failed.', severity: 'error' });
+            toastError(err.response?.data?.message || 'Update failed.');
         } finally {
             setIsManagingProofs(false);
         }
@@ -390,13 +411,13 @@ const KkAssemblyPortal: React.FC<KkAssemblyPortalProps> = ({ project, user }) =>
                 setKkMinutes(null);
                 setSubmissionStatus('SUBMITTED');
                 setRevisionComment(null);
-                setSnackbar({ open: true, message: 'Revision submitted successfully.', severity: 'success' });
+                toastSuccess('Revision submitted successfully.');
                 await fetchSubmissionDetails();
             } else {
-                setSnackbar({ open: true, message: res.data.message || 'Submit failed.', severity: 'error' });
+                toastError(res.data.message || 'Submit failed.');
             }
         } catch (err: any) {
-            setSnackbar({ open: true, message: err.response?.data?.message || 'Submit failed. Please try again.', severity: 'error' });
+            toastError(err.response?.data?.message || 'Submit failed. Please try again.');
         } finally {
             setIsUploading(false);
             setTimeout(() => setUploadProgress(0), 800);
@@ -842,21 +863,7 @@ const KkAssemblyPortal: React.FC<KkAssemblyPortalProps> = ({ project, user }) =>
                 </div>
             )}
 
-            <Snackbar
-                open={snackbar.open}
-                autoHideDuration={5000}
-                onClose={() => setSnackbar(p => ({ ...p, open: false }))}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert
-                    severity={snackbar.severity}
-                    variant="filled"
-                    onClose={() => setSnackbar(p => ({ ...p, open: false }))}
-                    sx={{ width: '100%' }}
-                >
-                    {snackbar.message}
-                </Alert>
-            </Snackbar>
+            
 
             <AnnexViewingModal
                 open={viewModalOpen}

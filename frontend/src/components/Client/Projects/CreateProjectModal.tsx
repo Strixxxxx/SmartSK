@@ -252,7 +252,7 @@ const CreateProjectModal: React.FC<CreateProjectModalProps> = ({ open, onClose, 
                         {formData.projType === 'ABYIP' && (
                             <TextField
                                 fullWidth
-                                label="Estimated Annual Budget"
+                                label="Certified SK Fund Allocation"
                                 value={budgetDisplay}
                                 onChange={handleBudgetChange}
                                 onBlur={handleBudgetBlur}

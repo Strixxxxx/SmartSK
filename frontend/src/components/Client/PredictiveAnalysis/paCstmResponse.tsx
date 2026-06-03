@@ -133,48 +133,6 @@ const DashboardSection: React.FC<DashboardSectionProps> = ({
   </Box>
 );
 
-// --- SUCCESS PROBABILITY RING COMPONENT ---
-
-const ProbabilityRing: React.FC<{ value: number }> = ({ value }) => {
-  const pct = Math.min(Math.max(value * 100, 0), 100);
-  const color = pct >= 70 ? '#2e7d32' : pct >= 40 ? '#f57c00' : '#d32f2f';
-
-  return (
-    <Box sx={{ position: 'relative', display: 'inline-flex', mb: 1 }}>
-      {/* Background track */}
-      <CircularProgress
-        variant="determinate"
-        value={100}
-        size={110}
-        thickness={4}
-        sx={{ color: '#e2e8f0', position: 'absolute' }}
-      />
-      {/* Coloured fill */}
-      <CircularProgress
-        variant="determinate"
-        value={pct}
-        size={110}
-        thickness={4}
-        sx={{ color }}
-      />
-      <Box
-        sx={{
-          top: 0, left: 0, bottom: 0, right: 0,
-          position: 'absolute',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-        }}
-      >
-        <Typography variant="h5" fontWeight={800} sx={{ color, lineHeight: 1 }}>
-          {pct.toFixed(0)}%
-        </Typography>
-      </Box>
-    </Box>
-  );
-};
-
 // --- MAIN RESPONSE COMPONENT ---
 
 const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoading }) => {
@@ -237,7 +195,6 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
     return <Alert severity="warning" sx={{ mt: 4, borderRadius: 2 }}>The analysis returned no content for the selected filters.</Alert>;
   }
 
-  const successProbability = quantitative_analysis?.predicted_success_probability ?? null;
 
   return (
     <Box className={styles.responseContainer} sx={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -266,35 +223,6 @@ const PaCstmResponse: React.FC<PaCstmResponseProps> = ({ analysisResult, isLoadi
                 </Typography>
               )}
             </Box>
-
-            {/* Right: Probability Ring */}
-            {successProbability !== null && (
-              <Box sx={{ 
-                minWidth: '240px', 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                p: 3,
-                bgcolor: 'rgba(46, 125, 50, 0.03)',
-                borderRadius: '16px',
-                border: '1px solid rgba(46, 125, 50, 0.1)',
-                alignSelf: 'stretch'
-              }}>
-                <ProbabilityRing value={successProbability} />
-                <Typography className={styles.statLabel} sx={{ mt: 2 }}>Success Probability</Typography>
-                <Typography variant="h4" fontWeight={800} color={
-                  successProbability * 100 >= 70 ? 'success.main'
-                    : successProbability * 100 >= 40 ? 'warning.main'
-                      : 'error.main'
-                }>
-                  {(successProbability * 100).toFixed(0)}%
-                </Typography>
-                <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 1, textAlign: 'center', maxWidth: '200px' }}>
-                  Based on AI analysis of historical data and current project metrics.
-                </Typography>
-              </Box>
-            )}
 
           </Box>
         </Card>

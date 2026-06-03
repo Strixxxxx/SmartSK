@@ -35,7 +35,6 @@ interface TrendData {
   id: number;
   name: string;
   description: string;
-  confidence: number;
   trend: 'up' | 'down' | 'stable';
   category: string;
   subcategory?: string;
@@ -192,8 +191,7 @@ const Trends: React.FC = () => {
         </Box>
         
         <Typography variant="body1" sx={{ mb: 3 }}>
-          Based on historical data, here are the top predictive project trends for the selected category. 
-          Each trend includes a confidence score indicating the reliability of the prediction.
+          Based on historical data, here are the top predictive project trends for the selected category.
         </Typography>
         
         {loading ? (

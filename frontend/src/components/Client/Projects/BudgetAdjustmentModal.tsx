@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import {
     Dialog, DialogTitle, DialogContent, DialogActions,
     Button, Typography, Box, TextField, InputAdornment,
-    Divider, Slider, Alert
+    Divider, Slider
 } from '@mui/material';
 import axios from '../../../backend connection/axiosConfig';
+import { toastSuccess, toastError } from '../../../utils/ProjectCycleToast';
 
 const THEMATIC_AREAS = [
     { key: 'governance', label: 'Governance' },
@@ -33,7 +34,6 @@ const BudgetAdjustmentModal: React.FC<BudgetAdjustmentModalProps> = ({ open, onC
     const [allocations, setAllocations] = useState<Record<string, number>>({});
     const [reason, setReason] = useState('');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         if (open && batchID) {
@@ -44,14 +44,13 @@ const BudgetAdjustmentModal: React.FC<BudgetAdjustmentModalProps> = ({ open, onC
     const fetchBudgetSummary = async () => {
         try {
             setLoading(true);
-            setError(null);
             const response = await axios.get(`/api/project-batch/${batchID}/budget-summary`);
             if (response.data.success) {
                 setTotalBudget(response.data.data.totalBudget);
                 setAllocations(response.data.data.allocations);
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Failed to load budget data');
+            toastError(err.response?.data?.message || 'Failed to load budget data');
         } finally {
             setLoading(false);
         }
@@ -72,29 +71,29 @@ const BudgetAdjustmentModal: React.FC<BudgetAdjustmentModalProps> = ({ open, onC
 
     const handleSubmit = async () => {
         if (!reason.trim()) {
-            setError('Please provide a reason for this adjustment.');
+            toastError('Please provide a reason for this adjustment.');
             return;
         }
         if (isOverBudget) {
-            setError('Total allocated exceeds project budget.');
+            toastError('Total allocated exceeds project budget.');
             return;
         }
 
         try {
             setLoading(true);
-            setError(null);
             const response = await axios.post(`/api/project-batch/${batchID}/reallocate-budget`, {
                 newAllocations: allocations,
                 reason
             });
 
             if (response.data.success) {
+                toastSuccess('Budget successfully reallocated.');
                 onAdjusted();
                 onClose();
                 setReason('');
             }
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Failed to reallocate budget');
+            toastError(err.response?.data?.message || 'Failed to reallocate budget');
         } finally {
             setLoading(false);
         }
@@ -108,16 +107,15 @@ const BudgetAdjustmentModal: React.FC<BudgetAdjustmentModalProps> = ({ open, onC
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
             <DialogTitle sx={{ fontWeight: 'bold' }}>Reallocate Budget</DialogTitle>
             <DialogContent dividers>
-                {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
                 
                 <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <Typography variant="subtitle1" fontWeight={600}>Estimated Annual Budget: ₱{formatCurrency(totalBudget)}</Typography>
+                    <Typography variant="subtitle1" fontWeight={600}>Certified SK Fund Allocation: ₱{formatCurrency(totalBudget)}</Typography>
                     <Box sx={{ textAlign: 'right' }}>
                         <Typography variant="subtitle1" color={isOverBudget ? 'error' : 'primary'} fontWeight={700}>
                             Remaining: ₱{formatCurrency(totalBudget - totalAllocated)}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                            Sum of categories must not exceed estimated annual budget
+                            Sum of categories must not exceed certified SK fund allocation
                         </Typography>
                     </Box>
                 </Box>

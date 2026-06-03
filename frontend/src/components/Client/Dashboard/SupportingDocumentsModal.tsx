@@ -8,6 +8,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import axios from '../../../backend connection/axiosConfig';
 import { useAuth } from '../../../context/AuthContext';
+import { toastSuccess, toastError, showMilestoneToast } from '../../../utils/ProjectCycleToast';
 import styles from './SupportingDocumentsModal.module.css';
 
 interface SupportingDocumentsModalProps {
@@ -18,7 +19,7 @@ interface SupportingDocumentsModalProps {
     onStatusChange?: () => void;
 }
 
-type CategoryType = 'PPMP_or_APP' | 'Activity_Design' | 'SK_Resolution' | 'LYDP' | 'KK_Minutes' | 'EstIncomeCert' | 'IncomeCert' | 'KK_Attendance' | 'KK_Photo_Doc' | 'YP_Notice_Letter' | 'YP_Campaign_Proof' | 'YP_Master_Dataset' | 'QCYDO_Review_Doc' | 'QC_SK_Fed_Review_Doc' | 'City_Budget_Review_Doc' | 'City_Council_Hearing_Doc' | 'Procurement_Doc';
+type CategoryType = 'PPMP_or_APP' | 'Activity_Design' | 'SK_Resolution' | 'LYDP' | 'KK_Minutes' | 'EstIncomeCert' | 'IncomeCert' | 'KK_Attendance' | 'KK_Photo_Doc' | 'YP_Notice_Letter' | 'YP_Campaign_Proof' | 'YP_Master_Dataset' | 'QCYDO_Review_Doc' | 'QC_SK_Fed_Review_Doc' | 'City_Budget_Review_Doc' | 'City_Council_Hearing_Doc' | 'Procurement_Doc' | 'SK_Session_Docs';
 
 interface DocumentFile {
     name: string;
@@ -53,7 +54,8 @@ const CATEGORY_LABELS: Record<string, string> = {
     'QC_SK_Fed_Review_Doc': 'QC SK Federation Review Document',
     'City_Budget_Review_Doc': 'City Budget Review Document',
     'City_Council_Hearing_Doc': 'City Council Hearing Document',
-    'Procurement_Doc': 'Procurement Document'
+    'Procurement_Doc': 'Procurement Document',
+    'SK_Session_Docs': 'Session Documents'
 };
 
 const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ open, onClose, batchID, projName, onStatusChange }) => {
@@ -103,6 +105,7 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                         if (cat === 'SK_Resolution') return statusID >= 6;
                         if (cat === 'EstIncomeCert' || cat === 'IncomeCert') return statusID >= 5;
                         if (cat === 'KK_Minutes' || cat === 'KK_Attendance' || cat === 'KK_Photo_Doc') return statusID >= 4;
+                        if (cat === 'SK_Session_Docs') return statusID >= 3;
                         if (cat === 'LYDP') return statusID >= 2;
                         if (cat === 'YP_Notice_Letter' || cat === 'YP_Campaign_Proof' || cat === 'YP_Master_Dataset') return statusID >= 1;
                         return false;
@@ -127,7 +130,7 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
             }
         } catch (error) {
             console.error('Failed to fetch documents:', error);
-            alert('Failed to load documents.');
+            toastError('Failed to load documents.');
         } finally {
             setLoading(false);
         }
@@ -148,7 +151,7 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
         if (!selectedFileForUpload || !selectedCategory) return;
         if (selectedCategory === 'LYDP') {
             if (user?.position !== 'SKC') {
-                alert('Only the SK Chairperson can upload the LYDP.');
+                toastError('Only the SK Chairperson can upload the LYDP.');
                 setSelectedFileForUpload(null);
                 if (fileInputRef.current) fileInputRef.current.value = '';
                 return;
@@ -156,7 +159,7 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
             setConfirmUploadOpen(true);
         } else if (selectedCategory === 'SK_Resolution') {
             if (user?.position !== 'SKC') {
-                alert('Only the SK Chairperson can upload the SK Resolution.');
+                toastError('Only the SK Chairperson can upload the SK Resolution.');
                 setSelectedFileForUpload(null);
                 if (fileInputRef.current) fileInputRef.current.value = '';
                 return;
@@ -177,7 +180,7 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
         const isAllowed = allowedExtensions.some(ext => fileName.endsWith(ext)) || file.type.startsWith('image/');
 
         if (!isAllowed) {
-            alert('Only PDF, DOCS, and image formats are allowed.');
+            toastError('Only PDF, DOCS, and image formats are allowed.');
             if (fileInputRef.current) fileInputRef.current.value = '';
             return;
         }
@@ -191,7 +194,13 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
         setConfirmUploadOpen(false);
 
         const formData = new FormData();
-        formData.append('document', selectedFileForUpload);
+        const timestamp = new Date().getTime();
+        const extension = selectedFileForUpload.name.substring(selectedFileForUpload.name.lastIndexOf('.'));
+        const baseName = selectedFileForUpload.name.substring(0, selectedFileForUpload.name.lastIndexOf('.'));
+        const newFileName = `${baseName}_${timestamp}${extension}`;
+        
+        const fileToUpload = new File([selectedFileForUpload], newFileName, { type: selectedFileForUpload.type });
+        formData.append('document', fileToUpload);
         formData.append('category', selectedCategory);
 
         try {
@@ -210,16 +219,16 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                             batchID: batchID,
                             statusID: 7,
                         });
-                        alert('Project has successfully advanced to Checkpoint 7: Barangay Captain\'s Approval.');
+                        showMilestoneToast(7, user?.position || user?.role || '', projName);
                         if (onStatusChange) onStatusChange();
                     } catch (error) {
                         console.error('Failed to advance to Checkpoint 7:', error);
-                        alert('Uploaded SK Resolution successfully, but failed to auto-advance to Checkpoint 7.');
+                        toastError('Uploaded SK Resolution successfully, but failed to auto-advance to Checkpoint 7.');
                     }
                 }
             }
         } catch (error: any) {
-            alert(error.response?.data?.message || 'Failed to upload document.');
+            toastError(error.response?.data?.message || 'Failed to upload document.');
             setSelectedFileForUpload(null);
             if (fileInputRef.current) fileInputRef.current.value = '';
         } finally {
@@ -239,7 +248,7 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                 if (onStatusChange) onStatusChange();
             }
         } catch (error) {
-            alert('Failed to delete document.');
+            toastError('Failed to delete document.');
         }
     };
 
@@ -267,7 +276,7 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                 document.body.removeChild(a);
             }
         } catch (error) {
-            alert('Failed to get download link.');
+            toastError('Failed to get download link.');
         }
     };
 
@@ -277,7 +286,7 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
         const isImage = lowerName.match(/\.(jpg|jpeg|png|gif|webp)$/);
 
         if (!isPdf && !isImage) {
-            alert('Preview is only available for PDF and image files. Please download the file instead.');
+            toastError('Preview is only available for PDF and image files. Please download the file instead.');
             return;
         }
 
@@ -297,14 +306,14 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
             }
         } catch (error) {
             console.error('Failed to load preview:', error);
-            alert('Failed to load preview.');
+            toastError('Failed to load preview.');
         }
     };
 
     const handleValidateBudget = async () => {
         const numericBudget = parseFloat(budgetInput.replace(/,/g, ''));
         if (isNaN(numericBudget) || numericBudget <= 0) {
-            alert('Please enter a valid positive number for the budget.');
+            toastError('Please enter a valid positive number for the budget.');
             return;
         }
 
@@ -358,14 +367,14 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                 budget: numericBudget
             });
             if (res.data.success) {
-                alert('Budget successfully recorded!');
+                toastSuccess('Budget successfully recorded!');
                 setBudgetConfirmModalOpen(false);
                 setPreviewModalOpen(false);
                 fetchDocuments();
                 if (onStatusChange) onStatusChange();
             }
         } catch (error: any) {
-            alert(error.response?.data?.message || 'Failed to save budget.');
+            toastError(error.response?.data?.message || 'Failed to save budget.');
         } finally {
             setIsSavingBudget(false);
         }
@@ -374,7 +383,23 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
     if (!open) return null;
 
     const availableCategories = docData ? Object.keys(docData.categories) as CategoryType[] : [];
-    const currentFiles = (selectedCategory && docData?.categories[selectedCategory]) || [];
+    const ATTEMPT_CATEGORIES = ['YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'QCYDO_Review_Doc', 'QC_SK_Fed_Review_Doc', 'City_Budget_Review_Doc', 'City_Council_Hearing_Doc', 'Procurement_Doc'];
+    let currentFiles = (selectedCategory && docData?.categories[selectedCategory]) || [];
+    
+    if (selectedCategory && ATTEMPT_CATEGORIES.includes(selectedCategory)) {
+        currentFiles = [...currentFiles].sort((a, b) => new Date(a.lastModified).getTime() - new Date(b.lastModified).getTime());
+        currentFiles = currentFiles.map((f, idx) => ({
+            ...f,
+            name: `Attempt ${idx + 1} - ${f.name.replace(/_\d{13}(\.[^.]+)$/, '$1')}`,
+            originalName: f.name // Store original name for downloading/previewing
+        }));
+    } else {
+        currentFiles = currentFiles.map(f => ({
+            ...f,
+            name: f.name.replace(/_\d{13}(\.[^.]+)$/, '$1'),
+            originalName: f.name
+        }));
+    }
 
     const isSkc = user?.role === 'SKC' || user?.position?.toLowerCase().includes('chairperson') || user?.position?.toUpperCase() === 'SKC';
     const isBcpt = user?.role === 'BCPT' || user?.position?.toLowerCase().includes('captain') || user?.position?.toUpperCase() === 'BCPT';
@@ -382,7 +407,8 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
 
     const READ_ONLY_CATEGORIES = [
         'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 
-        'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset'
+        'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset',
+        'SK_Session_Docs'
     ];
 
     const canUpload = () => {
@@ -429,12 +455,12 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
         },
         {
             checkpoint: 6,
-            label: 'Checkpoint 6',
+            label: 'Checkpoint 6: SK Resolution',
             categories: ['SK_Resolution']
         },
         {
             checkpoint: 5,
-            label: 'Checkpoint 5',
+            label: 'Checkpoint 5: ABYIP Budget Draft',
             categories: ['EstIncomeCert', 'IncomeCert']
         },
         {
@@ -443,8 +469,13 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
             categories: ['KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc']
         },
         {
+            checkpoint: 3,
+            label: 'Checkpoint 3: SK Session',
+            categories: ['SK_Session_Docs']
+        },
+        {
             checkpoint: 2,
-            label: 'Checkpoint 2',
+            label: 'Checkpoint 2: CBYDP Drafting',
             categories: ['LYDP']
         },
         {
@@ -571,12 +602,12 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                                             <InsertDriveFileIcon 
                                                 className={styles.fileIcon} 
                                                 style={{ color: file.name.endsWith('.pdf') ? '#ea4335' : file.name.endsWith('.xlsx') ? '#34a853' : '#4285f4', cursor: 'pointer' }} 
-                                                onClick={() => handlePreview(file.path, file.name)}
+                                                onClick={() => handlePreview(file.path, (file as any).originalName || file.name)}
                                             />
                                             <div 
                                                 className={styles.fileName} 
                                                 style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                                                onClick={() => handlePreview(file.path, file.name)}
+                                                onClick={() => handlePreview(file.path, (file as any).originalName || file.name)}
                                             >
                                                 {file.name}
                                             </div>
@@ -665,7 +696,7 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                 sx={{ '& .MuiDialog-paper': { height: '85vh', maxHeight: '900px' } }}
             >
                 <DialogTitle>
-                    {previewCategory === 'EstIncomeCert' ? 'Estimated Annual Budget' : 'Document Preview'}
+                    {previewCategory === 'EstIncomeCert' ? 'Certified SK Fund Allocation' : 'Document Preview'}
                     <IconButton onClick={() => setPreviewModalOpen(false)} style={{ position: 'absolute', right: 8, top: 8 }} disabled={isValidatingOCR}>
                         <CloseIcon />
                     </IconButton>
@@ -684,13 +715,13 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                     {previewCategory === 'EstIncomeCert' && isSkc && (
                         <Box sx={{ flexShrink: 0 }}>
                             <Typography sx={{ mb: 2 }}>
-                                Please enter the Estimated Annual Budget extracted from this document for the ABYIP.
+                                Please enter the Certified SK Fund Allocation extracted from this document for the ABYIP.
                             </Typography>
                             <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                                 <TextField
                                     autoFocus
                                     margin="dense"
-                                    label="Estimated Annual Budget (PHP)"
+                                    label="Certified SK Fund Allocation (PHP)"
                                     type="number"
                                     fullWidth
                                     variant="outlined"
@@ -736,7 +767,7 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                 <DialogTitle>Confirm Allocation</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Is this the correct estimated annual budget?
+                        Is this the correct certified SK fund allocation?
                         <br /><br />
                         <Typography variant="h6" color="primary" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
                             ₱{parseFloat(budgetInput.replace(/,/g, '') || '0').toLocaleString()}

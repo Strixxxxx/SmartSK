@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Typography } from '@mui/material';
 import { useAuth } from '../../../context/AuthContext';
 import axios from '../../../backend connection/axiosConfig';
+import { toastSuccess, toastError, toastInfo } from '../../../utils/ProjectCycleToast';
 
 import AppSettingsAltIcon from '@mui/icons-material/AppSettingsAlt';
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
@@ -34,8 +35,9 @@ import SupportingDocumentsModal from './SupportingDocumentsModal';
 import CheckpointModal from './CheckpointModal';
 import Checkpoint2to3 from './checkpoint2to3';
 import Checkpoint3to4 from './checkpoint3to4';
-import RescheduleModal from './RescheduleModal';
+import SessionValidationModal from './SessionValidationModal';
 import CheckpointValidationModal from './CheckpointValidationModal';
+import RescheduleModal from './RescheduleModal';
 import './ProjectTrackerList.css';
 
 interface ProjectBatch {
@@ -111,8 +113,9 @@ const ProjectTrackerList: React.FC = () => {
     const [docModalOpen, setDocModalOpen] = useState(false);
     const [selectedBatchForDocs, setSelectedBatchForDocs] = useState<ProjectBatch | null>(null);
     const [openScheduleModalBatchID, setOpenScheduleModalBatchID] = useState<number | null>(null);
-    const [openRescheduleModalBatchID, setOpenRescheduleModalBatchID] = useState<number | null>(null);
     const [openAttendanceModalBatchID, setOpenAttendanceModalBatchID] = useState<number | null>(null);
+    const [openSessionValidationBatchID, setOpenSessionValidationBatchID] = useState<number | null>(null);
+    const [openRescheduleModalBatchID, setOpenRescheduleModalBatchID] = useState<number | null>(null);
     const [validationModal, setValidationModal] = useState<{ open: boolean; checkpointID: number; batchID: number } | null>(null);
     const [checklistModalBatchID, setChecklistModalBatchID] = useState<number | null>(null);
     const [selectedChecklistCategory, setSelectedChecklistCategory] = useState<string>('All');
@@ -136,6 +139,10 @@ const ProjectTrackerList: React.FC = () => {
         user?.role === 'BCPT' ||
         user?.position?.toLowerCase().includes('captain') ||
         user?.position?.toUpperCase() === 'BCPT';
+
+    const isSKS =
+        user?.role === 'SKS' ||
+        user?.position?.toUpperCase() === 'SKS';
 
     const hasTrackerControl = isSkc; // SKC handles scheduling, attendance, and PPA tracking
     const hasDocsControl = isSkc || user?.permissions?.docsControl === true;
@@ -225,34 +232,6 @@ const ProjectTrackerList: React.FC = () => {
         return () => clearInterval(pollInterval);
     }, [activeCycleIdsStr]);
 
-    const handleAdvance = async (e: React.MouseEvent, batch: any) => {
-        e.stopPropagation();
-        const nextStatusID = batch.currentStatusID + 1;
-        const nextStep = STATUS_STEPS[nextStatusID - 1];
-        const isAIWarning = nextStatusID === 13 && batch.projType === 'ABYIP';
-
-        const msg = isAIWarning
-            ? `Advance to "${nextStep.label}"?\n\nIMPORTANT: This ABYIP project will be locked for editing and AI Historical Sync will be triggered.`
-            : `Advance project to Step ${nextStatusID}: "${nextStep.label}"?`;
-
-        if (!window.confirm(msg)) return;
-
-        try {
-            await axios.post('/api/project-batch/update-status', {
-                batchID: batch.batchID,
-                statusID: nextStatusID,
-            });
-            setCycles(prev =>
-                prev.map(c =>
-                    c.cycleID === batch.cycleID
-                        ? { ...c, currentStatusID: nextStatusID, updatedAt: new Date().toISOString() }
-                        : c
-                )
-            );
-        } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to advance milestone.');
-        }
-    };
 
     const handleOpenDocs = (e: React.MouseEvent, batch: any) => {
         e.stopPropagation();
@@ -281,7 +260,7 @@ const ProjectTrackerList: React.FC = () => {
             try {
                 const res = await axios.get(`/api/project-documents/${batch.batchID}/check-lydp`);
                 if (res.data.success && !res.data.hasLYDP) {
-                    alert('Please upload the Local Youth Development Plan (LYDP) in Supporting Documents before opening the project.');
+                    toastInfo('Please upload the Local Youth Development Plan (LYDP) in Supporting Documents before opening the project.');
                     return;
                 }
             } catch (err) {
@@ -302,13 +281,13 @@ const ProjectTrackerList: React.FC = () => {
                 remarks
             });
             if (res.data.success) {
-                alert(res.data.message || `Budget ${action}d successfully.`);
+                toastSuccess(res.data.message || `Budget ${action}d successfully.`);
                 setBudgetValidationModal(null);
                 await fetchBatches();
                 await refreshBatchDetails(batchID);
             }
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to process budget validation.');
+            toastError(err.response?.data?.message || 'Failed to process budget validation.');
         } finally {
             setSubmitting(prev => ({ ...prev, [`${batchID}_budget`]: false }));
         }
@@ -317,7 +296,7 @@ const ProjectTrackerList: React.FC = () => {
     const handleOpenBudgetValidation = async (batch: any) => {
         const budgetValue = batch.budget || details[batch.batchID]?.batch?.budget;
         if (!budgetValue || budgetValue <= 0) {
-            alert("The SK Chairperson hasn't extracted and inputted the budget yet.");
+            toastError("The SK Chairperson hasn't extracted and inputted the budget yet.");
             return;
         }
 
@@ -350,11 +329,11 @@ const ProjectTrackerList: React.FC = () => {
                     setBudgetValidationDocUrl(null);
                 }
             } else {
-                alert('No Certificate of Estimated Income document found.');
+                toastError('No Certificate of Estimated Income document found.');
             }
         } catch (err) {
             console.error('Failed to fetch document for budget validation', err);
-            alert('Failed to load document preview.');
+            toastError('Failed to load document preview.');
         } finally {
             setIsLoadingBudgetDoc(false);
         }
@@ -364,7 +343,7 @@ const ProjectTrackerList: React.FC = () => {
     const handleScheduleMeeting = async (batchID: number, selectedMeetingDate?: string) => {
         const mDate = selectedMeetingDate || inputs[`${batchID}_meetingDate`];
         if (!mDate) {
-            alert('Please select a meeting date and time.');
+            toastError('Please select a meeting date and time.');
             return;
         }
 
@@ -375,13 +354,13 @@ const ProjectTrackerList: React.FC = () => {
                 meetingDate: mDate
             });
             if (res.data.success) {
-                alert(res.data.message || 'Meeting scheduled successfully!');
+                toastSuccess(res.data.message || 'Meeting scheduled successfully!');
                 setOpenScheduleModalBatchID(null);
                 await fetchBatches();
                 await refreshBatchDetails(batchID);
             }
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to schedule meeting.');
+            toastError(err.response?.data?.message || 'Failed to schedule meeting.');
             throw err;
         } finally {
             setSubmitting(prev => ({ ...prev, [`${batchID}_schedule`]: false }));
@@ -391,13 +370,13 @@ const ProjectTrackerList: React.FC = () => {
     const handleRescheduleMeeting = async (batchID: number, meetingDate: string, reason: string) => {
         try {
             await axios.post('/api/project-tracker/reschedule-meeting', { batchID, meetingDate, reason });
-            alert('Meeting rescheduled successfully!');
+            toastSuccess('Meeting rescheduled successfully!');
             setOpenRescheduleModalBatchID(null);
             await fetchBatches();
             await refreshBatchDetails(batchID);
         } catch (error: any) {
             console.error('Error rescheduling meeting:', error);
-            alert(error.response?.data?.message || 'Failed to reschedule meeting');
+            toastError(error.response?.data?.message || 'Failed to reschedule meeting');
         }
     };
 
@@ -409,12 +388,12 @@ const ProjectTrackerList: React.FC = () => {
         try {
             const res = await axios.post('/api/project-tracker/override-finalization', { batchID });
             if (res.data.success) {
-                alert('Bypass successful! The project plan has proceeded to Checkpoint 4.');
+                toastSuccess('Bypass successful! The project plan has proceeded to Checkpoint 4.');
                 await fetchBatches();
                 await refreshBatchDetails(batchID);
             }
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to override finalization.');
+            toastError(err.response?.data?.message || 'Failed to override finalization.');
         } finally {
             setSubmitting(prev => ({ ...prev, [`${batchID}_override`]: false }));
         }
@@ -443,7 +422,7 @@ const ProjectTrackerList: React.FC = () => {
                 isExecuted: newVal
             });
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to update PPA execution.');
+            toastError(err.response?.data?.message || 'Failed to update PPA execution.');
             await refreshBatchDetails(batchID);
         }
     };
@@ -455,12 +434,12 @@ const ProjectTrackerList: React.FC = () => {
         try {
             const res = await axios.post('/api/project-tracker/validate-closure', { batchID });
             if (res.data.success) {
-                alert('Project closure validated successfully!');
+                toastSuccess('Project closure validated successfully!');
                 await fetchBatches();
                 await refreshBatchDetails(batchID);
             }
         } catch (err: any) {
-            alert(err.response?.data?.message || 'Failed to validate project closure.');
+            toastError(err.response?.data?.message || 'Failed to validate project closure.');
         } finally {
             setSubmitting(prev => ({ ...prev, [`${batchID}_closure`]: false }));
         }
@@ -510,6 +489,11 @@ const ProjectTrackerList: React.FC = () => {
                     const abyipBatch = cycle.batches?.find(b => b.projType === 'ABYIP');
                     const abyipBudget = abyipBatch?.budget || 0;
 
+                    const hasLYDP = detail?.hasLYDP === true;
+                    const hasABYIPDocs = detail?.hasABYIPDocs === true;
+                    const isWaitingForPrereq2 = batch.currentStatusID === 2 && !hasLYDP;
+                    const isWaitingForPrereq5 = batch.currentStatusID === 5 && !hasABYIPDocs;
+
                     return (
                         <div
                             key={batch.batchID}
@@ -552,8 +536,28 @@ const ProjectTrackerList: React.FC = () => {
                                 {STATUS_STEPS.map((step, index) => {
                                     const stepID = index + 1;
                                     const isCompleted = stepID < batch.currentStatusID;
-                                    const isCurrent = stepID === batch.currentStatusID;
-                                    const statusClass = isCompleted ? 'completed' : isCurrent ? 'current' : 'pending';
+                                    let isCurrent = stepID === batch.currentStatusID;
+                                    let statusClass = isCompleted ? 'completed' : isCurrent ? 'current' : 'pending';
+
+                                    if (isWaitingForPrereq2 && stepID === 2) {
+                                        statusClass = 'pending';
+                                        isCurrent = false;
+                                    }
+                                    if (isWaitingForPrereq5 && stepID === 5) {
+                                        statusClass = 'pending';
+                                        isCurrent = false;
+                                    }
+
+                                    let connectorClass = '';
+                                    if (isCompleted) {
+                                        connectorClass = 'ptl-step__connector--filled';
+                                    }
+                                    if (isWaitingForPrereq2 && stepID === 1) {
+                                        connectorClass = 'ptl-step__connector--active';
+                                    }
+                                    if (isWaitingForPrereq5 && stepID === 4) {
+                                        connectorClass = 'ptl-step__connector--active';
+                                    }
 
                                     return (
                                         <React.Fragment key={stepID}>
@@ -564,7 +568,7 @@ const ProjectTrackerList: React.FC = () => {
                                                 <span className="ptl-step__label">{step.label}</span>
                                             </div>
                                             {index < STATUS_STEPS.length - 1 && (
-                                                <div className={`ptl-step__connector ${isCompleted ? 'ptl-step__connector--filled' : ''}`} />
+                                                <div className={`ptl-step__connector ${connectorClass}`} />
                                             )}
                                         </React.Fragment>
                                     );
@@ -618,7 +622,7 @@ const ProjectTrackerList: React.FC = () => {
                                                     {hasTrackerControl ? (
                                                         <div className="ptl-schedule-form" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                                             <span className="ptl-form-instruction">
-                                                                The Barangay Captain must validate the Estimated Annual Budget before you can schedule the SK Resolution Session.
+                                                                The Barangay Captain must validate the Certified SK Fund Allocation before you can schedule the SK Resolution Session.
                                                             </span>
                                                             {/* We will leave this disabled or hidden if they haven't validated, but since the status advances to 6 upon validation, if it's 5, it means it's NOT validated yet. */}
                                                             <div>
@@ -645,7 +649,7 @@ const ProjectTrackerList: React.FC = () => {
                                                         </div>
                                                     ) : (
                                                         <p className="ptl-info-text">
-                                                            Waiting for the Barangay Captain to validate the Estimated Annual Budget.
+                                                            Waiting for the Barangay Captain to validate the Certified SK Fund Allocation.
                                                         </p>
                                                     )}
                                                 </>
@@ -659,7 +663,7 @@ const ProjectTrackerList: React.FC = () => {
                                             <p className="ptl-detail-title">
                                                 <CalendarMonthIcon sx={{ fontSize: 16 }} /> Finalization SK Session Schedule
                                             </p>
-                                            {hasTrackerControl ? (
+                                            {isSkc ? (
                                                 <div className="ptl-schedule-form" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                                     <span className="ptl-form-instruction">
                                                         Click the button below to open the scheduler modal and set the date and time for the official SK Session.
@@ -668,6 +672,8 @@ const ProjectTrackerList: React.FC = () => {
                                                         <button
                                                             className="ptl-btn ptl-btn--primary"
                                                             onClick={() => setOpenScheduleModalBatchID(batch.batchID)}
+                                                            disabled={false}
+                                                            title=""
                                                             style={{
                                                                 display: 'flex',
                                                                 alignItems: 'center',
@@ -722,33 +728,81 @@ const ProjectTrackerList: React.FC = () => {
                                                     </span>
                                                 </div>
 
-                                                <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                                                    <button
-                                                        className="ptl-btn"
-                                                        onClick={() => setOpenAttendanceModalBatchID(batch.batchID)}
-                                                        style={{
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: '8px',
-                                                            padding: '10px 18px',
-                                                            borderRadius: '8px',
-                                                            backgroundColor: '#4f46e5',
-                                                            color: '#ffffff',
-                                                            fontWeight: 600,
-                                                            border: 'none',
-                                                            cursor: 'pointer',
-                                                            transition: 'background-color 0.2s ease',
-                                                            fontSize: '13px'
-                                                        }}
-                                                    >
-                                                        <PeopleIcon sx={{ fontSize: 18 }} />
-                                                        Manage Session Attendance & Comments
-                                                    </button>
+                                                {detail.sessionDocs?.validationNote && !detail.sessionDocs?.isValidated && (
+                                                    <div style={{ marginTop: '4px', padding: '12px', backgroundColor: '#fef2f2', border: '1px solid #fca5a5', borderRadius: '8px' }}>
+                                                        <p style={{ margin: 0, fontSize: '13px', color: '#991b1b', fontWeight: 600 }}>
+                                                            SK Chairperson Validation Note (Revision Requested):
+                                                        </p>
+                                                        <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#7f1d1d' }}>
+                                                            {detail.sessionDocs.validationNote}
+                                                        </p>
+                                                    </div>
+                                                )}
 
-                                                    {hasTrackerControl && (
+                                                <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                                        {isSKS && (() => {
+                                                            const meetingTime = detail.batch?.meetingDate ? new Date(detail.batch.meetingDate).getTime() : null;
+                                                            const isSessionUnlocked = meetingTime !== null;
+                                                            return (
+                                                                <button
+                                                                    className="ptl-btn"
+                                                                    onClick={() => setOpenAttendanceModalBatchID(batch.batchID)}
+                                                                    disabled={!isSessionUnlocked}
+                                                                    style={{
+                                                                        display: 'flex',
+                                                                        alignItems: 'center',
+                                                                        gap: '8px',
+                                                                        padding: '10px 18px',
+                                                                        borderRadius: '8px',
+                                                                        backgroundColor: isSessionUnlocked ? '#4f46e5' : '#9ca3af',
+                                                                        color: '#ffffff',
+                                                                        fontWeight: 600,
+                                                                        border: 'none',
+                                                                        cursor: isSessionUnlocked ? 'pointer' : 'not-allowed',
+                                                                        transition: 'background-color 0.2s ease',
+                                                                        boxShadow: isSessionUnlocked ? '0 2px 4px rgba(79, 70, 229, 0.2)' : 'none',
+                                                                        fontSize: '13px',
+                                                                        width: 'fit-content'
+                                                                    }}
+                                                                >
+                                                                    <CheckCircleOutlineIcon fontSize="small" />
+                                                                    Manage Session Attendance
+                                                                </button>
+                                                            );
+                                                        })()}
+                                                    </div>
+
+                                                    {hasTrackerControl && detail.sessionDocs?.attendanceSheetUrl && !detail.sessionDocs?.isValidated && (
+                                                        <button
+                                                            className="ptl-btn"
+                                                            onClick={() => setOpenSessionValidationBatchID(batch.batchID)}
+                                                            style={{
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: '8px',
+                                                                padding: '10px 18px',
+                                                                borderRadius: '8px',
+                                                                backgroundColor: '#10b981',
+                                                                color: '#ffffff',
+                                                                fontWeight: 600,
+                                                                border: 'none',
+                                                                cursor: 'pointer',
+                                                                boxShadow: '0 2px 4px rgba(16, 185, 129, 0.2)',
+                                                                fontSize: '13px'
+                                                            }}
+                                                        >
+                                                            <CheckCircleOutlineIcon fontSize="small" />
+                                                            Validate Session
+                                                        </button>
+                                                    )}
+
+                                                    {isSkc && (
                                                         <button
                                                             className="ptl-btn"
                                                             onClick={() => setOpenRescheduleModalBatchID(batch.batchID)}
+                                                            disabled={false}
+                                                            title=""
                                                             style={{
                                                                 display: 'flex',
                                                                 alignItems: 'center',
@@ -848,15 +902,81 @@ const ProjectTrackerList: React.FC = () => {
                                         </div>
                                     )}
 
+                                    {/* --- Checkpoint 1 Panel: Youth Profiling Hint --- */}
+                                    {batch.currentStatusID === 1 && (isSkc || isSKS) && (
+                                        <div className="ptl-detail-section" style={{ marginTop: '12px', border: '1px dashed #3b82f6', backgroundColor: '#eff6ff', padding: '12px', borderRadius: '8px' }}>
+                                            <p className="ptl-form-instruction" style={{ margin: 0, fontSize: '12px', color: '#1e40af', lineHeight: '1.5' }}>
+                                                📄 {isSkc ? (
+                                                    <><strong>Reminder for SK Chairperson:</strong> Please wait for the SK Secretary to submit the Youth Profiling documents. Once submitted, press the <strong>'Open'</strong> button on this card to validate them.</>
+                                                ) : (
+                                                    <><strong>Reminder for SK Secretary:</strong> Please press the <strong>'Open'</strong> button on this card to start submitting the Youth Profiling documents.</>
+                                                )}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* --- Checkpoint 2 Panel: LYDP Hint --- */}
+                                    {batch.currentStatusID === 2 && isSkc && (
+                                        <div className="ptl-detail-section" style={{ marginTop: '12px', border: '1px dashed #3b82f6', backgroundColor: '#eff6ff', padding: '12px', borderRadius: '8px' }}>
+                                            <p className="ptl-form-instruction" style={{ margin: 0, fontSize: '12px', color: '#1e40af', lineHeight: '1.5' }}>
+                                                📄 <strong>Reminder for SK Chairperson:</strong> Upload the Local Youth Development Plan (LYDP) by clicking the <strong>'Support Documents'</strong> button. The CBYDP workspace will only unlock after the LYDP is provided.
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* --- Checkpoint 4 Panel: KK General Assembly Hint --- */}
+                                    {batch.currentStatusID === 4 && (isSkc || isSKS) && (
+                                        <div className="ptl-detail-section" style={{ marginTop: '12px', border: '1px dashed #3b82f6', backgroundColor: '#eff6ff', padding: '12px', borderRadius: '8px' }}>
+                                            <p className="ptl-form-instruction" style={{ margin: 0, fontSize: '12px', color: '#1e40af', lineHeight: '1.5' }}>
+                                                📄 {isSkc ? (
+                                                    <><strong>Reminder for SK Chairperson:</strong> Press the <strong>'Open'</strong> button on this card to access the KK General Assembly portal and monitor the SK Secretary's submissions.</>
+                                                ) : (
+                                                    <><strong>Reminder for SK Secretary:</strong> Please press the <strong>'Open'</strong> button on this card and submit the KK General Assembly documents.</>
+                                                )}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* --- Checkpoint 5 Panel: Certifications Hint --- */}
+                                    {batch.currentStatusID === 5 && isSkc && (
+                                        <div className="ptl-detail-section" style={{ marginTop: '12px', border: '1px dashed #3b82f6', backgroundColor: '#eff6ff', padding: '12px', borderRadius: '8px' }}>
+                                            <p className="ptl-form-instruction" style={{ margin: 0, fontSize: '12px', color: '#1e40af', lineHeight: '1.5' }}>
+                                                📄 <strong>Reminder for SK Chairperson:</strong> Go to <strong>'Support Documents'</strong> and upload two required certificates: (1) Certification of Income from Barangay, and (2) Certification of Estimated Income. The ABYIP workspace will not open until both are uploaded and the budget is approved.
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* --- Checkpoint 6 Panel: SK Resolution Hint --- */}
+                                    {batch.currentStatusID === 6 && isSkc && (
+                                        <div className="ptl-detail-section" style={{ marginTop: '12px', border: '1px dashed #3b82f6', backgroundColor: '#eff6ff', padding: '12px', borderRadius: '8px' }}>
+                                            <p className="ptl-form-instruction" style={{ margin: 0, fontSize: '12px', color: '#1e40af', lineHeight: '1.5' }}>
+                                                📄 <strong>Reminder for SK Chairperson:</strong> The ABYIP draft takes time to finalize. Once the SK Resolution is ready and signed, upload it via the <strong>'Support Documents'</strong> button. You do not need to rush — upload it only when it is officially complete.
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* --- Checkpoints 8-12 Panel: LGU Proof Hint --- */}
+                                    {batch.currentStatusID >= 8 && batch.currentStatusID <= 12 && isSkc && (
+                                        <div className="ptl-detail-section" style={{ marginTop: '12px', border: '1px dashed #f59e0b', backgroundColor: '#fffbeb', padding: '12px', borderRadius: '8px' }}>
+                                            <p className="ptl-form-instruction" style={{ margin: 0, fontSize: '12px', color: '#b45309', lineHeight: '1.5' }}>
+                                                📋 <strong>Reminder for SK Chairperson:</strong> The project is currently going through the government review and approval process (QCYDO → QC SK Federation → City Budget → City Council). During this time, please collect and prepare the <strong>official proof of validation from the LGU</strong> (Local Government Unit). Once you receive it, upload it via the <strong>'Support Documents'</strong> button so the Barangay Captain can validate it and unlock the next step.
+                                            </p>
+                                        </div>
+                                    )}
+
                                     {/* --- Checkpoints 6, 8, 9, 10, 11, 12 Validation & Proof --- */}
                                     {[6, 8, 9, 10, 11, 12].includes(batch.currentStatusID) && (
                                         <div className="ptl-detail-section" style={{ marginTop: '12px' }}>
                                             <p className="ptl-detail-title">
                                                 <VerifiedIcon sx={{ fontSize: 16 }} /> Checkpoint {batch.currentStatusID} Validation & Proof
                                             </p>
-                                            <p className="ptl-form-instruction">
-                                                The SK Chairperson must upload the required documents in the Supporting Documents for this checkpoint. Once uploaded, the Barangay Captain will review and validate it.
-                                            </p>
+                                            {isBcpt && (
+                                                <div style={{ marginTop: '8px', border: '1px dashed #f59e0b', backgroundColor: '#fffbeb', padding: '12px', borderRadius: '8px' }}>
+                                                    <p className="ptl-form-instruction" style={{ margin: 0, fontSize: '12px', color: '#b45309', lineHeight: '1.5' }}>
+                                                        📋 <strong>Reminder for Barangay Captain:</strong> Please review and validate the documents or screenshots submitted by the SK Chairperson for this checkpoint to proceed to the next step.
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                     )}
 
@@ -903,15 +1023,6 @@ const ProjectTrackerList: React.FC = () => {
 
                             {/* ── Action Rows ────────────────────────────────── */}
                             <div className="ptl-actions-row">
-                                {/* ── Standard Advance Button (Hidden for custom states to prevent accidental skips) ── */}
-                                {isBcpt && batch.currentStatusID < 14 && ![2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].includes(batch.currentStatusID) && (
-                                    <button
-                                        className="ptl-advance-btn"
-                                        onClick={(e) => handleAdvance(e, batch)}
-                                    >
-                                        Advance to Step {batch.currentStatusID + 1}: {STATUS_STEPS[batch.currentStatusID]?.label}
-                                    </button>
-                                )}
 
                                 {/* ── Supporting Document Button ────────────────── */}
                                 {(hasDocsControl || isBcpt) && batch.currentStatusID >= 2 && (
@@ -952,7 +1063,7 @@ const ProjectTrackerList: React.FC = () => {
                                             }
                                         }}
                                         disabled={abyipBudget <= 0}
-                                        title={abyipBudget <= 0 ? 'Waiting for the SK Chairperson to extract and input the budget from the Supporting Documents.' : 'Validate the Estimated Annual Budget'}
+                                        title={abyipBudget <= 0 ? 'Waiting for the SK Chairperson to extract and input the budget from the Supporting Documents.' : 'Validate the Certified SK Fund Allocation'}
                                     >
                                         <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
                                         {abyipBudget <= 0 ? 'Waiting for Budget Input' : 'Validate Budget'}
@@ -1011,11 +1122,25 @@ const ProjectTrackerList: React.FC = () => {
                 {openAttendanceModalBatchID !== null && (
                     <Checkpoint3to4
                         batchID={openAttendanceModalBatchID}
+                        isSKS={isSKS}
                         onClose={() => setOpenAttendanceModalBatchID(null)}
                         onSuccess={() => refreshBatchDetails(openAttendanceModalBatchID)}
                     />
                 )}
             </CheckpointModal>
+
+            {openSessionValidationBatchID !== null && (
+                <SessionValidationModal
+                    open={openSessionValidationBatchID !== null}
+                    onClose={() => setOpenSessionValidationBatchID(null)}
+                    batchID={openSessionValidationBatchID}
+                    onSuccess={() => {
+                        setOpenSessionValidationBatchID(null);
+                        refreshBatchDetails(openSessionValidationBatchID);
+                        fetchBatches();
+                    }}
+                />
+            )}
 
             {validationModal && (
                 <CheckpointValidationModal
@@ -1141,7 +1266,7 @@ const ProjectTrackerList: React.FC = () => {
             {/* --- Budget Validation Modal --- */}
             {budgetValidationModal?.open && (
                 <CheckpointModal
-                    title="Validate Estimated Annual Budget"
+                    title="Validate Certified SK Fund Allocation"
                     open={budgetValidationModal.open}
                     onClose={() => setBudgetValidationModal(null)}
                 >
@@ -1164,7 +1289,7 @@ const ProjectTrackerList: React.FC = () => {
 
                         <div style={{ padding: '8px', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb', textAlign: 'center' }}>
                             <Typography variant="subtitle2" color="textSecondary">
-                                Estimated Annual Budget inputted by SK Chairperson:
+                                Certified SK Fund Allocation inputted by SK Chairperson:
                             </Typography>
                             <Typography variant="h4" color="primary" sx={{ mt: 1, fontWeight: 'bold' }}>
                                 ₱{budgetValidationModal.budget.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -1197,7 +1322,7 @@ const ProjectTrackerList: React.FC = () => {
                                     className="ptl-btn ptl-btn--danger"
                                     onClick={() => {
                                         if (!budgetValidationRemarks.trim()) {
-                                            alert("Please enter remarks before rejecting.");
+                                            toastError("Please enter remarks before rejecting.");
                                             return;
                                         }
                                         handleValidateBudget(budgetValidationModal.batchID, 'reject', budgetValidationRemarks);

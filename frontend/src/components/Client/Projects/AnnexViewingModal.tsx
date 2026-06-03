@@ -61,23 +61,54 @@ const AnnexViewingModal: React.FC<AnnexViewingModalProps> = ({ open, onClose, ti
                 ) : isCarousel ? (
                     <Box sx={{ position: 'relative', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                         <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', height: '500px', overflow: 'hidden', borderRadius: '4px', bgcolor: '#0f172a' }}>
-                            <img 
-                                src={urls[activeIndex]} 
-                                alt={`Campaign Proof ${activeIndex + 1}`} 
-                                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
-                            />
+                            {(() => {
+                                const currentUrl = urls[activeIndex];
+                                const ext = currentUrl.split('?')[0].split('.').pop()?.toLowerCase() || '';
+                                const isImageFile = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
+                                const isPdfFile = ext === 'pdf';
+                                
+                                if (isImageFile) {
+                                    return (
+                                        <img 
+                                            src={currentUrl} 
+                                            alt={`Document ${activeIndex + 1}`} 
+                                            style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
+                                        />
+                                    );
+                                } else if (isPdfFile) {
+                                    return (
+                                        <iframe 
+                                            src={currentUrl} 
+                                            title={`Document ${activeIndex + 1}`} 
+                                            width="100%" 
+                                            height="100%" 
+                                            style={{ border: 'none' }} 
+                                        />
+                                    );
+                                } else {
+                                    return (
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white', textAlign: 'center', p: 3 }}>
+                                            <Typography variant="h6" gutterBottom>File Cannot Be Previewed</Typography>
+                                            <Typography variant="body2" sx={{ mb: 2, color: '#94a3b8' }}>This file type (.{ext}) does not support inline preview.</Typography>
+                                            <Button variant="contained" href={currentUrl} target="_blank" rel="noopener noreferrer" sx={{ bgcolor: '#3b82f6', '&:hover': { bgcolor: '#2563eb' } }}>
+                                                Download File
+                                            </Button>
+                                        </Box>
+                                    );
+                                }
+                            })()}
                             
                             {urls.length > 1 && (
                                 <>
                                     <IconButton 
                                         onClick={handlePrev} 
-                                        sx={{ position: 'absolute', left: 16, bgcolor: 'rgba(255,255,255,0.2)', color: 'white', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)' } }}
+                                        sx={{ position: 'absolute', left: 16, bgcolor: 'rgba(0,0,0,0.4)', color: 'white', border: '2px solid white', borderRadius: '50%', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)' } }}
                                     >
                                         <ArrowBackIosNewIcon />
                                     </IconButton>
                                     <IconButton 
                                         onClick={handleNext} 
-                                        sx={{ position: 'absolute', right: 16, bgcolor: 'rgba(255,255,255,0.2)', color: 'white', '&:hover': { bgcolor: 'rgba(255,255,255,0.4)' } }}
+                                        sx={{ position: 'absolute', right: 16, bgcolor: 'rgba(0,0,0,0.4)', color: 'white', border: '2px solid white', borderRadius: '50%', '&:hover': { bgcolor: 'rgba(0,0,0,0.6)' } }}
                                     >
                                         <ArrowForwardIosIcon />
                                     </IconButton>

@@ -5,7 +5,8 @@ import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import CircularProgress from '@mui/material/CircularProgress';
 import styles from './CheckpointValidationModal.module.css';
-import { toast } from 'react-toastify';
+import { toastError, toastInfo, showMilestoneToast } from '../../../utils/ProjectCycleToast';
+import { useAuth } from '../../../context/AuthContext';
 import { FilePreviewModal } from './FilePreviewModal';
 
 const CHECKPOINT_FOLDER_MAP: Record<number, string> = {
@@ -30,6 +31,7 @@ interface CheckpointValidationModalProps {
 }
 
 const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ open, batchID, checkpointID, onClose, onSuccess }) => {
+    const { user } = useAuth();
     const [files, setFiles] = useState<ProofFile[]>([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -37,6 +39,7 @@ const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ o
     const [validationNote, setValidationNote] = useState('');
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewFile, setPreviewFile] = useState<{ url: string; name: string } | null>(null);
+    const [expectedAttempt, setExpectedAttempt] = useState<string | null>(null);
 
     const fetchFiles = async () => {
         try {
@@ -44,6 +47,11 @@ const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ o
             const res = await axios.get(`/api/project-tracker/checkpoint-proof/${batchID}/${checkpointID}`);
             if (res.data.success) {
                 setFiles(res.data.data);
+                if (res.data.expectedAttempt) {
+                    setExpectedAttempt(res.data.expectedAttempt);
+                } else {
+                    setExpectedAttempt(null);
+                }
             }
         } catch (error) {
             console.error('Failed to fetch proof files', error);
@@ -65,7 +73,7 @@ const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ o
 
     const handleAction = async (action: 'approve' | 'reject') => {
         if (validationNote.trim() === '') {
-            toast.error('Please enter remarks/notes.');
+            toastError('Please enter remarks/notes.');
             return;
         }
 
@@ -84,22 +92,18 @@ const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ o
             });
             if (res.data.success) {
                 if (action === 'approve') {
-                    toast.success(`Checkpoint ${checkpointID} validated successfully.`);
+                    showMilestoneToast(checkpointID + 1, user?.position || user?.role || '', 'Project Cycle');
                     if (res.data.aiTriggered) {
-                        toast.info('City Approval reached! AI Report generation has been queued and will update shortly.');
+                        toastInfo('City Approval reached! AI Report generation has been queued and will update shortly.');
                     }
                 } else {
                     let revertMsg = '';
-                    if (checkpointID >= 4 && checkpointID <= 6) {
-                        revertMsg = `Checkpoint rejected. Project reverted to Checkpoint 2.`;
-                    } else if (checkpointID >= 7 && checkpointID <= 11) {
-                        revertMsg = `Checkpoint rejected. Project reverted to Checkpoint 5 (ABYIP Budget Draft).`;
-                    } else if (checkpointID === 12) {
-                        revertMsg = `Procurement Phase revisions requested. Remaining at Checkpoint 12.`;
+                    if (checkpointID >= 4 && checkpointID <= 12) {
+                        revertMsg = `Revisions requested. Retaining to the current checkpoint.`;
                     } else {
-                        revertMsg = `Checkpoint rejected. Project reverted.`;
+                        revertMsg = `Checkpoint rejected. Retaining to the current checkpoint.`;
                     }
-                    toast.info(revertMsg);
+                    toastInfo(revertMsg);
                 }
                 onSuccess(); // Triggers a parent refresh
                 onClose();
@@ -107,7 +111,7 @@ const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ o
         } catch (error: any) {
             console.error('Checkpoint action failed', error);
             const msg = error.response?.data?.message || 'Failed to process checkpoint action.';
-            toast.error(msg);
+            toastError(msg);
         } finally {
             setSubmitting(false);
             setRejecting(false);
@@ -143,6 +147,19 @@ const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ o
         return file.path.includes(`Checkpoints/${folderName}/`);
     });
 
+    const isGrouped = checkpointID >= 8 && checkpointID <= 12;
+    const groupedFiles = isGrouped ? filteredFiles.reduce((acc, file) => {
+        const attempt = file.attempt || '1st';
+        if (!acc[attempt]) acc[attempt] = [];
+        acc[attempt].push(file);
+        return acc;
+    }, {} as Record<string, ProofFile[]>) : null;
+
+    let hasExpectedFiles = true;
+    if (isGrouped && expectedAttempt) {
+        hasExpectedFiles = !!(groupedFiles && groupedFiles[expectedAttempt] && groupedFiles[expectedAttempt].length > 0);
+    }
+
     const hasFiles = filteredFiles.length > 0;
 
     return (
@@ -160,20 +177,51 @@ const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ o
                                 <CircularProgress size={24} />
                             </div>
                         ) : hasFiles ? (
-                            filteredFiles.map((file, idx) => (
-                                <div key={idx} className={styles.fileItem}>
-                                    <div className={styles.fileInfo}>
-                                        <span className={styles.fileName}>
-                                            <InsertDriveFileIcon style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 4, color: '#1a73e8' }} />
-                                            {file.name}
-                                        </span>
-                                        <span className={styles.fileMeta}>{formatBytes(file.size)} • {formatDate(file.uploadedAt)}</span>
+                            isGrouped ? (
+                                <>
+                                    {Object.keys(groupedFiles!).map(attempt => (
+                                        <div key={attempt} style={{ marginBottom: '16px' }}>
+                                            <h4 style={{ margin: '0 0 8px 0', fontSize: '13px', color: '#4b5563', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                                {attempt} Attempt
+                                            </h4>
+                                            {groupedFiles![attempt].map((file, idx) => (
+                                                <div key={idx} className={styles.fileItem}>
+                                                    <div className={styles.fileInfo}>
+                                                        <span className={styles.fileName}>
+                                                            <InsertDriveFileIcon style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 4, color: '#1a73e8' }} />
+                                                            {file.name}
+                                                        </span>
+                                                        <span className={styles.fileMeta}>{formatBytes(file.size)} • {formatDate(file.uploadedAt)}</span>
+                                                    </div>
+                                                    <button className={styles.downloadBtn} onClick={(e) => handlePreview(e, file)}>
+                                                        Review File
+                                                    </button>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ))}
+                                    {!hasExpectedFiles && expectedAttempt && (
+                                        <div style={{ padding: '12px', backgroundColor: '#fffbeb', color: '#b45309', borderRadius: '4px', border: '1px solid #fde68a', fontSize: '14px', marginTop: '16px' }}>
+                                            <strong>Pending Update:</strong> Awaiting proof upload for {expectedAttempt} attempt from SK Chairperson.
+                                        </div>
+                                    )}
+                                </>
+                            ) : (
+                                filteredFiles.map((file, idx) => (
+                                    <div key={idx} className={styles.fileItem}>
+                                        <div className={styles.fileInfo}>
+                                            <span className={styles.fileName}>
+                                                <InsertDriveFileIcon style={{ fontSize: 16, verticalAlign: 'middle', marginRight: 4, color: '#1a73e8' }} />
+                                                {file.name}
+                                            </span>
+                                            <span className={styles.fileMeta}>{formatBytes(file.size)} • {formatDate(file.uploadedAt)}</span>
+                                        </div>
+                                        <button className={styles.downloadBtn} onClick={(e) => handlePreview(e, file)}>
+                                            Review File
+                                        </button>
                                     </div>
-                                    <button className={styles.downloadBtn} onClick={(e) => handlePreview(e, file)}>
-                                        Review File
-                                    </button>
-                                </div>
-                            ))
+                                ))
+                            )
                         ) : (
                             <p className={styles.noFiles}>Awaiting proof upload from SK Chairperson.</p>
                         )}
@@ -198,7 +246,7 @@ const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ o
                         <button 
                             className={`${styles.btn} ${styles.btnDanger}`} 
                             onClick={() => handleAction('reject')} 
-                            disabled={!hasFiles || validationNote.trim() === '' || submitting || rejecting}
+                            disabled={(!isGrouped && !hasFiles) || (isGrouped && !hasExpectedFiles) || validationNote.trim() === '' || submitting || rejecting}
                             style={{ gap: '6px' }}
                         >
                             {rejecting ? <CircularProgress size={16} color="inherit" /> : <CancelOutlinedIcon fontSize="small" />}
@@ -208,7 +256,7 @@ const CheckpointValidationModal: React.FC<CheckpointValidationModalProps> = ({ o
                         <button 
                             className={`${styles.btn} ${styles.btnPrimary}`} 
                             onClick={() => handleAction('approve')} 
-                            disabled={!hasFiles || validationNote.trim() === '' || submitting || rejecting}
+                            disabled={(!isGrouped && !hasFiles) || (isGrouped && !hasExpectedFiles) || validationNote.trim() === '' || submitting || rejecting}
                             style={{ gap: '6px' }}
                         >
                             {submitting ? <CircularProgress size={16} color="inherit" /> : <CheckCircleOutlineIcon fontSize="small" />}

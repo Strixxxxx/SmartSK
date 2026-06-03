@@ -763,9 +763,11 @@ const sendMeetingScheduledEmail = async (barangayID, projName, meetingDate) => {
         SELECT u.emailAddress
         FROM userInfo u
         JOIN roles r ON u.position = r.roleID
+        JOIN skTerms bt ON u.termID = bt.termID
         WHERE u.barangay = @barangayID
           AND r.roleName IN ('SKC', 'SKS', 'SKK', 'SKT')
           AND u.isArchived = 0
+          AND bt.isCurrent = 1
       `);
 
     if (userResult.recordset.length === 0) {
@@ -805,9 +807,11 @@ const sendMeetingRescheduledEmail = async (barangayID, projName, meetingDate, re
         SELECT u.emailAddress
         FROM userInfo u
         JOIN roles r ON u.position = r.roleID
+        JOIN skTerms bt ON u.termID = bt.termID
         WHERE u.barangay = @barangayID
           AND r.roleName IN ('SKC', 'SKS', 'SKK', 'SKT')
           AND u.isArchived = 0
+          AND bt.isCurrent = 1
       `);
 
     if (userResult.recordset.length === 0) {
@@ -862,7 +866,7 @@ const sendBudgetRejectionEmail = async (barangayID, projName, remarks) => {
       .filter(Boolean)
       .join(',');
 
-    const subject = `⚠️ SmartSK: Barangay Captain Rejected Estimated Annual Budget for "${projName}"`;
+    const subject = `⚠️ SmartSK: Barangay Captain Rejected Certified SK Fund Allocation for "${projName}"`;
 
     const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 5px; overflow: hidden;">
@@ -871,7 +875,7 @@ const sendBudgetRejectionEmail = async (barangayID, projName, remarks) => {
       </div>
       <div style="padding: 20px;">
         <p>Dear SK Council,</p>
-        <p>The Barangay Captain has reviewed the Estimated Annual Budget submitted for the project plan:</p>
+        <p>The Barangay Captain has reviewed the Certified SK Fund Allocation submitted for the project plan:</p>
         <div style="background-color: #ffebee; padding: 15px; border-left: 4px solid #c62828; margin: 15px 0;">
           <p><strong>Project Plan:</strong> ${projName}</p>
           <p><strong>Status:</strong> <span style="color: #c62828; font-weight: bold;">REJECTED</span></p>

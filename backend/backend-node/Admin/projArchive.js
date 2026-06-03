@@ -3,7 +3,7 @@ const router = express.Router();
 const { getConnection, sql } = require('../database/database');
 const { addAuditTrail } = require('../audit/auditService');
 const { authMiddleware } = require('../session/session');
-const { deleteBlob, projectBatchContainerName } = require('../Storage/storage');
+const { deleteBlob, projectBatchContainerName, docContainerName } = require('../Storage/storage');
 
 // GET all archived project batches
 router.get('/', authMiddleware, async (req, res) => {
@@ -167,18 +167,81 @@ router.delete('/cycles/:cycleID', authMiddleware, async (req, res) => {
         }
 
         // Get blob names (projName) to delete from Azure Blob Storage before deleting from DB
-        const blobsCheck = await request
+        const blobsCheck = await pool.request()
             .input('cycleID', sql.Int, cycleID)
             .query('SELECT projName FROM projectBatch WHERE cycleID = @cycleID');
 
         const blobNames = blobsCheck.recordset.map(row => row.projName).filter(name => name);
 
-        // Delete blobs from Azure Storage
+        // Get sk_session_photos blob names before deleting from DB
+        const sessionPhotosCheck = await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .query(`
+                SELECT sp.blobName 
+                FROM sk_session_photos sp
+                JOIN projectBatch pb ON sp.batchID = pb.batchID
+                WHERE pb.cycleID = @cycleID AND sp.blobName IS NOT NULL
+            `);
+        const sessionPhotoBlobNames = sessionPhotosCheck.recordset.map(row => row.blobName).filter(name => name);
+
+        // Fetch blobs for youth profiling
+        const ypBlobsCheck = await pool.request().input('cycleID', sql.Int, cycleID).query(`
+            SELECT noticeLetterBlobName, masterDatasetBlobName, submissionID 
+            FROM youth_profiling_submissions WHERE cycleID = @cycleID
+        `);
+        
+        let blobsToDeleteDocContainer = [];
+        if (ypBlobsCheck.recordset.length > 0) {
+            const sub = ypBlobsCheck.recordset[0];
+            if (sub.noticeLetterBlobName) blobsToDeleteDocContainer.push(sub.noticeLetterBlobName);
+            if (sub.masterDatasetBlobName) blobsToDeleteDocContainer.push(sub.masterDatasetBlobName);
+            
+            const ypProofs = await pool.request().input('submissionID', sql.Int, sub.submissionID).query(`
+                SELECT imageBlobName FROM youth_profiling_proof_attachments WHERE submissionID = @submissionID
+            `);
+            ypProofs.recordset.forEach(row => { if (row.imageBlobName) blobsToDeleteDocContainer.push(row.imageBlobName) });
+        }
+
+        // Fetch blobs for KK General Assembly
+        const kkBlobsCheck = await pool.request().input('cycleID', sql.Int, cycleID).query(`
+            SELECT attendanceSheetBlobName, kkMinutesBlobName, submissionID 
+            FROM kk_general_assembly_submissions WHERE cycleID = @cycleID
+        `);
+        if (kkBlobsCheck.recordset.length > 0) {
+            const sub = kkBlobsCheck.recordset[0];
+            if (sub.attendanceSheetBlobName) blobsToDeleteDocContainer.push(sub.attendanceSheetBlobName);
+            if (sub.kkMinutesBlobName) blobsToDeleteDocContainer.push(sub.kkMinutesBlobName);
+            
+            const kkProofs = await pool.request().input('submissionID', sql.Int, sub.submissionID).query(`
+                SELECT imageBlobName FROM kk_general_assembly_proof_attachments WHERE submissionID = @submissionID
+            `);
+            kkProofs.recordset.forEach(row => { if (row.imageBlobName) blobsToDeleteDocContainer.push(row.imageBlobName) });
+        }
+
+        // Delete blobs from project batch container
         for (const blobName of blobNames) {
             try {
                 await deleteBlob(projectBatchContainerName, blobName);
             } catch (blobErr) {
-                console.warn(`Failed to delete blob ${blobName} but continuing with database deletion`, blobErr);
+                console.warn(`Failed to delete blob ${blobName} from projectBatchContainerName`, blobErr);
+            }
+        }
+
+        // Delete sk_session_photos blobs from project batch container
+        for (const blobName of sessionPhotoBlobNames) {
+            try {
+                await deleteBlob(projectBatchContainerName, blobName);
+            } catch (blobErr) {
+                console.warn(`Failed to delete session photo blob ${blobName} from projectBatchContainerName`, blobErr);
+            }
+        }
+        
+        // Delete blobs from documents container
+        for (const blobName of blobsToDeleteDocContainer) {
+            try {
+                await deleteBlob(docContainerName, blobName);
+            } catch (blobErr) {
+                console.warn(`Failed to delete blob ${blobName} from docContainerName`, blobErr);
             }
         }
 
@@ -193,9 +256,23 @@ router.delete('/cycles/:cycleID', authMiddleware, async (req, res) => {
                 DECLARE @batchIDs TABLE (batchID INT);
                 INSERT INTO @batchIDs SELECT batchID FROM projectBatch WHERE cycleID = @cycleID;
                 
+                -- 1. Delete non-cascading dependencies of project batches
+                DELETE FROM projectAgenda WHERE batchID IN (SELECT batchID FROM @batchIDs);
                 DELETE FROM projectABYIP WHERE projbatchID IN (SELECT batchID FROM @batchIDs);
                 DELETE FROM projectCBYDP WHERE projbatchID IN (SELECT batchID FROM @batchIDs);
+                DELETE FROM sk_session_photos WHERE batchID IN (SELECT batchID FROM @batchIDs);
+                DELETE FROM userNotificationReads WHERE notifID IN (SELECT notificationID FROM projectNotifications WHERE batchID IN (SELECT batchID FROM @batchIDs) OR cycleID = @cycleID);
                 DELETE FROM projectBatch WHERE cycleID = @cycleID;
+                
+                -- 2. Delete dependencies of general assembly submissions
+                DELETE FROM kk_general_assembly_proof_attachments 
+                WHERE submissionID IN (SELECT submissionID FROM kk_general_assembly_submissions WHERE cycleID = @cycleID);
+                
+                -- 3. Delete general assembly and youth profiling submissions tied to the cycle
+                DELETE FROM kk_general_assembly_submissions WHERE cycleID = @cycleID;
+                DELETE FROM youth_profiling_submissions WHERE cycleID = @cycleID;
+                
+                -- 4. Finally, delete the parent cycle
                 DELETE FROM projectCycles WHERE cycleID = @cycleID;
             `;
             await reqTx.query(deleteBatchChildren);

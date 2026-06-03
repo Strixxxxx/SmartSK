@@ -95,6 +95,23 @@
     padding: 2px 10px;
 }
 
+.pnb-panel__read-all-btn {
+    background: none;
+    border: none;
+    color: #1a73e8;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.pnb-panel__read-all-btn:hover {
+    background: #f1f3f4;
+    text-decoration: underline;
+}
+
 .pnb-panel__list {
     overflow-y: auto;
     flex: 1;

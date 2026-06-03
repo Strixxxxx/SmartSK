@@ -5,7 +5,6 @@ import {
   Chip,
   Card,
   CardContent,
-  LinearProgress,
   List,
   Avatar,
 } from '@mui/material';
@@ -34,7 +33,6 @@ interface TrendData {
   id: number;
   name: string;
   description: string;
-  confidence: number;
   trend: 'up' | 'down' | 'stable';
   category: string;
   subcategory?: string;
@@ -126,26 +124,6 @@ const TrendsList: React.FC<TrendsListProps> = ({ trendsData, citations }) => {
                   <Typography variant="body1" paragraph color="text.secondary">
                     <CitationRenderer text={trend.description} citations={citations} />
                   </Typography>
-                  
-                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography variant="body2" sx={{ width: '140px' }}>
-                      Confidence: {Math.round(trend.confidence * 100)}%
-                    </Typography>
-                    <LinearProgress 
-                      variant="determinate" 
-                      value={trend.confidence * 100} 
-                      sx={{ 
-                        flexGrow: 1, 
-                        height: 8, 
-                        borderRadius: 1,
-                        bgcolor: 'rgba(0,0,0,0.05)',
-                        '& .MuiLinearProgress-bar': {
-                          backgroundColor: trend.confidence > 0.9 ? 'success.main' : 
-                                           trend.confidence > 0.8 ? 'primary.main' : 'warning.main'
-                        }
-                      }} 
-                    />
-                  </Box>
                 </Box>
               </Box>
             </CardContent>

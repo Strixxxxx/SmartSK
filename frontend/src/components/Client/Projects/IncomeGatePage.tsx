@@ -43,7 +43,7 @@ const IncomeGatePage: React.FC<IncomeGatePageProps> = ({ hasEstIncomeCert, hasIn
                         {hasEstIncomeCert ? '✅' : '❌'} <strong>Certification of Estimated Income</strong> (Uploaded)
                     </li>
                     <li style={{ marginBottom: '8px' }}>
-                        {hasBudget ? '✅' : '❌'} <strong>Estimated Annual Budget Value</strong> (Entered by SK Chairperson)
+                        {hasBudget ? '✅' : '❌'} <strong>Certified SK Fund Allocation Value</strong> (Entered by SK Chairperson)
                     </li>
                     <li style={{ marginBottom: '8px' }}>
                         {isApproved ? '✅' : '❌'} <strong>Budget Validation Approval</strong> (Approved by Brgy. Captain)

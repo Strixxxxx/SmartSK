@@ -5,6 +5,7 @@ import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import RocketLaunchIcon from '@mui/icons-material/RocketLaunch';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import axiosInstance from '../../../backend connection/axiosConfig';
+import { toastSuccess } from '../../../utils/ProjectCycleToast';
 import styles from './InitializeCycleModal.module.css';
 
 interface InitializeCycleModalProps {
@@ -31,6 +32,11 @@ const InitializeCycleModal: React.FC<InitializeCycleModalProps> = ({ open, onClo
         if (termStartYear.length === 4 && termEndYear.length === 4 && !isNaN(tStart) && !isNaN(tEnd)) {
             if (tEnd - tStart !== 2) {
                 errors.push(`Term must span exactly 3 years (end − start = 2). Current difference: ${tEnd - tStart}.`);
+            }
+            
+            const currentYear = new Date().getFullYear();
+            if (tStart < currentYear || tStart > currentYear + 1) {
+                errors.push(`Term start year must be the current year (${currentYear}) or next year (${currentYear + 1}).`);
             }
         }
         if (targetFiscalYear.length === 4 && !isNaN(tFiscal) && !isNaN(tStart) && !isNaN(tEnd)) {
@@ -71,6 +77,7 @@ const InitializeCycleModal: React.FC<InitializeCycleModalProps> = ({ open, onClo
                 targetFiscalYear: tFiscal,
             });
             if (response.data.success) {
+                toastSuccess(`Project Cycle successfully created for Fiscal Year ${tFiscal}! Please check the project card for next steps.`);
                 handleClose();
                 navigate('/projects', { state: { cycle: response.data.cycle } });
             }

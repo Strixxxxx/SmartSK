@@ -80,6 +80,13 @@ const ProjectNotificationBell: React.FC = () => {
         } catch { /* silent */ }
     };
 
+    const markAllAsRead = async () => {
+        try {
+            await axios.patch('/api/project-batch/notifications/read-all');
+            setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
+        } catch { /* silent */ }
+    };
+
     const getIcon = (type: string) => {
         if (type === 'FISCAL_DEADLINE') return <WarningAmberIcon sx={{ color: '#b71c1c', fontSize: 18 }} />;
         if (type === 'URGENT') return <WarningAmberIcon sx={{ color: '#c62828', fontSize: 18 }} />;
@@ -116,7 +123,12 @@ const ProjectNotificationBell: React.FC = () => {
                     <div className="pnb-panel__header">
                         <span>Project Alerts</span>
                         {unreadCount > 0 && (
-                            <span className="pnb-panel__count">{unreadCount} unread</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                <button className="pnb-panel__read-all-btn" onClick={markAllAsRead}>
+                                    Mark all as read
+                                </button>
+                                <span className="pnb-panel__count">{unreadCount} unread</span>
+                            </div>
                         )}
                     </div>
                     <div className="pnb-panel__list">

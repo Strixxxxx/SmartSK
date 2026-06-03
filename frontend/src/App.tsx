@@ -22,7 +22,7 @@ const App: React.FC = () => {
             <AuthProvider>
               <MaintenanceBanner />
               <AppRoutes />
-              <ToastContainer />
+              <ToastContainer position="bottom-right" />
             </AuthProvider>
           </MaintenanceHandler>
         </WebSocketProvider>

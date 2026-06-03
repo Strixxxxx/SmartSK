@@ -5,6 +5,7 @@ import { FileDownload, PictureAsPdf, Close } from '@mui/icons-material';
 import CollaboratorAvatars from './CollaboratorAvatars';
 import { CollaboratorInfo } from '../../../hooks/useCollaborationSocket';
 import instance from '../../../backend connection/axiosConfig';
+import { toastError } from '../../../utils/ProjectCycleToast';
 
 interface ProjectTopNavbarProps {
     project: any | null;
@@ -56,7 +57,7 @@ const ProjectTopNavbar: React.FC<ProjectTopNavbarProps> = ({
             
         } catch (error) {
             console.error(`Error exporting ${format}:`, error);
-            alert(`Failed to export ${format.toUpperCase()}. Please ensure the file is synced and try again.`);
+            toastError(`Failed to export ${format.toUpperCase()}. Please ensure the file is synced and try again.`);
         } finally {
             if (format === 'excel') setIsExportingExcel(false);
             else setIsExportingPDF(false);

@@ -12,8 +12,11 @@ router.get('/forecast', async (req, res) => {
         const reportData = await getReport('forecast.json');
         res.json(reportData);
     } catch (error) {
-        res.status(error.statusCode || 500).json({ 
-            message: `Failed to retrieve forecast report.`,
+        const isProcessing = error.code === 'REPORT_PROCESSING' || error.statusCode === 404;
+        res.status(isProcessing ? 404 : (error.statusCode || 500)).json({ 
+            message: isProcessing 
+                ? `Currently, The Budget Forecasting is currently empty, Please wait a while.`
+                : `Failed to retrieve forecast report.`,
             error: error.message
         });
     }
@@ -29,8 +32,11 @@ router.get('/pa-analysis', async (req, res) => {
         const reportData = await getReport('pa_analysis.json');
         res.json(reportData);
     } catch (error) {
-        res.status(error.statusCode || 500).json({ 
-            message: `Failed to retrieve predictive analysis report.`,
+        const isProcessing = error.code === 'REPORT_PROCESSING' || error.statusCode === 404;
+        res.status(isProcessing ? 404 : (error.statusCode || 500)).json({ 
+            message: isProcessing 
+                ? `Currently, The Predictive Project Analysis is currently empty, Please wait a while.`
+                : `Failed to retrieve predictive analysis report.`,
             error: error.message
         });
     }
@@ -46,8 +52,11 @@ router.get('/pa-trends', async (req, res) => {
         const reportData = await getReport('pa_trends.json');
         res.json(reportData);
     } catch (error) {
-        res.status(error.statusCode || 500).json({ 
-            message: `Failed to retrieve predictive trends report.`,
+        const isProcessing = error.code === 'REPORT_PROCESSING' || error.statusCode === 404;
+        res.status(isProcessing ? 404 : (error.statusCode || 500)).json({ 
+            message: isProcessing 
+                ? `Currently, The Project Trends is currently empty, Please wait a while.`
+                : `Failed to retrieve predictive trends report.`,
             error: error.message
         });
     }

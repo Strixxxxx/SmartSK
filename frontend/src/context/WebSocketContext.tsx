@@ -84,13 +84,11 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
             if (message.messages && Array.isArray(message.messages)) {
               message.messages.forEach((msg: string) => {
                 toast.info(msg, {
-                  position: "top-right",
                   autoClose: 6000,
                 });
               });
             } else {
               toast.info(message.message || 'Your account settings have been updated.', {
-                position: "top-right",
                 autoClose: 5000,
               });
             }

@@ -154,7 +154,7 @@ const ConfirmBudgetModal: React.FC<ConfirmBudgetModalProps> = ({
                 disableEscapeKeyDown={isSaving}
                 sx={{ '& .MuiDialog-paper': { height: '85vh', maxHeight: '900px', width: '1000px', maxWidth: '90vw' } }}
             >
-                <DialogTitle>Estimated Annual Budget</DialogTitle>
+                <DialogTitle>Certified SK Fund Allocation</DialogTitle>
                 <DialogContent sx={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', pb: 2 }}>
                     {previewUrl && (
                         <Box sx={{ flexGrow: 1, width: '100%', minHeight: 0, border: '1px solid #ccc', borderRadius: 1, overflow: 'hidden', mb: 2, mt: 1 }}>
@@ -167,13 +167,13 @@ const ConfirmBudgetModal: React.FC<ConfirmBudgetModalProps> = ({
                     )}
                     <Box sx={{ flexShrink: 0 }}>
                         <Typography sx={{ mb: 2 }}>
-                            Please enter the Estimated Annual Budget for the ABYIP.
+                            Please enter the Certified SK Fund Allocation for the ABYIP.
                         </Typography>
 
                     <TextField
                         autoFocus
                         margin="dense"
-                        label="Estimated Annual Budget (PHP)"
+                        label="Certified SK Fund Allocation (PHP)"
                         type="number"
                         fullWidth
                         variant="outlined"
@@ -220,7 +220,7 @@ const ConfirmBudgetModal: React.FC<ConfirmBudgetModalProps> = ({
                 <DialogTitle>Confirm Allocation</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Is this the correct estimated annual budget?
+                        Is this the correct certified SK fund allocation?
                         <br /><br />
                         <Typography variant="h6" color="primary" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
                             ₱{parseFloat(budgetInput.replace(/,/g, '') || '0').toLocaleString()}

@@ -264,6 +264,17 @@
     background: #2e7d32;
 }
 
+.ptl-step__connector--active {
+    background: #4f46e5;
+    animation: pulse-blue-connector 1.5s infinite;
+}
+
+@keyframes pulse-blue-connector {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
 /* ── Status Row ─────────────────────────────────────────── */
 .ptl-status-row {
     margin-top: 16px;

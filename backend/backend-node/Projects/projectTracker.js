@@ -7,9 +7,93 @@ const { broadcast, broadcastToRoom } = require('../websockets/websocket');
 const { decrypt } = require('../utils/crypto');
 const multer = require('multer');
 const upload = multer({ storage: multer.memoryStorage() });
+
+const validateImageSizes = (req, res, next) => {
+    const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB
+    let oversizedFiles = [];
+
+    const checkFile = (file) => {
+        if (file.mimetype && file.mimetype.toLowerCase().startsWith('image/') && file.size > MAX_IMAGE_SIZE) {
+            oversizedFiles.push(file.originalname);
+        }
+    };
+
+    if (req.file) {
+        checkFile(req.file);
+    } else if (req.files) {
+        if (Array.isArray(req.files)) {
+            req.files.forEach(checkFile);
+        } else {
+            Object.values(req.files).forEach(fileArray => {
+                fileArray.forEach(checkFile);
+            });
+        }
+    }
+
+    if (oversizedFiles.length > 0) {
+        return res.status(400).json({
+            success: false,
+            message: `Image file size must not exceed 2MB per photo. Oversized files: ${oversizedFiles.join(', ')}`
+        });
+    }
+
+    next();
+};
+
 const { uploadBlob, listBlobsWithProperties, generateSasUrl, docContainerName, deleteBlob } = require('../Storage/storage');
 const { sendProjectReviewVerdictEmail, sendBcptOverrideEmail, sendExecutionCompleteEmailToBCPT, sendMeetingScheduledEmail, sendMeetingRescheduledEmail } = require('../Email/email');
 const templateService = require('../utils/templateService');
+const ExcelJS = require('exceljs');
+const PDFDocument = require('pdfkit-table');
+
+const ROLE_NAME_MAP = {
+    "SKC": "SK Chairperson",
+    "SKS": "SK Secretary",
+    "SKT": "SK Treasurer",
+    "SKK1": "SK Kagawad I",
+    "SKK2": "SK Kagawad II",
+    "SKK3": "SK Kagawad III",
+    "SKK4": "SK Kagawad IV",
+    "SKK5": "SK Kagawad V",
+    "SKK6": "SK Kagawad VI",
+    "SKK7": "SK Kagawad VII",
+    "BCPT": "Barangay Captain",
+    "Admin": "Administrator"
+};
+
+const generatePDFBuffer = async (formattedDate, attendeesList) => {
+    return new Promise((resolve, reject) => {
+        const doc = new PDFDocument({ margin: 50 });
+        let buffers = [];
+        doc.on('data', buffers.push.bind(buffers));
+        doc.on('end', () => {
+            const pdfData = Buffer.concat(buffers);
+            resolve(pdfData);
+        });
+        doc.on('error', reject);
+
+        doc.fontSize(16).text('Session Attendance Sheet', { align: 'center' });
+        doc.moveDown();
+        doc.fontSize(12).text(`Meeting Schedule Date & Time: ${formattedDate}`);
+        doc.moveDown();
+
+        const table = {
+            title: "Attendees",
+            headers: [
+                { label: "Full Name", property: 'fullName', width: 250 },
+                { label: "Position", property: 'roleName', width: 200 }
+            ],
+            datas: attendeesList
+        };
+
+        doc.table(table, {
+            prepareHeader: () => doc.font("Helvetica-Bold").fontSize(10),
+            prepareRow: () => doc.font("Helvetica").fontSize(10)
+        });
+
+        doc.end();
+    });
+};
 
 /**
  * Custom Checkpoint-based Project Tracker Router
@@ -61,6 +145,15 @@ router.post('/initialize-cycle', authMiddleware, async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: `The SK term must span exactly 3 years (termEndYear - termStartYear = 2). Received difference: ${tEnd - tStart}.`
+            });
+        }
+
+        // Guard 3.5: Term start year must be current or next year
+        const currentYear = new Date().getFullYear();
+        if (tStart < currentYear || tStart > currentYear + 1) {
+            return res.status(400).json({
+                success: false,
+                message: `The term start year must be the current year (${currentYear}) or next year (${currentYear + 1}).`
             });
         }
 
@@ -148,7 +241,7 @@ router.post('/initialize-cycle', authMiddleware, async (req, res) => {
         const abbr = templateService.getBarangayAbbr(barangayID);
         
         const cbydpFileName = `CBYDP_${abbr}_${tStart}-${tEnd}_Rev${tFiscal}_V1.0.xlsx`;
-        await templateService.initializeNewProject({
+        const cbydpRes = await templateService.initializeNewProject({
             barangayID,
             userID,
             cycleID: newCycle.cycleID,
@@ -166,6 +259,18 @@ router.post('/initialize-cycle', authMiddleware, async (req, res) => {
             targetYear: `${tFiscal}`,
             fileName: abyipFileName
         });
+
+        // 3. Create Notification
+        const message = `A new Project Cycle for Fiscal Year ${tFiscal} has begun.`;
+        await pool.request()
+            .input('batchID', sql.Int, cbydpRes.batchID)
+            .input('barangayID', sql.Int, barangayID)
+            .input('notifType', sql.NVarChar, 'CYCLE_INITIALIZED')
+            .input('message', sql.NVarChar, message)
+            .query('INSERT INTO projectNotifications (batchID, barangayID, notifType, message) VALUES (@batchID, @barangayID, @notifType, @message)');
+
+        // 4. Broadcast to trigger frontend real-time updates
+        broadcast({ type: 'new_notification', barangayID });
 
         res.status(201).json({
             success: true,
@@ -403,6 +508,40 @@ router.get('/status/:batchID', authMiddleware, async (req, res) => {
             }
         }
 
+        // Fetch session docs for CP3
+        let sessionDocs = null;
+        try {
+            const docsRes = await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .query('SELECT attendanceSheetBlobName, sessionDocBlobName, isValidated, validationNote FROM sk_session_docs WHERE batchID = @batchID');
+            if (docsRes.recordset.length) {
+                const docData = docsRes.recordset[0];
+                sessionDocs = {
+                    attendanceSheetUrl: docData.attendanceSheetBlobName ? await generateSasUrl(docContainerName, docData.attendanceSheetBlobName) : null,
+                    sessionDocUrl: docData.sessionDocBlobName ? await generateSasUrl(docContainerName, docData.sessionDocBlobName) : null,
+                    isValidated: docData.isValidated,
+                    validationNote: docData.validationNote,
+                    photoDocs: []
+                };
+
+                const photosRes = await pool.request()
+                    .input('batchID', sql.Int, batchID)
+                    .query('SELECT photoID, blobName, attempt, uploadedAt FROM sk_session_photos WHERE batchID = @batchID AND isIncluded = 1 ORDER BY uploadedAt ASC');
+                
+                for (const photo of photosRes.recordset) {
+                    sessionDocs.photoDocs.push({
+                        photoID: photo.photoID,
+                        url: await generateSasUrl(docContainerName, photo.blobName),
+                        name: photo.blobName.split('/').pop(),
+                        attempt: photo.attempt,
+                        uploadedAt: photo.uploadedAt
+                    });
+                }
+            }
+        } catch (err) {
+             console.error('[projectTracker] Error checking session docs:', err.message);
+        }
+
         res.json({
             success: true,
             data: {
@@ -411,7 +550,8 @@ router.get('/status/:batchID', authMiddleware, async (req, res) => {
                 attendees,
                 ppas,
                 hasLYDP,
-                hasABYIPDocs
+                hasABYIPDocs,
+                sessionDocs
             }
         });
     } catch (err) {
@@ -609,7 +749,7 @@ router.post('/submit-attendance', authMiddleware, async (req, res) => {
         const batchRes = await pool.request()
             .input('batchID', sql.Int, batchID)
             .input('barangayID', sql.Int, barangayID)
-            .query('SELECT batchID, barangayID, projName, termID FROM projectBatch WHERE batchID = @batchID AND barangayID = @barangayID');
+            .query('SELECT batchID, barangayID, projName, termID, meetingDate, cycleID FROM projectBatch WHERE batchID = @batchID AND barangayID = @barangayID');
 
         if (!batchRes.recordset.length) {
             return res.status(404).json({ success: false, message: 'Project batch not found.' });
@@ -705,6 +845,52 @@ router.post('/submit-attendance', authMiddleware, async (req, res) => {
             broadcastToRoom(batchID, { type: 'attendance_updated', presentAttendees, totalActiveTermMembers });
         }
 
+        // Generate Attendance Sheet
+        const presentUserIDs = attendance.filter(a => a.attended).map(a => parseInt(a.userID)).filter(id => !isNaN(id));
+        let attendeesList = [];
+        if (presentUserIDs.length > 0) {
+            const usersRes = await pool.request().query(`
+                SELECT u.fullName, r.roleName 
+                FROM userInfo u JOIN roles r ON u.position = r.roleID 
+                WHERE u.userID IN (${presentUserIDs.join(',')})
+            `);
+            attendeesList = usersRes.recordset.map(u => ({
+                fullName: decrypt(u.fullName) || 'Unknown',
+                roleName: ROLE_NAME_MAP[u.roleName] || u.roleName
+            }));
+        }
+
+        const docRes = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query('SELECT attendanceSheetBlobName FROM sk_session_docs WHERE batchID = @batchID');
+        if (docRes.recordset.length > 0 && docRes.recordset[0].attendanceSheetBlobName) {
+            await deleteBlob(docContainerName, docRes.recordset[0].attendanceSheetBlobName).catch(err => console.log('Error deleting old blob:', err));
+        }
+
+        const formattedDate = batch.meetingDate ? new Date(batch.meetingDate).toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' }) : 'Unknown Date';
+        const buffer = await generatePDFBuffer(formattedDate, attendeesList);
+        const ts = Date.now();
+        const blobName = `CBYDP/SK_Session/${barangayID}/${batch.cycleID}/attendance_Sheet/attendance_sheet_${ts}.pdf`;
+        await uploadBlob(docContainerName, blobName, buffer, 'application/pdf');
+        
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('uploadedBy', sql.Int, userID)
+            .input('sheetBlob', sql.NVarChar(500), blobName)
+            .query(`
+                MERGE sk_session_docs AS target
+                USING (SELECT @batchID AS batchID) AS source
+                ON (target.batchID = source.batchID)
+                WHEN MATCHED THEN
+                    UPDATE SET 
+                        uploadedBy = @uploadedBy,
+                        attendanceSheetBlobName = @sheetBlob,
+                        updatedAt = GETDATE()
+                WHEN NOT MATCHED THEN
+                    INSERT (batchID, uploadedBy, attendanceSheetBlobName)
+                    VALUES (source.batchID, @uploadedBy, @sheetBlob);
+            `);
+
         res.json({
             success: true,
             message: advanced ? 'Attendance saved and project automatically progressed to Checkpoint 4.' : 'Attendance updated successfully.',
@@ -716,23 +902,26 @@ router.post('/submit-attendance', authMiddleware, async (req, res) => {
     }
 });
 
-// 3.5 POST /submit-self-attendance — Allow individual SK officials to check-in their own attendance and save comments
+// 3.5 POST /submit-self-attendance — SKS Batch Check-In
 router.post('/submit-self-attendance', authMiddleware, async (req, res) => {
     try {
-        const { batchID, attended, comments } = req.body;
+        const { batchID, attendance } = req.body;
         const { userID, barangay: barangayID } = req.user;
 
-        if (!batchID || attended === undefined) {
-            return res.status(400).json({ success: false, message: 'Batch ID and attendance state are required.' });
+        if (req.user.position !== 'SKS' && req.user.positionName !== 'SKS' && req.user.roleName !== 'SKS') {
+            return res.status(403).json({ success: false, message: 'Unauthorized. Only the SK Secretary can submit attendance for Checkpoint 3.' });
+        }
+
+        if (!batchID || !Array.isArray(attendance)) {
+            return res.status(400).json({ success: false, message: 'Batch ID and attendance array are required.' });
         }
 
         const pool = await getConnection();
 
-        // Verify batch exists and matches the user's barangayID
         const batchRes = await pool.request()
             .input('batchID', sql.Int, batchID)
             .input('barangayID', sql.Int, barangayID)
-            .query('SELECT projName, termID FROM projectBatch WHERE batchID = @batchID AND barangayID = @barangayID');
+            .query('SELECT projName, termID, meetingDate, cycleID FROM projectBatch WHERE batchID = @batchID AND barangayID = @barangayID');
 
         if (!batchRes.recordset.length) {
             return res.status(404).json({ success: false, message: 'Project batch not found.' });
@@ -740,98 +929,311 @@ router.post('/submit-self-attendance', authMiddleware, async (req, res) => {
 
         const batch = batchRes.recordset[0];
 
-        // Retrieve active term fallback if batch.termID is null
-        let activeTermID = batch.termID;
-        if (!activeTermID) {
-            const activeTermRes = await pool.request()
-                .input('barangayID', sql.Int, barangayID)
-                .query('SELECT TOP 1 termID FROM skTerms WHERE barangayID = @barangayID AND isCurrent = 1 ORDER BY termID DESC');
-            if (activeTermRes.recordset.length) {
-                activeTermID = activeTermRes.recordset[0].termID;
+        // Upsert self-attendance status for all members
+        for (const record of attendance) {
+            await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('userID', sql.Int, record.userID)
+                .input('attended', sql.Bit, record.attended ? 1 : 0)
+                .query(`
+                    MERGE projectCheckpointApprovals AS target
+                    USING (SELECT @batchID AS batchID, @userID AS userID) AS source
+                    ON (target.batchID = source.batchID AND target.userID = source.userID)
+                    WHEN MATCHED THEN
+                        UPDATE SET attended = @attended
+                    WHEN NOT MATCHED THEN
+                        INSERT (batchID, userID, attended) VALUES (source.batchID, source.userID, @attended);
+                `);
+        }
+
+        // Generate Attendance Sheet
+        const presentUserIDs = attendance.filter(a => a.attended).map(a => parseInt(a.userID)).filter(id => !isNaN(id));
+        let attendeesList = [];
+        if (presentUserIDs.length > 0) {
+            const usersRes = await pool.request().query(`
+                SELECT u.fullName, r.roleName 
+                FROM userInfo u JOIN roles r ON u.position = r.roleID 
+                WHERE u.userID IN (${presentUserIDs.join(',')})
+            `);
+            attendeesList = usersRes.recordset.map(u => ({
+                fullName: decrypt(u.fullName) || 'Unknown',
+                roleName: ROLE_NAME_MAP[u.roleName] || u.roleName
+            }));
+        }
+
+        const docRes = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query('SELECT attendanceSheetBlobName FROM sk_session_docs WHERE batchID = @batchID');
+        if (docRes.recordset.length > 0 && docRes.recordset[0].attendanceSheetBlobName) {
+            await deleteBlob(docContainerName, docRes.recordset[0].attendanceSheetBlobName).catch(err => console.log('Error deleting old blob:', err));
+        }
+
+        const formattedDate = batch.meetingDate ? new Date(batch.meetingDate).toLocaleString('en-PH', { timeZone: 'Asia/Manila', dateStyle: 'medium', timeStyle: 'short' }) : 'Unknown Date';
+        const buffer = await generatePDFBuffer(formattedDate, attendeesList);
+        const ts = Date.now();
+        const blobName = `CBYDP/SK_Session/${barangayID}/${batch.cycleID}/attendance_Sheet/attendance_sheet_${ts}.pdf`;
+        await uploadBlob(docContainerName, blobName, buffer, 'application/pdf');
+        
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('uploadedBy', sql.Int, userID)
+            .input('sheetBlob', sql.NVarChar(500), blobName)
+            .query(`
+                MERGE sk_session_docs AS target
+                USING (SELECT @batchID AS batchID) AS source
+                ON (target.batchID = source.batchID)
+                WHEN MATCHED THEN
+                    UPDATE SET 
+                        uploadedBy = @uploadedBy,
+                        attendanceSheetBlobName = @sheetBlob,
+                        updatedAt = GETDATE()
+                WHEN NOT MATCHED THEN
+                    INSERT (batchID, uploadedBy, attendanceSheetBlobName)
+                    VALUES (source.batchID, @uploadedBy, @sheetBlob);
+            `);
+
+        broadcastToRoom(batchID, { type: 'attendance_updated' });
+
+        res.json({
+            success: true,
+            message: 'Attendance submitted successfully and attendance sheet generated.'
+        });
+    } catch (err) {
+        console.error('[projectTracker] POST /submit-self-attendance error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to submit attendance.' });
+    }
+});
+
+// 3.6 POST /upload-session-docs
+router.post('/upload-session-docs', authMiddleware, upload.fields([{ name: 'sessionDoc', maxCount: 20 }]), validateImageSizes, async (req, res) => {
+    try {
+        const { batchID } = req.body;
+        const { userID, barangay: barangayID } = req.user;
+
+        if (req.user.position !== 'SKS' && req.user.positionName !== 'SKS' && req.user.roleName !== 'SKS') {
+            return res.status(403).json({ success: false, message: 'Unauthorized. Only the SK Secretary can upload session documents.' });
+        }
+
+        const sessionDocsFiles = req.files['sessionDoc'] || [];
+
+        if (!batchID) {
+            return res.status(400).json({ success: false, message: 'Batch ID is required.' });
+        }
+        if (sessionDocsFiles.length === 0) {
+            return res.status(400).json({ success: false, message: 'Session documentation is required.' });
+        }
+
+        const pool = await getConnection();
+
+        const batchRes = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('barangayID', sql.Int, barangayID)
+            .query('SELECT cycleID FROM projectBatch WHERE batchID = @batchID AND barangayID = @barangayID');
+
+        if (!batchRes.recordset.length) {
+            return res.status(404).json({ success: false, message: 'Project batch not found.' });
+        }
+
+        const cycleID = batchRes.recordset[0].cycleID;
+        const ts = Date.now();
+
+        // ── Handle Session Documentation ──
+
+        // ── Handle Photo Documentation ──
+        const uploadedPhotos = [];
+        if (sessionDocsFiles.length > 0) {
+            // Check for previous attempts to determine attempt number
+            const attemptRes = await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .query("SELECT ISNULL(MAX(CAST(REPLACE(attempt, 'st', '') AS INT)), 0) as maxAttempt FROM sk_session_photos WHERE batchID = @batchID");
+
+            let attemptNum = 1;
+            if (attemptRes.recordset.length && attemptRes.recordset[0].maxAttempt > 0) {
+                attemptNum = attemptRes.recordset[0].maxAttempt + 1;
+            }
+            const attemptCount = `${attemptNum}st`;
+
+            // Mark previous photo attempts as not included
+            await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .query('UPDATE sk_session_photos SET isIncluded = 0 WHERE batchID = @batchID');
+
+            for (const file of sessionDocsFiles) {
+                const safe = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+                const docBlobName = `CBYDP/SK_Session/${barangayID}/${cycleID}/Photo_Docs/${attemptCount}/${ts}-${safe}`;
+                const docUrl = await uploadBlob(docContainerName, docBlobName, file.buffer, file.mimetype);
+
+                await pool.request()
+                    .input('batchID', sql.Int, batchID)
+                    .input('uploadedBy', sql.Int, userID)
+                    .input('blobName', sql.NVarChar(500), docBlobName)
+                    .input('attempt', sql.NVarChar(20), attemptCount)
+                    .query(`
+                        INSERT INTO sk_session_photos (batchID, uploadedBy, blobName, attempt)
+                        VALUES (@batchID, @uploadedBy, @blobName, @attempt)
+                    `);
+
+                uploadedPhotos.push(docUrl);
             }
         }
 
-        // Ensure user belongs to the current term of the batch (excluding Admin & BCPT)
-        const userCheckRes = await pool.request()
-            .input('userID', sql.Int, userID)
-            .input('termID', sql.Int, activeTermID)
-            .query(`
-                SELECT u.userID 
-                FROM userInfo u
-                JOIN roles r ON u.position = r.roleID
-                WHERE u.userID = @userID AND u.termID = @termID AND u.isArchived = 0 AND r.roleName NOT IN ('Admin', 'BCPT')
-            `);
+        // ── MERGE sk_session_docs — reset validation status ──
+            await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('uploadedBy', sql.Int, userID)
+                .query(`
+                    MERGE sk_session_docs AS target
+                    USING (SELECT @batchID AS batchID) AS source
+                    ON (target.batchID = source.batchID)
+                    WHEN MATCHED THEN
+                        UPDATE SET
+                            uploadedBy = @uploadedBy,
+                            updatedAt = GETDATE(),
+                            isValidated = 0,
+                            validatedBy = NULL,
+                            validatedAt = NULL,
+                            validationNote = NULL
+                    WHEN NOT MATCHED THEN
+                        INSERT (batchID, uploadedBy)
+                        VALUES (source.batchID, @uploadedBy);
+                `);
+        res.json({
+            success: true,
+            message: 'Session documents uploaded successfully.',
+            sessionDocsUrls: uploadedPhotos
+        });
+    } catch (err) {
+        console.error('[projectTracker] POST /upload-session-docs error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to upload session documents.' });
+    }
+});
 
-        if (!userCheckRes.recordset.length) {
-            return res.status(403).json({ success: false, message: 'Unauthorized. Only active SK officials for this term can submit self-attendance.' });
+// 3.7 POST /validate-session
+router.post('/validate-session', authMiddleware, async (req, res) => {
+    try {
+        const { batchID, action, validationNote } = req.body;
+        const { userID, barangay: barangayID } = req.user;
+
+        if (!isSKC(req)) {
+            return res.status(403).json({ success: false, message: 'Unauthorized. Only the SK Chairperson can validate sessions.' });
         }
 
-        // Upsert self-attendance status and comments
-        await pool.request()
+        if (!batchID || !action || !validationNote) {
+            return res.status(400).json({ success: false, message: 'Batch ID, action, and validation note are required.' });
+        }
+
+        const pool = await getConnection();
+
+        const batchRes = await pool.request()
             .input('batchID', sql.Int, batchID)
-            .input('userID', sql.Int, userID)
-            .input('attended', sql.Bit, attended ? 1 : 0)
-            .input('comments', sql.NVarChar(sql.MAX), comments || null)
-            .query(`
-                MERGE projectCheckpointApprovals AS target
-                USING (SELECT @batchID AS batchID, @userID AS userID) AS source
-                ON (target.batchID = source.batchID AND target.userID = source.userID)
-                WHEN MATCHED THEN
-                    UPDATE SET attended = @attended, comments = @comments
-                WHEN NOT MATCHED THEN
-                    INSERT (batchID, userID, attended, comments) VALUES (source.batchID, source.userID, @attended, @comments);
-            `);
+            .input('barangayID', sql.Int, barangayID)
+            .query('SELECT cycleID, projName FROM projectBatch WHERE batchID = @batchID AND barangayID = @barangayID');
 
-        // Get total active term members count (excluding Admin/BCPT)
-        const membersCountRes = await pool.request()
-            .input('termID', sql.Int, activeTermID)
-            .query(`
-                SELECT COUNT(*) as count 
-                FROM userInfo u
-                JOIN roles r ON u.position = r.roleID
-                WHERE u.termID = @termID AND u.isArchived = 0 AND r.roleName NOT IN ('Admin', 'BCPT')
-            `);
-        const totalActiveTermMembers = membersCountRes.recordset[0].count;
+        if (!batchRes.recordset.length) {
+            return res.status(404).json({ success: false, message: 'Project batch not found.' });
+        }
+        
+        const cycleID = batchRes.recordset[0].cycleID;
+        const projName = batchRes.recordset[0].projName;
 
-        // Get count of present attendees for this batch
-        const presentAttendeesRes = await pool.request()
+        const statusRes = await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .query('SELECT TOP 1 statusID FROM projectTracker WHERE cycleID = @cycleID ORDER BY updatedAt DESC');
+            
+        const currentStatusID = statusRes.recordset.length ? statusRes.recordset[0].statusID : 2;
+        
+        if (currentStatusID !== 3) {
+            return res.status(400).json({ success: false, message: 'Project is not at Checkpoint 3.' });
+        }
+
+        const docsRes = await pool.request()
             .input('batchID', sql.Int, batchID)
-            .query('SELECT COUNT(*) as count FROM projectCheckpointApprovals WHERE batchID = @batchID AND attended = 1');
-        const presentAttendees = presentAttendeesRes.recordset[0].count;
+            .query('SELECT sessionDocID, attendanceSheetBlobName, sessionDocBlobName FROM sk_session_docs WHERE batchID = @batchID');
 
-        let advanced = false;
-        if (totalActiveTermMembers > 0 && presentAttendees >= totalActiveTermMembers) {
-            // Automatically advance to Checkpoint 4 (Brgy. Captain's Approval)
+        const photosRes = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query('SELECT TOP 1 photoID FROM sk_session_photos WHERE batchID = @batchID AND isIncluded = 1');
+
+        if (!docsRes.recordset.length) {
+            return res.status(400).json({ success: false, message: 'Cannot validate: No session document record found. The SK Secretary must submit attendance and upload session documents first.' });
+        }
+
+        const docRecord = docsRes.recordset[0];
+        if (!docRecord.attendanceSheetBlobName) {
+            return res.status(400).json({ success: false, message: 'Cannot validate: Attendance sheet not yet generated. The SK Secretary must save the attendance record first.' });
+        }
+        if (!photosRes.recordset.length) {
+            return res.status(400).json({ success: false, message: 'Cannot validate: Session documentation not uploaded.' });
+        }
+        
+        const approvalsRes = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query('SELECT TOP 1 pcaID FROM projectCheckpointApprovals WHERE batchID = @batchID');
+            
+        if (!approvalsRes.recordset.length) {
+            return res.status(400).json({ success: false, message: 'Cannot validate: Attendance not submitted.' });
+        }
+
+        if (action === 'approve') {
+            await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('userID', sql.Int, userID)
+                .input('validationNote', sql.NVarChar(sql.MAX), validationNote)
+                .query(`
+                    UPDATE sk_session_docs 
+                    SET isValidated = 1, validatedBy = @userID, validatedAt = GETDATE(), validationNote = @validationNote 
+                    WHERE batchID = @batchID
+                `);
+
             await pool.request()
                 .input('batchID', sql.Int, batchID)
                 .input('statusID', sql.Int, 4)
                 .input('userID', sql.Int, userID)
                 .query('INSERT INTO projectTracker (cycleID, statusID, updatedBy) SELECT cycleID, @statusID, @userID FROM projectBatch WHERE batchID = @batchID; UPDATE projectCycles SET currentStatusID = @statusID, updatedAt = GETDATE() WHERE cycleID = (SELECT cycleID FROM projectBatch WHERE batchID = @batchID);');
 
-            // Create notification
-            const notifMsg = `All SK Council members have approved the project plan "${batch.projName}". It has automatically progressed to Checkpoint 4: Brgy. Captain's Approval.`;
+            const notifMsg = `SK Chairperson has validated the session and approved attendance for "${projName}". It has progressed to Checkpoint 4: KK General Assembly.`;
             await pool.request()
                 .input('batchID', sql.Int, batchID)
                 .input('barangayID', sql.Int, barangayID)
                 .input('message', sql.NVarChar(sql.MAX), notifMsg)
-                .query('INSERT INTO projectNotifications (batchID, barangayID, notifType, message) VALUES (@batchID, @barangayID, \'INTERNAL_FINALIZED\', @message)');
+                .query("INSERT INTO projectNotifications (batchID, barangayID, notifType, message) VALUES (@batchID, @barangayID, 'CHECKPOINT_VALIDATED', @message)");
 
             broadcast({ type: 'new_notification', barangayID });
             broadcastToRoom(batchID, { type: 'checkpoint_updated', statusID: 4 });
-            advanced = true;
+            
+            return res.json({ success: true, message: 'Session approved and advanced to Checkpoint 4.' });
         } else {
-            // Broadcast live attendance change in room
-            broadcastToRoom(batchID, { type: 'attendance_updated' });
-        }
+            // Save the rejection note to sk_session_docs so the frontend can easily read it
+            await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('validationNote', sql.NVarChar(sql.MAX), validationNote)
+                .query(`
+                    UPDATE sk_session_docs 
+                    SET isValidated = 0, validationNote = @validationNote 
+                    WHERE batchID = @batchID
+                `);
 
-        res.json({
-            success: true,
-            message: advanced ? 'Your check-in has been submitted and project progressed to Checkpoint 4.' : 'Your check-in has been updated successfully.',
-            advanced
-        });
+            await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('userID', sql.Int, userID)
+                .input('content', sql.NVarChar(sql.MAX), `[SKC Rejection CP3] ${validationNote}`)
+                .query('INSERT INTO projectNotes (batchID, userID, content) VALUES (@batchID, @userID, @content)');
+
+            const notifMsg = `SK Chairperson requested revisions for Checkpoint 3 session documents for "${projName}". Please re-submit.`;
+            await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('barangayID', sql.Int, barangayID)
+                .input('message', sql.NVarChar(sql.MAX), notifMsg)
+                .query("INSERT INTO projectNotifications (batchID, barangayID, notifType, message) VALUES (@batchID, @barangayID, 'REVISION_REQUESTED', @message)");
+
+            broadcast({ type: 'new_notification', barangayID });
+            broadcastToRoom(batchID, { type: 'session_rejected' });
+
+            return res.json({ success: true, message: 'Revisions requested.' });
+        }
     } catch (err) {
-        console.error('[projectTracker] POST /submit-self-attendance error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to submit self-attendance.' });
+        console.error('[projectTracker] POST /validate-session error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to validate session.' });
     }
 });
 
@@ -923,7 +1325,84 @@ router.post('/override-finalization', authMiddleware, async (req, res) => {
     }
 });
 
+// POST /revert-to-cp3 — SK Chairperson Revert Checkpoint 4 to Checkpoint 3
+router.post('/revert-to-cp3', authMiddleware, async (req, res) => {
+    try {
+        const { batchID, reason } = req.body;
+        const { userID, barangay: barangayID } = req.user;
+
+        if (req.user.roleName !== 'SKC') {
+            return res.status(403).json({ success: false, message: 'Unauthorized. Only the SK Chairperson can revert a checkpoint.' });
+        }
+
+        if (!batchID || !reason || reason.trim().length < 20) {
+            return res.status(400).json({ success: false, message: 'Batch ID and a valid reason (min 20 chars) are required.' });
+        }
+
+        const pool = await getConnection();
+
+        const batchRes = await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query('SELECT cycleID, projName FROM projectBatch WHERE batchID = @batchID');
+
+        if (!batchRes.recordset.length) {
+            return res.status(404).json({ success: false, message: 'Project batch not found.' });
+        }
+        
+        const { cycleID, projName } = batchRes.recordset[0];
+
+        const statusRes = await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .query('SELECT TOP 1 statusID FROM projectTracker WHERE cycleID = @cycleID ORDER BY updatedAt DESC');
+
+        if (statusRes.recordset.length === 0 || statusRes.recordset[0].statusID !== 4) {
+            return res.status(400).json({ success: false, message: 'Project is not at Checkpoint 4.' });
+        }
+
+        // Revert to CP3
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('statusID', sql.Int, 3)
+            .input('userID', sql.Int, userID)
+            .query('INSERT INTO projectTracker (cycleID, statusID, updatedBy) SELECT cycleID, @statusID, @userID FROM projectBatch WHERE batchID = @batchID; UPDATE projectCycles SET currentStatusID = @statusID, updatedAt = GETDATE() WHERE cycleID = (SELECT cycleID FROM projectBatch WHERE batchID = @batchID);');
+
+        // Reset CP4 submission
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('reason', sql.NVarChar(sql.MAX), reason)
+            .query("UPDATE kk_general_assembly_submissions SET status = 'INCOMPLETE', revisionComment = @reason WHERE cycleID = (SELECT cycleID FROM projectBatch WHERE batchID = @batchID) AND barangayID = (SELECT barangayID FROM projectBatch WHERE batchID = @batchID)");
+
+        // Reset CP3 validation
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .query('UPDATE sk_session_docs SET isValidated = 0, validatedBy = NULL, validatedAt = NULL, validationNote = NULL WHERE batchID = @batchID');
+
+        const noteContent = `[SKC Reversion CP4→CP3] ${reason}`;
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('userID', sql.Int, userID)
+            .input('content', sql.NVarChar(sql.MAX), noteContent)
+            .query('INSERT INTO projectNotes (batchID, userID, content) VALUES (@batchID, @userID, @content)');
+
+        const notifMsg = `SK Chairperson has reverted "${projName}" to Checkpoint 3. Reason: ${reason}`;
+        await pool.request()
+            .input('batchID', sql.Int, batchID)
+            .input('barangayID', sql.Int, barangayID)
+            .input('message', sql.NVarChar(sql.MAX), notifMsg)
+            .query('INSERT INTO projectNotifications (batchID, barangayID, notifType, message) VALUES (@batchID, @barangayID, \'CP4_REVERTED_TO_CP3\', @message)');
+
+        broadcast({ type: 'new_notification', barangayID });
+        broadcastToRoom(batchID, { type: 'checkpoint_updated', statusID: 3 });
+
+        res.json({ success: true, message: 'Project reverted to Checkpoint 3.' });
+    } catch (err) {
+        console.error('[projectTracker] POST /revert-to-cp3 error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to revert project.' });
+    }
+});
+
 // 5. POST /endorse-project — Barangay Captain Endorsement (Checkpoint 4 Approval / Reversion to Checkpoint 2)
+
 router.post('/endorse-project', authMiddleware, async (req, res) => {
     try {
         const { batchID, action, notes } = req.body; // action: 'approve' or 'revise', notes: reasoning content
@@ -978,9 +1457,9 @@ router.post('/endorse-project', authMiddleware, async (req, res) => {
             notifType = 'BCPT_ENDORSED';
             notifMsg = `Barangay Captain has APPROVED/ENDORSED project plan "${projName}". It has proceeded to Checkpoint 8: QCYDO Review. Please check the work notes & agenda.`;
         } else {
-            nextStatusID = 5; // Return to ABYIP Budget Draft (Checkpoint 5)
+            nextStatusID = 7; // Maintain at Checkpoint 7
             notifType = 'BCPT_REVISION_REQUESTED';
-            notifMsg = `Barangay Captain has requested REVISIONS for project plan "${projName}". It has reverted to Checkpoint 5: ABYIP Budget Draft. Please review the captain's feedback in the work notes.`;
+            notifMsg = `Barangay Captain has requested REVISIONS for project plan "${projName}". The project remains at Checkpoint 7. Please review the captain's feedback in the work notes.`;
         }
 
         // 1. Save Captain's reasoning note in projectNotes
@@ -998,12 +1477,7 @@ router.post('/endorse-project', authMiddleware, async (req, res) => {
             .input('userID', sql.Int, userID)
             .query('INSERT INTO projectTracker (cycleID, statusID, updatedBy) SELECT cycleID, @statusID, @userID FROM projectBatch WHERE batchID = @batchID; UPDATE projectCycles SET currentStatusID = @statusID, updatedAt = GETDATE() WHERE cycleID = (SELECT cycleID FROM projectBatch WHERE batchID = @batchID);');
 
-        if (nextStatusID === 5) {
-            // Revert request means a whole new session is required. Delete old attendance.
-            await pool.request()
-                .input('batchID', sql.Int, batchID)
-                .query('DELETE FROM projectCheckpointApprovals WHERE batchID = @batchID');
-        }
+
 
         // 3. Create Notification
         await pool.request()
@@ -1032,7 +1506,7 @@ router.post('/endorse-project', authMiddleware, async (req, res) => {
             success: true,
             message: action === 'approve'
                 ? 'Project endorsed successfully. Advanced to Checkpoint 8.'
-                : 'Project returned to Checkpoint 5 for revisions.',
+                : 'Revisions requested. Project remains at Checkpoint 7.',
             nextStatusID
         });
     } catch (err) {
@@ -1219,6 +1693,7 @@ router.post('/validate-closure', authMiddleware, async (req, res) => {
         await pool.request()
             .input('batchID', sql.Int, batchID)
             .input('barangayID', sql.Int, barangayID)
+            .input('message', sql.NVarChar(sql.MAX), notifMsg)
             .query('INSERT INTO projectNotifications (batchID, barangayID, notifType, message) VALUES (@batchID, @barangayID, \'PROJECT_CLOSED\', @message)');
 
         // Broadcast notifications & updates
@@ -1246,66 +1721,6 @@ function getAttemptSuffix(count) {
     return `${num}th`;
 }
 
-// 1. POST /upload-checkpoint-proof
-router.post('/upload-checkpoint-proof', authMiddleware, hasAccessControl('trackerControl'), upload.single('proofFile'), async (req, res) => {
-    try {
-        const batchID = parseInt(req.body.batchID, 10);
-        const checkpointID = parseInt(req.body.checkpointID, 10);
-        
-        if (!batchID || isNaN(checkpointID) || !CHECKPOINT_FOLDER_MAP[checkpointID]) {
-            return res.status(400).json({ success: false, message: 'Invalid batch ID or checkpoint ID.' });
-        }
-        
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: 'No proof file provided.' });
-        }
-
-        // Validate file extension
-        const allowedExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.webm', '.pdf'];
-        const fileExt = req.file.originalname.toLowerCase().substring(req.file.originalname.lastIndexOf('.'));
-        if (!allowedExtensions.includes(fileExt)) {
-            return res.status(400).json({ success: false, message: 'Invalid file format. Only png, jpg, jpeg, webp, webm, and pdf files are allowed.' });
-        }
-        
-        const folderName = CHECKPOINT_FOLDER_MAP[checkpointID];
-        const timestamp = Date.now();
-        // Sanitize original filename (replace spaces with underscores, etc)
-        const safeFilename = req.file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
-        
-        const pool = await getConnection();
-        const batchCheck = await pool.request()
-            .input('batchID', sql.Int, batchID)
-            .query(`SELECT barangayID, cycleID FROM projectBatch WHERE batchID = @batchID`);
-            
-        if (batchCheck.recordset.length === 0) {
-            return res.status(404).json({ success: false, message: 'Project not found.' });
-        }
-        
-        const { barangayID, cycleID } = batchCheck.recordset[0];
-        
-        let blobName;
-        if (checkpointID >= 8 && checkpointID <= 12) {
-            // Count existing tracker arrivals to determine the active attempt suffix
-            const trackerCheck = await pool.request()
-                .input('batchID', sql.Int, batchID)
-                .input('statusID', sql.Int, checkpointID)
-                .query(`SELECT COUNT(*) as count FROM projectTracker WHERE batchID = @batchID AND statusID = @statusID`);
-            const arrivalsCount = trackerCheck.recordset[0].count;
-            const attemptSuffix = getAttemptSuffix(Math.max(0, arrivalsCount - 1));
-            blobName = `Checkpoints/${folderName}/${barangayID}/${cycleID}/${attemptSuffix}/${timestamp}-${safeFilename}`;
-        } else {
-            blobName = `Checkpoints/${folderName}/${barangayID}/${cycleID}/${timestamp}-${safeFilename}`;
-        }
-        
-        await uploadBlob(docContainerName, blobName, req.file.buffer, req.file.mimetype);
-        
-        res.json({ success: true, message: `Proof file uploaded successfully.`, path: blobName });
-    } catch (err) {
-        console.error('[projectTracker] POST /upload-checkpoint-proof error:', err.message);
-        res.status(500).json({ success: false, message: 'Failed to upload proof file.' });
-    }
-});
-
 // 2. GET /checkpoint-proof/:batchID/:checkpointID
 router.get('/checkpoint-proof/:batchID/:checkpointID', authMiddleware, async (req, res) => {
     try {
@@ -1328,6 +1743,16 @@ router.get('/checkpoint-proof/:batchID/:checkpointID', authMiddleware, async (re
         const { barangayID, cycleID } = batchCheck.recordset[0];
         let prefix = `Checkpoints/${folderName}/${barangayID}/${cycleID}/`;
         
+        let expectedAttempt = null;
+        if (checkpointID >= 8 && checkpointID <= 12) {
+            const trackerCheck = await pool.request()
+                .input('batchID', sql.Int, batchID)
+                .input('statusID', sql.Int, checkpointID)
+                .query(`SELECT COUNT(*) as count FROM projectTracker pt JOIN projectBatch pb ON pt.cycleID = pb.cycleID WHERE pb.batchID = @batchID AND pt.statusID = @statusID`);
+            const arrivalsCount = trackerCheck.recordset[0].count;
+            expectedAttempt = getAttemptSuffix(Math.max(0, arrivalsCount - 1));
+        }
+
         const blobs = await listBlobsWithProperties(docContainerName, { prefix });
         
         const files = [];
@@ -1338,9 +1763,24 @@ router.get('/checkpoint-proof/:batchID/:checkpointID', authMiddleware, async (re
             const filename = parts.pop();
             let originalName = filename;
             
-            if (checkpointID < 8 || checkpointID > 12) {
+            if (checkpointID >= 8 && checkpointID <= 12) {
+                if (parts.length === 5) {
+                    attempt = parts[4]; 
+                } else if (parts.length === 4) {
+                    attempt = '1st'; // Fallback for old files without attempt folder
+                } else {
+                    attempt = parts[parts.length - 1];
+                }
                 const nameParts = filename.split('-');
-                nameParts.shift(); // remove timestamp
+                if (nameParts.length > 1 && !isNaN(nameParts[0])) {
+                    nameParts.shift(); // remove timestamp only if present
+                }
+                originalName = nameParts.join('-') || filename;
+            } else {
+                const nameParts = filename.split('-');
+                if (nameParts.length > 1 && !isNaN(nameParts[0])) {
+                    nameParts.shift(); // remove timestamp only if present
+                }
                 originalName = nameParts.join('-') || filename;
             }
             
@@ -1354,7 +1794,7 @@ router.get('/checkpoint-proof/:batchID/:checkpointID', authMiddleware, async (re
             });
         }
         
-        res.json({ success: true, data: files });
+        res.json({ success: true, data: files, expectedAttempt: expectedAttempt });
     } catch (err) {
         console.error('[projectTracker] GET /checkpoint-proof error:', err.message);
         res.status(500).json({ success: false, message: 'Failed to fetch proof files.' });
@@ -1428,22 +1868,20 @@ router.post('/validate-budget', authMiddleware, async (req, res) => {
                 .input('batchID', sql.Int, batchID)
                 .query(`UPDATE projectNotifications SET isRead = 1 WHERE batchID = @batchID AND notifType IN ('URGENT', 'DEADLINE')`);
 
-            res.json({ success: true, message: 'Estimated Annual Budget approved. Advanced to Checkpoint 6.' });
+            res.json({ success: true, message: 'Certified SK Fund Allocation approved. Advanced to Checkpoint 6.' });
         } else if (action === 'reject') {
             // Keep at Checkpoint 5, send rejection email, and insert notification
             const { sendBudgetRejectionEmail } = require('../Email/email');
             await sendBudgetRejectionEmail(barangayID, projName, remarks || 'No remarks provided.');
             
-            // Send system notification to SKC/SKS
+            // Send system notification to the Barangay
             await pool.request()
                 .input('barangayID', sql.Int, barangayID)
                 .input('batchID', sql.Int, batchID)
                 .input('remarks', sql.NVarChar, remarks || 'No remarks provided.')
                 .query(`
-                    INSERT INTO projectNotifications (userID, notifType, message, batchID, isRead, createdAt)
-                    SELECT userID, 'SYSTEM', 'Budget Rejected: ' + @remarks, @batchID, 0, GETDATE()
-                    FROM userInfo
-                    WHERE barangay = @barangayID AND position IN (SELECT roleID FROM roles WHERE roleName IN ('SKC', 'SKS')) AND isArchived = 0
+                    INSERT INTO projectNotifications (batchID, barangayID, notifType, message)
+                    VALUES (@batchID, @barangayID, 'SYSTEM', 'Budget Rejected by Brgy. Captain: ' + @remarks)
                 `);
 
             res.json({ success: true, message: 'Budget rejected. Notification sent to SK Council.' });
@@ -1517,6 +1955,18 @@ router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
         let notifType = 'CHECKPOINT_VALIDATED';
         let abyipBatchID = null;
 
+        // Fetch Fiscal Year and all cycle batches
+        const cycleInfoRes = await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .query("SELECT targetFiscalYear FROM projectCycles WHERE cycleID = @cycleID");
+        const fiscalYear = cycleInfoRes.recordset[0]?.targetFiscalYear || 'Unknown';
+        const cycleName = `Project Cycle ${cycleID} - ${fiscalYear}`;
+
+        const allBatchesRes = await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .query("SELECT batchID FROM projectBatch WHERE cycleID = @cycleID");
+        const cycleBatches = allBatchesRes.recordset.map(r => r.batchID);
+
         // Ensure we find the ABYIP batch ID for this cycle for AI sync
         if (batchCheck.recordset[0].projType === 'ABYIP') {
             abyipBatchID = batchID;
@@ -1532,12 +1982,12 @@ router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
         if (act === 'approve') {
             nextStatusID = fromCP + 1;
             taggedNote = `[BCPT Validation: CP${fromCP}] ${validationNote}`;
-            notifMessage = `Barangay Captain has validated Checkpoint ${fromCP} for project "${projName}". Status advanced to Checkpoint ${nextStatusID}.`;
+            notifMessage = `Barangay Captain has validated Checkpoint ${fromCP} for "${cycleName}". Status advanced to Checkpoint ${nextStatusID}.`;
             notifType = 'CHECKPOINT_VALIDATED';
         } else {
             // Rejection / Revert request
             nextStatusID = fromCP;
-            notifMessage = `Barangay Captain requested REVISIONS for project "${projName}" during Checkpoint ${fromCP} validation. Status remains at Checkpoint ${fromCP}.`;
+            notifMessage = `Barangay Captain requested REVISIONS for "${cycleName}" during Checkpoint ${fromCP} validation. Status remains at Checkpoint ${fromCP}.`;
             notifType = 'BCPT_REVISION_REQUESTED';
             taggedNote = `[BCPT Rejection: CP${fromCP}] ${validationNote}`;
         }
@@ -1569,13 +2019,14 @@ router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
                 .input('updatedBy', sql.Int, req.user.userID)
                 .query(`INSERT INTO projectTracker (cycleID, statusID, updatedBy) SELECT cycleID, @statusID, @updatedBy FROM projectBatch WHERE batchID = @batchID; UPDATE projectCycles SET currentStatusID = @statusID, updatedAt = GETDATE() WHERE cycleID = (SELECT cycleID FROM projectBatch WHERE batchID = @batchID);`);
                 
-                
-            // Insert validation/rejection note in projectNotes (using correct column names: userID, content)
-            await transaction.request()
-                .input('batchID', sql.Int, batchID)
-                .input('userID', sql.Int, req.user.userID)
-                .input('content', sql.NVarChar(sql.MAX), taggedNote)
-                .query(`INSERT INTO projectNotes (batchID, userID, content) VALUES (@batchID, @userID, @content)`);
+            // Insert validation/rejection note in projectNotes for all batches in the cycle
+            for (const bID of cycleBatches) {
+                await transaction.request()
+                    .input('batchID', sql.Int, bID)
+                    .input('userID', sql.Int, req.user.userID)
+                    .input('content', sql.NVarChar(sql.MAX), taggedNote)
+                    .query(`INSERT INTO projectNotes (batchID, userID, content) VALUES (@batchID, @userID, @content)`);
+            }
                 
             // Insert Notification in projectNotifications with correct fields
             await transaction.request()
@@ -1588,8 +2039,10 @@ router.post('/validate-checkpoint', authMiddleware, async (req, res) => {
             await transaction.commit();
             
             // Broadcasts
-            broadcastToRoom(batchID.toString(), { type: 'checkpoint_updated', statusID: nextStatusID });
-            broadcastToRoom(batchID.toString(), { type: 'new_note' });
+            for (const bID of cycleBatches) {
+                broadcastToRoom(bID.toString(), { type: 'checkpoint_updated', statusID: nextStatusID });
+                broadcastToRoom(bID.toString(), { type: 'new_note' });
+            }
             broadcast({ type: 'new_notification', barangayID });
             
             let aiTriggered = false;
@@ -1682,7 +2135,7 @@ async function getOrCreateSubmission(pool, cycleID, barangayID, userID) {
 // Accepts the three file types, uploads them to Azure Blob Storage,
 // and records blob references + optional DPA consent flag in the DB.
 // ---
-router.post('/profiling/upload', authMiddleware, uploadFields, async (req, res) => {
+router.post('/profiling/upload', authMiddleware, uploadFields, validateImageSizes, async (req, res) => {
     try {
         const role = req.user.position;
         if (role !== 'Admin' && role !== 'SKS') {
@@ -1806,10 +2259,23 @@ router.post('/profiling/upload', authMiddleware, uploadFields, async (req, res) 
                         SET status = 'SUBMITTED', updatedAt = GETDATE() 
                         WHERE submissionID = @submissionID AND status IN ('INCOMPLETE', 'REVISION_REQUESTED')
                     `);
+                    
+                    const notifReq = new sql.Request(transaction);
+                    notifReq.input('cycleID', sql.Int, cycleID);
+                    notifReq.input('barangayID', sql.Int, barangayID);
+                    notifReq.input('message', sql.NVarChar, 'Youth Profiling documents uploaded and ready for validation.');
+                    await notifReq.query(`
+                        INSERT INTO projectNotifications (cycleID, barangayID, notifType, message) 
+                        VALUES (@cycleID, @barangayID, 'DOCUMENT_UPLOAD', @message)
+                    `);
                 }
             }
 
             await transaction.commit();
+
+            if (finalStatus === 'SUBMITTED') {
+                broadcast({ type: 'new_notification', barangayID });
+            }
 
             res.json({
                 success: true,
@@ -2048,7 +2514,7 @@ router.post('/profiling/request-revision', authMiddleware, async (req, res) => {
 // CP1-2b: PATCH /api/project-tracker/profiling/replace-annex
 // Accepts files for replacement. Restrict to SKS/Admin.
 // ---
-router.patch('/profiling/replace-annex', authMiddleware, uploadFields, async (req, res) => {
+router.patch('/profiling/replace-annex', authMiddleware, uploadFields, validateImageSizes, async (req, res) => {
     try {
         const role = req.user.position;
         if (role !== 'Admin' && role !== 'SKS') {
@@ -2435,7 +2901,7 @@ async function getOrCreateKkSubmission(pool, cycleID, barangayID) {
 }
 
 // CP4-1: Upload
-router.post('/kk-assembly/upload', authMiddleware, uploadFieldsKk, async (req, res) => {
+router.post('/kk-assembly/upload', authMiddleware, uploadFieldsKk, validateImageSizes, async (req, res) => {
     try {
         const role = req.user.position;
         if (role !== 'Admin' && role !== 'SKS') return res.status(403).json({ success: false, message: 'Access denied. Only SKS can upload.' });
@@ -2653,7 +3119,7 @@ router.post('/kk-assembly/request-revision', authMiddleware, async (req, res) =>
 });
 
 // CP4-4: Replace Annex
-router.patch('/kk-assembly/replace-annex', authMiddleware, uploadFieldsKk, async (req, res) => {
+router.patch('/kk-assembly/replace-annex', authMiddleware, uploadFieldsKk, validateImageSizes, async (req, res) => {
     try {
         const role = req.user.position;
         if (role !== 'Admin' && role !== 'SKS') return res.status(403).json({ success: false, message: 'Access denied.' });

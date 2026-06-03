@@ -3,6 +3,7 @@ import { Box, Typography, TextField, Button, Paper, Divider, IconButton, Tooltip
 import { PushPin, NoteAlt, Menu as MenuIcon } from '@mui/icons-material';
 import axiosInstance from '../../../backend connection/axiosConfig';
 import { formatRoleName } from '../../../utils/roleUtils';
+import { toastError } from '../../../utils/ProjectCycleToast';
 
 interface NoteItem {
     noteID: number;
@@ -81,6 +82,7 @@ const ProjectWorkNotes: React.FC<ProjectWorkNotesProps> = ({ project, onPostNote
             onPostNote?.(newNote);
         } catch (err) {
             console.error('Failed to post note:', err);
+            toastError('Failed to post note. Please try again.');
         } finally {
             setIsPosting(false);
         }

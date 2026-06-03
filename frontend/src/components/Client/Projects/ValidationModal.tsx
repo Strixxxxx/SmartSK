@@ -160,7 +160,7 @@ const ValidationModal: React.FC<ValidationModalProps> = ({
                                         variant="caption" 
                                         sx={{ position: 'absolute', bottom: 16, bgcolor: 'rgba(0, 0, 0, 0.6)', color: 'white', px: 2, py: 0.5, borderRadius: 4 }}
                                     >
-                                        {currentImageIndex + 1} of {campaignProofUrls.length}
+                                        Attempt {campaignProofUrls[currentImageIndex].match(/\/Campaign_Proof\/(\d+)\//i)?.[1] || '?'} - Image {currentImageIndex + 1} of {campaignProofUrls.length}
                                     </Typography>
                                 </Box>
                             )}

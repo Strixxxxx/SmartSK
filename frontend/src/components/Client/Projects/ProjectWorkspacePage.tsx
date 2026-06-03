@@ -14,6 +14,7 @@ import ProjectTableSkeleton from './ProjectTableSkeleton';
 import { useAuth } from '../../../context/AuthContext';
 import { useCollaborationSocket } from '../../../hooks/useCollaborationSocket';
 import axiosInstance from '../../../backend connection/axiosConfig';
+import { toastError, showMilestoneToast } from '../../../utils/ProjectCycleToast';
 import styles from './ProfilingPortal.module.css';
 import AnnexViewingModal from './AnnexViewingModal';
 import CampaignProofUploadModal from './CampaignProofUploadModal';
@@ -54,13 +55,34 @@ const DropZone: React.FC<DropZoneProps> = ({ label, accept, multiple, file, onFi
     const [dragging, setDragging] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
+    const filterFiles = (files: File[]) => {
+        const validFiles: File[] = [];
+        const invalidFiles: string[] = [];
+
+        files.forEach(file => {
+            if (file.type.startsWith('image/') && file.size > 2 * 1024 * 1024) {
+                invalidFiles.push(file.name);
+            } else {
+                validFiles.push(file);
+            }
+        });
+
+        if (invalidFiles.length > 0) {
+            toastError(`File size limit exceeded (2MB per image) for: ${invalidFiles.join(', ')}`);
+        }
+
+        if (validFiles.length > 0) {
+            if (multiple) onFile(validFiles);
+            else onFile(validFiles[0]);
+        }
+    };
+
     const handleDrop = (e: DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         setDragging(false);
         const files = Array.from(e.dataTransfer.files);
         if (!files.length) return;
-        if (multiple) onFile(files);
-        else onFile(files[0]);
+        filterFiles(files);
     };
 
     const hasFile = multiple ? (Array.isArray(file) && file.length > 0) : !!file;
@@ -88,8 +110,7 @@ const DropZone: React.FC<DropZoneProps> = ({ label, accept, multiple, file, onFi
                 onChange={(e) => {
                     const files = Array.from(e.target.files || []);
                     if (!files.length) return;
-                    if (multiple) onFile(files);
-                    else onFile(files[0]);
+                    filterFiles(files);
                     e.target.value = '';
                 }}
             />
@@ -283,7 +304,7 @@ const ProfilingPortal: React.FC<ProfilingPortalProps> = ({ project, user }) => {
             if (res.data.success) {
                 setSubmissionStatus('CHECKPOINT_1_COMPLETE');
                 setRevisionComment(null);
-                setSnackbar({ open: true, message: 'Checkpoint 1 approved. Youth profiling is complete. Analytics computing in the background.', severity: 'success' });
+                showMilestoneToast(2, user?.position || user?.role || '', project?.projName || 'Project Cycle');
                 await fetchSubmissionDetails();
             } else {
                 setSnackbar({ open: true, message: res.data.message || 'Approval failed.', severity: 'error' });
@@ -1385,6 +1406,7 @@ function getAgendaColumnMap(tabName: string): string {
             setAuditRefreshTrigger(prev => prev + 1);
         } catch (err) {
             console.error('Failed to save finalized cell:', err);
+            toastError('Failed to save cell edit. Please try again.');
         }
     }, [selectedProject?.batchID, projType, activeTab]);
 
@@ -1428,6 +1450,7 @@ function getAgendaColumnMap(tabName: string): string {
             setAuditRefreshTrigger(prev => prev + 1);
         } catch (err) {
             console.error('Failed to add row:', err);
+            toastError('Failed to add row. Please try again.');
         }
     }, [selectedProject?.batchID, activeTab, projType, rows]);
 
@@ -1483,6 +1506,7 @@ function getAgendaColumnMap(tabName: string): string {
                 setAuditRefreshTrigger(prev => prev + 1);
             } catch (err) {
                 console.error('Failed to delete row:', err);
+                toastError('Failed to delete row. Please try again.');
             } finally {
                 setDeleteConfirmation({ open: false });
             }
@@ -1551,8 +1575,8 @@ function getAgendaColumnMap(tabName: string): string {
                 setAiSnackbar({
                     open: true,
                     message: verdictAction === 'approve'
-                        ? '✅ Project endorsed! Advancing to Checkpoint 5: QCYDO Validation.'
-                        : '📝 Revisions requested. Project returned to Checkpoint 2.',
+                        ? '✅ Project endorsed! Advancing to Checkpoint 8: QCYDO Review.'
+                        : '📝 Revisions requested. Project remains at Checkpoint 7 pending updates.',
                     severity: 'success'
                 });
                 // Redirect BCPT to dashboard after a short delay
@@ -1594,6 +1618,7 @@ function getAgendaColumnMap(tabName: string): string {
                 } else {
                     console.log(`[Update-Status-DEBUG] aiTriggered was false. Toast not shown.`);
                 }
+                showMilestoneToast(statusID, user?.position || user?.role || '', selectedProject.projName);
             }
         } catch (err: any) {
             console.error('Failed to update status:', err);
@@ -1630,6 +1655,7 @@ function getAgendaColumnMap(tabName: string): string {
             setAuditRefreshTrigger(prev => prev + 1);
         } catch (err) {
             console.error('Failed to update agenda statement:', err);
+            toastError('Failed to update agenda statement. Please try again.');
         }
     };
 
