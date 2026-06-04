@@ -82,14 +82,6 @@ const ClientSidebar: React.FC<SidebarProps> = ({
                   Projects
                 </Link>
               </li>
-              
-              {user?.role === 'SKC' && (
-                <li className={isActive('/access-control') ? 'active' : ''}>
-                  <Link to="/access-control" title="Access Control">
-                    Access Control
-                  </Link>
-                </li>
-              )}
 
               <li className={isActive('/predictive-analytics') ? 'active' : ''}>
                 <Link to="/predictive-analytics" title="Predictive Project Analysis">
