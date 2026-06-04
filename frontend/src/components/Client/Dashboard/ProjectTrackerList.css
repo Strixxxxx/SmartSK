@@ -408,6 +408,16 @@
     transform: translateY(0);
 }
 
+.ptl-docs-btn--blue {
+    color: #ffffff !important;
+    background-color: #1e3a8a !important;
+    border: 1px solid #1e3a8a !important;
+}
+
+.ptl-docs-btn--blue:hover {
+    background-color: #1e40af !important;
+}
+
 /* ── Empty / Loading States ─────────────────────────────── */
 .ptl-empty {
     display: flex;

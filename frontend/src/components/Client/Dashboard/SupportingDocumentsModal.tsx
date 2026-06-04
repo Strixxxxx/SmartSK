@@ -8,15 +8,17 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import axios from '../../../backend connection/axiosConfig';
 import { useAuth } from '../../../context/AuthContext';
-import { toastSuccess, toastError, showMilestoneToast } from '../../../utils/ProjectCycleToast';
+import { toastSuccess, toastError } from '../../../utils/ProjectCycleToast';
 import styles from './SupportingDocumentsModal.module.css';
 
 interface SupportingDocumentsModalProps {
     open: boolean;
     onClose: () => void;
     batchID: number;
+    cycleID?: number;
     projName: string;
     onStatusChange?: () => void;
+    isAssignedKagawad?: boolean;
 }
 
 type CategoryType = 'PPMP_or_APP' | 'Activity_Design' | 'SK_Resolution' | 'LYDP' | 'KK_Minutes' | 'EstIncomeCert' | 'IncomeCert' | 'KK_Attendance' | 'KK_Photo_Doc' | 'YP_Notice_Letter' | 'YP_Campaign_Proof' | 'YP_Master_Dataset' | 'QCYDO_Review_Doc' | 'QC_SK_Fed_Review_Doc' | 'City_Budget_Review_Doc' | 'City_Council_Hearing_Doc' | 'Procurement_Doc' | 'SK_Session_Docs';
@@ -43,7 +45,7 @@ const CATEGORY_LABELS: Record<string, string> = {
     'SK_Resolution': 'SK Resolution',
     'LYDP': 'LYDP',
     'KK_Minutes': 'KK Minutes',
-    'EstIncomeCert': 'Cert of Estimated Income',
+    'EstIncomeCert': 'Cert of SK Funds Allocation',
     'IncomeCert': 'Cert of Income from Barangay',
     'KK_Attendance': 'KK Attendance',
     'KK_Photo_Doc': 'Photo Documentation',
@@ -58,7 +60,7 @@ const CATEGORY_LABELS: Record<string, string> = {
     'SK_Session_Docs': 'Session Documents'
 };
 
-const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ open, onClose, batchID, projName, onStatusChange }) => {
+const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ open, onClose, batchID, cycleID, projName, onStatusChange, isAssignedKagawad }) => {
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
     const [docData, setDocData] = useState<ProjectDocumentsResponse | null>(null);
@@ -158,8 +160,8 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
             }
             setConfirmUploadOpen(true);
         } else if (selectedCategory === 'SK_Resolution') {
-            if (user?.position !== 'SKC') {
-                toastError('Only the SK Chairperson can upload the SK Resolution.');
+            if (!isAssignedKagawad) {
+                toastError('Only the assigned SK Kagawad can upload the SK Resolution.');
                 setSelectedFileForUpload(null);
                 if (fileInputRef.current) fileInputRef.current.value = '';
                 return;
@@ -200,11 +202,21 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
         const newFileName = `${baseName}_${timestamp}${extension}`;
         
         const fileToUpload = new File([selectedFileForUpload], newFileName, { type: selectedFileForUpload.type });
-        formData.append('document', fileToUpload);
+        
+        let endpoint = `/api/project-documents/${batchID}/upload`;
+        
+        if (selectedCategory === 'SK_Resolution') {
+            endpoint = `/api/project-tracker/sk-resolution/upload`;
+            formData.append('sk_resolution', fileToUpload);
+            formData.append('cycleID', cycleID?.toString() || '');
+        } else {
+            formData.append('document', fileToUpload);
+        }
+        
         formData.append('category', selectedCategory);
 
         try {
-            const res = await axios.post(`/api/project-documents/${batchID}/upload`, formData, {
+            const res = await axios.post(endpoint, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
             if (res.data.success) {
@@ -212,20 +224,6 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
                 if (onStatusChange) onStatusChange();
                 setSelectedFileForUpload(null);
                 if (fileInputRef.current) fileInputRef.current.value = '';
-
-                if (selectedCategory === 'SK_Resolution' && docData?.currentStatusID === 6) {
-                    try {
-                        await axios.post('/api/project-batch/update-status', {
-                            batchID: batchID,
-                            statusID: 7,
-                        });
-                        showMilestoneToast(7, user?.position || user?.role || '', projName);
-                        if (onStatusChange) onStatusChange();
-                    } catch (error) {
-                        console.error('Failed to advance to Checkpoint 7:', error);
-                        toastError('Uploaded SK Resolution successfully, but failed to auto-advance to Checkpoint 7.');
-                    }
-                }
             }
         } catch (error: any) {
             toastError(error.response?.data?.message || 'Failed to upload document.');
@@ -412,13 +410,19 @@ const SupportingDocumentsModal: React.FC<SupportingDocumentsModalProps> = ({ ope
     ];
 
     const canUpload = () => {
-        if (!selectedCategory || isBcpt || !hasDocsControl) return false;
+        if (!selectedCategory || isBcpt) return false;
         if (READ_ONLY_CATEGORIES.includes(selectedCategory)) return false;
         
         const statusID = docData?.currentStatusID || 0;
+
+        if (selectedCategory === 'SK_Resolution') {
+            return statusID === 6 && !!isAssignedKagawad;
+        }
+
+        if (!hasDocsControl) return false;
+
         if (selectedCategory === 'LYDP') return statusID === 2;
         if (selectedCategory === 'EstIncomeCert' || selectedCategory === 'IncomeCert') return statusID === 5;
-        if (selectedCategory === 'SK_Resolution') return statusID === 6;
         if (selectedCategory === 'QCYDO_Review_Doc') return statusID === 8;
         if (selectedCategory === 'QC_SK_Fed_Review_Doc') return statusID === 9;
         if (selectedCategory === 'City_Budget_Review_Doc') return statusID === 10;

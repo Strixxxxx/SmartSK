@@ -3239,4 +3239,275 @@ router.get('/kk-assembly/submission/:cycleID', authMiddleware, async (req, res) 
     }
 });
 
+// --- Checkpoint 6 SK Resolution (Proponent Delegation) ---
+
+// 1. GET SK Kagawads for assignment
+router.get('/sk-kagawads/:cycleID', authMiddleware, async (req, res) => {
+    try {
+        const { cycleID } = req.params;
+        const { barangay: barangayID } = req.user;
+
+        const pool = await getConnection();
+        
+        // Find termID for this cycle
+        const cycleRes = await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .query(`SELECT termID FROM projectCycles WHERE cycleID = @cycleID`);
+            
+        if (!cycleRes.recordset.length) {
+            return res.status(404).json({ success: false, message: 'Project cycle not found.' });
+        }
+        
+        const termID = cycleRes.recordset[0].termID;
+
+        // Fetch SK Kagawads for this term and barangay
+        const kagawadsRes = await pool.request()
+            .input('termID', sql.Int, termID)
+            .input('barangayID', sql.Int, barangayID)
+            .query(`
+                SELECT u.userID, u.fullName, r.roleName AS position
+                FROM userInfo u
+                JOIN roles r ON u.position = r.roleID
+                WHERE u.termID = @termID AND u.barangay = @barangayID AND r.roleName LIKE 'SKK%'
+            `);
+        const kagawads = kagawadsRes.recordset.map(row => {
+            let positionName = row.position;
+            if (positionName && positionName.startsWith('SKK')) {
+                const number = positionName.replace('SKK', '');
+                positionName = `SK Kagawad ${number}`.trim();
+            }
+            return {
+                ...row,
+                fullName: decrypt(row.fullName) || row.fullName,
+                position: positionName
+            };
+        });
+            
+        res.json({ success: true, data: kagawads });
+    } catch (err) {
+        console.error('[projectTracker] GET /sk-kagawads error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch SK Kagawads.' });
+    }
+});
+
+// 2. POST Assign Proponent
+router.post('/sk-resolution/assign-proponent', authMiddleware, async (req, res) => {
+    try {
+        const role = req.user.position;
+        if (role !== 'Admin' && role !== 'SKC') {
+            return res.status(403).json({ success: false, message: 'Access denied. Only SK Chairperson can assign a proponent.' });
+        }
+
+        const { cycleID, assignedUserID } = req.body;
+        const { userID, barangay: barangayID } = req.user;
+
+        if (!cycleID || !assignedUserID) {
+            return res.status(400).json({ success: false, message: 'cycleID and assignedUserID are required.' });
+        }
+
+        const pool = await getConnection();
+
+        // Ensure no assignment exists yet
+        const existingRes = await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .query(`SELECT proponentID FROM sk_resolution_proponent WHERE cycleID = @cycleID`);
+            
+        if (existingRes.recordset.length > 0) {
+            return res.status(400).json({ success: false, message: 'A proponent is already assigned to this cycle.' });
+        }
+
+        // Insert assignment
+        await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .input('barangayID', sql.Int, barangayID)
+            .input('assignedUserID', sql.Int, assignedUserID)
+            .input('assignedBy', sql.Int, userID)
+            .query(`
+                INSERT INTO sk_resolution_proponent (cycleID, barangayID, assignedUserID, assignedBy, status)
+                VALUES (@cycleID, @barangayID, @assignedUserID, @assignedBy, 'PENDING')
+            `);
+
+        // Send a notification to the assigned Kagawad and others
+        await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .input('barangayID', sql.Int, barangayID)
+            .query(`
+                INSERT INTO projectNotifications (cycleID, barangayID, notifType, message)
+                VALUES (@cycleID, @barangayID, 'SYSTEM', 'A proponent has been assigned for the SK Resolution (Checkpoint 6).')
+            `);
+
+        broadcast({ type: 'new_notification', barangayID });
+        broadcastToRoom(cycleID.toString(), { type: 'checkpoint_updated', statusID: 6 });
+
+        res.json({ success: true, message: 'Proponent assigned successfully.' });
+    } catch (err) {
+        console.error('[projectTracker] POST /sk-resolution/assign-proponent error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to assign proponent.' });
+    }
+});
+
+// 3. GET Proponent Details
+router.get('/sk-resolution/proponent/:cycleID', authMiddleware, async (req, res) => {
+    try {
+        const { cycleID } = req.params;
+        const pool = await getConnection();
+
+        const proponentRes = await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .query(`
+                SELECT p.*, u.fullName, r.roleName AS position
+                FROM sk_resolution_proponent p
+                JOIN userInfo u ON p.assignedUserID = u.userID
+                JOIN roles r ON u.position = r.roleID
+                WHERE p.cycleID = @cycleID
+            `);
+
+        if (!proponentRes.recordset.length) {
+            return res.json({ success: true, data: null });
+        }
+
+        let data = proponentRes.recordset[0];
+        data.attemptCount = data.attemptCount || 1;
+        if (data.position && data.position.startsWith('SKK')) {
+            const number = data.position.replace('SKK', '');
+            data.position = `SK Kagawad ${number}`.trim();
+        }
+        data.fullName = decrypt(data.fullName) || data.fullName;
+
+        if (data.blobName) {
+            data.fileUrl = await generateSasUrl(docContainerName, data.blobName).catch(()=>null);
+        }
+
+        res.json({ success: true, data });
+    } catch (err) {
+        console.error('[projectTracker] GET /sk-resolution/proponent error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch proponent details.' });
+    }
+});
+
+const uploadResolutionField = upload.single('sk_resolution');
+
+// 4. POST Upload SK Resolution (By Assigned Kagawad)
+router.post('/sk-resolution/upload', authMiddleware, uploadResolutionField, async (req, res) => {
+    try {
+        const { cycleID } = req.body;
+        const { userID, barangay: barangayID } = req.user;
+
+        if (!cycleID) return res.status(400).json({ success: false, message: 'cycleID required.' });
+        if (!req.file) return res.status(400).json({ success: false, message: 'File required.' });
+
+        const pool = await getConnection();
+
+        // Verify assignment
+        const checkRes = await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .query(`SELECT proponentID, assignedUserID, blobName, status, ISNULL(attemptCount, 1) as attemptCount FROM sk_resolution_proponent WHERE cycleID = @cycleID`);
+            
+        if (!checkRes.recordset.length) {
+            return res.status(404).json({ success: false, message: 'Proponent assignment not found.' });
+        }
+
+        const proponent = checkRes.recordset[0];
+
+        // Ensure user is the assigned kagawad
+        if (proponent.assignedUserID !== userID) {
+            return res.status(403).json({ success: false, message: 'Access denied. You are not the assigned proponent.' });
+        }
+
+        let currentAttempt = proponent.attemptCount;
+
+        if (proponent.status === 'REVISION_REQUESTED') {
+            currentAttempt += 1; // Increment attempt on new revision
+        } else {
+            // Overwriting current attempt
+            if (proponent.blobName) {
+                await deleteBlob(docContainerName, proponent.blobName).catch(console.error);
+            }
+        }
+
+        const safe = req.file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const ts = Date.now();
+        const blobName = `ABYIP/SK_Resolution/${barangayID}/${cycleID}/${currentAttempt}/${ts}-${safe}`;
+
+        await uploadBlob(docContainerName, blobName, req.file.buffer, req.file.mimetype);
+
+        await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .input('blobName', sql.NVarChar(500), blobName)
+            .input('attemptCount', sql.Int, currentAttempt)
+            .query(`
+                UPDATE sk_resolution_proponent 
+                SET blobName = @blobName, status = 'SUBMITTED', revisionComment = NULL, attemptCount = @attemptCount
+                WHERE cycleID = @cycleID
+            `);
+
+        broadcastToRoom(cycleID.toString(), { type: 'checkpoint_updated', statusID: 6 });
+
+        res.json({ success: true, message: 'SK Resolution uploaded successfully. Awaiting validation.' });
+    } catch (err) {
+        console.error('[projectTracker] POST /sk-resolution/upload error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to upload resolution.' });
+    }
+});
+
+// 5. POST Validate SK Resolution (By SK Chairperson)
+router.post('/sk-resolution/validate', authMiddleware, async (req, res) => {
+    try {
+        const role = req.user.position;
+        if (role !== 'Admin' && role !== 'SKC') {
+            return res.status(403).json({ success: false, message: 'Access denied. Only SK Chairperson can validate.' });
+        }
+
+        const { cycleID, action, comment } = req.body;
+        const { userID } = req.user;
+
+        if (!cycleID || !action) return res.status(400).json({ success: false, message: 'cycleID and action are required.' });
+        
+        if (action === 'reject' && (!comment || !comment.trim())) {
+            return res.status(400).json({ success: false, message: 'Comment is required for revision.' });
+        }
+
+        const pool = await getConnection();
+
+        const checkRes = await pool.request()
+            .input('cycleID', sql.Int, cycleID)
+            .query(`SELECT status FROM sk_resolution_proponent WHERE cycleID = @cycleID`);
+
+        if (!checkRes.recordset.length) return res.status(404).json({ success: false, message: 'Assignment not found.' });
+
+        if (action === 'approve') {
+            await pool.request()
+                .input('cycleID', sql.Int, cycleID)
+                .query(`UPDATE sk_resolution_proponent SET status = 'VALIDATED', validatedAt = GETDATE() WHERE cycleID = @cycleID`);
+
+            // Advance project cycle to CP7
+            await pool.request()
+                .input('cycleID', sql.Int, cycleID)
+                .query(`UPDATE projectCycles SET currentStatusID = 7, updatedAt = GETDATE() WHERE cycleID = @cycleID`);
+
+            await pool.request()
+                .input('cycleID', sql.Int, cycleID)
+                .input('updatedBy', sql.Int, userID)
+                .query(`INSERT INTO projectTracker (cycleID, statusID, updatedBy) VALUES (@cycleID, 7, @updatedBy)`);
+
+            broadcastToRoom(cycleID.toString(), { type: 'checkpoint_updated', statusID: 7 });
+            res.json({ success: true, message: 'SK Resolution approved. Advanced to Checkpoint 7.' });
+        } else if (action === 'reject') {
+            await pool.request()
+                .input('cycleID', sql.Int, cycleID)
+                .input('comment', sql.NVarChar(sql.MAX), comment.trim())
+                .query(`UPDATE sk_resolution_proponent SET status = 'REVISION_REQUESTED', revisionComment = @comment WHERE cycleID = @cycleID`);
+
+            broadcastToRoom(cycleID.toString(), { type: 'checkpoint_updated', statusID: 6 });
+            res.json({ success: true, message: 'Revision requested.' });
+        } else {
+            res.status(400).json({ success: false, message: 'Invalid action.' });
+        }
+
+    } catch (err) {
+        console.error('[projectTracker] POST /sk-resolution/validate error:', err.message);
+        res.status(500).json({ success: false, message: 'Failed to validate resolution.' });
+    }
+});
+
 module.exports = router;

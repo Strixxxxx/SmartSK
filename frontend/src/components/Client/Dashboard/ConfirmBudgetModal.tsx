@@ -219,13 +219,13 @@ const ConfirmBudgetModal: React.FC<ConfirmBudgetModalProps> = ({
             >
                 <DialogTitle>Confirm Allocation</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
+                    <Box sx={{ color: 'text.secondary', fontSize: '1rem' }}>
                         Is this the correct certified SK fund allocation?
                         <br /><br />
                         <Typography variant="h6" color="primary" sx={{ textAlign: 'center', fontWeight: 'bold' }}>
                             ₱{parseFloat(budgetInput.replace(/,/g, '') || '0').toLocaleString()}
                         </Typography>
-                    </DialogContentText>
+                    </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setConfirmationModalOpen(false)} color="inherit" disabled={isSaving}>

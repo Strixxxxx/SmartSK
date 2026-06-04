@@ -71,7 +71,7 @@ router.get('/:batchID', authMiddleware, async (req, res) => {
         for (const category of categories) {
             let blobs = [];
 
-            const useNewStructure = ['LYDP', 'EstIncomeCert', 'IncomeCert', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset', 'QCYDO_Review_Doc', 'QC_SK_Fed_Review_Doc', 'City_Budget_Review_Doc', 'City_Council_Hearing_Doc', 'Procurement_Doc', 'SK_Session_Docs'].includes(category);
+            const useNewStructure = ['LYDP', 'EstIncomeCert', 'IncomeCert', 'KK_Minutes', 'KK_Attendance', 'KK_Photo_Doc', 'YP_Notice_Letter', 'YP_Campaign_Proof', 'YP_Master_Dataset', 'QCYDO_Review_Doc', 'QC_SK_Fed_Review_Doc', 'City_Budget_Review_Doc', 'City_Council_Hearing_Doc', 'Procurement_Doc', 'SK_Session_Docs', 'SK_Resolution'].includes(category);
             
             // Primary Check: New brgyID/cycleID structure
             if (useNewStructure) {

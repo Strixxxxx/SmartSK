@@ -38,6 +38,9 @@ import Checkpoint3to4 from './checkpoint3to4';
 import SessionValidationModal from './SessionValidationModal';
 import CheckpointValidationModal from './CheckpointValidationModal';
 import RescheduleModal from './RescheduleModal';
+import AssignProponentModal from '../Projects/AssignProponentModal';
+import SkResolutionUploadModal from '../Projects/SkResolutionUploadModal';
+import SkResolutionValidationModal from '../Projects/SkResolutionValidationModal';
 import './ProjectTrackerList.css';
 
 interface ProjectBatch {
@@ -126,6 +129,13 @@ const ProjectTrackerList: React.FC = () => {
     const [budgetValidationDocUrl, setBudgetValidationDocUrl] = useState<string | null>(null);
     const [budgetValidationDocType, setBudgetValidationDocType] = useState<'pdf' | 'image' | null>(null);
     const [isLoadingBudgetDoc, setIsLoadingBudgetDoc] = useState(false);
+
+    // CP6 States
+    const [assignProponentModalOpen, setAssignProponentModalOpen] = useState<{ cycleID: number; batchID: number } | null>(null);
+    const [skResolutionUploadModalOpen, setSkResolutionUploadModalOpen] = useState<{ cycleID: number; batchID: number } | null>(null);
+    const [skResolutionValidationModalOpen, setSkResolutionValidationModalOpen] = useState<{ cycleID: number; batchID: number } | null>(null);
+    const [proponents, setProponents] = useState<Record<number, any>>({});
+
     const navigate = useNavigate();
     const { user } = useAuth();
 
@@ -212,6 +222,15 @@ const ProjectTrackerList: React.FC = () => {
                 const abyipBatchID = c.batches?.find(b => b.projType === 'ABYIP')?.batchID;
                 if (primaryBatchID) await refreshBatchDetails(primaryBatchID);
                 if (abyipBatchID && abyipBatchID !== primaryBatchID) await refreshBatchDetails(abyipBatchID);
+                
+                if (c.currentStatusID === 6) {
+                    try {
+                        const propRes = await axios.get(`/api/project-tracker/sk-resolution/proponent/${c.cycleID}`);
+                        if (propRes.data.success) {
+                            setProponents(prev => ({ ...prev, [c.cycleID]: propRes.data.data }));
+                        }
+                    } catch (err) {}
+                }
             }
         };
         if (cycles.length > 0) {
@@ -221,11 +240,20 @@ const ProjectTrackerList: React.FC = () => {
         // Setup background poll interval for active details to reflect attendees and comment updates
         const pollInterval = setInterval(() => {
             const active = cycles.filter(c => c.currentStatusID <= 14);
-            active.forEach(c => {
+            active.forEach(async c => {
                 const primaryBatchID = c.batches?.find(b => b.projType === 'CBYDP')?.batchID || c.batches?.[0]?.batchID;
                 const abyipBatchID = c.batches?.find(b => b.projType === 'ABYIP')?.batchID;
                 if (primaryBatchID) refreshBatchDetails(primaryBatchID);
                 if (abyipBatchID && abyipBatchID !== primaryBatchID) refreshBatchDetails(abyipBatchID);
+                
+                if (c.currentStatusID === 6) {
+                    try {
+                        const propRes = await axios.get(`/api/project-tracker/sk-resolution/proponent/${c.cycleID}`);
+                        if (propRes.data.success) {
+                            setProponents(prev => ({ ...prev, [c.cycleID]: propRes.data.data }));
+                        }
+                    } catch (err) {}
+                }
             });
         }, 5000);
 
@@ -612,7 +640,7 @@ const ProjectTrackerList: React.FC = () => {
                                                 <p className="ptl-info-text">
                                                     Waiting for the SK Chairperson to schedule the official SK Session meeting.
                                                     <br/><br/>
-                                                    <em>Note: The Validate Budget button is available below.</em>
+                                                    <em>Note: The Validate SK Funds button is available below.</em>
                                                 </p>
                                             ) : (
                                                 <>
@@ -947,10 +975,22 @@ const ProjectTrackerList: React.FC = () => {
                                     )}
 
                                     {/* --- Checkpoint 6 Panel: SK Resolution Hint --- */}
-                                    {batch.currentStatusID === 6 && isSkc && (
+                                    {batch.currentStatusID === 6 && (
                                         <div className="ptl-detail-section" style={{ marginTop: '12px', border: '1px dashed #3b82f6', backgroundColor: '#eff6ff', padding: '12px', borderRadius: '8px' }}>
                                             <p className="ptl-form-instruction" style={{ margin: 0, fontSize: '12px', color: '#1e40af', lineHeight: '1.5' }}>
-                                                📄 <strong>Reminder for SK Chairperson:</strong> The ABYIP draft takes time to finalize. Once the SK Resolution is ready and signed, upload it via the <strong>'Support Documents'</strong> button. You do not need to rush — upload it only when it is officially complete.
+                                                📄 {isSkc ? (
+                                                    proponents[batch.cycleID] ? (
+                                                        <><strong>Reminder for SK Chairperson:</strong> You have assigned {proponents[batch.cycleID].firstName} {proponents[batch.cycleID].lastName} as the proponent. Wait for them to upload the SK Resolution, then click <strong>'Validate SK Resolution'</strong>.</>
+                                                    ) : (
+                                                        <><strong>Reminder for SK Chairperson:</strong> The ABYIP draft takes time to finalize. Please assign a proponent who will upload the SK Resolution once it's officially complete.</>
+                                                    )
+                                                ) : (
+                                                    proponents[batch.cycleID]?.assignedUserID === user?.id ? (
+                                                        <><strong>Reminder for SK Kagawad:</strong> You have been assigned as the proponent. Once the SK Resolution is ready and signed, upload it via the <strong>'Upload SK Resolution'</strong> button.</>
+                                                    ) : (
+                                                        <><strong>Reminder:</strong> Waiting for the assigned Kagawad to upload the SK Resolution.</>
+                                                    )
+                                                )}
                                             </p>
                                         </div>
                                     )}
@@ -1025,7 +1065,7 @@ const ProjectTrackerList: React.FC = () => {
                             <div className="ptl-actions-row">
 
                                 {/* ── Supporting Document Button ────────────────── */}
-                                {(hasDocsControl || isBcpt) && batch.currentStatusID >= 2 && (
+                                {((hasDocsControl || isBcpt) && batch.currentStatusID >= 2) || (batch.currentStatusID === 6 && proponents[batch.cycleID]?.assignedUserID === user?.id) ? (
                                     <button
                                         className="ptl-docs-btn"
                                         onClick={(e) => handleOpenDocs(e, batch)}
@@ -1033,10 +1073,43 @@ const ProjectTrackerList: React.FC = () => {
                                         <InsertDriveFileIcon sx={{ fontSize: 16 }} />
                                         Supporting Documents
                                     </button>
+                                ) : null}
+
+                                {/* ── Checkpoint 6 SK Resolution Actions ────────────────── */}
+                                {batch.currentStatusID === 6 && isSkc && !proponents[batch.cycleID] && (
+                                    <button
+                                        className="ptl-docs-btn ptl-docs-btn--blue"
+                                        onClick={(e) => { e.stopPropagation(); setAssignProponentModalOpen({ cycleID: batch.cycleID, batchID: batch.batchID }); }}
+                                    >
+                                        <AssignmentTurnedInIcon sx={{ fontSize: 16 }} />
+                                        Assign Proponent
+                                    </button>
                                 )}
 
-                                {/* ── Validate Checkpoint Button (Checkpoint 6, 8, 9, 10, 11, 12) ── */}
-                                {[6, 8, 9, 10, 11, 12].includes(batch.currentStatusID) && isBcpt && (
+                                {batch.currentStatusID === 6 && isSkc && proponents[batch.cycleID] && proponents[batch.cycleID]?.status === 'SUBMITTED' && (
+                                    <button
+                                        className="ptl-docs-btn"
+                                        style={{ backgroundColor: '#1a73e8', color: '#ffffff', border: 'none' }}
+                                        onClick={(e) => { e.stopPropagation(); setSkResolutionValidationModalOpen({ cycleID: batch.cycleID, batchID: batch.batchID }); }}
+                                    >
+                                        <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
+                                        Validate SK Resolution
+                                    </button>
+                                )}
+                                {batch.currentStatusID === 6 && isSkc && proponents[batch.cycleID] && proponents[batch.cycleID]?.status !== 'SUBMITTED' && (
+                                    <button
+                                        className="ptl-docs-btn"
+                                        style={{ backgroundColor: '#9ca3af', color: '#ffffff', border: 'none', cursor: 'not-allowed' }}
+                                        disabled
+                                        title="Waiting for Kagawad to upload"
+                                    >
+                                        <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
+                                        Validate SK Resolution
+                                    </button>
+                                )}
+
+                                {/* ── Validate Checkpoint Button (Checkpoint 8, 9, 10, 11, 12) ── */}
+                                {[8, 9, 10, 11, 12].includes(batch.currentStatusID) && isBcpt && (
                                     <button
                                         className="ptl-docs-btn"
                                         style={{ backgroundColor: '#1a73e8', color: '#ffffff', border: '1px solid #1a73e8' }}
@@ -1066,7 +1139,7 @@ const ProjectTrackerList: React.FC = () => {
                                         title={abyipBudget <= 0 ? 'Waiting for the SK Chairperson to extract and input the budget from the Supporting Documents.' : 'Validate the Certified SK Fund Allocation'}
                                     >
                                         <CheckCircleOutlineIcon sx={{ fontSize: 16 }} />
-                                        {abyipBudget <= 0 ? 'Waiting for Budget Input' : 'Validate Budget'}
+                                        {abyipBudget <= 0 ? 'Waiting for SK Fund Input' : 'Validate SK Fund Allocation'}
                                     </button>
                                 )}
                             </div>
@@ -1080,11 +1153,13 @@ const ProjectTrackerList: React.FC = () => {
                     open={docModalOpen}
                     onClose={() => setDocModalOpen(false)}
                     batchID={selectedBatchForDocs.batchID}
+                    cycleID={selectedBatchForDocs.cycleID}
                     projName={selectedBatchForDocs.projName}
                     onStatusChange={() => {
                         fetchBatches();
                         refreshBatchDetails(selectedBatchForDocs.batchID);
                     }}
+                    isAssignedKagawad={proponents[selectedBatchForDocs.cycleID]?.assignedUserID === user?.id}
                 />
             )}
 
@@ -1342,6 +1417,42 @@ const ProjectTrackerList: React.FC = () => {
                         </div>
                     </div>
                 </CheckpointModal>
+            )}
+
+            {assignProponentModalOpen && (
+                <AssignProponentModal
+                    open={!!assignProponentModalOpen}
+                    cycleID={assignProponentModalOpen.cycleID}
+                    onClose={() => setAssignProponentModalOpen(null)}
+                    onSuccess={() => {
+                        setAssignProponentModalOpen(null);
+                        fetchBatches();
+                    }}
+                />
+            )}
+
+            {skResolutionUploadModalOpen && (
+                <SkResolutionUploadModal
+                    open={!!skResolutionUploadModalOpen}
+                    cycleID={skResolutionUploadModalOpen.cycleID}
+                    onClose={() => setSkResolutionUploadModalOpen(null)}
+                    onSuccess={() => {
+                        setSkResolutionUploadModalOpen(null);
+                        fetchBatches();
+                    }}
+                />
+            )}
+
+            {skResolutionValidationModalOpen && (
+                <SkResolutionValidationModal
+                    open={!!skResolutionValidationModalOpen}
+                    cycleID={skResolutionValidationModalOpen.cycleID}
+                    onClose={() => setSkResolutionValidationModalOpen(null)}
+                    onSuccess={() => {
+                        setSkResolutionValidationModalOpen(null);
+                        fetchBatches();
+                    }}
+                />
             )}
         </div>
     );

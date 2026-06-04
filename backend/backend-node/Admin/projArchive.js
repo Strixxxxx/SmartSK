@@ -218,6 +218,12 @@ router.delete('/cycles/:cycleID', authMiddleware, async (req, res) => {
             kkProofs.recordset.forEach(row => { if (row.imageBlobName) blobsToDeleteDocContainer.push(row.imageBlobName) });
         }
 
+        // Fetch blobs for SK Resolution
+        const skResBlobsCheck = await pool.request().input('cycleID', sql.Int, cycleID).query(`
+            SELECT blobName FROM sk_resolution_proponent WHERE cycleID = @cycleID
+        `);
+        skResBlobsCheck.recordset.forEach(row => { if (row.blobName) blobsToDeleteDocContainer.push(row.blobName) });
+
         // Delete blobs from project batch container
         for (const blobName of blobNames) {
             try {
@@ -272,7 +278,10 @@ router.delete('/cycles/:cycleID', authMiddleware, async (req, res) => {
                 DELETE FROM kk_general_assembly_submissions WHERE cycleID = @cycleID;
                 DELETE FROM youth_profiling_submissions WHERE cycleID = @cycleID;
                 
-                -- 4. Finally, delete the parent cycle
+                -- 4. Delete SK Resolution proponent tied to the cycle
+                DELETE FROM sk_resolution_proponent WHERE cycleID = @cycleID;
+                
+                -- 5. Finally, delete the parent cycle
                 DELETE FROM projectCycles WHERE cycleID = @cycleID;
             `;
             await reqTx.query(deleteBatchChildren);
