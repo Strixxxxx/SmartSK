@@ -17,6 +17,7 @@ better-profanity
 requests
 fastapi
 uvicorn[standard]
+python-multipart
 
 # Config
 python-dotenv
